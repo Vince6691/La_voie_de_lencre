@@ -232,7 +232,40 @@
   const fontCache = {};
   const off = document.createElement('canvas'); off.width = off.height = 1000;
   const octx = off.getContext('2d');
+  // les kaishu 學 / 学 viennent tous de Make Me a Hanzi (mêmes formes que le tracé trait par trait)
+  const KAI = { kai_xue_trad: 'xue_trad', kai_xue_simp: 'xue_simp' };
+  const kaiCache = {};
   E.drawFontGlyph = function (ctx, key, o) {
+    if (KAI[key]) return drawKai(ctx, KAI[key], o);
+    return drawFont(ctx, key, o);
+  };
+  function drawKai(ctx, key, o) {
+    const D = window.STROKES[key];
+    if (!kaiCache[key]) kaiCache[key] = D.strokes.map((d) => new Path2D(d));
+    const comp = (i) => (D.comp[i] === 'fusion' ? 'hand' : D.comp[i]); // ⺍ = ancien haut (mains + 爻)
+    octx.setTransform(1, 0, 0, 1, 0, 0);
+    octx.clearRect(0, 0, 1000, 1000);
+    kaiCache[key].forEach((p, i) => {
+      const c = comp(i);
+      const a = o.alpha ? o.alpha(c) : 1;
+      const rv = o.reveal ? o.reveal(c) : 1; // 0..1 balayage vertical
+      if (a <= 0 || rv <= 0) return;
+      octx.save();
+      octx.beginPath(); octx.rect(0, 0, 1000, 1000 * rv + 1); octx.clip();
+      octx.scale(1000 / 1024, 1000 / 1024); octx.translate(0, 900); octx.scale(1, -1);
+      octx.globalAlpha = a;
+      octx.fillStyle = o.color(c);
+      octx.fill(p);
+      octx.restore();
+    });
+    ctx.save();
+    // halo discret : le contour du trait doit rester net
+    if (o.glow) { ctx.shadowColor = o.glowColor || 'rgba(255,200,120,0.6)'; ctx.shadowBlur = o.glow * 0.5; }
+    ctx.globalAlpha = o.opacity ?? 1;
+    ctx.drawImage(off, o.x - o.size / 2, o.y - o.size / 2, o.size, o.size);
+    ctx.restore();
+  }
+  function drawFont(ctx, key, o) {
     // tous les contours dans un seul chemin : les contre-formes (boucles) restent évidées
     if (!fontCache[key]) { const all = new Path2D(); window.FONTGLYPHS[key].forEach((c) => all.addPath(new Path2D(c.d))); fontCache[key] = [all]; }
     const paths = fontCache[key];
@@ -267,7 +300,7 @@
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.drawImage(off, o.x - o.size / 2, o.y - o.size / 2, o.size, o.size);
     ctx.restore();
-  };
+  }
 
   // ───────── glyphes historiques réels (window.REALGLYPHS, boîte 400)
   // o : x, y, size, color(c), alpha(c), reveal(c) 0..1 (balayage vertical), opacity, glow, glowColor, carve
@@ -338,7 +371,7 @@
       ctx.save();
       ctx.globalAlpha = a;
       ctx.fillStyle = ctx.strokeStyle = o.color(c);
-      if (o.glow) { ctx.shadowColor = o.glowColor || o.color(c); ctx.shadowBlur = o.glow * 1024 / o.size; }
+      if (o.glow) { ctx.shadowColor = o.glowColor || o.color(c); ctx.shadowBlur = o.glow * 0.5; } // halo discret
       if (p >= 1) ctx.fill(paths[i]);
       else {
         // l'encre suit la médiane du trait, à l'intérieur de son contour
