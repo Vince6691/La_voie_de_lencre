@@ -8,7 +8,7 @@ L = [  # (clip, début, fin, texte) — temps relatifs au clip
     (1, 4.5, None, "Trois mille ans d'histoire, dans un seul mot : apprendre."),
     (2, 0.0, 4.4, "Vers 1250 avant notre ère, à Anyang, capitale des Shang."),
     (2, 4.9, 9.5, "Les devins gravent l'os et l'écaille de tortue. Là naît le signe."),
-    (2, 10.0, 15.0, "Au centre, deux croix : yao. Des baguettes à compter."),
+    (2, 10.0, 15.0, "Au centre, des baguettes croisées : yao. On s'en sert pour compter."),
     (2, 15.5, None, "Dessous, le toit d'un bâtiment. Et de chaque côté… deux mains."),
     (3, 0.0, 2.9, "Puis viennent les Zhou."),
     (3, 2.85, 5.4, "Sur leurs grands vases rituels en bronze, des inscriptions sont coulées dans le métal, à l'intérieur même du vase."),

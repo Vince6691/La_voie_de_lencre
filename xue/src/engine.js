@@ -233,7 +233,8 @@
   const off = document.createElement('canvas'); off.width = off.height = 1000;
   const octx = off.getContext('2d');
   E.drawFontGlyph = function (ctx, key, o) {
-    if (!fontCache[key]) fontCache[key] = window.FONTGLYPHS[key].map((c) => new Path2D(c.d));
+    // tous les contours dans un seul chemin : les contre-formes (boucles) restent évidées
+    if (!fontCache[key]) { const all = new Path2D(); window.FONTGLYPHS[key].forEach((c) => all.addPath(new Path2D(c.d))); fontCache[key] = [all]; }
     const paths = fontCache[key];
     const regions = window.FONT_REGIONS[key];
     octx.setTransform(1, 0, 0, 1, 0, 0);
@@ -266,6 +267,54 @@
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.drawImage(off, o.x - o.size / 2, o.y - o.size / 2, o.size, o.size);
     ctx.restore();
+  };
+
+  // ───────── glyphes historiques réels (window.REALGLYPHS, boîte 400)
+  // o : x, y, size, color(c), alpha(c), reveal(c) 0..1 (balayage vertical), opacity, glow, glowColor, carve
+  const realCache = {};
+  const roff = document.createElement('canvas'); roff.width = roff.height = 1000;
+  const rctx = roff.getContext('2d');
+  E.drawRealGlyph = function (ctx, key, o) {
+    const G = window.REALGLYPHS[key];
+    if (!realCache[key]) realCache[key] = G.paths.map((p) => ({ ...p, P: new Path2D(p.d) }));
+    const paths = realCache[key];
+    const polyPath = (poly) => { const q = new Path2D(); poly.forEach((p, i) => (i ? q.lineTo(p[0], p[1]) : q.moveTo(p[0], p[1]))); q.closePath(); return q; };
+    const paint = (c, P, clip, invert) => {
+      const a = o.alpha ? o.alpha(c) : 1, rv = o.reveal ? o.reveal(c) : 1;
+      if (a <= 0 || rv <= 0) return;
+      rctx.save();
+      if (clip) {
+        if (invert) { const q = new Path2D(); q.rect(-10, -10, 420, 420); q.addPath(clip); rctx.clip(q, 'evenodd'); }
+        else rctx.clip(clip);
+      }
+      rctx.beginPath(); rctx.rect(-10, -10, 420, 420 * rv + 10); rctx.clip();
+      rctx.globalAlpha = a; rctx.fillStyle = o.color(c); rctx.fill(P);
+      rctx.restore();
+    };
+    rctx.setTransform(1, 0, 0, 1, 0, 0); rctx.clearRect(0, 0, 1000, 1000);
+    rctx.setTransform(2.5, 0, 0, 2.5, 0, 0);
+    for (const p of paths) {
+      if (!p.cut.length) { paint(p.c, p.P); continue; }
+      let rest = null;
+      for (const cut of p.cut) {
+        const q = polyPath(cut.poly);
+        paint(cut.c, p.P, q, false);
+        rest = rest || new Path2D(); rest.addPath(q);
+      }
+      paint(p.c, p.P, rest, true);
+    }
+    ctx.save();
+    const x0 = o.x - o.size / 2, y0 = o.y - o.size / 2;
+    ctx.globalAlpha = o.opacity ?? 1;
+    if (o.carve) { ctx.save(); ctx.globalAlpha *= 0.5; ctx.filter = 'brightness(3.5)'; ctx.drawImage(roff, x0 + o.size * 0.004, y0 + o.size * 0.005, o.size, o.size); ctx.restore(); }
+    if (o.glow) { ctx.shadowColor = o.glowColor || 'rgba(255,200,120,0.6)'; ctx.shadowBlur = o.glow; }
+    ctx.drawImage(roff, x0, y0, o.size, o.size);
+    ctx.restore();
+  };
+  // centre d'une composante, en coordonnées écran
+  E.realCenter = (key, c, o) => {
+    const p = window.REALGLYPHS[key].centers[c] || [200, 200];
+    return [o.x - o.size / 2 + (p[0] / 400) * o.size, o.y - o.size / 2 + (p[1] / 400) * o.size];
   };
 
   // ───────── caractère tracé trait par trait, dans l'ordre réel (window.STROKES)

@@ -38,6 +38,7 @@ data = {
   'kai_xue_trad': contours('assets/fonts/LXGWWenKaiTC-Bold.ttf', '學'),
   'kai_xue_simp': contours('assets/fonts/LXGWWenKaiTC-Bold.ttf', '学'),
   'song_xue_simp': contours('assets/fonts/NotoSerifTC-Bold.otf', '学'),
+  'cao_xue_simp': contours('assets/fonts/LiuJianMaoCao-Regular.ttf', '学'),
 }
 for k, v in data.items():
     print(k, len(v)); [print('  ', i, c['bb']) for i, c in enumerate(v)]

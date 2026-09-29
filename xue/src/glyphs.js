@@ -124,6 +124,13 @@
       roof: [[0, 0], [1000, 0], [1000, 1000], [0, 1000]],
     },
   };
+  // cursive (police Liu Jian Mao Cao) : le haut ⺍ et le toit se fondent en un seul geste
+  window.FONT_REGIONS.cao_xue_simp = {
+    yao: [[400, 30], [820, 30], [820, 205], [400, 205]],
+    hand: [[200, 140], [385, 140], [385, 330], [200, 330]],
+    child: [[0, 350], [1000, 350], [1000, 1000], [0, 1000]],
+    roof: [[0, 0], [1000, 0], [1000, 1000], [0, 1000]],
+  };
   // ordre de priorité : la première région qui contient le point gagne
   window.FONT_REGION_ORDER = ['yao', 'hand', 'child', 'roof'];
 })();

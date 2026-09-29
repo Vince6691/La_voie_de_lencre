@@ -53,10 +53,9 @@ const inscription = () => {
     g.beginPath(); g.arc(rnd() * 1024, rnd() * 1024, 1 + rnd() * 5, 0, 7); g.fill();
   }
   const E = W().E;
-  const G = E.prepare(W().GLYPHS.bronze);
-  // lèvre claire décalée puis creux sombre : effet de signe coulé en creux
-  E.drawGlyph(g, G, { x: 518, y: 520, size: 700, color: () => 'rgba(190,225,200,0.35)' });
-  E.drawGlyph(g, G, { x: 512, y: 512, size: 700, color: () => '#132019' });
+  // jinwen réel de 學 ; lèvre claire décalée puis creux sombre : effet de signe coulé en creux
+  E.drawRealGlyph(g, 'jinwen', { x: 518, y: 520, size: 760, color: () => 'rgba(190,225,200,0.35)' });
+  E.drawRealGlyph(g, 'jinwen', { x: 512, y: 512, size: 760, color: () => '#132019' });
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
