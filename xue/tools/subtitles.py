@@ -4,14 +4,15 @@ TL = json.loads(open('src/timeline.js').read().split('=', 1)[1].strip().rstrip('
 V = [v['start'] for v in TL['voice']]
 D = [v['dur'] for v in TL['voice']]
 L = [  # (clip, début, fin, texte) — temps relatifs au clip
-    (1, 0.0, 3.0, "Un seul caractère. Trois mille ans d'histoire."),
-    (1, 3.6, None, "Voici comment la Chine a écrit… apprendre."),
+    (1, 0.0, 4.4, "Ce caractère cache deux mains… que plus personne ne voit."),
+    (1, 4.5, None, "Trois mille ans d'histoire, dans un seul mot : apprendre."),
     (2, 0.0, 4.4, "Vers 1250 avant notre ère, à Anyang, capitale des Shang."),
     (2, 4.9, 9.5, "Les devins gravent l'os et l'écaille de tortue. Là naît le signe."),
     (2, 10.0, 15.0, "Au centre, deux croix : yao. Des baguettes à compter."),
     (2, 15.5, None, "Dessous, le toit d'un bâtiment. Et de chaque côté… deux mains."),
     (3, 0.0, 2.9, "Puis viennent les Zhou."),
-    (3, 3.0, 8.4, "Sur le bronze des vases rituels, un nouveau venu se glisse sous le toit : l'enfant."),
+    (3, 2.85, 5.4, "Sur leurs grands vases rituels en bronze, des inscriptions sont coulées dans le métal, à l'intérieur même du vase."),
+    (3, 5.5, 8.4, "Et sous le toit, un nouveau venu se glisse : l'enfant."),
     (3, 9.1, 14.0, "Tout est dit. Des mains transmettent, sous un toit, à un enfant."),
     (3, 14.6, None, "Un vase raconte même qu'un roi fit enseigner le tir à l'arc aux jeunes de la cour… dans la salle d'étude."),
     (4, 0.0, 4.8, "221 avant notre ère. Le premier empereur unifie la Chine."),

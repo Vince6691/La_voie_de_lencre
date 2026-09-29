@@ -35,7 +35,7 @@ export const loadLegacy = (flags: Flags) => {
           document.fonts.add(f);
         }),
       );
-      for (const f of ['timeline.js', 'warp.js', 'fontglyphs.js', 'glyphs.js', 'engine.js', 'scenes.js']) {
+      for (const f of ['timeline.js', 'warp.js', 'geodata.js', 'fontglyphs.js', 'strokes.js', 'glyphs.js', 'engine.js', 'scenes.js']) {
         await loadScript(staticFile(`legacy/${f}`));
       }
     })();

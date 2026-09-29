@@ -43,15 +43,23 @@ police LXGW WenKai TC (contours extraits par `tools/extract_glyphs.py`).
 ## Version Remotion (`remotion/`)
 
 Proposition enrichie, rendue avec [Remotion](https://www.remotion.dev) → `rendu/xue_remotion.mp4`,
-voix « François Louis – Deep, Warm and Poised » (`eleven_v4`, `assets/voice_fl/`).
+voix « Chuck Miller – Deep, Raspy, American » (`eleven_v4`, sans balises d'emphase, `assets/voice_cm/`).
 
 - Le moteur Canvas 2D ci-dessous sert de couche de base, piloté image par image par Remotion.
 - **3D (Three.js / `@remotion/three`)** : carapace de tortue bombée dont la texture (craquelures,
   lueur du feu) est dessinée à chaque image, puis plongée caméra jusqu'au signe ; vase ding en
   bronze patiné (panse tournée, pieds, anses, frise) qui monte dans le cadre en tournant.
 - **Transitions « tache d'encre »** entre scènes (bords organiques via `@remotion/noise`).
-- **Sous-titres animés mot à mot** (horodatage estimé par `tools/captions.py`), masqués quand le
-  texte est déjà à l'écran.
+- **Accroche** : « Ce caractère cache deux mains… que plus personne ne voit » — les mains de 學
+  s'allument puis partent en cendres pour laisser 学.
+- **Kaishu tracé trait par trait dans l'ordre réel** (16 traits pour 學, 8 pour 学), d'après
+  *Make Me a Hanzi* / hanzi-writer-data (Arphic Public License, `assets/strokes/`).
+- **Cartes** : côtes, fleuves, lacs et reliefs Natural Earth (domaine public), frontières des Zhou
+  et de l'empire unifié d'après *historical-basemaps* (GPL-3.0) — `tools/build_geo.py`.
+- **Vase ding 3D** : plan de ~7 s, la caméra monte au-dessus du bord et plonge vers l'inscription
+  coulée au fond du vase.
+- Rythme plus posé : 0,95 s entre répliques, transitions plus longues.
+- Sous-titres animés mot à mot : désactivés par défaut (option `captions`).
 - Voix off posée clip par clip dans la timeline, fond sonore (`out/bed.wav`) séparé.
 - Options dans le Studio (panneau *Props*) : `three`, `captions`, `inkTransitions`.
 

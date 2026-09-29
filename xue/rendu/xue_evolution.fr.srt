@@ -1,99 +1,103 @@
 1
-00:00:00,700 --> 00:00:04,147
-Un seul caractère. Trois mille ans d'histoire.
+00:00:00,700 --> 00:00:05,100
+Ce caractère cache deux mains… que plus personne ne voit.
 
 2
-00:00:04,825 --> 00:00:08,267
-Voici comment la Chine a écrit… apprendre.
+00:00:05,200 --> 00:00:08,990
+Trois mille ans d'histoire, dans un seul mot : apprendre.
 
 3
-00:00:08,617 --> 00:00:13,225
+00:00:09,740 --> 00:00:14,401
 Vers 1250 avant notre ère, à Anyang, capitale des Shang.
 
 4
-00:00:13,702 --> 00:00:18,363
+00:00:14,884 --> 00:00:19,293
 Les devins gravent l'os et l'écaille de tortue. Là naît le signe.
 
 5
-00:00:19,020 --> 00:00:23,032
+00:00:19,863 --> 00:00:23,704
 Au centre, deux croix : yao. Des baguettes à compter.
 
 6
-00:00:23,462 --> 00:00:28,098
+00:00:24,113 --> 00:00:28,600
 Dessous, le toit d'un bâtiment. Et de chaque côté… deux mains.
 
 7
-00:00:28,448 --> 00:00:30,146
+00:00:29,349 --> 00:00:30,929
 Puis viennent les Zhou.
 
 8
-00:00:30,205 --> 00:00:35,483
-Sur le bronze des vases rituels, un nouveau venu se glisse sous le toit : l'enfant.
+00:00:30,799 --> 00:00:37,433
+Sur leurs grands vases rituels en bronze, des inscriptions sont coulées dans le métal, à l'intérieur même du vase.
 
 9
-00:00:36,152 --> 00:00:40,568
-Tout est dit. Des mains transmettent, sous un toit, à un enfant.
+00:00:37,693 --> 00:00:41,339
+Et sous le toit, un nouveau venu se glisse : l'enfant.
 
 10
-00:00:41,045 --> 00:00:47,397
-Un vase raconte même qu'un roi fit enseigner le tir à l'arc aux jeunes de la cour… dans la salle d'étude.
+00:00:41,978 --> 00:00:46,264
+Tout est dit. Des mains transmettent, sous un toit, à un enfant.
 
 11
-00:00:47,746 --> 00:00:52,145
-221 avant notre ère. Le premier empereur unifie la Chine.
+00:00:46,714 --> 00:00:52,767
+Un vase raconte même qu'un roi fit enseigner le tir à l'arc aux jeunes de la cour… dans la salle d'étude.
 
 12
-00:00:52,684 --> 00:00:56,034
-Son ministre, Li Si, unifie l'écriture.
+00:00:53,518 --> 00:00:57,805
+221 avant notre ère. Le premier empereur unifie la Chine.
 
 13
-00:00:56,825 --> 00:01:00,418
-Le petit sceau aligne tout, en parfaite symétrie.
+00:00:58,354 --> 00:01:01,813
+Son ministre, Li Si, unifie l'écriture.
 
 14
-00:01:00,768 --> 00:01:06,363
-Vers l'an 100, le lettré Xu Shen, dans le Shuowen jiezi, l'explique ainsi :
+00:01:02,631 --> 00:01:06,315
+Le petit sceau aligne tout, en parfaite symétrie.
 
 15
-00:01:06,585 --> 00:01:12,958
-apprendre, c'est s'éveiller. Le toit, c'est l'obscurité qui couvre encore l'esprit.
+00:01:07,065 --> 00:01:12,008
+Vers l'an 100, le lettré Xu Shen, dans le Shuowen jiezi, l'explique ainsi :
 
 16
-00:01:13,308 --> 00:01:18,063
-Sous les Han, les scribes accélèrent. Le pinceau aplatit les courbes.
+00:01:12,217 --> 00:01:17,742
+apprendre, c'est s'éveiller. Le toit, c'est l'obscurité qui couvre encore l'esprit.
 
 17
-00:01:18,467 --> 00:01:24,906
-Les deux mains se figent en un bloc qui ressemble à un mortier. Leur sens s'efface.
+00:01:18,492 --> 00:01:22,817
+Sous les Han, les scribes accélèrent. Le pinceau aplatit les courbes.
 
 18
-00:01:25,257 --> 00:01:30,691
-L'écriture régulière fixe enfin la forme. Xué. Seize traits.
+00:01:23,213 --> 00:01:29,224
+Les deux mains se figent en un bloc qui ressemble à un mortier. Leur sens s'efface.
 
 19
-00:01:31,040 --> 00:01:37,388
-Seize traits, c'est long. Dans la cursive, la main pressée réduit le haut à trois petits traits.
+00:01:29,975 --> 00:01:34,999
+L'écriture régulière fixe enfin la forme. Xué. Seize traits.
 
 20
-00:01:37,634 --> 00:01:41,784
-Cette abréviation court déjà dans les livres populaires des Song et des Yuan.
+00:01:35,749 --> 00:01:42,174
+Seize traits, c'est long. Dans la cursive, la main pressée réduit le haut à trois petits traits.
 
 21
-00:01:42,316 --> 00:01:48,120
-Au XXe siècle, le Japon, puis la Chine, l'adoptent officiellement. Huit traits.
+00:01:42,411 --> 00:01:46,484
+Cette abréviation court déjà dans les livres populaires des Song et des Yuan.
 
 22
-00:01:48,471 --> 00:01:52,385
-Les mains se sont effacées. Les baguettes sont devenues trois traits.
+00:01:47,007 --> 00:01:52,527
+Au XXe siècle, le Japon, puis la Chine, l'adoptent officiellement. Huit traits.
 
 23
-00:01:52,686 --> 00:01:55,640
-Mais l'enfant est toujours là, sous le toit.
+00:01:53,277 --> 00:01:57,181
+Les mains se sont effacées. Les baguettes sont devenues trois traits.
 
 24
-00:01:56,271 --> 00:02:02,125
-Depuis trois mille ans, apprendre, c'est recevoir ce que d'autres mains transmettent.
+00:01:57,489 --> 00:02:00,119
+Mais l'enfant est toujours là, sous le toit.
 
 25
-00:02:02,475 --> 00:02:06,810
+00:02:00,677 --> 00:02:05,597
+Depuis trois mille ans, apprendre, c'est recevoir ce que d'autres mains transmettent.
+
+26
+00:02:06,347 --> 00:02:10,491
 Et vous, quel caractère voulez-vous voir renaître ? Dites-le en commentaire.

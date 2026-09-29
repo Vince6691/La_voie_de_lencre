@@ -268,6 +268,60 @@
     ctx.restore();
   };
 
+  // ───────── caractère tracé trait par trait, dans l'ordre réel (window.STROKES)
+  // o : x, y, size, progress (nombre de traits tracés, décimal), color(comp) → css, alpha(comp), glow, tip
+  const strokeCache = {};
+  E.drawStrokes = function (ctx, key, o) {
+    const D = window.STROKES[key];
+    if (!strokeCache[key]) strokeCache[key] = D.strokes.map((d) => new Path2D(d));
+    const paths = strokeCache[key];
+    const prog = o.progress ?? D.strokes.length;
+    ctx.save();
+    ctx.translate(o.x - o.size / 2, o.y - o.size / 2);
+    ctx.scale(o.size / 1024, o.size / 1024);
+    ctx.translate(0, 900); ctx.scale(1, -1);
+    D.strokes.forEach((_, i) => {
+      const p = clamp(prog - i);
+      if (p <= 0) return;
+      const c = D.comp[i];
+      const a = o.alpha ? o.alpha(c) : 1;
+      if (a <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.fillStyle = ctx.strokeStyle = o.color(c);
+      if (o.glow) { ctx.shadowColor = o.glowColor || o.color(c); ctx.shadowBlur = o.glow * 1024 / o.size; }
+      if (p >= 1) ctx.fill(paths[i]);
+      else {
+        // l'encre suit la médiane du trait, à l'intérieur de son contour
+        ctx.clip(paths[i]);
+        const m = D.medians[i];
+        const L = [0];
+        for (let j = 1; j < m.length; j++) L.push(L[j - 1] + Math.hypot(m[j][0] - m[j - 1][0], m[j][1] - m[j - 1][1]));
+        const target = L[L.length - 1] * easeInOut(p);
+        ctx.lineWidth = 150; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(m[0][0], m[0][1]);
+        let tip = m[0];
+        for (let j = 1; j < m.length; j++) {
+          if (L[j] <= target) { ctx.lineTo(m[j][0], m[j][1]); tip = m[j]; continue; }
+          const u = (target - L[j - 1]) / (L[j] - L[j - 1] || 1);
+          tip = [lerp(m[j - 1][0], m[j][0], u), lerp(m[j - 1][1], m[j][1], u)];
+          ctx.lineTo(tip[0], tip[1]);
+          break;
+        }
+        ctx.stroke();
+        ctx.restore(); ctx.save();
+        ctx.translate(0, 0);
+        if (o.tip) {
+          const g = ctx.createRadialGradient(tip[0], tip[1], 0, tip[0], tip[1], 90);
+          g.addColorStop(0, 'rgba(255,240,200,0.9)'); g.addColorStop(1, 'rgba(255,200,120,0)');
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(tip[0], tip[1], 90, 0, 7); ctx.fill();
+        }
+      }
+      ctx.restore();
+    });
+    ctx.restore();
+  };
+
   // ───────── texte
   E.text = function (ctx, str, x, y, o = {}) {
     ctx.save();
@@ -440,7 +494,130 @@
     if (close) ctx.closePath();
   }
   E.geoPath = geoPath;
+  // ───────── carte « vieux parchemin » à partir de Natural Earth (window.GEODATA)
+  const inPoly = (x, y, r) => {
+    let c = false;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      if ((r[i][1] > y) !== (r[j][1] > y) && x < ((r[j][0] - r[i][0]) * (y - r[i][1])) / (r[j][1] - r[i][1]) + r[i][0]) c = !c;
+    }
+    return c;
+  };
+  let reliefMarks = null;
+  function reliefPoints() {
+    if (reliefMarks) return reliefMarks;
+    const rnd = E.rand(42);
+    reliefMarks = [];
+    for (const f of window.GEODATA.relief) {
+      const xs = f.r.map((p) => p[0]), ys = f.r.map((p) => p[1]);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+      const dens = f.k === 'Range/mtn' ? 2.2 : f.k === 'Plateau' ? 0.7 : 1.2;
+      const n = Math.min(900, Math.round((x1 - x0) * (y1 - y0) * dens));
+      for (let i = 0; i < n; i++) {
+        const x = x0 + rnd() * (x1 - x0), y = y0 + rnd() * (y1 - y0);
+        if (inPoly(x, y, f.r)) reliefMarks.push({ k: f.k, p: [x, y], s: 0.6 + rnd() * 0.8 });
+      }
+    }
+    return reliefMarks;
+  }
+  const RIVER_STYLE = {
+    huang: [4.5, '#a86f1c'], yangzi: [4.5, '#2f6484'], huai: [2.2, '#3d6f8a'], han: [2.2, '#3d6f8a'], wei: [2.4, '#3d6f8a'],
+    luo: [1.8, '#3d6f8a'], fen: [1.8, '#3d6f8a'], liao: [2, '#3d6f8a'], xi: [2.4, '#3d6f8a'], gan: [1.8, '#3d6f8a'],
+    xiang: [1.8, '#3d6f8a'], jialing: [1.8, '#3d6f8a'], min: [1.8, '#3d6f8a'],
+  };
+  function landPath(ctx, v) {
+    ctx.beginPath();
+    for (const r of window.GEODATA.land) {
+      r.forEach((p, i) => { const q = E.proj(v, p); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); });
+      ctx.closePath();
+    }
+  }
+  E.landPath = landPath;
+  function drawMapGeo(ctx, t, v, o) {
+    const G = window.GEODATA;
+    // mer d'encre
+    const sea = ctx.createRadialGradient(W / 2, H / 2, 200, W / 2, H / 2, 1300);
+    sea.addColorStop(0, '#1d3036'); sea.addColorStop(1, '#0b1418');
+    ctx.fillStyle = sea; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.strokeStyle = 'rgba(160,200,200,0.05)'; ctx.lineWidth = 1;
+    for (let y = -40; y < H + 40; y += 14) { ctx.beginPath(); for (let x = 0; x <= W; x += 40) ctx.lineTo(x, y + Math.sin(x / 90 + y) * 3); ctx.stroke(); }
+    ctx.restore();
+    // rides côtières gravées
+    ctx.save(); ctx.lineJoin = 'round';
+    [[34, 0.05], [22, 0.07], [12, 0.1]].forEach(([w, a]) => { landPath(ctx, v); ctx.lineWidth = w; ctx.strokeStyle = `rgba(190,215,205,${a})`; ctx.stroke(); });
+    ctx.restore();
+    // terres parchemin
+    ctx.save();
+    landPath(ctx, v);
+    const lg = ctx.createRadialGradient(W * 0.45, H * 0.45, 100, W / 2, H / 2, 1200);
+    lg.addColorStop(0, '#dcc79c'); lg.addColorStop(1, '#a88c5e');
+    ctx.fillStyle = lg; ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 24; ctx.fill('nonzero');
+    ctx.shadowBlur = 0;
+    ctx.clip('nonzero');
+    ctx.globalAlpha = 0.18; ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = ctx.createPattern(grain, 'repeat'); ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    // reliefs : aplats + signes de montagne à l'encre
+    for (const f of G.relief) {
+      geoPath(ctx, v, f.r, true);
+      ctx.fillStyle = f.k === 'Range/mtn' ? 'rgba(92,64,34,0.16)' : f.k === 'Plateau' ? 'rgba(120,88,50,0.10)' : 'rgba(200,160,90,0.18)';
+      ctx.fill();
+    }
+    const px = v.k / 60;
+    ctx.lineWidth = Math.max(1, 1.6 * px); ctx.lineCap = 'round';
+    for (const m of reliefPoints()) {
+      const q = E.proj(v, m.p);
+      if (q[0] < -20 || q[0] > W + 20 || q[1] < -20 || q[1] > H + 20) continue;
+      const s = 9 * m.s * Math.max(0.6, Math.min(2.2, px));
+      if (m.k === 'Desert') { ctx.fillStyle = 'rgba(110,80,40,0.35)'; ctx.fillRect(q[0], q[1], 2, 2); continue; }
+      ctx.strokeStyle = m.k === 'Range/mtn' ? 'rgba(70,45,22,0.55)' : 'rgba(90,62,34,0.3)';
+      ctx.beginPath(); ctx.moveTo(q[0] - s, q[1] + s * 0.55); ctx.lineTo(q[0], q[1] - s * 0.55); ctx.lineTo(q[0] + s, q[1] + s * 0.55); ctx.stroke();
+      if (m.k === 'Range/mtn') { ctx.beginPath(); ctx.moveTo(q[0], q[1] - s * 0.55); ctx.lineTo(q[0] + s * 0.35, q[1] + s * 0.55); ctx.strokeStyle = 'rgba(70,45,22,0.25)'; ctx.stroke(); }
+    }
+    ctx.restore();
+    // côte à l'encre
+    ctx.save(); landPath(ctx, v); ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(52,34,18,0.85)'; ctx.stroke(); ctx.restore();
+    // lacs
+    ctx.save(); ctx.fillStyle = '#4f7c8c'; ctx.strokeStyle = 'rgba(40,30,18,0.7)'; ctx.lineWidth = 1.2;
+    G.lakes.forEach((r) => { geoPath(ctx, v, r, true); ctx.fill(); ctx.stroke(); });
+    ctx.restore();
+    // fleuves, tracés progressivement (o.rivers : 0..1)
+    const u = o.rivers ?? 1;
+    ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const [k, lines] of Object.entries(G.rivers)) {
+      const [w, col] = RIVER_STYLE[k] || [1.6, '#3d6f8a'];
+      const major = k === 'huang' || k === 'yangzi';
+      const uu = major ? u : clamp((u - 0.3) / 0.7);
+      if (uu <= 0) continue;
+      ctx.strokeStyle = col; ctx.lineWidth = w * Math.max(0.7, Math.min(1.6, px));
+      for (const l of lines) { const n = Math.max(2, Math.ceil(l.length * uu)); geoPath(ctx, v, l.slice(0, n)); ctx.stroke(); }
+    }
+    ctx.restore();
+    // graticule
+    ctx.save(); ctx.strokeStyle = 'rgba(40,25,10,0.12)'; ctx.lineWidth = 1; ctx.setLineDash([2, 6]);
+    for (let lon = 70; lon <= 160; lon += 5) { geoPath(ctx, v, [[lon, 0], [lon, 60]]); ctx.stroke(); }
+    for (let lat = 0; lat <= 60; lat += 5) { geoPath(ctx, v, [[60, lat], [170, lat]]); ctx.stroke(); }
+    ctx.restore();
+    if (o.riverLabels) {
+      const a = o.riverLabels;
+      const p1 = E.proj(v, [110.8, 38.6]), p2 = E.proj(v, [111.5, 30.1]);
+      E.text(ctx, '黃河  Fleuve Jaune', p1[0] + 16, p1[1], { font: 'Kai', size: 30, color: '#6e4410', align: 'left', alpha: a, glow: 8, glowColor: 'rgba(240,220,180,0.9)' });
+      E.text(ctx, '長江  Yangzi', p2[0], p2[1] + 30, { font: 'Kai', size: 30, color: '#1f4d66', alpha: a, glow: 8, glowColor: 'rgba(240,220,180,0.9)' });
+    }
+    // rose des vents
+    ctx.save(); ctx.translate(W - 150, H - 170); ctx.globalAlpha = 0.75;
+    ctx.strokeStyle = '#e8d3a6'; ctx.fillStyle = '#e8d3a6'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, 0, 46, 0, 7); ctx.stroke();
+    for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); ctx.beginPath(); ctx.moveTo(0, -62); ctx.lineTo(9, 0); ctx.lineTo(-9, 0); ctx.closePath(); i === 3 ? ctx.fill() : ctx.stroke(); }
+    ctx.restore();
+    E.text(ctx, 'N', W - 150, H - 250, { font: 'Cinzel', weight: 700, size: 26, color: '#e8d3a6', alpha: 0.8 });
+    // cadre
+    ctx.save(); ctx.strokeStyle = 'rgba(232,211,166,0.55)'; ctx.lineWidth = 3; ctx.strokeRect(36, 36, W - 72, H - 72);
+    ctx.lineWidth = 1; ctx.strokeRect(46, 46, W - 92, H - 92); ctx.restore();
+    E.text(ctx, 'Sources : Natural Earth ; historical-basemaps', W - 60, H - 58, { size: 20, weight: 500, align: 'right', color: '#d8c7a0', alpha: 0.55 });
+  }
+
   E.drawMap = function (ctx, t, v, o = {}) {
+    if (window.GEODATA) return drawMapGeo(ctx, t, v, o);
     // mer
     const sea = ctx.createLinearGradient(0, 0, W, H);
     sea.addColorStop(0, '#0d1b22'); sea.addColorStop(1, '#08121a');
@@ -491,11 +668,14 @@
     if (a <= 0) return;
     ctx.save(); ctx.globalAlpha = a;
     // clip sur les terres
-    geoPath(ctx, v, GEO.china, true); ctx.clip();
+    if (window.GEODATA) { landPath(ctx, v); ctx.clip('nonzero'); } else { geoPath(ctx, v, GEO.china, true); ctx.clip(); }
     if (u < 1 && center) {
       const c = E.proj(v, center); ctx.beginPath(); ctx.arc(c[0], c[1], 1800 * easeInOut(u), 0, 7); ctx.clip();
     }
-    geoPath(ctx, v, GEO[key], true);
+    // frontières historiques (historical-basemaps) si disponibles, sinon tracé manuel
+    const hist = window.GEODATA && window.GEODATA.hist[key];
+    ctx.beginPath();
+    (hist || [GEO[key]]).forEach((r) => { r.forEach((p, i) => { const q = E.proj(v, p); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.closePath(); });
     ctx.fillStyle = col; ctx.fill();
     ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,230,190,0.6)'; ctx.setLineDash([10, 8]); ctx.stroke();
     ctx.restore();
@@ -513,6 +693,11 @@
     ctx.beginPath(); ctx.arc(q[0], q[1], 11 * backOut(clamp(a)), 0, 7); ctx.fill();
     ctx.shadowBlur = 0;
     const tx = q[0] + side * 34;
+    // plaque sombre sous l'étiquette : lisible sur le parchemin comme sur la mer
+    ctx.font = '700 46px Cormorant, Kai'; let bw = ctx.measureText(label).width;
+    if (sub) { ctx.font = '600 30px Cormorant, Kai'; bw = Math.max(bw, ctx.measureText(sub).width); }
+    ctx.fillStyle = 'rgba(18,11,6,0.72)';
+    E.roundRect(ctx, side > 0 ? tx - 16 : tx - bw - 16, q[1] - 50, bw + 32, sub ? 106 : 70, 10); ctx.fill();
     E.text(ctx, label, tx, q[1] - 14, { size: 46, weight: 700, align: side > 0 ? 'left' : 'right', color: '#fff3dc', glow: 14 });
     if (sub) E.text(ctx, sub, tx, q[1] + 30, { size: 30, weight: 600, align: side > 0 ? 'left' : 'right', color: '#e7c98f', glow: 12 });
     ctx.restore();

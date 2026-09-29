@@ -1,6 +1,6 @@
 """Calcule la timeline à partir des durées des clips de voix (voice_fast/*.wav)."""
 import json, wave
-LEAD, GAP, TAIL = 0.7, 0.55, 2.2
+LEAD, GAP, TAIL = 0.7, 0.95, 2.6
 voice, t = [], LEAD
 for i in range(1, 11):
     w = wave.open(f'assets/voice_fast/s{i:02d}.wav'); d = w.getnframes() / w.getframerate()

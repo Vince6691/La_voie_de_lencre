@@ -25,7 +25,7 @@ export const Props3D: React.FC = () => {
     content = <Plastron3D t={t} vt={vt} />;
   } else if (t >= d0 && t < d1) {
     const vt = sceneTime(3, t);
-    opacity = interpolate(vt, [2.85, 3.4, 5.2, 5.75], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+    opacity = interpolate(vt, [2.85, 3.3, 5.45, 5.75], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
     content = <Ding3D t={t} vt={vt} />;
   }
   if (!content) return null;

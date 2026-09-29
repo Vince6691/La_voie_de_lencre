@@ -5,8 +5,8 @@ import { AbsoluteFill, Easing, interpolate, useCurrentFrame, useVideoConfig } fr
 import { noise2D } from '@remotion/noise';
 import { W } from './legacy';
 
-const IN = 0.32;
-const OUT = 0.45;
+const IN = 0.42;
+const OUT = 0.6;
 const R = 1250;
 
 const blob = (cx: number, cy: number, r: number, seed: string, t: number) => {

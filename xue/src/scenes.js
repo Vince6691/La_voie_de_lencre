@@ -25,6 +25,7 @@
   const BONE_INK = '#4a3320';
   const compCol = (c) => COMP[c].col;
   const fusionCol = (c) => (c === 'hand' || c === 'yao' ? FUSION : COMP[c].col);
+  const strokeCol = (c) => (c === 'fusion' ? FUSION : COMP[c].col);
 
   // ─────────────────────────── outils de scène
   function camera(ctx, s, x = W / 2, y = H / 2, rot = 0) {
@@ -52,8 +53,9 @@
     ctx.save();
     ctx.globalAlpha = u * out;
     ctx.translate(o.x ?? W / 2, o.y ?? H / 2); ctx.scale(s, s);
-    E.text(ctx, big, 0, 0, { font: 'Cinzel', weight: 900, size: o.size || 170, color: o.color || '#f6e7c6', glow: 40, glowColor: 'rgba(255,120,40,0.55)', spacing: 6 });
-    if (small) E.text(ctx, small, 0, (o.size || 170) * 0.62, { font: 'Cinzel', weight: 700, size: 40, color: '#f4b73f', spacing: 10 });
+    // o.ink : encre sombre sur le parchemin des cartes
+    E.text(ctx, big, 0, 0, { font: 'Cinzel', weight: 900, size: o.size || 170, color: o.ink ? '#2a170a' : o.color || '#f6e7c6', glow: o.ink ? 26 : 40, glowColor: o.ink ? 'rgba(250,236,206,0.95)' : 'rgba(255,120,40,0.55)', spacing: 6 });
+    if (small) E.text(ctx, small, 0, (o.size || 170) * 0.62, { font: 'Cinzel', weight: 700, size: 40, color: o.ink ? '#7a2416' : '#f4b73f', spacing: 10, glow: o.ink ? 18 : 0, glowColor: 'rgba(250,236,206,0.95)' });
     ctx.restore();
   }
   function caption(ctx, str, a, y = H - 110, o = {}) {
@@ -211,45 +213,77 @@
   // ─────────────────────────── SCÈNES
   const S = [];
 
-  // 1. Accroche
+  // 1. Accroche : « Ce caractère cache deux mains… que plus personne ne voit. »
+  // Ancres (temps de la réplique 1) : mains 0–1,56 s ; disparition 2,54 s ; « Trois mille ans » 4,62 s ;
+  // « dans un seul mot » 6,04 s ; « apprendre » 7,48 s.
+  const HOOK = { hands: 0.9, gone: 2.54, years: 4.62, one: 6.04, learn: 7.48 };
   S.push({
     k: 1,
     draw(ctx, t) {
       const vt = VT(1, t);
+      const A = HOOK;
       E.background(ctx, t, '#1a120c', '#050302');
       E.motes(ctx, t, '255,190,110', 0.6);
       ctx.save();
-      shake(ctx, vt, [-0.2, 5.94], 18);
-      // a) 学 surgit de l'encre
-      const aA = 1 - seg(vt, 1.55, 1.7);
+      shake(ctx, vt, [A.learn], 18);
+      // a) 學 surgit de l'encre ; les deux mains s'allument, puis se dissipent en cendres → 学
+      const aA = 1 - seg(vt, A.years - 0.35, A.years);
       if (aA > 0) {
         ctx.save(); ctx.globalAlpha = aA;
-        E.inkBlot(ctx, W / 2, H / 2, 420, seg(vt, -0.45, 0.2), 4, 'rgba(0,0,0,0.85)');
-        const s = lerp(1.25, 1, easeOut(seg(vt, -0.3, 1.2)));
-        camera(ctx, s);
-        E.drawFontGlyph(ctx, 'kai_xue_simp', {
-          x: W / 2, y: H / 2, size: 700, color: () => '#f3e5c6',
-          reveal: () => easeOut(seg(vt, -0.25, 0.7)), glow: 50, glowColor: 'rgba(255,150,60,0.7)',
+        E.inkBlot(ctx, W / 2, H / 2, 440, seg(vt, -0.45, 0.25), 4, 'rgba(0,0,0,0.85)');
+        const push = easeInOut(seg(vt, 0.2, A.gone + 0.4));
+        const back = easeInOut(seg(vt, A.gone + 0.6, A.years - 0.2));
+        camera(ctx, lerp(1.0, 1.28, push) - 0.28 * back, W / 2, lerp(H / 2, H / 2 - 170, push * (1 - back)));
+        const handHi = easeOut(seg(vt, A.hands - 0.5, A.hands + 0.4));
+        const vanish = easeInOut(seg(vt, A.gone, A.gone + 1.1));
+        const swap = seg(vt, A.gone + 0.7, A.gone + 1.4);
+        const gx = W / 2, gy = H / 2, gs = 720;
+        E.drawFontGlyph(ctx, 'kai_xue_trad', {
+          x: gx, y: gy, size: gs,
+          color: (c) => (c === 'hand' ? E.mix('#f3e5c6', COMP.hand.col, handHi) : '#f3e5c6'),
+          alpha: (c) => (c === 'hand' ? 1 - vanish : 1),
+          opacity: 1 - swap, reveal: () => easeOut(seg(vt, -0.25, 0.6)),
+          glow: 30 + 40 * handHi * (1 - vanish), glowColor: E.rgba(COMP.hand.col, 0.35 + 0.5 * handHi * (1 - vanish)),
         });
+        if (swap > 0) E.drawFontGlyph(ctx, 'kai_xue_simp', { x: gx, y: gy, size: gs, color: (c) => (c === 'hand' || c === 'yao' ? FUSION : '#f3e5c6'), opacity: swap, glow: 40, glowColor: 'rgba(255,150,60,0.6)' });
+        // cendres rouges qui s'envolent des deux mains
+        if (vanish > 0 && vanish < 1) {
+          const r = E.rand(77);
+          ctx.save(); ctx.globalCompositeOperation = 'lighter';
+          for (let i = 0; i < 90; i++) {
+            const side = i % 2 ? 1 : -1;
+            const bx = gx + side * (130 + r() * 110) * gs / 720, by = gy - (40 + r() * 220) * gs / 720;
+            const life = clamp(vanish * 1.4 - r() * 0.4);
+            if (life <= 0) continue;
+            const px = bx + side * life * (40 + r() * 120), py = by - life * (120 + r() * 260);
+            ctx.fillStyle = `rgba(255,${110 + Math.round(r() * 80)},60,${(1 - life) * 0.9})`;
+            ctx.beginPath(); ctx.arc(px, py, 2 + r() * 5, 0, 7); ctx.fill();
+          }
+          ctx.restore();
+        }
         ctx.restore();
+        const lab = seg(vt, A.hands - 0.3, A.hands + 0.2) * (1 - seg(vt, A.gone, A.gone + 0.5));
+        E.text(ctx, '𦥑  deux mains', W / 2, 1000, { font: 'Kai', size: 46, color: COMP.hand.col, alpha: lab, glow: 16, glowColor: COMP.hand.col });
       }
-      // b) 3000 ans en accéléré
+      // b) trois mille ans : les formes défilent (un peu plus posé qu'avant)
       const flashes = [];
       const years = ['v. 1250 av. J.-C.', 'v. 1000 av. J.-C.', '221 av. J.-C.', 'Han', 'Tang', 'cursive', 'aujourd\'hui'];
-      if (vt >= 1.6 && vt < 3.72) {
-        const i = Math.min(6, Math.floor((vt - 1.6) / 0.3));
+      const step = (A.one + 0.35 - A.years) / 7;
+      if (vt >= A.years && vt < A.one + 0.35) {
+        const i = Math.min(6, Math.floor((vt - A.years) / step));
         const f = FORMS[i];
-        const lu = (vt - 1.6 - i * 0.3) / 0.3;
+        const lu = (vt - A.years - i * step) / step;
         ctx.save();
-        camera(ctx, lerp(1.12, 1.0, lu));
+        ctx.globalAlpha = Math.min(1, lu * 6, (1 - lu) * 6 + 0.35);
+        camera(ctx, lerp(1.08, 1.0, lu));
         drawForm(ctx, f.k, W / 2, H / 2 - 30, 620, i === 5 || i === 6 ? fusionCol : compCol, () => 1, { glow: 30 });
         E.text(ctx, f.zh, W / 2 - 440, H / 2 + 330, { font: 'Kai', size: 60, color: '#f4e7c8', align: 'left' });
         E.text(ctx, years[i], W / 2 + 440, H / 2 + 330, { font: 'Cinzel', size: 44, weight: 700, color: '#f4b73f', align: 'right' });
         ctx.restore();
       }
-      for (let i = 0; i < 7; i++) flashes.push(T(1, 1.6) + i * 0.3);
-      // c) titre
-      const aC = seg(vt, 3.72, 4.0) * (1 - seg(vt, 5.8, 5.95));
+      for (let i = 0; i < 7; i++) flashes.push(T(1, A.years) + i * step);
+      // c) titre, puis « APPRENDRE »
+      const aC = seg(vt, A.one + 0.35, A.one + 0.6) * (1 - seg(vt, A.learn - 0.1, A.learn + 0.05));
       if (aC > 0) {
         ctx.save(); ctx.globalAlpha = aC;
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: 620, y: 520, size: 560, color: fusionCol, glow: 30, glowColor: 'rgba(255,140,60,0.5)' });
@@ -258,15 +292,14 @@
         E.text(ctx, "D'HISTOIRE", 1270, 650, { font: 'Cinzel', weight: 700, size: 76, color: '#f4b73f', spacing: 12 });
         ctx.restore();
       }
-      // d) APPRENDRE
-      const aD = seg(vt, 5.9, 6.05);
+      const aD = seg(vt, A.learn, A.learn + 0.15);
       if (aD > 0) {
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: W / 2, y: H / 2 - 60, size: 520, color: () => 'rgba(180,40,30,1)', opacity: 0.35 * aD });
-        dateSlam(ctx, t, T(1, 5.9), 'APPRENDRE', null, { size: 190 });
+        dateSlam(ctx, t, T(1, A.learn), 'APPRENDRE', null, { size: 190 });
       }
       ctx.restore();
-      flash(ctx, t, flashes.map((f) => f), '255,240,220', 0.12, 0.5);
-      flash(ctx, t, [T(1, 3.72), T(1, 5.9)]);
+      flash(ctx, t, flashes, '255,240,220', 0.15, 0.35);
+      flash(ctx, t, [T(1, A.one + 0.35), T(1, A.learn)]);
       E.finish(ctx, t);
     },
   });
@@ -280,10 +313,10 @@
       if (vt < 5.1) {
         const z = easeInOut(seg(vt, -0.3, 4.6));
         const v = { lon: lerp(108, 114, z), lat: lerp(33, 35.2, z), k: lerp(36, 95, z) };
-        E.drawMap(ctx, t, v, { rivers: seg(vt, -0.3, 1.8), riverLabels: seg(vt, 0.8, 1.4) * (1 - seg(vt, 3, 3.5)) });
-        E.region(ctx, v, 'shang', 'rgba(239,90,60,0.28)', seg(vt, 3.1, 3.8));
+        E.drawMap(ctx, t, v, { rivers: seg(vt, -0.3, 1.8), riverLabels: seg(vt, 2.2, 2.7) * (1 - seg(vt, 4.2, 4.6)) });
+        E.region(ctx, v, 'shang', 'rgba(200,60,40,0.22)', seg(vt, 3.1, 3.8));
         E.marker(ctx, t, v, E.CITIES.anyang, 'Anyang', 'dernière capitale des Shang', seg(vt, 2.25, 2.6));
-        dateSlam(ctx, t, T(2, 0.0), 'v. 1250', 'AVANT NOTRE ÈRE', { y: 200, size: 120, out: T(2, 2.1) });
+        dateSlam(ctx, t, T(2, 0.0), 'v. 1250', 'AVANT NOTRE ÈRE', { y: 200, size: 120, out: T(2, 2.1), ink: true });
         E.finish(ctx, t, { vignette: 0.8 });
         ctx.fillStyle = `rgba(0,0,0,${seg(vt, 4.7, 5.1)})`; ctx.fillRect(0, 0, W, H);
         return;
@@ -350,7 +383,7 @@
           for (let i = 1; i <= steps * u; i++) { const s = i / steps; ctx.lineTo((1 - s) * (1 - s) * a[0] + 2 * (1 - s) * s * mx + s * s * b[0], (1 - s) * (1 - s) * a[1] + 2 * (1 - s) * s * my + s * s * b[1]); }
           ctx.stroke(); ctx.restore();
         }
-        dateSlam(ctx, t, T(3, 0.3), 'v. 1046', 'LES ZHOU RENVERSENT LES SHANG', { y: 200, size: 120 });
+        dateSlam(ctx, t, T(3, 0.3), 'v. 1046', 'LES ZHOU RENVERSENT LES SHANG', { y: 200, size: 120, ink: true });
         E.finish(ctx, t, { vignette: 0.8 });
         ctx.fillStyle = `rgba(0,0,0,${seg(vt, 2.6, 2.9)})`; ctx.fillRect(0, 0, W, H);
         return;
@@ -364,12 +397,17 @@
           ctx.save(); ctx.translate(0, 120 * (1 - easeOut(seg(vt, 2.9, 3.8))));
           if (!FLAGS.three) ding(ctx, 620, 560, 1.15, aV);
           ctx.restore();
-          ctx.save(); ctx.globalAlpha = aV;
-          ctx.fillStyle = '#0b0b0b'; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 40;
-          ctx.fillRect(1120, 230, 520, 620); ctx.restore();
-          E.drawGlyph(ctx, P.bronze, { x: 1380, y: 540, size: 520, color: () => '#e9e2d0', alpha: () => aV, progress: seg(vt, 3.6, 5.0) });
-          E.text(ctx, 'estampage d\'inscription', 1380, 900, { size: 30, weight: 600, color: '#bfb49c', alpha: aV });
+          if (!FLAGS.three) {
+            // version 2D : estampage de l'inscription à côté du vase
+            ctx.save(); ctx.globalAlpha = aV;
+            ctx.fillStyle = '#0b0b0b'; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 40;
+            ctx.fillRect(1120, 230, 520, 620); ctx.restore();
+            E.drawGlyph(ctx, P.bronze, { x: 1380, y: 540, size: 520, color: () => '#e9e2d0', alpha: () => aV, progress: seg(vt, 3.6, 5.0) });
+            E.text(ctx, 'estampage d\'inscription', 1380, 900, { size: 30, weight: 600, color: '#bfb49c', alpha: aV });
+          }
         }
+        // version 3D : le vase occupe le plan, puis la caméra plonge vers l'inscription du fond
+        if (FLAGS.three) caption(ctx, 'Les inscriptions sont coulées dans le bronze, à l\'intérieur du vase', fadeIO(vt, 3.4, 5.3), 190);
         E.eraTag(ctx, t, '金文', 'jinwen', 'bronzes · Zhou occidentaux', seg(vt, 3.0, 3.5));
         // métamorphose oracle → bronze puis arrivée de l'enfant
         const aG = seg(vt, 5.3, 5.8);
@@ -607,13 +645,11 @@
       E.motes(ctx, t, '255,210,150', 0.4);
       E.eraTag(ctx, t, '楷書', 'kaishu', 'écriture régulière · canon des Tang', seg(vt, 0.0, 0.5));
       const gx = 800, gy = 560, gs = 820;
-      const order = { hand: [0.0, 0.9], yao: [0.3, 1.2], roof: [1.1, 1.6], child: [1.5, 2.2] };
-      E.drawFontGlyph(ctx, 'kai_xue_trad', {
-        x: gx, y: gy, size: gs, color: compCol, reveal: (c) => easeOut(seg(vt, order[c][0], order[c][1])),
-        glow: 26, glowColor: 'rgba(255,170,90,0.45)',
-      });
+      // les 16 traits dans l'ordre d'écriture réel, le compteur suit le pinceau
+      const prog = 16 * seg(vt, 0.05, 3.65);
+      E.drawStrokes(ctx, 'xue_trad', { x: gx, y: gy, size: gs, progress: prog, color: strokeCol, glow: 22, glowColor: 'rgba(255,170,90,0.45)', tip: true });
       E.text(ctx, 'xué', 1560, 380, { font: 'Cormorant', weight: 700, size: 150, color: '#f6e7c6', alpha: seg(vt, 2.6, 2.9), glow: 30, glowColor: 'rgba(255,140,60,0.6)' });
-      const n = Math.round(16 * easeOut(seg(vt, 0.0, 3.7)));
+      const n = Math.min(16, Math.ceil(prog - 0.02));
       const u = seg(vt, 3.6, 3.9);
       E.text(ctx, String(n), 1560, 640, { font: 'Cinzel', weight: 900, size: 220, color: '#f4b73f', alpha: seg(vt, 0.2, 0.6) });
       E.text(ctx, 'TRAITS', 1560, 790, { font: 'Cinzel', weight: 700, size: 56, color: '#f3e5c6', spacing: 14, alpha: u });
@@ -700,16 +736,13 @@
         const q1 = E.proj(v, E.CITIES.tokyo), q2 = E.proj(v, E.CITIES.beijing);
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: q1[0] + 40, y: q1[1] + 170, size: 200, color: fusionCol, opacity: seg(vt, 11.6, 12.0), glow: 20 });
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: q2[0] + 60, y: q2[1] + 190, size: 200, color: fusionCol, opacity: seg(vt, 12.9, 13.3), glow: 20 });
-        dateSlam(ctx, t, T(8, 10.8), 'XXe SIÈCLE', null, { y: 150, size: 90 });
+        dateSlam(ctx, t, T(8, 10.8), 'XXe SIÈCLE', null, { y: 150, size: 90, ink: true });
         E.finish(ctx, t, { vignette: 0.8 });
         return;
       }
       E.background(ctx, t, '#1d1710', '#040302');
       E.motes(ctx, t, '255,210,150', 0.5);
-      E.drawFontGlyph(ctx, 'kai_xue_simp', {
-        x: gx, y: gy, size: gs, color: fusionCol, reveal: (c) => easeOut(seg(vt, 15.3 + (c === 'roof' ? 0.2 : c === 'child' ? 0.4 : 0), 15.9 + (c === 'child' ? 0.4 : 0.2))),
-        glow: 30, glowColor: 'rgba(255,150,70,0.5)',
-      });
+      E.drawStrokes(ctx, 'xue_simp', { x: gx, y: gy, size: gs, progress: 8 * seg(vt, 15.2, 16.0), color: strokeCol, glow: 26, glowColor: 'rgba(255,150,70,0.5)', tip: true });
       ctx.save(); shake(ctx, vt, [15.72], 12);
       E.text(ctx, '8', 1560, 560, { font: 'Cinzel', weight: 900, size: 260, color: '#f4b73f', alpha: seg(vt, 15.6, 15.8), glow: 30, glowColor: '#f4b73f' });
       E.text(ctx, 'TRAITS', 1560, 730, { font: 'Cinzel', weight: 700, size: 56, color: '#f3e5c6', spacing: 14, alpha: seg(vt, 15.7, 15.9) });
@@ -834,7 +867,8 @@
 
   // repères sonores (percussions, souffles) pour la bande-son
   window.CUES = [
-    ['boom', 0.1], ['riser', T(1, 1.2)], ...Array.from({ length: 7 }, (_, i) => ['tick', T(1, 1.6) + i * 0.3]), ['hit', T(1, 3.72)], ['boom', T(1, 5.9)],
+    ['boom', 0.1], ['low', T(1, 0.6)], ['riser', T(1, HOOK.gone - 0.6)], ['whoosh', T(1, HOOK.gone)],
+    ...Array.from({ length: 7 }, (_, i) => ['tick', T(1, HOOK.years) + i * (HOOK.one + 0.35 - HOOK.years) / 7]), ['hit', T(1, HOOK.one + 0.35)], ['boom', T(1, HOOK.learn)],
     ['whoosh', V(2) - 0.35], ['hit', V(2)], ['whoosh', T(2, 4.8)], ['crack', T(2, 5.6)], ['crack', T(2, 6.3)], ['crack', T(2, 7.0)], ['whoosh', T(2, 8.0)],
     ['chime', T(2, 12.6)], ['chime', T(2, 16.5)], ['chime', T(2, 19.5)],
     ['whoosh', V(3) - 0.35], ['hit', T(3, 0.3)], ['whoosh', T(3, 2.8)], ['metal', T(3, 3.0)], ['whoosh', T(3, 5.5)], ['boom', T(3, 7.7)],
@@ -868,7 +902,7 @@
     S[i].draw(ctx, t);
     ctx.restore();
     if (i > 0) {
-      const f = 1 - seg(t, a, a + 0.28);
+      const f = 1 - seg(t, a, a + 0.4);
       if (f > 0) { ctx.fillStyle = `rgba(0,0,0,${f})`; ctx.fillRect(0, 0, W, H); }
     }
     const fin = seg(t, 0, 0.4);

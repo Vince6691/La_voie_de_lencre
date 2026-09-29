@@ -13,6 +13,6 @@ export const RemotionRoot: React.FC = () => (
     fps={FPS}
     width={1920}
     height={1080}
-    defaultProps={{ three: true, captions: true, inkTransitions: true } satisfies XueProps}
+    defaultProps={{ three: true, captions: false, inkTransitions: true } satisfies XueProps}
   />
 );
