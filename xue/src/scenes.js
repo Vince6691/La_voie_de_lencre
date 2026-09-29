@@ -4,6 +4,7 @@
 (function () {
   const { W, H, clamp, lerp, seg, smooth, easeOut, easeIn, easeInOut, backOut, pulse, COMP } = E;
   const TL = window.TIMELINE; // {voice:[{start,dur}], total}
+  const FLAGS = window.FLAGS || {}; // {three: objets 3D rendus ailleurs, captions: sous-titres incrustés}
   const V = (k) => TL.voice[k - 1].start;
   // Les ancres de chaque scène sont écrites sur la première prise de voix ; WARP les recale
   // sur la prise actuelle (interpolation linéaire par morceaux entre débuts de phrases).
@@ -57,6 +58,7 @@
   }
   function caption(ctx, str, a, y = H - 110, o = {}) {
     if (a <= 0) return;
+    if (FLAGS.captions) y = Math.min(y, H - 200); // laisse la place aux sous-titres
     ctx.save(); ctx.globalAlpha = easeOut(clamp(a));
     ctx.font = `600 ${o.size || 40}px Cormorant`;
     const w = ctx.measureText(str).width + 80;
@@ -292,7 +294,7 @@
       const zoom = easeInOut(seg(vt, 8.0, 9.8));
       ctx.save();
       camera(ctx, lerp(1, 2.6, zoom), lerp(W / 2, W / 2, zoom), lerp(H / 2, H / 2 - 20, zoom));
-      plastron(ctx, t, W / 2, H / 2 + 20, 1.35 * lerp(0.92, 1, easeOut(seg(vt, 5.0, 5.8))), seg(vt, 5.6, 7.6), seg(vt, 5.2, 6.0) * (1 - seg(vt, 7.4, 8.4)));
+      if (!(FLAGS.three && vt < 9.4)) plastron(ctx, t, W / 2, H / 2 + 20, 1.35 * lerp(0.92, 1, easeOut(seg(vt, 5.0, 5.8))), seg(vt, 5.6, 7.6), seg(vt, 5.2, 6.0) * (1 - seg(vt, 7.4, 8.4)));
       ctx.restore();
       E.eraTag(ctx, t, '甲骨文', 'jiaguwen', 'os oraculaires · Shang', seg(vt, 5.1, 5.6));
       caption(ctx, 'Les devins interrogent les ancêtres : le feu fait craquer l\'os', fadeIO(vt, 5.3, 8.4));
@@ -360,7 +362,7 @@
         const aV = seg(vt, 2.9, 3.5) * (1 - seg(vt, 5.2, 5.7));
         if (aV > 0) {
           ctx.save(); ctx.translate(0, 120 * (1 - easeOut(seg(vt, 2.9, 3.8))));
-          ding(ctx, 620, 560, 1.15, aV);
+          if (!FLAGS.three) ding(ctx, 620, 560, 1.15, aV);
           ctx.restore();
           ctx.save(); ctx.globalAlpha = aV;
           ctx.fillStyle = '#0b0b0b'; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 40;
@@ -846,6 +848,11 @@
     ['whoosh', V(9) - 0.35], ['chime', T(9, 2.1)], ['chime', T(9, 5.1)], ['riser', T(9, 7.4)], ['boom', T(9, 8.9)],
     ['whoosh', V(10) - 0.35], ['hit', T(10, 1.2)], ['chime', T(10, 2.3)],
   ];
+
+  // accès pour la version Remotion
+  window.ANCHOR = T;
+  window.VTIME = VT;
+  window.PROPS = { plastron, ding };
 
   window.renderFrame = function (t) {
     const ctx = window.CTX;

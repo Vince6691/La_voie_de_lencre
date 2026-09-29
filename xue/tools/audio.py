@@ -226,6 +226,15 @@ with wave.open('out/mix.wav', 'wb') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
     w.writeframes((st * 32767).astype(np.int16).tobytes())
 print('ok', TOTAL)
+# fond sonore seul (musique + bruitages, déjà « duckés ») pour la version Remotion, qui pose la voix
+# elle-même : même gain que le mixage complet, gain de la voix exporté dans out/audio_gain.json
+pre = (vox * 1.0 + music * duck * 0.2 + sfx * (0.5 + 0.5 * duck) * 0.24) * fade
+g = 0.95 / np.abs(pre[:end]).max()
+bed = ((music * duck * 0.2 + sfx * (0.5 + 0.5 * duck) * 0.24) * fade)[:end] * g
+with wave.open('out/bed.wav', 'wb') as w:
+    w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
+    w.writeframes((np.stack([bed, bed], 1) * 32767).astype(np.int16).tobytes())
+json.dump({'voice_gain': float(g)}, open('out/audio_gain.json', 'w'))
 _bed = (music * duck * 0.2 + sfx * (0.5 + 0.5 * duck) * 0.24)[:end]
 _act = np.abs(voice[:end]) > 0.02
 _r = lambda x: 20 * np.log10(np.sqrt((x ** 2).mean()) + 1e-9)

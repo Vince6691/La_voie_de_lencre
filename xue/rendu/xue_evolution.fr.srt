@@ -1,99 +1,99 @@
 1
-00:00:00,700 --> 00:00:04,157
+00:00:00,700 --> 00:00:04,147
 Un seul caractère. Trois mille ans d'histoire.
 
 2
-00:00:04,876 --> 00:00:08,148
+00:00:04,825 --> 00:00:08,267
 Voici comment la Chine a écrit… apprendre.
 
 3
-00:00:08,498 --> 00:00:12,812
+00:00:08,617 --> 00:00:13,225
 Vers 1250 avant notre ère, à Anyang, capitale des Shang.
 
 4
-00:00:13,285 --> 00:00:17,771
+00:00:13,702 --> 00:00:18,363
 Les devins gravent l'os et l'écaille de tortue. Là naît le signe.
 
 5
-00:00:18,341 --> 00:00:22,110
+00:00:19,020 --> 00:00:23,032
 Au centre, deux croix : yao. Des baguettes à compter.
 
 6
-00:00:22,513 --> 00:00:27,076
+00:00:23,462 --> 00:00:28,098
 Dessous, le toit d'un bâtiment. Et de chaque côté… deux mains.
 
 7
-00:00:27,426 --> 00:00:29,010
+00:00:28,448 --> 00:00:30,146
 Puis viennent les Zhou.
 
 8
-00:00:29,064 --> 00:00:34,112
+00:00:30,205 --> 00:00:35,483
 Sur le bronze des vases rituels, un nouveau venu se glisse sous le toit : l'enfant.
 
 9
-00:00:34,772 --> 00:00:39,228
+00:00:36,152 --> 00:00:40,568
 Tout est dit. Des mains transmettent, sous un toit, à un enfant.
 
 10
-00:00:39,719 --> 00:00:45,820
+00:00:41,045 --> 00:00:47,397
 Un vase raconte même qu'un roi fit enseigner le tir à l'arc aux jeunes de la cour… dans la salle d'étude.
 
 11
-00:00:46,170 --> 00:00:50,623
+00:00:47,746 --> 00:00:52,145
 221 avant notre ère. Le premier empereur unifie la Chine.
 
 12
-00:00:51,167 --> 00:00:54,334
+00:00:52,684 --> 00:00:56,034
 Son ministre, Li Si, unifie l'écriture.
 
 13
-00:00:55,080 --> 00:00:58,687
+00:00:56,825 --> 00:01:00,418
 Le petit sceau aligne tout, en parfaite symétrie.
 
 14
-00:00:59,037 --> 00:01:04,155
+00:01:00,768 --> 00:01:06,363
 Vers l'an 100, le lettré Xu Shen, dans le Shuowen jiezi, l'explique ainsi :
 
 15
-00:01:04,386 --> 00:01:10,752
+00:01:06,585 --> 00:01:12,958
 apprendre, c'est s'éveiller. Le toit, c'est l'obscurité qui couvre encore l'esprit.
 
 16
-00:01:11,102 --> 00:01:15,783
+00:01:13,308 --> 00:01:18,063
 Sous les Han, les scribes accélèrent. Le pinceau aplatit les courbes.
 
 17
-00:01:16,196 --> 00:01:22,315
+00:01:18,467 --> 00:01:24,906
 Les deux mains se figent en un bloc qui ressemble à un mortier. Leur sens s'efface.
 
 18
-00:01:22,666 --> 00:01:28,097
+00:01:25,257 --> 00:01:30,691
 L'écriture régulière fixe enfin la forme. Xué. Seize traits.
 
 19
-00:01:28,447 --> 00:01:34,827
+00:01:31,040 --> 00:01:37,388
 Seize traits, c'est long. Dans la cursive, la main pressée réduit le haut à trois petits traits.
 
 20
-00:01:35,057 --> 00:01:39,002
+00:01:37,634 --> 00:01:41,784
 Cette abréviation court déjà dans les livres populaires des Song et des Yuan.
 
 21
-00:01:39,509 --> 00:01:45,442
+00:01:42,316 --> 00:01:48,120
 Au XXe siècle, le Japon, puis la Chine, l'adoptent officiellement. Huit traits.
 
 22
-00:01:45,792 --> 00:01:49,686
+00:01:48,471 --> 00:01:52,385
 Les mains se sont effacées. Les baguettes sont devenues trois traits.
 
 23
-00:01:49,987 --> 00:01:52,878
+00:01:52,686 --> 00:01:55,640
 Mais l'enfant est toujours là, sous le toit.
 
 24
-00:01:53,496 --> 00:01:59,307
+00:01:56,271 --> 00:02:02,125
 Depuis trois mille ans, apprendre, c'est recevoir ce que d'autres mains transmettent.
 
 25
-00:01:59,657 --> 00:02:03,996
+00:02:02,475 --> 00:02:06,810
 Et vous, quel caractère voulez-vous voir renaître ? Dites-le en commentaire.

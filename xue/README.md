@@ -40,6 +40,29 @@ police LXGW WenKai TC (contours extraits par `tools/extract_glyphs.py`).
 | 1:45 | Conclusion : bandeau des 7 formes, rubans de composantes |
 | 1:59 | Carte de fin (appel au commentaire, 墨道) |
 
+## Version Remotion (`remotion/`)
+
+Proposition enrichie, rendue avec [Remotion](https://www.remotion.dev) → `rendu/xue_remotion.mp4`,
+voix « François Louis – Deep, Warm and Poised » (`eleven_v4`, `assets/voice_fl/`).
+
+- Le moteur Canvas 2D ci-dessous sert de couche de base, piloté image par image par Remotion.
+- **3D (Three.js / `@remotion/three`)** : carapace de tortue bombée dont la texture (craquelures,
+  lueur du feu) est dessinée à chaque image, puis plongée caméra jusqu'au signe ; vase ding en
+  bronze patiné (panse tournée, pieds, anses, frise) qui monte dans le cadre en tournant.
+- **Transitions « tache d'encre »** entre scènes (bords organiques via `@remotion/noise`).
+- **Sous-titres animés mot à mot** (horodatage estimé par `tools/captions.py`), masqués quand le
+  texte est déjà à l'écran.
+- Voix off posée clip par clip dans la timeline, fond sonore (`out/bed.wav`) séparé.
+- Options dans le Studio (panneau *Props*) : `three`, `captions`, `inkTransitions`.
+
+```sh
+cd remotion && npm install
+npm run studio     # aperçu interactif, timeline, réglages
+npm run render     # → remotion/out/xue_remotion.mp4
+```
+
+Licence Remotion : gratuite pour les particuliers et structures de 3 personnes au plus.
+
 ## Reconstruire
 
 ```sh
@@ -53,10 +76,12 @@ python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
 `src/index.html?play` rejoue l'animation en temps réel dans un navigateur (servir le dossier
 `xue/` en HTTP).
 
-- Voix off : ElevenLabs, voix « German Epic Trailer Voice – Helmut », modèle `eleven_v4`
+- Voix off (version Canvas, `rendu/xue_evolution.mp4`) : ElevenLabs, voix « German Epic Trailer Voice – Helmut », modèle `eleven_v4`
   avec balises d'interprétation (`[deep voice]`, `[dramatically]`…) et noms chinois en API
-  (`assets/voice_v4/*.mp3`), silences rognés (`assets/voice_fast/`). `src/warp.js` recale les
-  ancres de l'animation sur cette prise. (`assets/voice/` : première prise, « Helmut German »,
+  (`assets/voice_v4/*.mp3`). Les deux versions partagent désormais la prise « François Louis »
+  (`assets/voice_fl/`, silences rognés dans `assets/voice_fast/`) : `./tools/render_all.sh`
+  régénère la version Canvas avec cette voix. `src/warp.js` recale les ancres de l'animation
+  sur la prise courante. (`assets/voice/` : première prise, « Helmut German »,
   `eleven_multilingual_v2`, conservée pour comparaison.)
 - Musique et bruitages : synthèse procédurale (`tools/audio.py`) — bourdon, cordes,
   guzheng pentatonique, taiko, souffles, craquements d'os, gong de bronze.
