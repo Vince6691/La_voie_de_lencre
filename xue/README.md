@@ -95,12 +95,17 @@ python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
   guzheng pentatonique, taiko, souffles, craquements d'os, gong de bronze.
 - Polices : LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant Garamond (licence OFL).
 
-## Points historiques à vérifier avant publication
+## Sources des formes
 
-Les formes archaïques sont des **reconstitutions stylisées** fidèles à la structure attestée,
-pas des fac-similés d'une inscription précise. Pour un calque exact, fournir les PNG (zdic)
-et remplacer les tracés dans `src/glyphs.js`. Points à contrôler :
+- **Jiaguwen, jinwen, Royaumes combattants, petit sceau** : glyphes de zdic.net vectorisés,
+  fournis par l'auteur (`assets/glyphs/`), découpés en composantes par `tools/build_real_glyphs.py`.
+- **Lishu** : reconstitution (aucune source fournie) — à remplacer par un SVG si disponible.
+- **Cursive** : police Liu Jian Mao Cao (Google Fonts, OFL), forme 学.
+- **Kaishu 學 / 学** : ordre et forme des traits d'après *Make Me a Hanzi* (hanzi-writer-data).
+
+## Points historiques à vérifier avant publication
 
 - Les dates « Japon 1949 » (当用漢字字体表) et « Chine 1956 » (汉字简化方案) pour 学.
 - La mention des imprimés populaires Song–Yuan (cf. 《宋元以來俗字譜》, 1930).
 - Le rattachement du 學宮 et de l'enseignement du tir à l'arc à l'inscription du *Jing gui* 靜簋.
+- Les frontières historiques (historical-basemaps) sont approximatives.
