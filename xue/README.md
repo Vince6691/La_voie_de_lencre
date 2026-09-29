@@ -44,7 +44,7 @@ police LXGW WenKai TC (contours extraits par `tools/extract_glyphs.py`).
 
 ```sh
 pip install playwright pillow numpy scipy imageio-ffmpeg fonttools
-./tools/prepare_voice.sh                 # voix ×1,1, silences rognés
+./tools/prepare_voice.sh                 # silences rognés
 python3 tools/build_timeline.py          # timeline depuis assets/voice_fast/*.wav
 python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
 ./tools/render_all.sh                    # vidéo complète → out/xue_evolution.mp4
@@ -53,8 +53,11 @@ python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
 `src/index.html?play` rejoue l'animation en temps réel dans un navigateur (servir le dossier
 `xue/` en HTTP).
 
-- Voix off : ElevenLabs, voix « Helmut German », modèle `eleven_multilingual_v2`
-  (`assets/voice/*.mp3`), accélérée ×1,1 et rognée (`assets/voice_fast/`).
+- Voix off : ElevenLabs, voix « German Epic Trailer Voice – Helmut », modèle `eleven_v4`
+  avec balises d'interprétation (`[deep voice]`, `[dramatically]`…) et noms chinois en API
+  (`assets/voice_v4/*.mp3`), silences rognés (`assets/voice_fast/`). `src/warp.js` recale les
+  ancres de l'animation sur cette prise. (`assets/voice/` : première prise, « Helmut German »,
+  `eleven_multilingual_v2`, conservée pour comparaison.)
 - Musique et bruitages : synthèse procédurale (`tools/audio.py`) — bourdon, cordes,
   guzheng pentatonique, taiko, souffles, craquements d'os, gong de bronze.
 - Polices : LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant Garamond (licence OFL).

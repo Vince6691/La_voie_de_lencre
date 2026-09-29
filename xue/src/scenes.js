@@ -5,6 +5,17 @@
   const { W, H, clamp, lerp, seg, smooth, easeOut, easeIn, easeInOut, backOut, pulse, COMP } = E;
   const TL = window.TIMELINE; // {voice:[{start,dur}], total}
   const V = (k) => TL.voice[k - 1].start;
+  // Les ancres de chaque scène sont écrites sur la première prise de voix ; WARP les recale
+  // sur la prise actuelle (interpolation linéaire par morceaux entre débuts de phrases).
+  const pw = (pairs, x, a, b) => {
+    for (let i = 0; i < pairs.length - 1; i++) {
+      const [p0, p1] = [pairs[i], pairs[i + 1]];
+      if (x <= p1[a] || i === pairs.length - 2) return p0[b] + (x - p0[a]) * (p1[b] - p0[b]) / (p1[a] - p0[a] || 1);
+    }
+    return x;
+  };
+  const T = (k, old) => V(k) + pw(window.WARP[k], old, 0, 1); // ancre → temps global
+  const VT = (k, t) => pw(window.WARP[k], t - V(k), 1, 0);   // temps global → temps d'ancre
   const D = (k) => TL.voice[k - 1].dur;
   const P = {};
   for (const k in GLYPHS) P[k] = E.prepare(GLYPHS[k]);
@@ -202,7 +213,7 @@
   S.push({
     k: 1,
     draw(ctx, t) {
-      const vt = t - V(1);
+      const vt = VT(1, t);
       E.background(ctx, t, '#1a120c', '#050302');
       E.motes(ctx, t, '255,190,110', 0.6);
       ctx.save();
@@ -234,7 +245,7 @@
         E.text(ctx, years[i], W / 2 + 440, H / 2 + 330, { font: 'Cinzel', size: 44, weight: 700, color: '#f4b73f', align: 'right' });
         ctx.restore();
       }
-      for (let i = 0; i < 7; i++) flashes.push(V(1) + 1.6 + i * 0.3);
+      for (let i = 0; i < 7; i++) flashes.push(T(1, 1.6) + i * 0.3);
       // c) titre
       const aC = seg(vt, 3.72, 4.0) * (1 - seg(vt, 5.8, 5.95));
       if (aC > 0) {
@@ -249,11 +260,11 @@
       const aD = seg(vt, 5.9, 6.05);
       if (aD > 0) {
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: W / 2, y: H / 2 - 60, size: 520, color: () => 'rgba(180,40,30,1)', opacity: 0.35 * aD });
-        dateSlam(ctx, t, V(1) + 5.9, 'APPRENDRE', null, { size: 190 });
+        dateSlam(ctx, t, T(1, 5.9), 'APPRENDRE', null, { size: 190 });
       }
       ctx.restore();
       flash(ctx, t, flashes.map((f) => f), '255,240,220', 0.12, 0.5);
-      flash(ctx, t, [V(1) + 3.72, V(1) + 5.9]);
+      flash(ctx, t, [T(1, 3.72), T(1, 5.9)]);
       E.finish(ctx, t);
     },
   });
@@ -262,7 +273,7 @@
   S.push({
     k: 2,
     draw(ctx, t) {
-      const vt = t - V(2);
+      const vt = VT(2, t);
       // a) carte
       if (vt < 5.1) {
         const z = easeInOut(seg(vt, -0.3, 4.6));
@@ -270,7 +281,7 @@
         E.drawMap(ctx, t, v, { rivers: seg(vt, -0.3, 1.8), riverLabels: seg(vt, 0.8, 1.4) * (1 - seg(vt, 3, 3.5)) });
         E.region(ctx, v, 'shang', 'rgba(239,90,60,0.28)', seg(vt, 3.1, 3.8));
         E.marker(ctx, t, v, E.CITIES.anyang, 'Anyang', 'dernière capitale des Shang', seg(vt, 2.25, 2.6));
-        dateSlam(ctx, t, V(2) + 0.0, 'v. 1250', 'AVANT NOTRE ÈRE', { y: 200, size: 120, out: V(2) + 2.1 });
+        dateSlam(ctx, t, T(2, 0.0), 'v. 1250', 'AVANT NOTRE ÈRE', { y: 200, size: 120, out: T(2, 2.1) });
         E.finish(ctx, t, { vignette: 0.8 });
         ctx.fillStyle = `rgba(0,0,0,${seg(vt, 4.7, 5.1)})`; ctx.fillRect(0, 0, W, H);
         return;
@@ -319,7 +330,7 @@
   S.push({
     k: 3,
     draw(ctx, t) {
-      const vt = t - V(3);
+      const vt = VT(3, t);
       if (vt < 2.9) {
         const v = { lon: 111.5, lat: 35, k: 88 };
         E.drawMap(ctx, t, v, { rivers: 1 });
@@ -337,7 +348,7 @@
           for (let i = 1; i <= steps * u; i++) { const s = i / steps; ctx.lineTo((1 - s) * (1 - s) * a[0] + 2 * (1 - s) * s * mx + s * s * b[0], (1 - s) * (1 - s) * a[1] + 2 * (1 - s) * s * my + s * s * b[1]); }
           ctx.stroke(); ctx.restore();
         }
-        dateSlam(ctx, t, V(3) + 0.3, 'v. 1046', 'LES ZHOU RENVERSENT LES SHANG', { y: 200, size: 120 });
+        dateSlam(ctx, t, T(3, 0.3), 'v. 1046', 'LES ZHOU RENVERSENT LES SHANG', { y: 200, size: 120 });
         E.finish(ctx, t, { vignette: 0.8 });
         ctx.fillStyle = `rgba(0,0,0,${seg(vt, 2.6, 2.9)})`; ctx.fillRect(0, 0, W, H);
         return;
@@ -384,7 +395,7 @@
           });
         }
         E.finish(ctx, t);
-        flash(ctx, t, [V(3) + 7.7]);
+        flash(ctx, t, [T(3, 7.7)]);
         ctx.fillStyle = `rgba(0,0,0,${seg(vt, 14.0, 14.3)})`; ctx.fillRect(0, 0, W, H);
         return;
       }
@@ -424,7 +435,7 @@
   S.push({
     k: 4,
     draw(ctx, t) {
-      const vt = t - V(4);
+      const vt = VT(4, t);
       if (vt < 5.4) {
         const v = { lon: 112.5, lat: 32.5, k: 44 };
         const mapA = seg(vt, 2.2, 2.7);
@@ -440,7 +451,7 @@
           caption(ctx, 'Qin Shi Huang, premier empereur', fadeIO(vt, 3.0, 5.4));
         }
         ctx.save(); shake(ctx, vt, [0.05, 1.2], 22);
-        dateSlam(ctx, t, V(4) + 0.0, '221', 'AVANT NOTRE ÈRE', { size: 260, out: V(4) + 2.2, color: '#ffffff' });
+        dateSlam(ctx, t, T(4, 0.0), '221', 'AVANT NOTRE ÈRE', { size: 260, out: T(4, 2.2), color: '#ffffff' });
         ctx.restore();
         flash(ctx, t, [V(4)], '255,80,40', 0.35, 0.6);
         E.finish(ctx, t);
@@ -460,7 +471,7 @@
         });
         E.text(ctx, '書同文', W / 2, 150, { font: 'Kai', size: 120, color: '#ffe8c2', alpha: seg(vt, 5.6, 6.0), glow: 30, glowColor: 'rgba(255,90,40,0.7)' });
         E.text(ctx, '« une même écriture pour tous » — le ministre Li Si 李斯', W / 2, 960, { size: 44, weight: 700, color: '#f3e5c6', alpha: seg(vt, 6.2, 6.6) });
-        flash(ctx, t, [V(4) + 8.6], '255,230,200', 0.3, 0.7);
+        flash(ctx, t, [T(4, 8.6)], '255,230,200', 0.3, 0.7);
         E.finish(ctx, t);
         return;
       }
@@ -485,7 +496,7 @@
   S.push({
     k: 5,
     draw(ctx, t) {
-      const vt = t - V(5);
+      const vt = VT(5, t);
       E.background(ctx, t, '#221a10', '#050302');
       E.motes(ctx, t, '255,200,130', 0.4);
       // lattes de bambou (lecture de droite à gauche)
@@ -539,7 +550,7 @@
   S.push({
     k: 6,
     draw(ctx, t) {
-      const vt = t - V(6);
+      const vt = VT(6, t);
       E.background(ctx, t, '#161a26', '#030306');
       E.motes(ctx, t, '180,200,255', 0.4);
       E.eraTag(ctx, t, '隸書', 'lishu', 'écriture des clercs · Han', seg(vt, 0.1, 0.6));
@@ -589,7 +600,7 @@
   S.push({
     k: 7,
     draw(ctx, t) {
-      const vt = t - V(7);
+      const vt = VT(7, t);
       E.background(ctx, t, '#1d1710', '#040302');
       E.motes(ctx, t, '255,210,150', 0.4);
       E.eraTag(ctx, t, '楷書', 'kaishu', 'écriture régulière · canon des Tang', seg(vt, 0.0, 0.5));
@@ -612,7 +623,7 @@
   S.push({
     k: 8,
     draw(ctx, t) {
-      const vt = t - V(8);
+      const vt = VT(8, t);
       const gx = 800, gy = 560, gs = 820;
       if (vt < 5.8) {
         E.background(ctx, t, '#1d1710', '#040302');
@@ -687,7 +698,7 @@
         const q1 = E.proj(v, E.CITIES.tokyo), q2 = E.proj(v, E.CITIES.beijing);
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: q1[0] + 40, y: q1[1] + 170, size: 200, color: fusionCol, opacity: seg(vt, 11.6, 12.0), glow: 20 });
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: q2[0] + 60, y: q2[1] + 190, size: 200, color: fusionCol, opacity: seg(vt, 12.9, 13.3), glow: 20 });
-        dateSlam(ctx, t, V(8) + 10.8, 'XXe SIÈCLE', null, { y: 150, size: 90 });
+        dateSlam(ctx, t, T(8, 10.8), 'XXe SIÈCLE', null, { y: 150, size: 90 });
         E.finish(ctx, t, { vignette: 0.8 });
         return;
       }
@@ -709,7 +720,7 @@
   S.push({
     k: 9,
     draw(ctx, t) {
-      const vt = t - V(9);
+      const vt = VT(9, t);
       E.background(ctx, t, '#1b130c', '#030201');
       E.motes(ctx, t, '255,200,130', 0.7);
       const stripA = 1 - seg(vt, 8.6, 9.3);
@@ -788,7 +799,7 @@
   S.push({
     k: 10,
     draw(ctx, t) {
-      const vt = t - V(10);
+      const vt = VT(10, t);
       E.background(ctx, t, '#1b130c', '#030201');
       E.motes(ctx, t, '255,200,130', 0.8);
       E.drawFontGlyph(ctx, 'kai_xue_simp', { x: 480, y: 500, size: 520, color: fusionCol, glow: 40, glowColor: 'rgba(255,140,60,0.5)' });
@@ -821,19 +832,19 @@
 
   // repères sonores (percussions, souffles) pour la bande-son
   window.CUES = [
-    ['boom', 0.1], ['riser', V(1) + 1.2], ...Array.from({ length: 7 }, (_, i) => ['tick', V(1) + 1.6 + i * 0.3]), ['hit', V(1) + 3.72], ['boom', V(1) + 5.9],
-    ['whoosh', V(2) - 0.35], ['hit', V(2)], ['whoosh', V(2) + 4.8], ['crack', V(2) + 5.6], ['crack', V(2) + 6.3], ['crack', V(2) + 7.0], ['whoosh', V(2) + 8.0],
-    ['chime', V(2) + 12.6], ['chime', V(2) + 16.5], ['chime', V(2) + 19.5],
-    ['whoosh', V(3) - 0.35], ['hit', V(3) + 0.3], ['whoosh', V(3) + 2.8], ['metal', V(3) + 3.0], ['whoosh', V(3) + 5.5], ['boom', V(3) + 7.7],
-    ['chime', V(3) + 10.5], ['chime', V(3) + 11.9], ['chime', V(3) + 13.0], ['whoosh', V(3) + 14.0],
-    ...[0, 1, 2, 3].map((i) => ['arrow', V(3) + 15.4 + i * 1.6]),
-    ['boom', V(4)], ['hit', V(4) + 1.2], ['riser', V(4) + 4.0], ['whoosh', V(4) + 5.4], ['boom', V(4) + 8.6], ['chime', V(4) + 10.8],
-    ['whoosh', V(5) - 0.35], ['chime', V(5) + 5.7], ['low', V(5) + 7.6],
-    ['whoosh', V(6) - 0.35], ['whoosh', V(6) + 2.6], ['hit', V(6) + 6.0], ['hit', V(6) + 8.8],
-    ['whoosh', V(7) - 0.35], ['hit', V(7) + 3.66],
-    ['hit', V(8) + 0.0], ['hit', V(8) + 0.7], ['whoosh', V(8) + 2.2], ['whoosh', V(8) + 5.8], ['chime', V(8) + 6.6], ['whoosh', V(8) + 10.7], ['hit', V(8) + 11.4], ['hit', V(8) + 12.7], ['whoosh', V(8) + 15.3], ['boom', V(8) + 15.72],
-    ['whoosh', V(9) - 0.35], ['chime', V(9) + 2.1], ['chime', V(9) + 5.1], ['riser', V(9) + 7.4], ['boom', V(9) + 8.9],
-    ['whoosh', V(10) - 0.35], ['hit', V(10) + 1.2], ['chime', V(10) + 2.3],
+    ['boom', 0.1], ['riser', T(1, 1.2)], ...Array.from({ length: 7 }, (_, i) => ['tick', T(1, 1.6) + i * 0.3]), ['hit', T(1, 3.72)], ['boom', T(1, 5.9)],
+    ['whoosh', V(2) - 0.35], ['hit', V(2)], ['whoosh', T(2, 4.8)], ['crack', T(2, 5.6)], ['crack', T(2, 6.3)], ['crack', T(2, 7.0)], ['whoosh', T(2, 8.0)],
+    ['chime', T(2, 12.6)], ['chime', T(2, 16.5)], ['chime', T(2, 19.5)],
+    ['whoosh', V(3) - 0.35], ['hit', T(3, 0.3)], ['whoosh', T(3, 2.8)], ['metal', T(3, 3.0)], ['whoosh', T(3, 5.5)], ['boom', T(3, 7.7)],
+    ['chime', T(3, 10.5)], ['chime', T(3, 11.9)], ['chime', T(3, 13.0)], ['whoosh', T(3, 14.0)],
+    ...[0, 1, 2, 3].map((i) => ['arrow', T(3, 15.4) + i * 1.6]),
+    ['boom', V(4)], ['hit', T(4, 1.2)], ['riser', T(4, 4.0)], ['whoosh', T(4, 5.4)], ['boom', T(4, 8.6)], ['chime', T(4, 10.8)],
+    ['whoosh', V(5) - 0.35], ['chime', T(5, 5.7)], ['low', T(5, 7.6)],
+    ['whoosh', V(6) - 0.35], ['whoosh', T(6, 2.6)], ['hit', T(6, 6.0)], ['hit', T(6, 8.8)],
+    ['whoosh', V(7) - 0.35], ['hit', T(7, 3.66)],
+    ['hit', T(8, 0.0)], ['hit', T(8, 0.7)], ['whoosh', T(8, 2.2)], ['whoosh', T(8, 5.8)], ['chime', T(8, 6.6)], ['whoosh', T(8, 10.7)], ['hit', T(8, 11.4)], ['hit', T(8, 12.7)], ['whoosh', T(8, 15.3)], ['boom', T(8, 15.72)],
+    ['whoosh', V(9) - 0.35], ['chime', T(9, 2.1)], ['chime', T(9, 5.1)], ['riser', T(9, 7.4)], ['boom', T(9, 8.9)],
+    ['whoosh', V(10) - 0.35], ['hit', T(10, 1.2)], ['chime', T(10, 2.3)],
   ];
 
   window.renderFrame = function (t) {

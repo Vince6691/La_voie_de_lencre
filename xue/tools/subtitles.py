@@ -30,12 +30,18 @@ L = [  # (clip, début, fin, texte) — temps relatifs au clip
     (9, 9.0, None, "Depuis trois mille ans, apprendre, c'est recevoir ce que d'autres mains transmettent."),
     (10, 0.0, None, "Et vous, quel caractère voulez-vous voir renaître ? Dites-le en commentaire."),
 ]
+WARP = {int(k): v for k, v in json.load(open('tools/warp.json')).items()}
+def warp(k, x):
+    p = WARP[k]
+    for i in range(len(p) - 1):
+        if x <= p[i + 1][0] or i == len(p) - 2:
+            return p[i][1] + (x - p[i][0]) * (p[i + 1][1] - p[i][1]) / (p[i + 1][0] - p[i][0])
 def ts(x):
     ms = int(round(x * 1000)); h, ms = divmod(ms, 3600000); m, ms = divmod(ms, 60000); s, ms = divmod(ms, 1000)
     return f'{h:02d}:{m:02d}:{s:02d},{ms:03d}'
 out = []
 for i, (k, a, b, txt) in enumerate(L, 1):
-    b = D[k - 1] + 0.2 if b is None else b
-    out.append(f'{i}\n{ts(V[k - 1] + a)} --> {ts(V[k - 1] + b)}\n{txt}\n')
+    b = D[k - 1] + 0.2 if b is None else warp(k, b)
+    out.append(f'{i}\n{ts(V[k - 1] + warp(k, a))} --> {ts(V[k - 1] + b)}\n{txt}\n')
 open('rendu/xue_evolution.fr.srt', 'w').write('\n'.join(out))
 print(len(out), 'sous-titres')

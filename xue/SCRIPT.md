@@ -1,7 +1,8 @@
-# Voix off — 学 (xué) · ~2 min · voix ElevenLabs « Helmut German »
+# Voix off — 学 (xué) · ~2 min · ElevenLabs « German Epic Trailer Voice – Helmut » · eleven_v4
 
-(Les graphies phonétiques envoyées au synthétiseur — « Djo », « Li Sseu », « Su Chenn »,
-« Chouo-wenn Tsié-tseu », « Sué » — sont remplacées ici par la transcription usuelle.)
+(Les noms chinois ont été envoyés au synthétiseur en API — /dʒo/, /li sə/, /ɕy ʃən/,
+/ʃwo wən tɕjɛ dzɨ/, /ɕɥe/, /jɥɛn/, /an.jɑ̃ɡ/, /ʃɑ̃ɡ/, /jao/ — avec des balises [deep voice],
+[dramatically], [slowly], [pause]. Ils sont remplacés ici par la transcription usuelle.)
 
 1. Un seul caractère. Trois mille ans d'histoire. Voici comment la Chine a écrit… apprendre.
 2. Vers 1250 avant notre ère, à Anyang, capitale des Shang. Les devins gravent l'os et l'écaille de tortue. Là, naît le signe. Au centre, deux croix : yao. Des baguettes à compter. Dessous, le toit d'un bâtiment. Et de chaque côté… deux mains.
