@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="icon" href="data:,"><title>学 — 3000 ans d'histoire</title>
+<style>
+@font-face{font-family:Kai;src:url(../assets/fonts/LXGWWenKaiTC-Bold.ttf)}
+@font-face{font-family:Song;src:url(../assets/fonts/NotoSerifTC-Bold.otf);font-weight:700}
+@font-face{font-family:Song;src:url(../assets/fonts/NotoSerifTC-Bold.otf);font-weight:400}
+@font-face{font-family:Cinzel;src:url(../assets/fonts/Cinzel.ttf);font-weight:400 900}
+@font-face{font-family:Cormorant;src:url(../assets/fonts/Cormorant.ttf);font-weight:300 700}
+html,body{margin:0;background:#000}canvas{display:block;width:100vw;height:auto}
+</style></head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script src="timeline.js"></script>
+<script src="fontglyphs.js"></script>
+<script src="glyphs.js"></script>
+<script src="engine.js"></script>
+<script src="scenes.js"></script>
+<script>
+window.CTX = document.getElementById('c').getContext('2d');
+window.READY = (async () => {
+  const fams = ['400 40px Kai', '700 40px Song', '700 40px Cinzel', '900 40px Cinzel', '600 40px Cormorant', '700 40px Cormorant'];
+  await Promise.all(fams.map((f) => document.fonts.load(f, '學学AÉ')));
+  await document.fonts.ready;
+  return true;
+})();
+// lecture en temps réel si ouvert dans un navigateur (?play)
+if (location.search.includes('play')) {
+  window.READY.then(() => { const t0 = performance.now(); const loop = () => { renderFrame((performance.now() - t0) / 1000); requestAnimationFrame(loop); }; loop(); });
+}
+</script>
+</body></html>
