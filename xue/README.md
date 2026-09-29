@@ -42,8 +42,17 @@ police LXGW WenKai TC (contours extraits par `tools/extract_glyphs.py`).
 
 ## Version Remotion (`remotion/`)
 
-Proposition enrichie, rendue avec [Remotion](https://www.remotion.dev) → `rendu/xue_remotion.mp4`,
-voix « Chuck Miller – Deep, Raspy, American » (`eleven_v4`, sans balises d'emphase, `assets/voice_cm/`).
+Proposition enrichie, rendue avec [Remotion](https://www.remotion.dev) → `rendu/xue_remotion.mp4` (≈ 2 min 53),
+voix « Chinese narration » (`eleven_v4`, `assets/voice_cn/`) : les noms chinois sont écrits en caractères
+dans le texte envoyé au synthétiseur, la voix bascule alors en mandarin sur ces mots.
+
+- **Respirations** : `tools/build_warp.py` insère des pauses dans la voix (début de scène, après les
+  moments clés) et recale l'animation phrase à phrase ; les métamorphoses s'achèvent dans ces pauses.
+- **Tortue 3D** : vrai contour de plastron, tranche d'os visible, creusets 鑽 / 鑿, tige de bronze
+  rougie, étincelles et fumée, fissure 卜 incandescente qui refroidit, signe incisé puis rempli de cinabre.
+- **Tir à l'arc en lavis** (`src/lavis.js`) : papier, montagnes dans la brume, pavillon du 學宮 et son
+  reflet dans le Grand Étang (大池), archers peints au pinceau et articulés, maître Jing, cible 侯, sceau.
+- **Kaishu** : tous les 學 / 学 réguliers viennent de *Make Me a Hanzi*, les mêmes que le tracé trait par trait.
 
 - Le moteur Canvas 2D ci-dessous sert de couche de base, piloté image par image par Remotion.
 - **3D (Three.js / `@remotion/three`)** : carapace de tortue bombée dont la texture (craquelures,
@@ -75,7 +84,8 @@ Licence Remotion : gratuite pour les particuliers et structures de 3 personnes a
 
 ```sh
 pip install playwright pillow numpy scipy imageio-ffmpeg fonttools
-./tools/prepare_voice.sh                 # silences rognés
+./tools/prepare_voice.sh                 # silences rognés → out/voice_raw
+python3 tools/build_warp.py              # pauses + recalage → assets/voice_fast, src/warp.js
 python3 tools/build_timeline.py          # timeline depuis assets/voice_fast/*.wav
 python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
 ./tools/render_all.sh                    # vidéo complète → out/xue_evolution.mp4

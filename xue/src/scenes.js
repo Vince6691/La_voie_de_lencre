@@ -332,7 +332,7 @@
       if (!(FLAGS.three && vt < 9.4)) plastron(ctx, t, W / 2, H / 2 + 20, 1.35 * lerp(0.92, 1, easeOut(seg(vt, 5.0, 5.8))), seg(vt, 5.6, 7.6), seg(vt, 5.2, 6.0) * (1 - seg(vt, 7.4, 8.4)));
       ctx.restore();
       E.eraTag(ctx, t, '甲骨文', 'jiaguwen', 'os oraculaires · Shang', seg(vt, 5.1, 5.6));
-      caption(ctx, 'Les devins interrogent les ancêtres : le feu fait craquer l\'os', fadeIO(vt, 5.3, 8.4));
+      caption(ctx, 'Les devins interrogent les ancêtres : le feu fait craquer l\'os', fadeIO(vt, 5.3, 8.4), FLAGS.three ? 150 : H - 110); // au-dessus de la carapace 3D
 
       if (vt > 9.4) {
         // panneau d'os en gros plan
@@ -348,7 +348,8 @@
         const hiAll = Math.max(hi.yao, hi.roof, hi.hand);
         E.drawRealGlyph(ctx, 'jiaguwen', {
           ...rg, opacity: a, carve: true,
-          reveal: (c) => easeInOut(c === 'yao' ? seg(vt, 10.0, 11.6) : c === 'roof' ? seg(vt, 15.6, 16.7) : seg(vt, 17.9, 19.5)),
+          // signe déjà incisé sur l'os (version 3D) ; sinon révélé composante par composante
+          reveal: (c) => (FLAGS.three ? 1 : easeInOut(c === 'yao' ? seg(vt, 10.0, 11.6) : c === 'roof' ? seg(vt, 15.6, 16.7) : seg(vt, 17.9, 19.5))),
           color: (c) => E.mix(E.mix(BONE_INK, COMP[c].col, known[c]), '#ffffff', 0.3 * (hi[c] || 0)),
           glow: 10 + 20 * hiAll, glowColor: 'rgba(255,190,110,0.45)',
         });
@@ -416,7 +417,7 @@
         // métamorphose oracle → bronze puis arrivée de l'enfant
         const aG = seg(vt, 5.3, 5.8);
         if (aG > 0) {
-          const m = easeInOut(seg(vt, 5.5, 6.9));
+          const m = easeInOut(seg(vt, 5.4, 7.0)); // métamorphose lente : on voit ce qui bouge
           const hi = { hand: pulse(vt, 10.5, 1.2), roof: pulse(vt, 11.9, 1.0), child: Math.max(pulse(vt, 7.7, 1.4), pulse(vt, 13.0, 1.0)) };
           const gx = 800, gy = 530, gs = 800;
           const rg = { x: gx, y: gy, size: gs };
@@ -424,7 +425,7 @@
           if (m < 1) E.drawRealGlyph(ctx, 'jiaguwen', { ...rg, opacity: 1 - m, color: (c) => COMP[c].col, glow: 16 });
           E.drawRealGlyph(ctx, 'jinwen', {
             ...rg, opacity: m,
-            reveal: (c) => (c === 'child' ? easeOut(seg(vt, 6.9, 8.2)) : 1),
+            reveal: (c) => (c === 'child' ? easeOut(seg(vt, 7.0, 8.4)) : 1),
             color: (c) => E.mix(COMP[c].col, '#ffffff', 0.35 * (hi[c] || 0)),
             glow: 16 + 24 * Math.max(hi.hand, hi.roof, hi.child), glowColor: 'rgba(255,220,170,0.5)',
           });
@@ -444,35 +445,14 @@
         ctx.fillStyle = `rgba(0,0,0,${seg(vt, 14.0, 14.3)})`; ctx.fillRect(0, 0, W, H);
         return;
       }
-      // tir à l'arc au 學宮
-      const sky = ctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#1d0f0a'); sky.addColorStop(0.55, '#a8482a'); sky.addColorStop(0.75, '#e79a4f'); sky.addColorStop(1, '#2a140b');
-      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
-      ctx.save();
-      camera(ctx, lerp(1.08, 1, easeOut(seg(vt, 14.3, 18))));
-      const sun = ctx.createRadialGradient(1100, 700, 20, 1100, 700, 380);
-      sun.addColorStop(0, 'rgba(255,220,150,0.95)'); sun.addColorStop(1, 'rgba(255,160,80,0)');
-      ctx.fillStyle = sun; ctx.beginPath(); ctx.arc(1100, 700, 380, 0, 7); ctx.fill();
-      const gy = 860;
-      pavilion(ctx, 1180, gy - 40, 0.72, '#2b150c');
-      ctx.fillStyle = '#140905'; ctx.fillRect(0, gy, W, H - gy);
-      const sil = '#0d0604';
-      target(ctx, 1700, gy, 1.0, sil, 0);
-      [[260, 0], [440, 0.33], [620, 0.66]].forEach(([x, ph], i) => {
-        const cyc = ((vt - 14.3) / 1.6 + ph) % 1;
-        archer(ctx, x, gy, 1.05, smooth(clamp(cyc / 0.7)), sil);
-        // flèche
-        if (cyc > 0.7) {
-          const u = (cyc - 0.7) / 0.3;
-          const ax = lerp(x + 120, 1690, u), ay = lerp(gy - 212, gy - 205, u) - Math.sin(u * Math.PI) * 60;
-          ctx.save(); ctx.strokeStyle = '#fff6e0'; ctx.shadowColor = '#ffd08a'; ctx.shadowBlur = 16; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(ax - 120, ay + 6); ctx.lineTo(ax, ay); ctx.stroke(); ctx.restore();
-        }
-      });
-      ctx.restore();
-      E.text(ctx, '學宮', W / 2, 190, { font: 'Kai', size: 130, color: '#fff0d0', alpha: seg(vt, 20.2, 20.6), glow: 30, glowColor: 'rgba(255,140,60,0.8)' });
-      E.text(ctx, 'la « salle d\'étude »', W / 2, 300, { size: 46, weight: 700, color: '#ffe3b0', alpha: seg(vt, 20.4, 20.8), glow: 14 });
+      // tir à l'arc au 學宮, en lavis à l'encre
+      LAVIS.archery(ctx, t, vt, 14.3);
+      const aT = seg(vt, 20.2, 20.6);
+      E.text(ctx, '學宮', W / 2 - 40, 170, { font: 'Kai', size: 120, color: '#1c160f', alpha: aT });
+      E.text(ctx, 'la « salle d\'étude »', W / 2 - 40, 270, { size: 44, weight: 700, color: '#5a3a1c', alpha: seg(vt, 20.4, 20.8) });
+      LAVIS.seal(ctx, W / 2 + 150, 190, seg(vt, 20.5, 20.8));
       caption(ctx, 'Inscription du vase Jing gui 靜簋 : on y apprend le tir à l\'arc', fadeIO(vt, 14.6, 30), H - 70, { size: 36 });
-      E.finish(ctx, t, { vignette: 0.6 });
+      E.finish(ctx, t, { vignette: 0.35 });
     },
   });
 
@@ -481,7 +461,7 @@
     k: 4,
     draw(ctx, t) {
       const vt = VT(4, t);
-      if (vt < 5.4) {
+      if (vt < 5.0) {
         const v = { lon: 112.5, lat: 32.5, k: 44 };
         const mapA = seg(vt, 2.2, 2.7);
         E.background(ctx, t, '#2a0b08', '#050101');
@@ -493,7 +473,7 @@
           const q = E.proj(v, [115, 33]);
           E.text(ctx, '秦', q[0], q[1], { font: 'Kai', size: 180, color: '#ffffff', alpha: seg(vt, 3.4, 4.0) * 0.85, glow: 30, glowColor: '#000' });
           ctx.restore();
-          caption(ctx, 'Qin Shi Huang, premier empereur', fadeIO(vt, 3.0, 5.4));
+          caption(ctx, 'Qin Shi Huang, premier empereur', fadeIO(vt, 3.0, 5.0));
         }
         ctx.save(); shake(ctx, vt, [0.05, 1.2], 22);
         dateSlam(ctx, t, T(4, 0.0), '221', 'AVANT NOTRE ÈRE', { size: 260, out: T(4, 2.2), color: '#ffffff' });
@@ -507,7 +487,9 @@
       if (vt < 9.2) {
         // variantes régionales qui convergent vers une forme unique
         const u = easeInOut(seg(vt, 6.2, 8.4));
-        const a0 = seg(vt, 5.4, 5.9);
+        const a0 = seg(vt, 5.0, 5.2);
+        // « Jusque-là, chaque royaume écrivait à sa façon »
+        E.text(ctx, 'avant Qin : chaque royaume écrit à sa façon', W / 2, 150, { size: 52, weight: 700, color: '#f3e5c6', alpha: seg(vt, 5.05, 5.2) * (1 - seg(vt, 5.5, 5.6)) });
         const ivory = () => '#e9dcc3';
         // avant Qin : chaque royaume écrit à sa façon
         [['real:zhanguo', 480, '戰國文字', 'Royaumes combattants'], ['real:jinwen', 1440, '金文', 'bronzes Zhou']].forEach(([k, px, zh, fr]) => {
@@ -589,6 +571,8 @@
       }
       E.text(ctx, '許慎  Xu Shen', 470, 150, { font: 'Kai', size: 56, color: '#f4e7c8', alpha: seg(vt, 0.3, 0.8) });
       E.text(ctx, '說文解字  ·  Shuowen jiezi  ·  v. 100', 470, 225, { size: 38, weight: 700, color: '#f4b73f', alpha: seg(vt, 2.3, 2.7) });
+      // « le premier dictionnaire qui explique la forme de chaque caractère » (passage étiré par la voix)
+      caption(ctx, 'premier dictionnaire à expliquer la forme des caractères · 9 353 entrées · 540 clés', fadeIO(vt, 4.3, 5.05, 0.06, 0.06), H - 90);
       caption(ctx, '覺悟 : « s\'éveiller, prendre conscience »', fadeIO(vt, 5.7, 7.5, 0.3, 0.3), H - 90);
       caption(ctx, '冂 尚矇也 : « le toit, c\'est ce qui couvre encore — l\'obscurité »', fadeIO(vt, 7.6, 20, 0.3, 0.3), H - 90);
       E.finish(ctx, t);
@@ -607,7 +591,7 @@
       ctx.save(); ctx.globalAlpha = 0.12 * (1 - seg(vt, 3, 4));
       for (let i = 0; i < 14; i++) { const y = 200 + i * 60, x = ((vt * 1400 + i * 377) % 2600) - 400; ctx.fillStyle = '#fff'; ctx.fillRect(x, y, 300 + (i % 3) * 120, 4); }
       ctx.restore();
-      const m = easeInOut(seg(vt, 2.6, 4.3));
+      const m = easeInOut(seg(vt, 2.6, 4.8)); // s'achève pendant la pause qui suit « …les courbes »
       const G = P.clerical;
       const gx = 800, gy = 540, gs = 820;
       if (m < 1) E.drawRealGlyph(ctx, 'xiaozhuan', { x: gx, y: gy, size: gs, color: (c) => COMP[c].col, opacity: 1 - m, glow: 16 });
@@ -690,7 +674,7 @@
           // papier
           ctx.save(); ctx.globalAlpha = aC; ctx.fillStyle = '#e9dcc0'; ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 50;
           ctx.fillRect(gx - 430, gy - 430, 860, 860); ctx.restore();
-          const top = seg(vt, 4.2, 4.6);
+          const top = easeInOut(seg(vt, 4.2, 5.0)); // moment clé : le haut devient ⺍ (pause dans la voix)
           const order = { hand: [2.3, 2.8], yao: [2.6, 3.2], roof: [3.0, 3.5], child: [3.3, 4.2] };
           E.drawFontGlyph(ctx, 'cao_xue_simp', {
             x: gx, y: gy, size: gs * 0.92, reveal: (c) => easeInOut(seg(vt, order[c][0], order[c][1])),
@@ -884,7 +868,7 @@
     ['chime', T(2, 12.6)], ['chime', T(2, 16.5)], ['chime', T(2, 19.5)],
     ['whoosh', V(3) - 0.35], ['hit', T(3, 0.3)], ['whoosh', T(3, 2.8)], ['metal', T(3, 3.0)], ['whoosh', T(3, 5.5)], ['boom', T(3, 7.7)],
     ['chime', T(3, 10.5)], ['chime', T(3, 11.9)], ['chime', T(3, 13.0)], ['whoosh', T(3, 14.0)],
-    ...[0, 1, 2, 3].map((i) => ['arrow', T(3, 15.4) + i * 1.6]),
+    ...LAVIS.releases(14.3, 22.4).map((v) => ['arrow', T(3, v)]),
     ['boom', V(4)], ['hit', T(4, 1.2)], ['riser', T(4, 4.0)], ['whoosh', T(4, 5.4)], ['boom', T(4, 8.6)], ['chime', T(4, 10.8)],
     ['whoosh', V(5) - 0.35], ['chime', T(5, 5.7)], ['low', T(5, 7.6)],
     ['whoosh', V(6) - 0.35], ['whoosh', T(6, 2.6)], ['hit', T(6, 6.0)], ['hit', T(6, 8.8)],
