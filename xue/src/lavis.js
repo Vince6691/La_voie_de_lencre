@@ -221,6 +221,8 @@
   const TGT = { x: 1660, gy: 915, s: 1.1 };
   window.LAVIS = {
     releases(v0, v1) { const out = []; for (let n = 0; FIRST + n * STEP <= v1; n++) if (FIRST + n * STEP >= v0) out.push(FIRST + n * STEP); return out; },
+    // papier de riz seul (fond des scènes « encre sur papier »)
+    paper(ctx) { ctx.drawImage(layers().paper, 0, 0); },
     archery(ctx, t, vt, v0) {
       const Ls = layers();
       const u = seg(vt, v0, v0 + 9);

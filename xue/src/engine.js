@@ -245,8 +245,9 @@
   // Calculé une fois par caractère, de façon déterministe (graines fixes). Sans WebGL2 : encre pleine.
   const brushed = {};
   let brushGL = null, brushOK = null;
-  function brushMasks(key) {
-    if (brushed[key]) return brushed[key];
+  function brushMasks(key, hair = true) {
+    const ck = `${key}|${hair ? 'pinceau' : 'net'}`;
+    if (brushed[ck]) return brushed[ck];
     const D = window.STROKES[key];
     const paths = D.strokes.map((d) => new Path2D(d));
     const scratch = document.createElement('canvas'); scratch.width = scratch.height = 1024;
@@ -274,7 +275,7 @@
         }
       } catch (e) { brushOK = false; }
     }
-    if (brushOK) {
+    if (hair && brushOK) {
       const B = window.brush, G = brushGL.G;
       B.clear(); G.bindFramebuffer(G.FRAMEBUFFER, null); G.clearColor(0, 0, 0, 0); G.clear(G.COLOR_BUFFER_BIT);
       B.seed(300); B.noiseSeed(300); B.push(); B.translate(-512, -512);
@@ -305,11 +306,12 @@
       B.pop(); B.render();
     }
     // masque de chaque trait : forme exacte, évidée par les poils, fin de trait un peu plus pâle
-    brushed[key] = paths.map((P, i) => {
+    brushed[ck] = paths.map((P, i) => {
       const c = document.createElement('canvas'); c.width = c.height = 1024;
       const g = c.getContext('2d');
-      g.setTransform(1, 0, 0, -1, 0, 900); g.fillStyle = 'rgba(0,0,0,0.94)'; g.fill(P);
+      g.setTransform(1, 0, 0, -1, 0, 900); g.fillStyle = hair ? 'rgba(0,0,0,0.94)' : '#000'; g.fill(P);
       g.setTransform(1, 0, 0, 1, 0, 0);
+      if (!hair) return c; // trait net (traits colorés sur fond sombre)
       g.globalCompositeOperation = 'destination-out';
       if (brushOK) g.drawImage(brushGL, 0, 0);
       const m = D.medians[i], e = m[m.length - 1], s0 = m[Math.max(0, m.length - 4)];
@@ -318,7 +320,7 @@
       g.fillStyle = gr; g.fillRect(0, 0, 1024, 1024);
       return c;
     });
-    return brushed[key];
+    return brushed[ck];
   }
   // un masque de trait teinté (dans tint, boîte 1024)
   const tint = document.createElement('canvas'); tint.width = tint.height = 1024;
@@ -334,7 +336,7 @@
 
   function drawKai(ctx, key, o) {
     const D = window.STROKES[key];
-    const masks = brushMasks(key);
+    const masks = brushMasks(key, !!o.brush);
     const comp = (i) => (D.comp[i] === 'fusion' ? 'hand' : D.comp[i]); // ⺍ = ancien haut (mains + 爻)
     octx.setTransform(1, 0, 0, 1, 0, 0);
     octx.clearRect(0, 0, 1000, 1000);
@@ -493,12 +495,12 @@
   };
 
   // ───────── caractère tracé trait par trait, dans l'ordre réel (window.STROKES)
-  // o : x, y, size, progress (nombre de traits tracés, décimal), color(comp) → css, alpha(comp), glow, tip
+  // o : x, y, size, progress (nombre de traits tracés, décimal), color(comp) → css, alpha(comp), glow, tip, brush
   const reveal = document.createElement('canvas'); reveal.width = reveal.height = 1024;
   const rvctx = reveal.getContext('2d');
   E.drawStrokes = function (ctx, key, o) {
     const D = window.STROKES[key];
-    const masks = brushMasks(key);
+    const masks = brushMasks(key, !!o.brush); // o.brush : encre au pinceau (blanc volant), sur papier
     const prog = o.progress ?? D.strokes.length;
     const place = (img) => ctx.drawImage(img, o.x - o.size / 2, o.y - o.size / 2, o.size, o.size);
     D.strokes.forEach((_, i) => {
