@@ -268,7 +268,7 @@
       const pan = lerp(0, -140, easeInOut(u)); // travelling lent vers la droite
       const zoom = lerp(1.05, 1.0, easeOut(u));
       ctx.save();
-      ctx.drawImage(Ls.paper, 0, 0);
+      ctx.drawImage(Ls.xuan, 0, 0); // papier xuan clair
       ctx.translate(W / 2, H / 2); ctx.scale(zoom, zoom); ctx.translate(-W / 2, -H / 2);
       // ciel : quelques oiseaux
       const r = rng(7);
@@ -281,7 +281,7 @@
       Ls.ridges.forEach((rg) => ctx.drawImage(rg.c, -120 + pan * rg.k, 0));
       // brume au ras de l'eau
       const mist = ctx.createLinearGradient(0, 560, 0, 720);
-      mist.addColorStop(0, 'rgba(237,226,200,0)'); mist.addColorStop(0.6, 'rgba(237,226,200,0.85)'); mist.addColorStop(1, 'rgba(237,226,200,0.3)');
+      mist.addColorStop(0, 'rgba(251,248,241,0)'); mist.addColorStop(0.6, 'rgba(251,248,241,0.85)'); mist.addColorStop(1, 'rgba(251,248,241,0.3)');
       ctx.fillStyle = mist; ctx.fillRect(0, 540, W, 200);
       // pavillon au loin, sur l'autre rive, et son reflet dans l'étang
       const px = 1180 + pan * 0.6, py = 700;

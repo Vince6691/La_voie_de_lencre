@@ -457,9 +457,9 @@
       const aT = seg(vt, 20.2, 20.6);
       E.text(ctx, '學宮', W / 2 - 40, 170, { font: 'Kai', size: 120, color: '#1c160f', alpha: aT });
       E.text(ctx, 'la « salle d\'étude »', W / 2 - 40, 270, { size: 44, weight: 700, color: '#5a3a1c', alpha: seg(vt, 20.4, 20.8) });
-      LAVIS.seal(ctx, W / 2 + 150, 190, seg(vt, 20.5, 20.8));
+      LAVIS.seal(ctx, W / 2 + 210, 200, seg(vt, 20.5, 20.8));
       caption(ctx, 'Inscription du vase Jing gui 靜簋 : on y apprend le tir à l\'arc', fadeIO(vt, 14.6, 30), H - 70, { size: 36 });
-      E.finish(ctx, t, { vignette: 0.35 });
+      E.finish(ctx, t, { vignette: 0.1, grain: 0.04 }); // papier clair : pas d'assombrissement des bords
     },
   });
 
@@ -642,27 +642,24 @@
     },
   });
 
-  // 7. Kaishu — encre noire au pinceau sur papier de riz
-  // teinte de l'encre : noire, ou légèrement teintée par composante (window.KAISHU_TINT, essai)
-  const INK = { hand: '#4d1a12', yao: '#4a3610', roof: '#0f3a34', child: '#172649', fusion: '#4d2a0f' };
-  const inkCol = (c) => (window.KAISHU_TINT ? INK[c] : '#15110c');
+  // 7. Kaishu
   S.push({
     k: 7,
     draw(ctx, t) {
       const vt = VT(7, t);
-      LAVIS.xuan(ctx);
-      E.eraTag(ctx, t, '楷書', 'kaishu', 'écriture régulière · canon des Tang', seg(vt, 0.0, 0.5), { paper: true });
+      E.background(ctx, t, '#1d1710', '#040302');
+      E.motes(ctx, t, '255,210,150', 0.4);
+      E.eraTag(ctx, t, '楷書', 'kaishu', 'écriture régulière · canon des Tang', seg(vt, 0.0, 0.5));
       const gx = 800, gy = 560, gs = 820;
       // les 16 traits dans l'ordre d'écriture réel, le compteur suit le pinceau
       const prog = 16 * seg(vt, 0.05, 3.65);
-      E.drawStrokes(ctx, 'xue_trad', { x: gx, y: gy, size: gs, progress: prog, color: inkCol });
-      E.text(ctx, 'xué', 1560, 380, { font: 'Cormorant', weight: 700, size: 150, color: '#2a1d12', alpha: seg(vt, 2.6, 2.9) });
+      E.drawStrokes(ctx, 'xue_trad', { x: gx, y: gy, size: gs, progress: prog, color: strokeCol, glow: 22, glowColor: 'rgba(255,170,90,0.45)', tip: true });
+      E.text(ctx, 'xué', 1560, 380, { font: 'Cormorant', weight: 700, size: 150, color: '#f6e7c6', alpha: seg(vt, 2.6, 2.9), glow: 30, glowColor: 'rgba(255,140,60,0.6)' });
       const n = Math.min(16, Math.ceil(prog - 0.02));
       const u = seg(vt, 3.6, 3.9);
-      E.text(ctx, String(n), 1560, 640, { font: 'Cinzel', weight: 900, size: 220, color: '#a8281d', alpha: seg(vt, 0.2, 0.6) });
-      E.text(ctx, 'TRAITS', 1560, 790, { font: 'Cinzel', weight: 700, size: 56, color: '#3a2a1a', spacing: 14, alpha: u });
-      LAVIS.seal1(ctx, gx + 330, gy + 330, seg(vt, 3.7, 4.0), '學', 84); // sceau du calligraphe
-      E.finish(ctx, t, { vignette: 0, grain: 0.035 });
+      E.text(ctx, String(n), 1560, 640, { font: 'Cinzel', weight: 900, size: 220, color: '#f4b73f', alpha: seg(vt, 0.2, 0.6) });
+      E.text(ctx, 'TRAITS', 1560, 790, { font: 'Cinzel', weight: 700, size: 56, color: '#f3e5c6', spacing: 14, alpha: u });
+      E.finish(ctx, t);
     },
   });
 
@@ -750,15 +747,14 @@
         E.finish(ctx, t, { vignette: 0.8 });
         return;
       }
-      // 学 au pinceau, sur le même papier que 學
-      LAVIS.xuan(ctx);
-      E.drawStrokes(ctx, 'xue_simp', { x: gx, y: gy, size: gs, progress: 8 * seg(vt, 15.2, 16.0), color: inkCol });
+      E.background(ctx, t, '#1d1710', '#040302');
+      E.motes(ctx, t, '255,210,150', 0.5);
+      E.drawStrokes(ctx, 'xue_simp', { x: gx, y: gy, size: gs, progress: 8 * seg(vt, 15.2, 16.0), color: strokeCol, glow: 26, glowColor: 'rgba(255,150,70,0.5)', tip: true });
       ctx.save(); shake(ctx, vt, [15.72], 12);
-      E.text(ctx, '8', 1560, 560, { font: 'Cinzel', weight: 900, size: 260, color: '#a8281d', alpha: seg(vt, 15.6, 15.8) });
-      E.text(ctx, 'TRAITS', 1560, 730, { font: 'Cinzel', weight: 700, size: 56, color: '#3a2a1a', spacing: 14, alpha: seg(vt, 15.7, 15.9) });
+      E.text(ctx, '8', 1560, 560, { font: 'Cinzel', weight: 900, size: 260, color: '#f4b73f', alpha: seg(vt, 15.6, 15.8), glow: 30, glowColor: '#f4b73f' });
+      E.text(ctx, 'TRAITS', 1560, 730, { font: 'Cinzel', weight: 700, size: 56, color: '#f3e5c6', spacing: 14, alpha: seg(vt, 15.7, 15.9) });
       ctx.restore();
-      LAVIS.seal1(ctx, gx + 330, gy + 330, seg(vt, 15.9, 16.2), '学', 84);
-      E.finish(ctx, t, { vignette: 0, grain: 0.035 });
+      E.finish(ctx, t);
     },
   });
 
