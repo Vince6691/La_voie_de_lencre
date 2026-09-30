@@ -655,7 +655,7 @@
       const gx = 800, gy = 560, gs = 820;
       // les 16 traits dans l'ordre d'écriture réel, le compteur suit le pinceau
       const prog = 16 * seg(vt, 0.05, 3.65);
-      E.drawStrokes(ctx, 'xue_trad', { x: gx, y: gy, size: gs, progress: prog, color: inkCol, brush: true });
+      E.drawStrokes(ctx, 'xue_trad', { x: gx, y: gy, size: gs, progress: prog, color: inkCol });
       E.text(ctx, 'xué', 1560, 380, { font: 'Cormorant', weight: 700, size: 150, color: '#2a1d12', alpha: seg(vt, 2.6, 2.9) });
       const n = Math.min(16, Math.ceil(prog - 0.02));
       const u = seg(vt, 3.6, 3.9);
@@ -752,7 +752,7 @@
       }
       // 学 au pinceau, sur le même papier que 學
       LAVIS.xuan(ctx);
-      E.drawStrokes(ctx, 'xue_simp', { x: gx, y: gy, size: gs, progress: 8 * seg(vt, 15.2, 16.0), color: inkCol, brush: true });
+      E.drawStrokes(ctx, 'xue_simp', { x: gx, y: gy, size: gs, progress: 8 * seg(vt, 15.2, 16.0), color: inkCol });
       ctx.save(); shake(ctx, vt, [15.72], 12);
       E.text(ctx, '8', 1560, 560, { font: 'Cinzel', weight: 900, size: 260, color: '#a8281d', alpha: seg(vt, 15.6, 15.8) });
       E.text(ctx, 'TRAITS', 1560, 730, { font: 'Cinzel', weight: 700, size: 56, color: '#3a2a1a', spacing: 14, alpha: seg(vt, 15.7, 15.9) });
