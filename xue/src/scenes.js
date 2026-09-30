@@ -197,7 +197,7 @@
     { k: 'real:jiaguwen', zh: '甲骨文', fr: 'Shang' },
     { k: 'real:jinwen', zh: '金文', fr: 'Zhou' },
     { k: 'real:xiaozhuan', zh: '小篆', fr: 'Qin' },
-    { k: 'clerical', zh: '隸書', fr: 'Han' },
+    { k: 'real:lishu', zh: '隸書', fr: 'Han' },
     { k: 'font:kai_xue_trad', zh: '楷書', fr: 'Tang' },
     { k: 'font:cao_xue_simp', zh: '草書', fr: 'cursive' },
     { k: 'font:kai_xue_simp', zh: '学', fr: 'XXe s.' },
@@ -592,19 +592,20 @@
       for (let i = 0; i < 14; i++) { const y = 200 + i * 60, x = ((vt * 1400 + i * 377) % 2600) - 400; ctx.fillStyle = '#fff'; ctx.fillRect(x, y, 300 + (i % 3) * 120, 4); }
       ctx.restore();
       const m = easeInOut(seg(vt, 2.6, 4.8)); // s'achève pendant la pause qui suit « …les courbes »
-      const G = P.clerical;
       const gx = 800, gy = 540, gs = 820;
       if (m < 1) E.drawRealGlyph(ctx, 'xiaozhuan', { x: gx, y: gy, size: gs, color: (c) => COMP[c].col, opacity: 1 - m, glow: 16 });
       const handHi = pulse(vt, 5.1, 3.0);
       const fade = seg(vt, 8.7, 9.6);
-      E.drawGlyph(ctx, G, {
-        x: gx, y: gy, size: gs, alpha: () => m,
+      // forme réelle : stèle de Cao Quan 曹全碑 (Han orientaux, 185), 小學堂 — Academia Sinica
+      E.drawRealGlyph(ctx, 'lishu', {
+        x: gx, y: gy, size: gs, opacity: m,
         color: (c) => (c === 'hand' ? E.mix(E.mix(COMP.hand.col, '#ffffff', 0.35 * handHi), '#6b6560', fade) : COMP[c].col),
-        glow: 18, glowColor: (c) => E.rgba(COMP[c].col, c === 'hand' ? 0.3 + 0.7 * handHi * (1 - fade) : 0.35),
+        glow: 16 + 22 * handHi * (1 - fade), glowColor: E.rgba(COMP.hand.col, 0.3 + 0.5 * handHi * (1 - fade)),
       });
+      E.text(ctx, 'stèle de Cao Quan 曹全碑 · 185', gx, gy + gs / 2 + 30, { size: 26, weight: 600, color: '#b9b2c8', alpha: m * 0.85 });
       E.legend(ctx, 1 - seg(vt, 5.0, 5.4), { hand: 1, yao: 1, roof: 1, child: 1 });
-      // 蠶頭燕尾
-      const fx = gx - gs / 2 + 868 * gs / 1000, fy = gy - gs / 2 + 676 * gs / 1000;
+      // 蠶頭燕尾 : l'extrémité droite de la grande horizontale de 子
+      const fx = gx - gs / 2 + 318 * gs / 400, fy = gy - gs / 2 + 248 * gs / 400;
       E.callout(ctx, fx, fy, 1360, 950, '燕尾', '#f4b73f', seg(vt, 4.3, 4.7) * (1 - seg(vt, 5.2, 5.5)), 'la « queue d\'hirondelle »');
       // 臼 : un mortier ?
       const aM = seg(vt, 6.0, 6.4);

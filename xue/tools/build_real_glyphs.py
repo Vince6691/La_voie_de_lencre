@@ -1,4 +1,5 @@
-"""Glyphes historiques réels (SVG zdic.net fournis dans assets/glyphs/) → src/realglyphs.js
+"""Glyphes historiques réels (SVG zdic.net fournis dans assets/glyphs/, et lishu.svg vectorisé depuis
+小學堂 par tools/vectorize_xiaoxue.py) → src/realglyphs.js
 
 Chaque tracé sombre est rattaché à une composante (hand 𦥑, yao 爻, roof 冖, child 子) ; un tracé
 qui en contient deux (ex. main gauche soudée au 爻 sur l'os) est découpé par un polygone `cut`.
@@ -20,6 +21,13 @@ GLYPHS = {
     # xiaozhuan (petit sceau, Qin)
     'xiaozhuan': {'src': 'xiaozhuan.svg', 'comp': {0: 'child', 1: 'roof', 2: 'yao', 3: 'hand', 4: 'hand'},
                   'label': '小篆', 'era': 'Qin'},
+    # lishu (écriture des clercs) — stèle de Cao Quan 曹全碑, Han orientaux, 185 ; 小學堂 (Academia
+    # Sinica), CC0 ; un seul tracé, composantes attribuées par polygones (reste : les deux mains)
+    'lishu': {'src': 'lishu.svg', 'comp': {0: 'hand'},
+              'cut': {0: [{'c': 'yao', 'poly': [[172, 25], [262, 25], [262, 138], [172, 138]]},
+                          {'c': 'roof', 'poly': [[55, 143], [365, 143], [365, 200], [330, 200], [330, 172], [100, 172], [100, 235], [55, 235]]},
+                          {'c': 'child', 'poly': [[100, 174], [340, 174], [340, 392], [36, 392], [36, 318], [100, 318]]}]},
+              'label': '隸書', 'era': 'Han'},
 }
 
 
@@ -62,7 +70,7 @@ for key, cfg in GLYPHS.items():
     out[key] = {'paths': paths, 'centers': centers, 'label': cfg['label'], 'era': cfg['era']}
 
 open('src/realglyphs.js', 'w').write(
-    "// Formes historiques réelles de 學 (images zdic.net vectorisées, fournies par l'auteur).\n"
+    "// Formes historiques réelles de 學 (images zdic.net vectorisées, fournies par l'auteur ; lishu : 小學堂, CC0).\n"
     "// Généré par tools/build_real_glyphs.py — boîte 400 × 400.\n"
     "window.REALGLYPHS = " + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ";\n")
 print({k: [p['c'] for p in v['paths']] for k, v in out.items()})

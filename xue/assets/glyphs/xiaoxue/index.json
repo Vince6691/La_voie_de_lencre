@@ -1,0 +1,109 @@
+{
+ "char": "學",
+ "source": "小學堂字形演變資料庫, 中央研究院 (https://xiaoxue.iis.sinica.edu.tw/yanbian)",
+ "license": "CC0 1.0 (déclaration de la page /License/License du site)",
+ "forms": [
+  {
+   "font": "中研院甲骨文重文一",
+   "text": "",
+   "label": "鐵157.4(甲) 商",
+   "file": "00.png"
+  },
+  {
+   "font": "中研院甲骨文重文一",
+   "text": "",
+   "label": "寧滬3.95(甲) 商",
+   "file": "01.png"
+  },
+  {
+   "font": "中研院甲骨文重文一",
+   "text": "",
+   "label": "燕717(甲) 商",
+   "file": "02.png"
+  },
+  {
+   "font": "中研院甲骨文重文一",
+   "text": "",
+   "label": "粹425(甲) 商",
+   "file": "03.png"
+  },
+  {
+   "font": "中研院金文重文一",
+   "text": "",
+   "label": "大盂鼎(金) 西周早期",
+   "file": "04.png"
+  },
+  {
+   "font": "中研院金文重文一",
+   "text": "",
+   "label": "沈子它簋蓋(金) 西周早期",
+   "file": "05.png"
+  },
+  {
+   "font": "中研院金文重文一",
+   "text": "",
+   "label": "者尸鎛(金) 戰國早期.楚",
+   "file": "06.png"
+  },
+  {
+   "font": "中研院金文重文一",
+   "text": "",
+   "label": "中山王昔鼎(金) 戰國晚期.晉",
+   "file": "07.png"
+  },
+  {
+   "font": "中研院楚系簡帛文字重文五",
+   "text": "",
+   "label": "郭.老乙.3 戰國.楚",
+   "file": "08.png"
+  },
+  {
+   "font": "中研院楚系簡帛文字重文五",
+   "text": "",
+   "label": "郭.尊.5 戰國.楚",
+   "file": "09.png"
+  },
+  {
+   "font": "北師大說文小篆",
+   "text": "",
+   "label": "說文‧教部",
+   "file": "10.png"
+  },
+  {
+   "font": "北師大說文小篆",
+   "text": "學",
+   "label": "說文篆文",
+   "file": "11.png"
+  },
+  {
+   "font": "中研院隸書重文一",
+   "text": "",
+   "label": "睡虎地簡16.112(隸) 秦",
+   "file": "12.png"
+  },
+  {
+   "font": "中研院隸書重文一",
+   "text": "",
+   "label": "老子甲59(隸) 西漢",
+   "file": "13.png"
+  },
+  {
+   "font": "中研院隸書重文一",
+   "text": "",
+   "label": "老子乙202上(隸) 西漢",
+   "file": "14.png"
+  },
+  {
+   "font": "中研院隸書重文一",
+   "text": "",
+   "label": "孫子192(隸) 西漢",
+   "file": "15.png"
+  },
+  {
+   "font": "中研院隸書重文一",
+   "text": "",
+   "label": "曹全碑(隸) 東漢",
+   "file": "16.png"
+  }
+ ]
+}
