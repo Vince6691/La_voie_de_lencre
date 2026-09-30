@@ -17,4 +17,7 @@ cp(pick(`${X}/out/captions.json`, `${X}/assets/data/captions.json`), `${here}/sr
 cp(pick(`${X}/out/audio_gain.json`, `${X}/assets/data/audio_gain.json`), `${here}/src/data/audio_gain.json`);
 const tl = fs.readFileSync(`${X}/src/timeline.js`, 'utf8').split('=').slice(1).join('=').trim().replace(/;$/, '');
 fs.writeFileSync(`${here}/src/data/timeline.json`, tl);
+// extrait vidéo de la divination (le seul fichier du dossier)
+const vids = fs.readdirSync(`${X}/assets/video`).filter((f) => f.endsWith('.mp4'));
+if (vids.length) cp(`${X}/assets/video/${vids[0]}`, `${here}/public/video/divination.mp4`);
 console.log('synchronisé');

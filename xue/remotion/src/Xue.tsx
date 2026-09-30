@@ -2,13 +2,14 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { loadLegacy, W } from './legacy';
 import { Props3D } from './three/Props3D';
+import { Divination } from './Divination';
 import { InkWipes } from './InkWipes';
 import { Captions } from './Captions';
 import timeline from './data/timeline.json';
 import gain from './data/audio_gain.json';
 
 export type XueProps = {
-  /** carapace et vase en 3D (Three.js) au lieu des dessins 2D */
+  /** vase ding en 3D (Three.js) et extrait vidéo de la divination, au lieu des dessins 2D */
   three: boolean;
   /** sous-titres animés mot à mot */
   captions: boolean;
@@ -41,6 +42,8 @@ export const Xue: React.FC<XueProps> = ({ three, captions, inkTransitions }) => 
 
   return (
     <AbsoluteFill style={{ background: '#000' }}>
+      {/* sous le canevas : pendant l'extrait, la scène 2 n'y peint pas de fond */}
+      {ready && three && <Divination />}
       {ready && <LegacyCanvas />}
       {ready && three && <Props3D />}
       {ready && inkTransitions && <InkWipes />}

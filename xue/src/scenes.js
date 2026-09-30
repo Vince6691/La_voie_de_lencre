@@ -324,19 +324,27 @@
         return;
       }
       // b) plastron + divination, puis c) gravure du signe
+      // version Remotion : un extrait vidéo passe sous le canevas (ancres 5,1 → 8,45) ; le fond reste
+      // transparent pendant l'extrait, puis revient sous le signe qui se grave
+      const clip = FLAGS.three ? 1 - seg(vt, 8.1, 8.45) : 0;
+      ctx.save(); ctx.globalAlpha = 1 - clip;
       E.background(ctx, t, '#2a1a0e', '#070403');
-      E.motes(ctx, t, '255,150,60', 0.9 * (1 - seg(vt, 9, 10)));
-      const zoom = easeInOut(seg(vt, 8.0, 9.8));
-      ctx.save();
-      camera(ctx, lerp(1, 2.6, zoom), lerp(W / 2, W / 2, zoom), lerp(H / 2, H / 2 - 20, zoom));
-      if (!(FLAGS.three && vt < 9.4)) plastron(ctx, t, W / 2, H / 2 + 20, 1.35 * lerp(0.92, 1, easeOut(seg(vt, 5.0, 5.8))), seg(vt, 5.6, 7.6), seg(vt, 5.2, 6.0) * (1 - seg(vt, 7.4, 8.4)));
       ctx.restore();
+      if (!clip) E.motes(ctx, t, '255,150,60', 0.9 * (1 - seg(vt, 9, 10)));
+      if (!FLAGS.three) {
+        const zoom = easeInOut(seg(vt, 8.0, 9.8));
+        ctx.save();
+        camera(ctx, lerp(1, 2.6, zoom), lerp(W / 2, W / 2, zoom), lerp(H / 2, H / 2 - 20, zoom));
+        plastron(ctx, t, W / 2, H / 2 + 20, 1.35 * lerp(0.92, 1, easeOut(seg(vt, 5.0, 5.8))), seg(vt, 5.6, 7.6), seg(vt, 5.2, 6.0) * (1 - seg(vt, 7.4, 8.4)));
+        ctx.restore();
+      }
       E.eraTag(ctx, t, '甲骨文', 'jiaguwen', 'os oraculaires · Shang', seg(vt, 5.1, 5.6));
-      caption(ctx, 'Les devins interrogent les ancêtres : le feu fait craquer l\'os', fadeIO(vt, 5.3, 8.4), FLAGS.three ? 150 : H - 110); // au-dessus de la carapace 3D
+      caption(ctx, 'Les devins interrogent les ancêtres : le feu fait craquer l\'os', fadeIO(vt, 5.3, 8.4));
 
-      if (vt > 9.4) {
+      const p0 = FLAGS.three ? 8.1 : 9.4; // « Là, naît le signe » : gravé juste après l'extrait vidéo
+      if (vt > p0) {
         // panneau d'os en gros plan
-        const a = seg(vt, 9.4, 9.9);
+        const a = seg(vt, p0, p0 + 0.45);
         const gx = 760, gy = 560, gs = 820;
         const hi = {
           yao: Math.max(pulse(vt, 11.2, 1.2), pulse(vt, 12.6, 1.4)),
@@ -348,8 +356,8 @@
         const hiAll = Math.max(hi.yao, hi.roof, hi.hand);
         E.drawRealGlyph(ctx, 'jiaguwen', {
           ...rg, opacity: a, carve: true,
-          // signe déjà incisé sur l'os (version 3D) ; sinon révélé composante par composante
-          reveal: (c) => (FLAGS.three ? 1 : easeInOut(c === 'yao' ? seg(vt, 10.0, 11.6) : c === 'roof' ? seg(vt, 15.6, 16.7) : seg(vt, 17.9, 19.5))),
+          // version Remotion : le signe se grave d'un seul geste ; sinon révélé composante par composante
+          reveal: (c) => (FLAGS.three ? easeInOut(seg(vt, 8.3, 9.7)) : easeInOut(c === 'yao' ? seg(vt, 10.0, 11.6) : c === 'roof' ? seg(vt, 15.6, 16.7) : seg(vt, 17.9, 19.5))),
           color: (c) => E.mix(E.mix(BONE_INK, COMP[c].col, known[c]), '#ffffff', 0.3 * (hi[c] || 0)),
           glow: 10 + 20 * hiAll, glowColor: 'rgba(255,190,110,0.45)',
         });
@@ -888,6 +896,7 @@
     const ctx = window.CTX;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, W, H); // fond transparent là où une scène n'en peint pas (extrait vidéo dessous)
     let i = bounds.findIndex(([a, b]) => t >= a && t < b);
     if (i < 0) i = S.length - 1;
     const [a] = bounds[i];
