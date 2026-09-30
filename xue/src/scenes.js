@@ -44,18 +44,42 @@
     let a = 0; for (const f of times) { const u = t - f; if (u >= 0 && u < dur) a = Math.max(a, (1 - u / dur) * max); }
     if (a > 0) { ctx.fillStyle = `rgba(${col},${a})`; ctx.fillRect(0, 0, W, H); }
   }
+  // date / titre : les lettres se posent une à une, comme de l'encre qui prend sur le papier
+  // (flou → net, légère descente) ; la ligne de sous-titre se dévoile ensuite de gauche à droite
   function dateSlam(ctx, t, t0, big, small, o = {}) {
-    const u = seg(t, t0, t0 + 0.35);
-    if (u <= 0) return;
+    if (t < t0) return;
     const out = o.out ? 1 - seg(t, o.out, o.out + 0.4) : 1;
     if (out <= 0) return;
-    const s = lerp(2.4, 1, easeOut(u));
+    const size = o.size || 170, sp = 6, stag = o.stagger ?? 0.07, dur = 0.5;
+    const x0 = o.x ?? W / 2, y0 = o.y ?? H / 2;
+    const col = o.ink ? '#2a170a' : o.color || '#f6e7c6';
+    const glow = o.ink ? 26 : 40, glowColor = o.ink ? 'rgba(250,236,206,0.95)' : 'rgba(255,120,40,0.55)';
     ctx.save();
-    ctx.globalAlpha = u * out;
-    ctx.translate(o.x ?? W / 2, o.y ?? H / 2); ctx.scale(s, s);
-    // o.ink : encre sombre sur le parchemin des cartes
-    E.text(ctx, big, 0, 0, { font: 'Cinzel', weight: 900, size: o.size || 170, color: o.ink ? '#2a170a' : o.color || '#f6e7c6', glow: o.ink ? 26 : 40, glowColor: o.ink ? 'rgba(250,236,206,0.95)' : 'rgba(255,120,40,0.55)', spacing: 6 });
-    if (small) E.text(ctx, small, 0, (o.size || 170) * 0.62, { font: 'Cinzel', weight: 700, size: 40, color: o.ink ? '#7a2416' : '#f4b73f', spacing: 10, glow: o.ink ? 18 : 0, glowColor: 'rgba(250,236,206,0.95)' });
+    ctx.font = `900 ${size}px Cinzel, Kai, Song`;
+    const chars = [...big], wd = chars.map((c) => ctx.measureText(c).width + sp);
+    const total = wd.reduce((p, q) => p + q, 0) - sp;
+    let x = x0 - total / 2;
+    chars.forEach((c, i) => {
+      const u = seg(t, t0 + i * stag, t0 + i * stag + dur);
+      if (u > 0 && c !== ' ') {
+        const e = easeOut(u);
+        ctx.save();
+        ctx.filter = `blur(${(1 - e) * 14}px)`;
+        ctx.translate(x + wd[i] / 2, y0 - 22 * (1 - e)); ctx.scale(lerp(1.18, 1, e), lerp(1.18, 1, e));
+        E.text(ctx, c, 0, 0, { font: 'Cinzel', weight: 900, size, color: col, alpha: Math.min(1, u * 1.6) * out, glow: glow * e, glowColor });
+        ctx.restore();
+      }
+      x += wd[i];
+    });
+    if (small) {
+      const u = easeInOut(seg(t, t0 + chars.length * stag + 0.15, t0 + chars.length * stag + 0.85));
+      if (u > 0) {
+        ctx.save();
+        ctx.beginPath(); ctx.rect(0, 0, W * lerp(0.2, 1, u) + (x0 - W / 2) * 2, H); ctx.clip(); // dévoilement gauche → droite
+        E.text(ctx, small, x0, y0 + size * 0.62, { font: 'Cinzel', weight: 700, size: 40, color: o.ink ? '#7a2416' : '#f4b73f', spacing: 10, glow: o.ink ? 18 : 0, glowColor: 'rgba(250,236,206,0.95)', alpha: u * out });
+        ctx.restore();
+      }
+    }
     ctx.restore();
   }
   function caption(ctx, str, a, y = H - 110, o = {}) {
@@ -297,7 +321,7 @@
       const aD = seg(vt, A.learn, A.learn + 0.15);
       if (aD > 0) {
         E.drawFontGlyph(ctx, 'kai_xue_simp', { x: W / 2, y: H / 2 - 60, size: 520, color: () => 'rgba(180,40,30,1)', opacity: 0.35 * aD });
-        dateSlam(ctx, t, T(1, A.learn), 'APPRENDRE', null, { size: 190 });
+        dateSlam(ctx, t, T(1, A.learn), 'APPRENDRE', null, { size: 190, stagger: 0.045 });
       }
       ctx.restore();
       flash(ctx, t, flashes, '255,240,220', 0.15, 0.35);
@@ -698,9 +722,13 @@
         return;
       }
       if (vt < 10.7) {
-        // page imprimée xylographique
+        // page imprimée xylographique : le Classique des trois caractères (三字經, manuel d'école
+        // populaire, attribué à Wang Yinglin, XIIIe s.), avec 學 écrit sous sa forme abrégée 学
         E.background(ctx, t, '#241a10', '#050302');
         const a = seg(vt, 5.8, 6.2);
+        const hl = seg(vt, 6.6, 7.0);
+        const TEXT = '人之初性本善性相近習相遠苟不教性乃遷教之道貴以專昔孟母擇鄰處子不学斷機杼竇燕山有義方教五子名俱揚養不教父之過教不嚴師之惰子不学非所宜幼不学老何為玉不琢不成器人不学不知義為人子方少時親師友習禮儀香九齡能溫席孝於親所當執融四歲能讓梨弟於長宜先知首孝弟次見聞知某數識某文';
+        const HC = 5; // colonne où le 学 est entouré (« 子不学，非所宜 »)
         ctx.save(); ctx.globalAlpha = a;
         camera(ctx, lerp(1.0, 1.12, seg(vt, 5.8, 10.7)), 900, 520);
         ctx.fillStyle = '#e4d3ae'; ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 60;
@@ -708,29 +736,26 @@
         ctx.strokeStyle = '#3a2412'; ctx.lineWidth = 6; ctx.strokeRect(400, 130, 1120, 820);
         ctx.lineWidth = 2;
         const r = E.rand(31);
+        let hx = 0, hy = 0, k = 0;
         for (let c = 0; c < 12; c++) {
-          const x = 1480 - c * 90;
-          ctx.beginPath(); ctx.moveTo(x - 45, 130); ctx.lineTo(x - 45, 950); ctx.stroke();
-          for (let j = 0; j < 11; j++) {
-            if (c === 4 && j === 5) continue;
-            ctx.strokeStyle = `rgba(35,20,8,${0.55 + r() * 0.35})`; ctx.lineWidth = 5; ctx.lineCap = 'square';
-            const cy = 160 + j * 72 + 26, n = 4 + Math.floor(r() * 5);
-            for (let q = 0; q < n; q++) {
-              const hz = r() < 0.55, px = x - 24 + r() * 48, py = cy - 24 + r() * 48, l = 14 + r() * 30;
-              ctx.beginPath(); ctx.moveTo(clamp(px, x - 26, x + 26), clamp(py, cy - 26, cy + 26));
-              ctx.lineTo(clamp(hz ? px + l : px + (r() - 0.5) * 12, x - 26, x + 26), clamp(hz ? py + (r() - 0.5) * 6 : py + l, cy - 26, cy + 26)); ctx.stroke();
-            }
+          const x = 1480 - c * 90; // lecture en colonnes, de droite à gauche
+          ctx.strokeStyle = '#3a2412'; ctx.beginPath(); ctx.moveTo(x - 45, 130); ctx.lineTo(x - 45, 950); ctx.stroke();
+          for (let j = 0; j < 11; j++, k++) {
+            const ch = TEXT[k % TEXT.length], cy = 160 + j * 72 + 26;
+            const mark = ch === '学' && c === HC && !hx;
+            if (mark) { hx = x; hy = cy; }
+            // encre d'impression inégale, comme sur un bois gravé
+            E.text(ctx, ch, x + (r() - 0.5) * 2, cy + (r() - 0.5) * 2, { font: 'Song', weight: 700, size: 60, color: mark ? E.mix('#2a1a0c', '#b3261e', hl) : `rgba(38,22,9,${0.72 + r() * 0.25})` });
           }
         }
-        ctx.restore();
-        const hx = 1480 - 4 * 90, hy = 160 + 5 * 72 + 26;
-        const hl = seg(vt, 6.6, 7.0);
-        E.text(ctx, '学', hx, hy, { font: 'Song', weight: 700, size: 64, color: E.mix('#2a1a0c', '#b3261e', hl), alpha: a });
-        if (hl > 0) {
-          ctx.save(); ctx.strokeStyle = '#b3261e'; ctx.lineWidth = 5; ctx.globalAlpha = hl;
-          ctx.beginPath(); ctx.arc(hx, hy, 60 + 20 * (1 - hl), 0, 7); ctx.stroke(); ctx.restore();
-          E.drawFontGlyph(ctx, 'kai_xue_simp', { x: 1745, y: 520, size: 250, color: fusionCol, opacity: hl, glow: 20 });
+        if (hl > 0 && hx) {
+          ctx.strokeStyle = '#b3261e'; ctx.lineWidth = 5; ctx.globalAlpha = hl * a;
+          ctx.beginPath(); ctx.arc(hx, hy, 52 + 18 * (1 - hl), 0, 7); ctx.stroke();
         }
+        ctx.restore();
+        if (hl > 0) E.drawFontGlyph(ctx, 'kai_xue_simp', { x: 1745, y: 520, size: 250, color: fusionCol, opacity: hl, glow: 20 });
+        E.text(ctx, '三字經', 1745, 690, { font: 'Kai', size: 40, color: '#e9dcc0', alpha: hl });
+        E.text(ctx, 'attr. Wang Yinglin, XIIIe s.', 1745, 740, { size: 26, weight: 600, color: '#cdbb98', alpha: hl });
         caption(ctx, 'Livres populaires imprimés · Song (960–1279) et Yuan (1271–1368)', fadeIO(vt, 6.4, 10.7), H - 60, { size: 36 });
         E.finish(ctx, t);
         return;
