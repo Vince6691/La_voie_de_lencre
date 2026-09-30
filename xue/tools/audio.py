@@ -239,3 +239,8 @@ _bed = (music * duck * 0.2 + sfx * (0.5 + 0.5 * duck) * 0.24)[:end]
 _act = np.abs(voice[:end]) > 0.02
 _r = lambda x: 20 * np.log10(np.sqrt((x ** 2).mean()) + 1e-9)
 print('voix', round(_r(vox[:end][_act]), 1), 'fond pendant voix', round(_r(_bed[_act]), 1), 'fond hors voix', round(_r(_bed[~_act]), 1))
+# copies versionnées pour la version Remotion (Studio utilisable depuis un clone neuf)
+import os, shutil, subprocess, imageio_ffmpeg
+os.makedirs('assets/audio', exist_ok=True); os.makedirs('assets/data', exist_ok=True)
+subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), '-y', '-loglevel', 'error', '-i', 'out/bed.wav', '-c:a', 'libmp3lame', '-b:a', '192k', 'assets/audio/bed.mp3'], check=True)
+shutil.copy('out/audio_gain.json', 'assets/data/audio_gain.json')

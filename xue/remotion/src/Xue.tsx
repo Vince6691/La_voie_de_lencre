@@ -45,7 +45,7 @@ export const Xue: React.FC<XueProps> = ({ three, captions, inkTransitions }) => 
       {ready && three && <Props3D />}
       {ready && inkTransitions && <InkWipes />}
       {ready && captions && <Captions />}
-      <Audio src={staticFile('audio/bed.wav')} />
+      <Audio src={staticFile('audio/bed.mp3')} />
       {timeline.voice.map((v, i) => (
         <Sequence key={i} from={Math.round(v.start * fps)} name={`voix ${i + 1}`}>
           <Audio src={staticFile(`voice/s${String(i + 1).padStart(2, '0')}.wav`)} volume={gain.voice_gain} />

@@ -78,5 +78,6 @@ for i, text in enumerate(TEXTS, 1):
         # le groupe suivant commence à la reprise de la parole
         nxt = [s0 for s0 in starts_ if s0 >= t_end - 0.01]
         t_prev = nxt[0] if nxt else t_end
-json.dump(words_out, open('out/captions.json', 'w'), ensure_ascii=False)
+json.dump(words_out, open("out/captions.json", "w"), ensure_ascii=False)
+json.dump(words_out, open("assets/data/captions.json", "w"), ensure_ascii=False)
 print(len(words_out), 'mots')

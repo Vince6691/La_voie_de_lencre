@@ -10,9 +10,11 @@ const cp = (from, to) => { fs.mkdirSync(path.dirname(to), { recursive: true }); 
 for (const f of ['timeline.js', 'warp.js', 'geodata.js', 'fontglyphs.js', 'strokes.js', 'realglyphs.js', 'glyphs.js', 'engine.js', 'lavis.js', 'scenes.js']) cp(`${X}/src/${f}`, `${here}/public/legacy/${f}`);
 for (const f of fs.readdirSync(`${X}/assets/fonts`)) cp(`${X}/assets/fonts/${f}`, `${here}/public/fonts/${f}`);
 for (const f of fs.readdirSync(`${X}/assets/voice_fast`)) if (f.endsWith('.wav')) cp(`${X}/assets/voice_fast/${f}`, `${here}/public/voice/${f}`);
-cp(`${X}/out/bed.wav`, `${here}/public/audio/bed.wav`);
-cp(`${X}/out/captions.json`, `${here}/src/data/captions.json`);
-cp(`${X}/out/audio_gain.json`, `${here}/src/data/audio_gain.json`);
+// fond sonore (versionné, écrit par tools/audio.py) ; données générées (out/) ou leur copie versionnée
+const pick = (gen, kept) => (fs.existsSync(gen) ? gen : kept);
+cp(`${X}/assets/audio/bed.mp3`, `${here}/public/audio/bed.mp3`);
+cp(pick(`${X}/out/captions.json`, `${X}/assets/data/captions.json`), `${here}/src/data/captions.json`);
+cp(pick(`${X}/out/audio_gain.json`, `${X}/assets/data/audio_gain.json`), `${here}/src/data/audio_gain.json`);
 const tl = fs.readFileSync(`${X}/src/timeline.js`, 'utf8').split('=').slice(1).join('=').trim().replace(/;$/, '');
 fs.writeFileSync(`${here}/src/data/timeline.json`, tl);
 console.log('synchronisé');
