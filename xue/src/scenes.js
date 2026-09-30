@@ -560,6 +560,7 @@
   });
 
   // 5. Xu Shen et le Shuowen jiezi
+  const shuowenCache = {};
   S.push({
     k: 5,
     draw(ctx, t) {
@@ -584,7 +585,17 @@
         const hl2 = c === '冂尚矇也' || c === '从冂' ? seg(vt, 7.5, 7.9) : 0;
         [...c].forEach((ch, j) => {
           const col = hl1 > 0 && j < 2 ? E.mix('#1d130a', '#b3261e', hl1) : hl2 > 0 && (ch === '冂' || j < 4 && c === '冂尚矇也') ? E.mix('#1d130a', '#136d63', hl2) : '#1d130a';
-          E.text(ctx, ch, x, top + 70 + j * 92, { font: 'Kai', size: 78, color: col });
+          // têtes d'article (斆, puis sa variante 學) en petit sceau ; explication en écriture des clercs
+          // (formes réelles du 小學堂) ; à défaut de forme retenue, kaishu
+          const head = (c === '斆' || c === '學') && j === 0;
+          const d = window.SHUOWEN[head ? 'seal:' + ch : ch];
+          const cy = top + 70 + j * 92;
+          if (d) {
+            if (!shuowenCache[d]) shuowenCache[d] = new Path2D(d);
+            const sz = head ? 100 : 88;
+            ctx.save(); ctx.translate(x - sz / 2, cy - sz / 2); ctx.scale(sz / 400, sz / 400);
+            ctx.fillStyle = col; ctx.fill(shuowenCache[d]); ctx.restore();
+          } else E.text(ctx, ch, x, cy, { font: 'Kai', size: 78, color: col });
         });
         ctx.restore();
       });
