@@ -7,6 +7,7 @@ dans l'ordre, puis chaque composante est vectorisée à part (potrace) : on obti
 composante, ce qui permet les métamorphoses composante par composante (E.drawMorph)."""
 import json
 import numpy as np, potrace
+from scipy import ndimage
 from PIL import Image, ImageDraw
 
 # key : (n° d'image, étiquette, époque, [(composante, polygone)], composante par défaut)
@@ -41,6 +42,7 @@ GLYPHS = {
 }
 FORMS = json.load(open('assets/glyphs/xiaoxue/index.json'))['forms']
 N = 1600  # résolution de travail (4 px par unité)
+MERGE = 0.25  # en dessous de 25 % d'un trait, la part d'une autre composante est un débordement
 
 
 def ink_400(idx):
@@ -79,6 +81,14 @@ for key, (idx, label, era, polys, default) in GLYPHS.items():
         ImageDraw.Draw(m).polygon([(x * N / 400, y * N / 400) for x, y in poly], fill=255)
         owner[(np.array(m) > 0) & (owner == '')] = c
     owner[owner == ''] = default
+    # un trait continu appartient en entier à une composante : on ne garde la découpe par polygones
+    # que si le trait est vraiment partagé (la part minoritaire dépasse MERGE du trait)
+    lab, n = ndimage.label(ink, structure=np.ones((3, 3)))
+    for i in range(1, n + 1):
+        blob = lab == i
+        names, counts = np.unique(owner[blob], return_counts=True)
+        if len(names) > 1 and counts.max() / counts.sum() > 1 - MERGE:
+            owner[blob] = names[counts.argmax()]
     paths, centers = [], {}
     for c in [default] + [c for c, _ in polys]:
         mask = ink & (owner == c)
