@@ -239,23 +239,114 @@
     if (KAI[key]) return drawKai(ctx, KAI[key], o);
     return drawFont(ctx, key, o);
   };
+  // ───────── traits de pinceau : chaque trait de Make Me a Hanzi devient un masque d'encre (boîte 1024,
+  // y vers le bas) — forme exacte, puis « blanc volant » (飛白) en fin de trait : des poils tracés par
+  // p5.brush (version autonome, WebGL2) le long de la médiane évident l'encre là où elle s'épuise.
+  // Calculé une fois par caractère, de façon déterministe (graines fixes). Sans WebGL2 : encre pleine.
+  const brushed = {};
+  let brushGL = null, brushOK = null;
+  function brushMasks(key) {
+    if (brushed[key]) return brushed[key];
+    const D = window.STROKES[key];
+    const paths = D.strokes.map((d) => new Path2D(d));
+    const scratch = document.createElement('canvas'); scratch.width = scratch.height = 1024;
+    const sg = scratch.getContext('2d', { willReadFrequently: true });
+    // largeur moyenne de chaque trait ≈ aire / longueur de la médiane
+    const widths = paths.map((P, i) => {
+      sg.setTransform(1, 0, 0, 1, 0, 0); sg.clearRect(0, 0, 1024, 1024);
+      sg.setTransform(1, 0, 0, -1, 0, 900); sg.fill(P);
+      const px = sg.getImageData(0, 0, 1024, 1024).data; let A = 0;
+      for (let k = 3; k < px.length; k += 4) if (px[k] > 127) A++;
+      const m = D.medians[i]; let L = 0;
+      for (let k = 1; k < m.length; k++) L += Math.hypot(m[k][0] - m[k - 1][0], m[k][1] - m[k - 1][1]);
+      return A / Math.max(L, 1);
+    });
+    // poils de tous les traits, en une seule passe p5.brush
+    if (brushOK === null) {
+      try {
+        brushGL = document.createElement('canvas'); brushGL.width = brushGL.height = 1024;
+        const G = brushGL.getContext('webgl2', { preserveDrawingBuffer: true });
+        brushOK = !!(G && window.brush);
+        if (brushOK) {
+          window.brush.load(brushGL);
+          window.brush.add('hair', { type: 'default', weight: 1, scatter: 0.25, sharpness: 0.6, grain: 12, opacity: 120, spacing: 0.35, pressure: [0.3, 1.2], rotate: 'none', noise: 0.6 });
+          brushGL.G = G;
+        }
+      } catch (e) { brushOK = false; }
+    }
+    if (brushOK) {
+      const B = window.brush, G = brushGL.G;
+      B.clear(); G.bindFramebuffer(G.FRAMEBUFFER, null); G.clearColor(0, 0, 0, 0); G.clear(G.COLOR_BUFFER_BIT);
+      B.seed(300); B.noiseSeed(300); B.push(); B.translate(-512, -512);
+      D.medians.forEach((m, i) => {
+        const w = widths[i];
+        const Lc = [0];
+        for (let k = 1; k < m.length; k++) Lc.push(Lc[k - 1] + Math.hypot(m[k][0] - m[k - 1][0], m[k][1] - m[k - 1][1]));
+        const at = (f) => {
+          const t = f * Lc[Lc.length - 1]; let k = 1;
+          while (k < m.length - 1 && Lc[k] < t) k++;
+          const u = (t - Lc[k - 1]) / ((Lc[k] - Lc[k - 1]) || 1);
+          return [m[k - 1][0] + (m[k][0] - m[k - 1][0]) * u, m[k - 1][1] + (m[k][1] - m[k - 1][1]) * u, k];
+        };
+        const rnd = E.rand(17 + i * 31);
+        for (let j = 0; j < 7; j++) {
+          const off = ((j + rnd() * 0.8) / 7 - 0.5) * w * 0.85, f0 = 0.5 + rnd() * 0.35;
+          const pts = [];
+          for (let q = 0; q <= 12; q++) {
+            const [x, y, k] = at(f0 + (1 - f0) * q / 12);
+            const a = m[Math.max(0, k - 1)], b = m[Math.min(m.length - 1, k)];
+            const nx = -(b[1] - a[1]), ny = b[0] - a[0], l = Math.hypot(nx, ny) || 1;
+            pts.push([x + (nx / l) * off, 900 - (y + (ny / l) * off)]);
+          }
+          B.set('hair', '#000000', w / (36 + rnd() * 20));
+          B.spline(pts, 0.5);
+        }
+      });
+      B.pop(); B.render();
+    }
+    // masque de chaque trait : forme exacte, évidée par les poils, fin de trait un peu plus pâle
+    brushed[key] = paths.map((P, i) => {
+      const c = document.createElement('canvas'); c.width = c.height = 1024;
+      const g = c.getContext('2d');
+      g.setTransform(1, 0, 0, -1, 0, 900); g.fillStyle = 'rgba(0,0,0,0.94)'; g.fill(P);
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.globalCompositeOperation = 'destination-out';
+      if (brushOK) g.drawImage(brushGL, 0, 0);
+      const m = D.medians[i], e = m[m.length - 1], s0 = m[Math.max(0, m.length - 4)];
+      const gr = g.createLinearGradient(s0[0], 900 - s0[1], e[0], 900 - e[1]);
+      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.2)');
+      g.fillStyle = gr; g.fillRect(0, 0, 1024, 1024);
+      return c;
+    });
+    return brushed[key];
+  }
+  // un masque de trait teinté (dans tint, boîte 1024)
+  const tint = document.createElement('canvas'); tint.width = tint.height = 1024;
+  const tctx = tint.getContext('2d');
+  function tinted(mask, color) {
+    tctx.globalCompositeOperation = 'source-over'; tctx.clearRect(0, 0, 1024, 1024);
+    tctx.drawImage(mask, 0, 0);
+    tctx.globalCompositeOperation = 'source-in'; tctx.fillStyle = color; tctx.fillRect(0, 0, 1024, 1024);
+    tctx.globalCompositeOperation = 'source-over';
+    return tint;
+  }
+  E.brushMasks = brushMasks;
+
   function drawKai(ctx, key, o) {
     const D = window.STROKES[key];
-    if (!kaiCache[key]) kaiCache[key] = D.strokes.map((d) => new Path2D(d));
+    const masks = brushMasks(key);
     const comp = (i) => (D.comp[i] === 'fusion' ? 'hand' : D.comp[i]); // ⺍ = ancien haut (mains + 爻)
     octx.setTransform(1, 0, 0, 1, 0, 0);
     octx.clearRect(0, 0, 1000, 1000);
-    kaiCache[key].forEach((p, i) => {
+    masks.forEach((mask, i) => {
       const c = comp(i);
       const a = o.alpha ? o.alpha(c) : 1;
       const rv = o.reveal ? o.reveal(c) : 1; // 0..1 balayage vertical
       if (a <= 0 || rv <= 0) return;
       octx.save();
       octx.beginPath(); octx.rect(0, 0, 1000, 1000 * rv + 1); octx.clip();
-      octx.scale(1000 / 1024, 1000 / 1024); octx.translate(0, 900); octx.scale(1, -1);
       octx.globalAlpha = a;
-      octx.fillStyle = o.color(c);
-      octx.fill(p);
+      octx.drawImage(tinted(mask, o.color(c)), 0, 0, 1000, 1000);
       octx.restore();
     });
     ctx.save();
@@ -403,16 +494,13 @@
 
   // ───────── caractère tracé trait par trait, dans l'ordre réel (window.STROKES)
   // o : x, y, size, progress (nombre de traits tracés, décimal), color(comp) → css, alpha(comp), glow, tip
-  const strokeCache = {};
+  const reveal = document.createElement('canvas'); reveal.width = reveal.height = 1024;
+  const rvctx = reveal.getContext('2d');
   E.drawStrokes = function (ctx, key, o) {
     const D = window.STROKES[key];
-    if (!strokeCache[key]) strokeCache[key] = D.strokes.map((d) => new Path2D(d));
-    const paths = strokeCache[key];
+    const masks = brushMasks(key);
     const prog = o.progress ?? D.strokes.length;
-    ctx.save();
-    ctx.translate(o.x - o.size / 2, o.y - o.size / 2);
-    ctx.scale(o.size / 1024, o.size / 1024);
-    ctx.translate(0, 900); ctx.scale(1, -1);
+    const place = (img) => ctx.drawImage(img, o.x - o.size / 2, o.y - o.size / 2, o.size, o.size);
     D.strokes.forEach((_, i) => {
       const p = clamp(prog - i);
       if (p <= 0) return;
@@ -421,38 +509,36 @@
       if (a <= 0) return;
       ctx.save();
       ctx.globalAlpha = a;
-      ctx.fillStyle = ctx.strokeStyle = o.color(c);
       if (o.glow) { ctx.shadowColor = o.glowColor || o.color(c); ctx.shadowBlur = o.glow * 0.5; } // halo discret
-      if (p >= 1) ctx.fill(paths[i]);
-      else {
-        // l'encre suit la médiane du trait, à l'intérieur de son contour
-        ctx.clip(paths[i]);
-        const m = D.medians[i];
-        const L = [0];
-        for (let j = 1; j < m.length; j++) L.push(L[j - 1] + Math.hypot(m[j][0] - m[j - 1][0], m[j][1] - m[j - 1][1]));
-        const target = L[L.length - 1] * easeInOut(p);
-        ctx.lineWidth = 150; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        ctx.beginPath(); ctx.moveTo(m[0][0], m[0][1]);
-        let tip = m[0];
-        for (let j = 1; j < m.length; j++) {
-          if (L[j] <= target) { ctx.lineTo(m[j][0], m[j][1]); tip = m[j]; continue; }
-          const u = (target - L[j - 1]) / (L[j] - L[j - 1] || 1);
-          tip = [lerp(m[j - 1][0], m[j][0], u), lerp(m[j - 1][1], m[j][1], u)];
-          ctx.lineTo(tip[0], tip[1]);
-          break;
-        }
-        ctx.stroke();
-        ctx.restore(); ctx.save();
-        ctx.translate(0, 0);
-        if (o.tip) {
-          const g = ctx.createRadialGradient(tip[0], tip[1], 0, tip[0], tip[1], 90);
-          g.addColorStop(0, 'rgba(255,240,200,0.9)'); g.addColorStop(1, 'rgba(255,200,120,0)');
-          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(tip[0], tip[1], 90, 0, 7); ctx.fill();
-        }
+      const ink = tinted(masks[i], o.color(c));
+      if (p >= 1) { place(ink); ctx.restore(); return; }
+      // trait en cours : le pinceau avance le long de la médiane ; on ne montre de l'encre que derrière lui
+      const m = D.medians[i];
+      const L = [0];
+      for (let j = 1; j < m.length; j++) L.push(L[j - 1] + Math.hypot(m[j][0] - m[j - 1][0], m[j][1] - m[j - 1][1]));
+      const target = L[L.length - 1] * easeInOut(p);
+      rvctx.globalCompositeOperation = 'source-over'; rvctx.clearRect(0, 0, 1024, 1024);
+      rvctx.lineWidth = 150; rvctx.lineCap = 'round'; rvctx.lineJoin = 'round'; rvctx.strokeStyle = '#000';
+      rvctx.beginPath(); rvctx.moveTo(m[0][0], 900 - m[0][1]);
+      let tip = m[0];
+      for (let j = 1; j < m.length; j++) {
+        if (L[j] <= target) { rvctx.lineTo(m[j][0], 900 - m[j][1]); tip = m[j]; continue; }
+        const u = (target - L[j - 1]) / (L[j] - L[j - 1] || 1);
+        tip = [lerp(m[j - 1][0], m[j][0], u), lerp(m[j - 1][1], m[j][1], u)];
+        rvctx.lineTo(tip[0], 900 - tip[1]);
+        break;
       }
+      rvctx.stroke();
+      rvctx.globalCompositeOperation = 'source-in'; rvctx.drawImage(ink, 0, 0);
+      place(reveal);
       ctx.restore();
+      if (o.tip) {
+        const k = o.size / 1024, tx = o.x - o.size / 2 + tip[0] * k, ty = o.y - o.size / 2 + (900 - tip[1]) * k;
+        const g = ctx.createRadialGradient(tx, ty, 0, tx, ty, 90 * k);
+        g.addColorStop(0, 'rgba(255,240,200,0.9)'); g.addColorStop(1, 'rgba(255,200,120,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(tx, ty, 90 * k, 0, 7); ctx.fill();
+      }
     });
-    ctx.restore();
   };
 
   // ───────── texte

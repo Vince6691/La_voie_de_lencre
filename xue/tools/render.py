@@ -23,7 +23,7 @@ def serve():
 
 def open_page(p):
     port = serve()
-    b = p.chromium.launch(executable_path=CHROME, args=['--disable-gpu-vsync', '--force-color-profile=srgb'])
+    b = p.chromium.launch(executable_path=CHROME, args=['--disable-gpu-vsync', '--force-color-profile=srgb', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'])  # WebGL2 logiciel (pinceau p5.brush)
     pg = b.new_page(viewport={'width': 1920, 'height': 1080})
     errs = []
     pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
