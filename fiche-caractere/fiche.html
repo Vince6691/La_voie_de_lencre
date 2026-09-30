@@ -1,0 +1,131 @@
+<!doctype html>
+<!-- Fiche caractère : un caractère chinois tracé à l'encre noire, dans l'ordre de ses traits, sur papier
+     xuan clair — étiquette d'époque, pinyin, compteur de traits vermillon et sceau.
+     Piloté par make.py : window.FICHE = {...} puis window.draw(t) pour chaque image. -->
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#fbf8f1}canvas{display:block}</style>
+</head><body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080;
+const ctx = document.getElementById('c').getContext('2d');
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const seg = (x, a, b) => clamp((x - a) / (b - a));
+const lerp = (a, b, u) => a + (b - a) * u;
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const rng = (s) => () => ((s = (s * 16807) % 2147483647) / 2147483647);
+
+// ── papier xuan : presque blanc, lumineux, fibres légères, lavis très dilué sur les bords
+let PAPER = null;
+function paper() {
+  if (PAPER) return PAPER;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#fbf8f1'; g.fillRect(0, 0, W, H);
+  const r = rng(12);
+  for (let i = 0; i < 40; i++) {
+    const cx = r() * W, cy = r() * H, rad = 120 + r() * 300;
+    const gr = g.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    gr.addColorStop(0, `rgba(${r() < 0.6 ? '236,226,204' : '255,255,252'},${0.25 + r() * 0.25})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(cx - rad, cy - rad, 2 * rad, 2 * rad);
+  }
+  g.lineWidth = 0.8;
+  for (let i = 0; i < 900; i++) {
+    const fx = r() * W, fy = r() * H, a = r() * 6.3, l = 10 + r() * 40;
+    g.strokeStyle = `rgba(150,130,100,${0.04 + r() * 0.05})`;
+    g.beginPath(); g.moveTo(fx, fy); g.quadraticCurveTo(fx + Math.cos(a) * l * 0.6, fy + Math.sin(a + 0.7) * l * 0.4, fx + Math.cos(a) * l, fy + Math.sin(a) * l); g.stroke();
+  }
+  g.filter = 'blur(38px)';
+  for (let i = 0; i < 18; i++) {
+    const side = i % 4, t = r();
+    const cx = side === 0 ? -60 + r() * 160 : side === 1 ? W + 60 - r() * 160 : t * W;
+    const cy = side === 2 ? -60 + r() * 140 : side === 3 ? H + 60 - r() * 140 : t * H;
+    g.fillStyle = `rgba(${r() < 0.5 ? '70,66,62' : '96,86,74'},${0.025 + r() * 0.035})`;
+    g.beginPath(); g.ellipse(cx, cy, 120 + r() * 220, 70 + r() * 150, r() * 3, 0, 7); g.fill();
+  }
+  g.filter = 'none';
+  // grain très léger
+  const im = g.getImageData(0, 0, W, H), d = im.data, rg = rng(7);
+  for (let k = 0; k < d.length; k += 4) { const n = (rg() - 0.5) * 6; d[k] += n; d[k + 1] += n; d[k + 2] += n; }
+  g.putImageData(im, 0, 0);
+  return (PAPER = c);
+}
+
+function text(str, x, y, o) {
+  ctx.save();
+  ctx.font = `${o.weight || 400} ${o.size}px ${o.font}`;
+  ctx.textAlign = o.align || 'center'; ctx.textBaseline = 'middle';
+  ctx.globalAlpha = o.alpha ?? 1; ctx.fillStyle = o.color;
+  if (o.spacing) ctx.letterSpacing = `${o.spacing}px`;
+  ctx.fillText(str, x, y);
+  ctx.restore();
+}
+
+function eraTag(zh, name, sub, a) {
+  if (a <= 0 || !zh) return;
+  const x = 90, y = 92, u = easeOut(a);
+  ctx.save(); ctx.globalAlpha = u; ctx.translate(-40 * (1 - u), 0);
+  ctx.fillStyle = '#b8322a'; ctx.fillRect(x - 30, y - 56, 5, 132);
+  text(zh, x + 8, y - 4, { font: 'Kai, Song', size: 64, align: 'left', color: '#1c1510' });
+  const tx = x + 8 + zh.length * 66 + 22;
+  if (name) text(name.toUpperCase(), tx, y - 18, { font: 'Cinzel', weight: 700, size: 30, align: 'left', color: '#a8281d', spacing: 3 });
+  if (sub) text(sub, tx, y + 24, { font: 'Cormorant', weight: 600, size: 30, align: 'left', color: '#4a3a2a' });
+  ctx.restore();
+}
+
+function seal(x, y, a, ch, size) {
+  if (a <= 0 || !ch) return;
+  const s = lerp(1.3, 1, easeOut(a));
+  ctx.save(); ctx.globalAlpha = Math.min(1, a * 1.5); ctx.translate(x, y); ctx.scale(s, s); ctx.rotate(-0.04);
+  ctx.fillStyle = '#b3261e'; ctx.beginPath(); ctx.roundRect(-size / 2, -size / 2, size, size, size * 0.12); ctx.fill();
+  ctx.fillStyle = '#fbf3e6'; ctx.font = `400 ${size * 0.72}px Kai, Song`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(ch, 0, size * 0.03);
+  ctx.restore();
+}
+
+// ── caractère tracé trait par trait (données Make Me a Hanzi : boîte 1024, y vers le haut, ligne de base 900)
+let PATHS = null;
+function glyph(D, prog, gx, gy, gs) {
+  if (!PATHS) PATHS = D.strokes.map((s) => new Path2D(s));
+  ctx.save();
+  ctx.translate(gx - gs / 2, gy - gs / 2); ctx.scale(gs / 1024, gs / 1024); ctx.translate(0, 900); ctx.scale(1, -1);
+  ctx.fillStyle = ctx.strokeStyle = '#15110c';
+  D.strokes.forEach((_, i) => {
+    const p = clamp(prog - i);
+    if (p <= 0) return;
+    if (p >= 1) { ctx.fill(PATHS[i]); return; }
+    // l'encre suit la médiane du trait, à l'intérieur de son contour
+    ctx.save(); ctx.clip(PATHS[i]);
+    const m = D.medians[i], L = [0];
+    for (let j = 1; j < m.length; j++) L.push(L[j - 1] + Math.hypot(m[j][0] - m[j - 1][0], m[j][1] - m[j - 1][1]));
+    const target = L[L.length - 1] * easeInOut(p);
+    ctx.lineWidth = 150; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(m[0][0], m[0][1]);
+    for (let j = 1; j < m.length; j++) {
+      if (L[j] <= target) { ctx.lineTo(m[j][0], m[j][1]); continue; }
+      const u = (target - L[j - 1]) / (L[j] - L[j - 1] || 1);
+      ctx.lineTo(lerp(m[j - 1][0], m[j][0], u), lerp(m[j - 1][1], m[j][1], u));
+      break;
+    }
+    ctx.stroke(); ctx.restore();
+  });
+  ctx.restore();
+}
+
+// t : secondes depuis le début ; F.draw = durée du tracé ; t ≥ F.draw + 0.6 → fiche complète
+window.draw = function (t) {
+  const F = window.FICHE, D = F.data, n = D.strokes.length;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(paper(), 0, 0);
+  eraTag(F.label, F.title, F.subtitle, seg(t, 0, 0.5));
+  const gx = 800, gy = 560, gs = 820;
+  const prog = n * seg(t, 0.05, F.draw);
+  glyph(D, prog, gx, gy, gs);
+  const end = F.draw;
+  text(F.pinyin, 1560, 380, { font: 'Cormorant', weight: 700, size: 150, color: '#2a1d12', alpha: seg(t, end - 1.0, end - 0.7) });
+  const k = Math.min(n, Math.ceil(prog - 0.02));
+  text(String(Math.max(k, 0)), 1560, 640, { font: 'Cinzel', weight: 900, size: 220, color: '#a8281d', alpha: seg(t, 0.2, 0.6) });
+  text(n > 1 ? F.unit : F.unit1, 1560, 790, { font: 'Cinzel', weight: 700, size: 56, color: '#3a2a1a', spacing: 14, alpha: seg(t, end, end + 0.3) });
+  seal(gx + 330, gy + 330, seg(t, end + 0.1, end + 0.4), F.seal, 84);
+};
+</script></body></html>
