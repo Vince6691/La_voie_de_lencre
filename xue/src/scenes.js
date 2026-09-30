@@ -605,10 +605,18 @@
       ctx.save(); ctx.globalAlpha = seg(vt, 0.6, 1.0); ctx.strokeStyle = '#3b2512'; ctx.lineWidth = 4;
       [top + 110, top + 680].forEach((y) => { ctx.beginPath(); ctx.moveTo(x0 + 60, y); ctx.lineTo(x0 - 7 * dx - 60, y); ctx.stroke(); });
       ctx.restore();
+      // portrait imaginé de Xu Shen (白描) peint trait par trait pendant « Vers l'an 100, le lettré Xu Shen compose… »,
+      // puis il s'efface pour le 學 sigillaire qu'on va lire
+      const portA = 1 - seg(vt, 4.8, 5.1);
+      if (portA > 0) {
+        E.drawPortrait(ctx, { x: 415, y: 590, height: 600, progress: seg(vt, 0.3, 4.75), color: '#f4e7c8', alpha: portA, glow: 10, tip: true });
+        E.text(ctx, 'portrait imaginé', 415, 915, { font: 'Cormorant', size: 28, color: '#cdbd9a', alpha: 0.85 * portA * seg(vt, 0.6, 1.2) });
+      }
+      const glyphA = seg(vt, 5.1, 5.5);
       // glyphe sigillaire, toit dans l'ombre
       const veil = seg(vt, 7.6, 8.6);
-      E.drawRealGlyph(ctx, 'xiaozhuan', {
-        x: 470, y: 560, size: 560,
+      if (glyphA > 0) E.drawRealGlyph(ctx, 'xiaozhuan', {
+        x: 470, y: 560, size: 560, alpha: () => glyphA,
         color: (c) => (c === 'roof' ? E.mix(COMP.roof.col, '#ffffff', 0.4 * pulse(vt, 7.6, 1.2)) : E.mix(COMP[c].col, '#555555', 0.7 * veil * (c === 'child' ? 1 : 0.3))),
         glow: 20, glowColor: 'rgba(255,210,160,0.45)',
       });

@@ -36,7 +36,7 @@ export const loadLegacy = (flags: Flags) => {
           document.fonts.add(f);
         }),
       );
-      for (const f of ['vendor/gsap.min.js', 'vendor/MorphSVGPlugin.min.js', 'vendor/CustomEase.min.js', 'vendor/brush.js', 'timeline.js', 'warp.js', 'geodata.js', 'fontglyphs.js', 'strokes.js', 'realglyphs.js', 'shuowen.js', 'glyphs.js', 'engine.js', 'lavis.js', 'scenes.js']) {
+      for (const f of ['vendor/gsap.min.js', 'vendor/MorphSVGPlugin.min.js', 'vendor/CustomEase.min.js', 'vendor/brush.js', 'timeline.js', 'warp.js', 'geodata.js', 'fontglyphs.js', 'strokes.js', 'realglyphs.js', 'shuowen.js', 'portrait.js', 'glyphs.js', 'engine.js', 'lavis.js', 'scenes.js']) {
         await loadScript(staticFile(`legacy/${f}`));
       }
     })();

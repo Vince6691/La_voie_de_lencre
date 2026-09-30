@@ -543,6 +543,72 @@
     });
   };
 
+  // ───────── portrait au trait (白描) peint trait par trait (window.PORTRAIT, tools/build_portrait.py)
+  // o : x, y (centre), height, progress [0, 1], color, alpha, glow, tip
+  // chaque trait du squelette avance le long de sa polyligne et dévoile l'encre vectorisée sous lui
+  let portraitData = null;
+  const portraitOff = document.createElement('canvas');
+  E.drawPortrait = function (ctx, o) {
+    const P = window.PORTRAIT;
+    if (!P || (o.alpha ?? 1) <= 0) return;
+    if (!portraitData) {
+      portraitData = {
+        ink: new Path2D(P.ink),
+        strokes: P.strokes.map((s) => {
+          const pts = []; for (let i = 3; i < s.length; i += 2) pts.push([s[i], s[i + 1]]);
+          const L = [0]; for (let j = 1; j < pts.length; j++) L.push(L[j - 1] + Math.hypot(pts[j][0] - pts[j - 1][0], pts[j][1] - pts[j - 1][1]));
+          return { t0: s[0], t1: s[1], w: s[2], pts, L };
+        }),
+      };
+    }
+    const k = o.height / P.h, w = Math.ceil(P.w * k), h = Math.ceil(P.h * k);
+    if (portraitOff.width !== w || portraitOff.height !== h) { portraitOff.width = w; portraitOff.height = h; }
+    const c = portraitOff.getContext('2d');
+    const p = o.progress ?? 1;
+    c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, w, h);
+    c.save(); c.scale(k, k);
+    const tips = [];
+    if (p < 1) {
+      c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = '#000';
+      for (const s of portraitData.strokes) {
+        if (s.t0 >= p) continue;
+        const f = clamp((p - s.t0) / (s.t1 - s.t0 || 1));
+        const target = s.L[s.L.length - 1] * f, m = s.pts;
+        c.lineWidth = s.w;
+        c.beginPath(); c.moveTo(m[0][0], m[0][1]);
+        let tip = m[0];
+        for (let j = 1; j < m.length; j++) {
+          if (s.L[j] <= target) { c.lineTo(m[j][0], m[j][1]); tip = m[j]; continue; }
+          const u = (target - s.L[j - 1]) / (s.L[j] - s.L[j - 1] || 1);
+          tip = [lerp(m[j - 1][0], m[j][0], u), lerp(m[j - 1][1], m[j][1], u)];
+          c.lineTo(tip[0], tip[1]);
+          break;
+        }
+        if (m.length === 2 && m[0][0] === m[1][0] && m[0][1] === m[1][1]) c.lineTo(m[0][0] + 0.01, m[0][1]);
+        c.stroke();
+        if (f < 1) tips.push(tip);
+      }
+      c.globalCompositeOperation = 'source-in';
+    }
+    c.fillStyle = o.color || '#f1e6cf'; c.fill(portraitData.ink);
+    c.restore();
+    const x0 = o.x - w / 2, y0 = o.y - h / 2;
+    ctx.save();
+    ctx.globalAlpha = o.alpha ?? 1;
+    if (o.glow) { ctx.shadowColor = o.glowColor || 'rgba(255,210,160,0.5)'; ctx.shadowBlur = o.glow; }
+    ctx.drawImage(portraitOff, x0, y0);
+    ctx.restore();
+    if (o.tip) {
+      // pointe du pinceau : lueur sur le dernier trait en cours (les plus anciens sont déjà presque finis)
+      tips.slice(-2).forEach(([tx0, ty0]) => {
+        const tx = x0 + tx0 * k, ty = y0 + ty0 * k, r = 26;
+        const g = ctx.createRadialGradient(tx, ty, 0, tx, ty, r);
+        g.addColorStop(0, `rgba(255,240,200,${0.8 * (o.alpha ?? 1)})`); g.addColorStop(1, 'rgba(255,200,120,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(tx, ty, r, 0, 7); ctx.fill();
+      });
+    }
+  };
+
   // ───────── texte
   E.text = function (ctx, str, x, y, o = {}) {
     ctx.save();

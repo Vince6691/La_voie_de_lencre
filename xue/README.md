@@ -112,6 +112,9 @@ python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
 - **Lishu** : stèle de Cao Quan 曹全碑 (185), 小學堂 (Academia Sinica), CC0.
 - **Lattes du Shuowen** : police de petit sceau 崇羲篆體 (小學堂, Academia Sinica), licence CC BY-ND 3.0 TW
   (usage commercial autorisé avec mention de l'auteur, police non modifiée).
+- **Portrait de Xu Shen** (scène 5) : portrait imaginé (il n'existe aucun portrait d'époque), dessin 白描 généré
+  (`assets/portrait/xushen_a.jpg`, variante `xushen_b.jpg`), vectorisé et découpé en traits par
+  `tools/build_portrait.py` → `src/portrait.js`, peint dans l'ordre tête → robe → mains → table → natte.
 - **Cursive** : police Liu Jian Mao Cao (Google Fonts, OFL), forme 学.
 - **Kaishu 學 / 学** : ordre et forme des traits d'après *Make Me a Hanzi* (hanzi-writer-data).
 
