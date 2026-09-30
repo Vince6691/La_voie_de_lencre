@@ -64,6 +64,33 @@
     vg.addColorStop(0, 'rgba(90,65,35,0)'); vg.addColorStop(1, 'rgba(90,65,35,0.35)');
     g.fillStyle = vg; g.fillRect(0, 0, W, H);
     L.paper = p;
+    // papier xuan moderne : presque blanc, lumineux, fibres à peine visibles, bords fondus en lavis
+    const x = mk(W, H), xg = x.getContext('2d');
+    xg.fillStyle = '#fbf8f1'; xg.fillRect(0, 0, W, H);
+    r = rng(12);
+    for (let i = 0; i < 40; i++) {
+      const cx = r() * W, cy = r() * H, rad = 120 + r() * 300;
+      const gr = xg.createRadialGradient(cx, cy, 0, cx, cy, rad);
+      gr.addColorStop(0, `rgba(${r() < 0.6 ? '236,226,204' : '255,255,252'},${0.25 + r() * 0.25})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      xg.fillStyle = gr; xg.fillRect(cx - rad, cy - rad, 2 * rad, 2 * rad);
+    }
+    xg.lineWidth = 0.8;
+    for (let i = 0; i < 900; i++) { // fibres longues du papier xuan
+      const fx = r() * W, fy = r() * H, a = r() * 6.3, l = 10 + r() * 40;
+      xg.strokeStyle = `rgba(150,130,100,${0.04 + r() * 0.05})`;
+      xg.beginPath(); xg.moveTo(fx, fy); xg.quadraticCurveTo(fx + Math.cos(a) * l * 0.6, fy + Math.sin(a + 0.7) * l * 0.4, fx + Math.cos(a) * l, fy + Math.sin(a) * l); xg.stroke();
+    }
+    // lavis très dilué qui entre par les bords (gris chaud, jamais triste)
+    xg.filter = 'blur(38px)';
+    for (let i = 0; i < 18; i++) {
+      const side = i % 4, t = r();
+      const cx = side === 0 ? -60 + r() * 160 : side === 1 ? W + 60 - r() * 160 : t * W;
+      const cy = side === 2 ? -60 + r() * 140 : side === 3 ? H + 60 - r() * 140 : t * H;
+      xg.fillStyle = `rgba(${r() < 0.5 ? '70,66,62' : '96,86,74'},${0.025 + r() * 0.035})`;
+      xg.beginPath(); xg.ellipse(cx, cy, 120 + r() * 220, 70 + r() * 150, r() * 3, 0, 7); xg.fill();
+    }
+    xg.filter = 'none';
+    L.xuan = x;
     // montagnes : trois plans, de plus en plus sombres, fondus dans la brume par le bas
     L.ridges = [
       { y: 470, amp: 170, a: 0.2, blur: 6, seed: 3, k: 0.15 },
@@ -223,6 +250,18 @@
     releases(v0, v1) { const out = []; for (let n = 0; FIRST + n * STEP <= v1; n++) if (FIRST + n * STEP >= v0) out.push(FIRST + n * STEP); return out; },
     // papier de riz seul (fond des scènes « encre sur papier »)
     paper(ctx) { ctx.drawImage(layers().paper, 0, 0); },
+    // papier xuan clair (scènes kaishu)
+    xuan(ctx) { ctx.drawImage(layers().xuan, 0, 0); },
+    // petit sceau rouge d'un caractère
+    seal1(ctx, x, y, a, ch, size = 96) {
+      if (a <= 0) return;
+      const s = lerp(1.3, 1, easeOut(a));
+      ctx.save(); ctx.globalAlpha = Math.min(1, a * 1.5); ctx.translate(x, y); ctx.scale(s, s); ctx.rotate(-0.04);
+      ctx.fillStyle = '#b3261e'; ctx.beginPath(); ctx.roundRect(-size / 2, -size / 2, size, size, size * 0.12); ctx.fill();
+      ctx.fillStyle = '#fbf3e6'; ctx.font = `400 ${size * 0.72}px Kai, Song`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(ch, 0, size * 0.03);
+      ctx.restore();
+    },
     archery(ctx, t, vt, v0) {
       const Ls = layers();
       const u = seg(vt, v0, v0 + 9);

@@ -650,8 +650,8 @@
     k: 7,
     draw(ctx, t) {
       const vt = VT(7, t);
-      LAVIS.paper(ctx);
-      E.eraTag(ctx, t, '楷書', 'kaishu', 'écriture régulière · canon des Tang', seg(vt, 0.0, 0.5));
+      LAVIS.xuan(ctx);
+      E.eraTag(ctx, t, '楷書', 'kaishu', 'écriture régulière · canon des Tang', seg(vt, 0.0, 0.5), { paper: true });
       const gx = 800, gy = 560, gs = 820;
       // les 16 traits dans l'ordre d'écriture réel, le compteur suit le pinceau
       const prog = 16 * seg(vt, 0.05, 3.65);
@@ -661,7 +661,8 @@
       const u = seg(vt, 3.6, 3.9);
       E.text(ctx, String(n), 1560, 640, { font: 'Cinzel', weight: 900, size: 220, color: '#a8281d', alpha: seg(vt, 0.2, 0.6) });
       E.text(ctx, 'TRAITS', 1560, 790, { font: 'Cinzel', weight: 700, size: 56, color: '#3a2a1a', spacing: 14, alpha: u });
-      E.finish(ctx, t, { vignette: 0.35 });
+      LAVIS.seal1(ctx, gx + 330, gy + 330, seg(vt, 3.7, 4.0), '學', 84); // sceau du calligraphe
+      E.finish(ctx, t, { vignette: 0, grain: 0.035 });
     },
   });
 
@@ -750,13 +751,14 @@
         return;
       }
       // 学 au pinceau, sur le même papier que 學
-      LAVIS.paper(ctx);
+      LAVIS.xuan(ctx);
       E.drawStrokes(ctx, 'xue_simp', { x: gx, y: gy, size: gs, progress: 8 * seg(vt, 15.2, 16.0), color: inkCol, brush: true });
       ctx.save(); shake(ctx, vt, [15.72], 12);
       E.text(ctx, '8', 1560, 560, { font: 'Cinzel', weight: 900, size: 260, color: '#a8281d', alpha: seg(vt, 15.6, 15.8) });
       E.text(ctx, 'TRAITS', 1560, 730, { font: 'Cinzel', weight: 700, size: 56, color: '#3a2a1a', spacing: 14, alpha: seg(vt, 15.7, 15.9) });
       ctx.restore();
-      E.finish(ctx, t, { vignette: 0.35 });
+      LAVIS.seal1(ctx, gx + 330, gy + 330, seg(vt, 15.9, 16.2), '学', 84);
+      E.finish(ctx, t, { vignette: 0, grain: 0.035 });
     },
   });
 

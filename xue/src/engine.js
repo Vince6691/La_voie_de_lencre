@@ -559,19 +559,19 @@
   };
 
   // Titre d'époque (bandeau en haut à gauche)
-  E.eraTag = function (ctx, t, zh, name, dates, a) {
+  // o.paper : version pour fond clair (papier xuan) — encre et vermillon, sans cartouche sombre
+  E.eraTag = function (ctx, t, zh, name, dates, a, o = {}) {
     if (a <= 0) return;
     const x = 90, y = 92, u = easeOut(a);
     ctx.save();
     ctx.globalAlpha = u;
     ctx.translate(-40 * (1 - u), 0);
-    ctx.fillStyle = 'rgba(10,6,4,0.55)';
-    roundRect(ctx, x - 30, y - 56, 620, 132, 10); ctx.fill();
+    if (!o.paper) { ctx.fillStyle = 'rgba(10,6,4,0.55)'; roundRect(ctx, x - 30, y - 56, 620, 132, 10); ctx.fill(); }
     ctx.fillStyle = '#b8322a';
-    ctx.fillRect(x - 30, y - 56, 8, 132);
-    E.text(ctx, zh, x + 8, y - 4, { font: 'Kai', size: 64, align: 'left', color: '#f4e7c8' });
-    E.text(ctx, name.toUpperCase(), x + 8 + zh.length * 66 + 22, y - 18, { font: 'Cinzel', weight: 700, size: 30, align: 'left', color: '#f4b73f', spacing: 3 });
-    E.text(ctx, dates, x + 8 + zh.length * 66 + 22, y + 24, { font: 'Cormorant', weight: 600, size: 30, align: 'left', color: '#e8dcc2' });
+    ctx.fillRect(x - 30, y - 56, o.paper ? 5 : 8, 132);
+    E.text(ctx, zh, x + 8, y - 4, { font: 'Kai', size: 64, align: 'left', color: o.paper ? '#1c1510' : '#f4e7c8' });
+    E.text(ctx, name.toUpperCase(), x + 8 + zh.length * 66 + 22, y - 18, { font: 'Cinzel', weight: 700, size: 30, align: 'left', color: o.paper ? '#a8281d' : '#f4b73f', spacing: 3 });
+    E.text(ctx, dates, x + 8 + zh.length * 66 + 22, y + 24, { font: 'Cormorant', weight: 600, size: 30, align: 'left', color: o.paper ? '#4a3a2a' : '#e8dcc2' });
     ctx.restore();
   };
 
