@@ -302,6 +302,57 @@
     ctx.restore();
   }
 
+  // ───────── métamorphose d'une forme réelle à l'autre, composante par composante (GSAP MorphSVG)
+  // o : x, y, size, progress(c) 0..1 (ou nombre), color(c), alpha(c), opacity, glow, glowColor
+  // Une composante absente d'un côté naît d'un point (ou s'y résorbe) à son centre.
+  const morphCache = {};
+  let morphSvg = null;
+  const pointAt = ([x, y]) => `M${x} ${y}m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0Z`;
+  function morphTween(from, to, c) {
+    const key = `${from}>${to}>${c}`;
+    if (morphCache[key]) return morphCache[key];
+    if (!morphSvg) {
+      window.gsap.registerPlugin(window.MorphSVGPlugin);
+      morphSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      morphSvg.setAttribute('style', 'position:absolute;width:0;height:0;visibility:hidden');
+      document.body.appendChild(morphSvg);
+    }
+    const A = window.REALGLYPHS[from], B = window.REALGLYPHS[to];
+    const dOf = (G, other) => { const p = G.paths.find((q) => q.c === c); return p ? p.d : pointAt(other.centers[c]); };
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    el.setAttribute('d', dOf(A, B));
+    morphSvg.appendChild(el);
+    const tw = window.gsap.to(el, { morphSVG: { shape: dOf(B, A), type: 'linear' }, duration: 1, ease: 'none', paused: true });
+    const pa = A.paths.find((q) => q.c === c), pb = B.paths.find((q) => q.c === c);
+    return (morphCache[key] = { el, tw, last: null, P: null, PA: pa && new Path2D(pa.d), PB: pb && new Path2D(pb.d) });
+  }
+  const moff = document.createElement('canvas'); moff.width = moff.height = 1000;
+  const mctx = moff.getContext('2d');
+  E.drawMorph = function (ctx, from, to, o) {
+    const comps = [...new Set([...window.REALGLYPHS[from].paths, ...window.REALGLYPHS[to].paths].map((p) => p.c))];
+    mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.clearRect(0, 0, 1000, 1000);
+    mctx.setTransform(2.5, 0, 0, 2.5, 0, 0);
+    for (const c of comps) {
+      const u = clamp(typeof o.progress === 'function' ? o.progress(c) : o.progress);
+      const a = o.alpha ? o.alpha(c) : 1;
+      if (a <= 0) continue;
+      const m = morphTween(from, to, c);
+      if (m.last !== u) { m.tw.progress(u); m.P = new Path2D(m.el.getAttribute('d')); m.last = u; }
+      // à mi-chemin, les contours interpolés s'épaississent : on atténue la forme intermédiaire et on
+      // laisse transparaître les formes de départ et d'arrivée (effet d'encre qui coule)
+      const k = 0.55 * Math.sin(Math.PI * u);
+      mctx.fillStyle = o.color(c);
+      mctx.globalAlpha = a * (1 - k); mctx.fill(m.P, 'evenodd');
+      if (m.PA && k > 0) { mctx.globalAlpha = a * k * (1 - u); mctx.fill(m.PA); }
+      if (m.PB && k > 0) { mctx.globalAlpha = a * k * u; mctx.fill(m.PB); }
+    }
+    ctx.save();
+    if (o.glow) { ctx.shadowColor = o.glowColor || 'rgba(255,200,120,0.6)'; ctx.shadowBlur = o.glow; }
+    ctx.globalAlpha = o.opacity ?? 1;
+    ctx.drawImage(moff, o.x - o.size / 2, o.y - o.size / 2, o.size, o.size);
+    ctx.restore();
+  };
+
   // ───────── glyphes historiques réels (window.REALGLYPHS, boîte 400)
   // o : x, y, size, color(c), alpha(c), reveal(c) 0..1 (balayage vertical), opacity, glow, glowColor, carve
   const realCache = {};

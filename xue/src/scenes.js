@@ -367,7 +367,7 @@
         E.callout(ctx, rc[0] + 150, rc[1] + 60, 1300, 760, '冖 toit', COMP.roof.col, seg(vt, 16.5, 16.9), 'un bâtiment');
         const hc = E.realCenter('jiaguwen', 'hand', rg);
         E.callout(ctx, hc[0] - 150, hc[1] - 40, 200, 520, '𦥑', COMP.hand.col, seg(vt, 19.5, 19.9), 'deux mains');
-        E.text(ctx, 'Jiaguwen de 學 — d\'après zdic.net', gx, gy + gs / 2 + 40, { size: 24, weight: 500, color: '#cdbb98', alpha: a * 0.8 });
+        E.text(ctx, '學 sur l\'os 鐵雲藏龜 157.4 · Academia Sinica (小學堂)', gx, gy + gs / 2 + 40, { size: 24, weight: 500, color: '#cdbb98', alpha: a * 0.8 });
         E.text(ctx, '(certaines inscriptions omettent les mains)', 1340, 1000, { size: 28, weight: 500, color: '#cdbb98', alpha: seg(vt, 19.8, 20.3) });
       }
       E.finish(ctx, t);
@@ -430,13 +430,12 @@
           const gx = 800, gy = 530, gs = 800;
           const rg = { x: gx, y: gy, size: gs };
           ctx.save(); ctx.globalAlpha = aG;
-          if (m < 1) E.drawRealGlyph(ctx, 'jiaguwen', { ...rg, opacity: 1 - m, color: (c) => COMP[c].col, glow: 16 });
-          E.drawRealGlyph(ctx, 'jinwen', {
-            ...rg, opacity: m,
-            reveal: (c) => (c === 'child' ? easeOut(seg(vt, 7.0, 8.4)) : 1),
-            color: (c) => E.mix(COMP[c].col, '#ffffff', 0.35 * (hi[c] || 0)),
-            glow: 16 + 24 * Math.max(hi.hand, hi.roof, hi.child), glowColor: 'rgba(255,220,170,0.5)',
-          });
+          // métamorphose réelle : l'os (鐵雲藏龜 157.4) devient le bronze (大盂鼎) ; l'enfant naît ensuite
+          const child = easeOut(seg(vt, 7.0, 8.4));
+          const glyphCol = (c) => E.mix(COMP[c].col, '#ffffff', 0.35 * (hi[c] || 0));
+          const glyphGlow = 16 + 24 * Math.max(hi.hand, hi.roof, hi.child);
+          if (m < 1 || child < 1) E.drawMorph(ctx, 'jiaguwen', 'jinwen', { ...rg, progress: (c) => (c === 'child' ? child : m), alpha: (c) => (c === 'child' ? Math.min(1, child * 4) : 1), color: glyphCol, glow: glyphGlow, glowColor: 'rgba(255,220,170,0.5)' });
+          else E.drawRealGlyph(ctx, 'jinwen', { ...rg, color: glyphCol, glow: glyphGlow, glowColor: 'rgba(255,220,170,0.5)' });
           ctx.restore();
           E.legend(ctx, aG, { hand: 1, yao: 1, roof: 1, child: seg(vt, 7.7, 8.1) }, hi);
           const cc = E.realCenter('jinwen', 'child', rg);
@@ -500,14 +499,17 @@
         E.text(ctx, 'avant Qin : chaque royaume écrit à sa façon', W / 2, 150, { size: 52, weight: 700, color: '#f3e5c6', alpha: seg(vt, 5.05, 5.2) * (1 - seg(vt, 5.5, 5.6)) });
         const ivory = () => '#e9dcc3';
         // avant Qin : chaque royaume écrit à sa façon
-        [['real:zhanguo', 480, '戰國文字', 'Royaumes combattants'], ['real:jinwen', 1440, '金文', 'bronzes Zhou']].forEach(([k, px, zh, fr]) => {
-          const x = lerp(px, W / 2, u), sz = lerp(440, 620, u), al = a0 * (1 - smooth(seg(vt, 7.6, 8.5)));
-          drawForm(ctx, k, x, 560, sz, ivory, () => 1, { opacity: al * 0.9, glow: 10 });
-          E.text(ctx, zh, x, 850, { font: 'Kai', size: 44, color: '#f4e7c8', alpha: al * (1 - u) });
-          E.text(ctx, fr, x, 905, { size: 30, weight: 600, color: '#d9c7a0', alpha: al * (1 - u) });
+        // la forme de Chu s'efface en rejoignant le centre ; celle des Zhou se métamorphose en petit sceau
+        const mz = easeInOut(seg(vt, 7.4, 8.8));
+        [['zhanguo', 480, '戰國文字', 'Royaumes combattants · Chu'], ['jinwen', 1440, '金文', 'bronzes Zhou']].forEach(([k, px, zh, fr]) => {
+          const x = lerp(px, W / 2, u), sz = lerp(440, 620, u);
+          const al = a0 * (k === 'zhanguo' ? 1 - smooth(seg(vt, 6.6, 7.4)) : 1); // Chu s'efface avant d'arriver
+          if (k === 'jinwen' && mz > 0) E.drawMorph(ctx, 'jinwen', 'xiaozhuan', { x, y: 560, size: sz, progress: mz, color: ivory, opacity: al * lerp(0.9, 1, mz), glow: lerp(10, 24, mz) });
+          else E.drawRealGlyph(ctx, k, { x, y: 560, size: sz, color: ivory, opacity: al * 0.9, glow: 10 });
+          const la = al * (1 - seg(u, 0, 0.35)); // les étiquettes partent avant que les formes se rejoignent
+          E.text(ctx, zh, x, 850, { font: 'Kai', size: 44, color: '#f4e7c8', alpha: la });
+          E.text(ctx, fr, x, 905, { size: 30, weight: 600, color: '#d9c7a0', alpha: la });
         });
-        const sa = seg(vt, 7.8, 8.6);
-        if (sa > 0) E.drawRealGlyph(ctx, 'xiaozhuan', { x: W / 2, y: 560, size: 620, color: ivory, opacity: sa, glow: 24 });
         E.text(ctx, '書同文', W / 2, 150, { font: 'Kai', size: 120, color: '#ffe8c2', alpha: seg(vt, 5.6, 6.0), glow: 30, glowColor: 'rgba(255,90,40,0.7)' });
         E.text(ctx, '« une même écriture pour tous » — le ministre Li Si 李斯', W / 2, 960, { size: 44, weight: 700, color: '#f3e5c6', alpha: seg(vt, 6.2, 6.6) });
         flash(ctx, t, [T(4, 8.6)], '255,230,200', 0.3, 0.7);
@@ -601,15 +603,16 @@
       ctx.restore();
       const m = easeInOut(seg(vt, 2.6, 4.8)); // s'achève pendant la pause qui suit « …les courbes »
       const gx = 800, gy = 540, gs = 820;
-      if (m < 1) E.drawRealGlyph(ctx, 'xiaozhuan', { x: gx, y: gy, size: gs, color: (c) => COMP[c].col, opacity: 1 - m, glow: 16 });
       const handHi = pulse(vt, 5.1, 3.0);
       const fade = seg(vt, 8.7, 9.6);
-      // forme réelle : stèle de Cao Quan 曹全碑 (Han orientaux, 185), 小學堂 — Academia Sinica
-      E.drawRealGlyph(ctx, 'lishu', {
-        x: gx, y: gy, size: gs, opacity: m,
+      // métamorphose réelle : petit sceau du Shuowen → stèle de Cao Quan 曹全碑 (Han orientaux, 185)
+      const lishuOpts = {
+        x: gx, y: gy, size: gs,
         color: (c) => (c === 'hand' ? E.mix(E.mix(COMP.hand.col, '#ffffff', 0.35 * handHi), '#6b6560', fade) : COMP[c].col),
         glow: 16 + 22 * handHi * (1 - fade), glowColor: E.rgba(COMP.hand.col, 0.3 + 0.5 * handHi * (1 - fade)),
-      });
+      };
+      if (m < 1) E.drawMorph(ctx, 'xiaozhuan', 'lishu', { ...lishuOpts, progress: m });
+      else E.drawRealGlyph(ctx, 'lishu', lishuOpts);
       E.text(ctx, 'stèle de Cao Quan 曹全碑 · 185', gx, gy + gs / 2 + 30, { size: 26, weight: 600, color: '#b9b2c8', alpha: m * 0.85 });
       E.legend(ctx, 1 - seg(vt, 5.0, 5.4), { hand: 1, yao: 1, roof: 1, child: 1 });
       // 蠶頭燕尾 : l'extrémité droite de la grande horizontale de 子
