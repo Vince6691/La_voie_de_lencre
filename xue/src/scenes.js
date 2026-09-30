@@ -590,7 +590,9 @@
           const head = (c === '斆' || c === '學') && j === 0;
           const d = window.SHUOWEN[head ? 'seal:' + ch : ch];
           const cy = top + 70 + j * 92;
-          if (d) {
+          // SHUOWEN_ZHUAN : tout le texte en petit sceau (police 崇羲篆體, d'après l'édition Song)
+          if (window.SHUOWEN_ZHUAN ?? true) E.text(ctx, ch, x, cy + 4, { font: 'Zhuan', size: 84, color: col });
+          else if (d) {
             if (!shuowenCache[d]) shuowenCache[d] = new Path2D(d);
             const sz = head ? 100 : 88;
             ctx.save(); ctx.translate(x - sz / 2, cy - sz / 2); ctx.scale(sz / 400, sz / 400);

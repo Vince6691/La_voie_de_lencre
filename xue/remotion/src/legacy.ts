@@ -18,6 +18,7 @@ const loadScript = (src: string) =>
 
 const FONTS: [string, string, string][] = [
   ['Kai', 'fonts/LXGWWenKaiTC-Bold.ttf', '400'],
+  ['Zhuan', 'fonts/ChongxiSeal.otf', '400'], // 崇羲篆體 (小學堂), CC BY-ND 3.0 TW
   ['Song', 'fonts/NotoSerifTC-Bold.otf', '400 700'],
   ['Cinzel', 'fonts/Cinzel.ttf', '400 900'],
   ['Cormorant', 'fonts/Cormorant.ttf', '300 700'],

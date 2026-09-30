@@ -109,7 +109,9 @@ python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
 
 - **Jiaguwen, jinwen, Royaumes combattants, petit sceau** : glyphes de zdic.net vectorisés,
   fournis par l'auteur (`assets/glyphs/`), découpés en composantes par `tools/build_real_glyphs.py`.
-- **Lishu** : reconstitution (aucune source fournie) — à remplacer par un SVG si disponible.
+- **Lishu** : stèle de Cao Quan 曹全碑 (185), 小學堂 (Academia Sinica), CC0.
+- **Lattes du Shuowen** : police de petit sceau 崇羲篆體 (小學堂, Academia Sinica), licence CC BY-ND 3.0 TW
+  (usage commercial autorisé avec mention de l'auteur, police non modifiée).
 - **Cursive** : police Liu Jian Mao Cao (Google Fonts, OFL), forme 学.
 - **Kaishu 學 / 学** : ordre et forme des traits d'après *Make Me a Hanzi* (hanzi-writer-data).
 
