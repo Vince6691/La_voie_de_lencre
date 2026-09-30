@@ -391,7 +391,6 @@
         E.callout(ctx, rc[0] + 150, rc[1] + 60, 1300, 760, '冖 toit', COMP.roof.col, seg(vt, 16.5, 16.9), 'un bâtiment');
         const hc = E.realCenter('jiaguwen', 'hand', rg);
         E.callout(ctx, hc[0] - 150, hc[1] - 40, 200, 520, '𦥑', COMP.hand.col, seg(vt, 19.5, 19.9), 'deux mains');
-        E.text(ctx, '學 sur l\'os 鐵雲藏龜 157.4 · Academia Sinica (小學堂)', gx, gy + gs / 2 + 40, { size: 24, weight: 500, color: '#cdbb98', alpha: a * 0.8 });
         E.text(ctx, '(certaines inscriptions omettent les mains)', 1340, 1000, { size: 28, weight: 500, color: '#cdbb98', alpha: seg(vt, 19.8, 20.3) });
       }
       E.finish(ctx, t);
@@ -456,10 +455,13 @@
           ctx.save(); ctx.globalAlpha = aG;
           // métamorphose réelle : l'os (鐵雲藏龜 157.4) devient le bronze (大盂鼎) ; l'enfant naît ensuite
           const child = easeOut(seg(vt, 7.0, 8.4));
-          const glyphCol = (c) => E.mix(COMP[c].col, '#ffffff', 0.35 * (hi[c] || 0));
-          const glyphGlow = 16 + 24 * Math.max(hi.hand, hi.roof, hi.child);
-          if (m < 1 || child < 1) E.drawMorph(ctx, 'jiaguwen', 'jinwen', { ...rg, progress: (c) => (c === 'child' ? child : m), alpha: (c) => (c === 'child' ? Math.min(1, child * 4) : 1), color: glyphCol, glow: glyphGlow, glowColor: 'rgba(255,220,170,0.5)' });
-          else E.drawRealGlyph(ctx, 'jinwen', { ...rg, color: glyphCol, glow: glyphGlow, glowColor: 'rgba(255,220,170,0.5)' });
+          // « Des mains… sous un toit… à un enfant » : la partie citée s'illumine, les autres s'estompent
+          const spot = vt > 9.5 ? Math.max(hi.hand, hi.roof, hi.child) : 0;
+          const glyphCol = (c) => E.mix(COMP[c].col, '#ffffff', 0.45 * (hi[c] || 0));
+          const dim = (c) => 1 - 0.82 * spot * (1 - (hi[c] || 0));
+          const glyphGlow = 16;
+          if (m < 1 || child < 1) E.drawMorph(ctx, 'jiaguwen', 'jinwen', { ...rg, progress: (c) => (c === 'child' ? child : m), alpha: (c) => (c === 'child' ? Math.min(1, child * 4) : 1) * dim(c), color: glyphCol, glow: glyphGlow, glowColor: 'rgba(255,220,170,0.5)' });
+          else E.drawRealGlyph(ctx, 'jinwen', { ...rg, alpha: dim, color: glyphCol, glow: glyphGlow, glowColor: 'rgba(255,220,170,0.5)' });
           ctx.restore();
           E.legend(ctx, aG, { hand: 1, yao: 1, roof: 1, child: seg(vt, 7.7, 8.1) }, hi);
           const cc = E.realCenter('jinwen', 'child', rg);
@@ -468,7 +470,7 @@
           const words = [['DES MAINS', 10.5, COMP.hand.col], ['SOUS UN TOIT', 11.9, COMP.roof.col], ['À UN ENFANT', 13.0, COMP.child.col]];
           words.forEach(([w, a0, col], i) => {
             const u = seg(vt, a0, a0 + 0.3);
-            if (u > 0) E.text(ctx, w, 470 + i * 480, 1000, { font: 'Cinzel', weight: 900, size: 56, color: col, alpha: u * (1 - seg(vt, 14.0, 14.3)), glow: 20, glowColor: col, spacing: 4 });
+            if (u > 0) E.text(ctx, w, [400, 960, 1520][i], 1000, { font: 'Cinzel', weight: 900, size: 56, color: col, alpha: u * (1 - seg(vt, 14.0, 14.3)), glow: 20, glowColor: col, spacing: 4 });
           });
         }
         E.finish(ctx, t);
@@ -604,7 +606,7 @@
         ctx.fillStyle = vg; ctx.fillRect(250, 620, 440, 290); ctx.restore();
       }
       E.text(ctx, '許慎  Xu Shen', 470, 150, { font: 'Kai', size: 56, color: '#f4e7c8', alpha: seg(vt, 0.3, 0.8) });
-      E.text(ctx, '說文解字  ·  Shuowen jiezi  ·  v. 100', 470, 225, { size: 38, weight: 700, color: '#f4b73f', alpha: seg(vt, 2.3, 2.7) });
+      E.text(ctx, '說文解字  ·  Shuowen jiezi', 470, 225, { size: 38, weight: 700, color: '#f4b73f', alpha: seg(vt, 2.3, 2.7) });
       // « le premier dictionnaire qui explique la forme de chaque caractère » (passage étiré par la voix)
       caption(ctx, 'premier dictionnaire à expliquer la forme des caractères · 9 353 entrées · 540 clés', fadeIO(vt, 4.3, 5.05, 0.06, 0.06), H - 90);
       caption(ctx, '覺悟 : « s\'éveiller, prendre conscience »', fadeIO(vt, 5.7, 7.5, 0.3, 0.3), H - 90);
