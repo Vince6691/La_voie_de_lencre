@@ -24,4 +24,6 @@ if (vids.length) cp(`${X}/assets/video/${vids[0]}`, `${here}/public/video/divina
 for (const f of fs.readdirSync(`${X}/assets/shuimo/elements`)) if (f.endsWith('.png')) cp(`${X}/assets/shuimo/elements/${f}`, `${here}/public/shuimo/elements/${f}`);
 cp(`${X}/assets/shuimo/paper.jpg`, `${here}/public/shuimo/paper.jpg`);
 cp(`${X}/assets/shuimo/elements/index.json`, `${here}/src/data/shuimo.json`);
+// fondus encre ↔ 3D (tools/build_morph.py) : paires d'images et champs de propagation
+for (const f of fs.readdirSync(`${X}/assets/morph`)) cp(`${X}/assets/morph/${f}`, `${here}/public/morph/${f}`);
 console.log('synchronisé');
