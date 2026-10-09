@@ -5,15 +5,16 @@ description: Crée le fond animé « shuimo moderne » de la série 墨道 dans 
 
 # Fond shuimo (Remotion)
 
-Validé par l'utilisateur : « léger, propre ». Version par défaut **sans brume ni nuages** et **sans coups de
-pinceau** (ceux-ci relèvent du skill `coup-de-pinceau`, à ajouter seulement si on le demande).
+Validé par l'utilisateur : « léger, propre ». Version par défaut : **bandes de nuages dans le ciel** (et soleil
+voilé), **pas de brouillard** devant ou entre les montagnes (l'utilisateur n'en veut pas), **pas de coups de
+pinceau** (ils relèvent du skill `coup-de-pinceau`, à ajouter seulement si on le demande).
 
 ## Où est quoi
 - Banque : `xue/assets/shuimo/` — `planches/` (planches Nano Banana d'origine), `PROMPTS.md` (prompts et bloc de
   style moderne), `elements/` (95 éléments détourés + `index.json`), `paper.jpg`. Doc : `assets/shuimo/README.md`.
 - Détourage : `python3 xue/tools/build_shuimo.py [--sheet]` (depuis `xue/`), puis `node sync.mjs` dans `remotion/`.
 - Code : `xue/remotion/src/shuimo/` — `layout.ts` (`compose`), `ShuimoBackground.tsx` (rendu), `ShuimoDemo.tsx`
-  (composition `ShuimoDemo`, props `clouds`, `strokes`).
+  (composition `ShuimoDemo`, props `clouds`, `mist`, `strokes`).
 
 ## Utilisation
 ```tsx
@@ -32,8 +33,9 @@ const shot = compose(37, { move: 'rise', mood: 'jour', duration: 8 });   // grai
   qui passe du lointain au premier plan), `still` (plan qui respire, pour un contenu à lire). Varier d'un plan à
   l'autre.
 - **Ambiances** : `jour`, `aube` (ciel chaud), `nuit` (bleu-gris, lune), `brume` (voile clair, sans nappes).
-- **Options** (désactivées par défaut, à n'activer que sur demande) : `clouds: true` remet les nappes de brume,
-  le nuage du ciel et le soleil voilé ; `strokes: true` ajoute les coups de pinceau.
+- **Options** : `clouds` (bandes de nuages du ciel, soleil voilé ; activé par défaut) ; `mist: true` remet les
+  nappes de brouillard entre les plans et au premier plan (rejetées par l'utilisateur, seulement sur demande
+  explicite) ; `strokes: true` ajoute les coups de pinceau.
 - **Raccord entre plans** : fondu de 1,2 s à travers un voile de papier (voir `MistVeil` dans `ShuimoDemo.tsx`).
 
 ## Règles

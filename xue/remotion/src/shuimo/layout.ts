@@ -28,9 +28,9 @@ export { rng, W, H } from './common';
 import { rng, W, H } from './common';
 import { edgeStrokes } from './InkEvents';
 
-// options : clouds (nappes de brume et nuage du ciel, désactivés par défaut), strokes (coups de pinceau du skill
-// coup-de-pinceau, désactivés par défaut)
-export type ComposeOptions = { move: Move; mood: Mood; duration: number; dir?: 1 | -1; clouds?: boolean; strokes?: boolean };
+// options : clouds (bandes de nuages du ciel et soleil voilé, activés par défaut), mist (nappes de brouillard entre
+// les plans et au premier plan, désactivées par défaut), strokes (coups de pinceau du skill coup-de-pinceau, désactivés)
+export type ComposeOptions = { move: Move; mood: Mood; duration: number; dir?: 1 | -1; clouds?: boolean; mist?: boolean; strokes?: boolean };
 export function compose(seed: number, o: ComposeOptions): Shot {
   const R = rng(seed);
   const r = (a: number, b: number) => a + (b - a) * R();
@@ -43,11 +43,12 @@ export function compose(seed: number, o: ComposeOptions): Shot {
 
   // ciel
   if (o.mood === 'nuit' || R() < 0.7) {
-    const sunmist = o.clouds ? ['sunmist'] : []; // soleil voilé d'un nuage : seulement avec l'option clouds
+    const clouds = o.clouds ?? true;
+    const sunmist = clouds ? ['sunmist'] : []; // soleil voilé d'une bande de nuage
     const k = o.mood === 'nuit' ? 'moon' : o.mood === 'aube' ? pick(['sun', ...sunmist]) : pick(['sun', 'sun', ...sunmist, 'moon']);
     add(pick(of(k)), { x: side(), y: r(170, 300), h: k === 'sunmist' ? r(150, 210) : r(140, 210), depth: 0.03, opacity: k === 'moon' ? 0.8 : 0.92, flip: false });
   }
-  if (o.clouds && R() < 0.5) add(pick(of('cloud')), { x: r(300, 1600), y: r(150, 260), h: r(60, 100), depth: 0.08, opacity: 0.55, drift: r(-8, 8), breathe: true });
+  if ((o.clouds ?? true) && R() < 0.5) add(pick(of('cloud')), { x: r(300, 1600), y: r(150, 260), h: r(60, 100), depth: 0.08, opacity: 0.55, drift: r(-8, 8), breathe: true });
   // montagnes lointaines : une chaîne continue de bandes qui se chevauchent
   const baseFar = r(470, 540);
   for (let x = r(-350, -100); x < W + 300;) {
@@ -56,7 +57,7 @@ export function compose(seed: number, o: ComposeOptions): Shot {
     x += w * r(0.5, 0.78);
   }
   // brume entre les plans
-  for (let i = 0; i < (o.clouds ? 2 : 0); i++) {
+  for (let i = 0; i < (o.mist ? 2 : 0); i++) {
     const el = pick(of('brume')), w = r(1100, 1700);
     add(el, { x: r(200, 1700), y: r(520, 600), h: (w * el.h) / el.w, depth: 0.22, opacity: r(0.3, 0.5), drift: r(-14, 14), breathe: true });
   }
@@ -75,7 +76,7 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   }
   // brume basse
   const el2 = pick(of('brume')), w2 = r(1400, 2100);
-  if (o.clouds) add(el2, { x: r(500, 1400), y: r(800, 880), h: (w2 * el2.h) / el2.w, depth: 0.55, opacity: r(0.35, 0.55), drift: r(-18, 18), breathe: true });
+  if (o.mist) add(el2, { x: r(500, 1400), y: r(800, 880), h: (w2 * el2.h) / el2.w, depth: 0.55, opacity: r(0.35, 0.55), drift: r(-18, 18), breathe: true });
   if (R() < 0.35) add(pick(of('boat')), { x: r(500, 1400), y: r(830, 870), h: r(55, 85), depth: 0.5, opacity: 0.9, drift: dir * r(10, 18) });
   // oiseaux qui traversent
   if (o.mood !== 'nuit' && R() < 0.55) add(pick(of('birds')), { x: dir > 0 ? r(150, 500) : r(1400, 1750), y: r(200, 340), h: r(100, 150), depth: 0.3, opacity: 0.85, drift: dir * r(28, 45), flip: dir < 0 });

@@ -17,8 +17,8 @@ export const RemotionRoot: React.FC = () => (
     height={1080}
     defaultProps={{ three: true, captions: false, inkTransitions: true } satisfies XueProps}
   />
-  {/* fond shuimo (banque d'éléments assets/shuimo) : démo de 30 s, quatre plans ; brume et coups de pinceau en option */}
+  {/* fond shuimo (banque d'éléments assets/shuimo) : démo de 30 s, quatre plans ; nuages du ciel ; brouillard et coups de pinceau en option */}
   <Composition id="ShuimoDemo" component={ShuimoDemo} durationInFrames={Math.round(SHUIMO_DEMO_SECONDS * FPS)} fps={FPS} width={1920} height={1080}
-    defaultProps={{ clouds: false, strokes: false } satisfies ShuimoDemoProps} />
+    defaultProps={{ clouds: true, mist: false, strokes: false } satisfies ShuimoDemoProps} />
   </>
 );
