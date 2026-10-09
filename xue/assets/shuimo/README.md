@@ -11,14 +11,15 @@ oiseaux), `ciel` (soleils, lunes, nuage), `brume` (nappes et lavis).
 
 ## Dans Remotion (`remotion/src/shuimo/`)
 
-- `layout.ts` : `compose(graine, { move, mood, duration })` compose un plan — ciel, chaîne lointaine, brume,
-  pics sur les côtés, détail de vie, brume basse, oiseaux ou barque, premiers plans en coin, événements d'encre
-  sur les bords. Même graine → même plan.
+- `layout.ts` : `compose(graine, { move, mood, duration, clouds?, strokes? })` compose un plan — ciel, chaîne
+  lointaine, pics sur les côtés, détail de vie, oiseaux ou barque, premiers plans en coin. Même graine → même plan.
+  Par défaut sans brume ni nuages (`clouds: true` les remet) et sans coups de pinceau (`strokes: true`).
 - `ShuimoBackground.tsx` : rendu en parallaxe (profondeur 0 lointain → 1 tout près). Mouvements : `pan`, `push`,
   `rise`, `focus` (mise au point qui glisse), `still`. Ambiances : `jour`, `aube`, `nuit`, `brume`. Halo de
   papier au centre pour le contenu.
-- `InkEvents.tsx` : goutte qui s'étale, trait de pinceau lisse, lavis ; l'encre sèche et pâlit.
-- `ShuimoDemo.tsx` : composition `ShuimoDemo` (30 s, quatre plans enchaînés par une brume).
+- `InkEvents.tsx` : coups de pinceau lisses ou lavis le long des bords (skill `coup-de-pinceau`).
+- `ShuimoDemo.tsx` : composition `ShuimoDemo` (30 s, quatre plans enchaînés par un voile de papier ; props
+  `clouds` et `strokes`). Skill associé : `fond-shuimo`.
 
 ```sh
 cd remotion && npm run studio          # composition « ShuimoDemo »

@@ -28,7 +28,10 @@ export { rng, W, H } from './common';
 import { rng, W, H } from './common';
 import { edgeStrokes } from './InkEvents';
 
-export function compose(seed: number, o: { move: Move; mood: Mood; duration: number; dir?: 1 | -1 }): Shot {
+// options : clouds (nappes de brume et nuage du ciel, désactivés par défaut), strokes (coups de pinceau du skill
+// coup-de-pinceau, désactivés par défaut)
+export type ComposeOptions = { move: Move; mood: Mood; duration: number; dir?: 1 | -1; clouds?: boolean; strokes?: boolean };
+export function compose(seed: number, o: ComposeOptions): Shot {
   const R = rng(seed);
   const r = (a: number, b: number) => a + (b - a) * R();
   const pick = <T,>(a: T[]) => a[Math.floor(R() * a.length)];
@@ -40,10 +43,11 @@ export function compose(seed: number, o: { move: Move; mood: Mood; duration: num
 
   // ciel
   if (o.mood === 'nuit' || R() < 0.7) {
-    const k = o.mood === 'nuit' ? 'moon' : o.mood === 'aube' ? pick(['sun', 'sunmist']) : pick(['sun', 'sun', 'sunmist', 'moon']);
+    const sunmist = o.clouds ? ['sunmist'] : []; // soleil voilé d'un nuage : seulement avec l'option clouds
+    const k = o.mood === 'nuit' ? 'moon' : o.mood === 'aube' ? pick(['sun', ...sunmist]) : pick(['sun', 'sun', ...sunmist, 'moon']);
     add(pick(of(k)), { x: side(), y: r(170, 300), h: k === 'sunmist' ? r(150, 210) : r(140, 210), depth: 0.03, opacity: k === 'moon' ? 0.8 : 0.92, flip: false });
   }
-  if (R() < 0.5) add(pick(of('cloud')), { x: r(300, 1600), y: r(150, 260), h: r(60, 100), depth: 0.08, opacity: 0.55, drift: r(-8, 8), breathe: true });
+  if (o.clouds && R() < 0.5) add(pick(of('cloud')), { x: r(300, 1600), y: r(150, 260), h: r(60, 100), depth: 0.08, opacity: 0.55, drift: r(-8, 8), breathe: true });
   // montagnes lointaines : une chaîne continue de bandes qui se chevauchent
   const baseFar = r(470, 540);
   for (let x = r(-350, -100); x < W + 300;) {
@@ -52,7 +56,7 @@ export function compose(seed: number, o: { move: Move; mood: Mood; duration: num
     x += w * r(0.5, 0.78);
   }
   // brume entre les plans
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < (o.clouds ? 2 : 0); i++) {
     const el = pick(of('brume')), w = r(1100, 1700);
     add(el, { x: r(200, 1700), y: r(520, 600), h: (w * el.h) / el.w, depth: 0.22, opacity: r(0.3, 0.5), drift: r(-14, 14), breathe: true });
   }
@@ -71,7 +75,7 @@ export function compose(seed: number, o: { move: Move; mood: Mood; duration: num
   }
   // brume basse
   const el2 = pick(of('brume')), w2 = r(1400, 2100);
-  add(el2, { x: r(500, 1400), y: r(800, 880), h: (w2 * el2.h) / el2.w, depth: 0.55, opacity: r(0.35, 0.55), drift: r(-18, 18), breathe: true });
+  if (o.clouds) add(el2, { x: r(500, 1400), y: r(800, 880), h: (w2 * el2.h) / el2.w, depth: 0.55, opacity: r(0.35, 0.55), drift: r(-18, 18), breathe: true });
   if (R() < 0.35) add(pick(of('boat')), { x: r(500, 1400), y: r(830, 870), h: r(55, 85), depth: 0.5, opacity: 0.9, drift: dir * r(10, 18) });
   // oiseaux qui traversent
   if (o.mood !== 'nuit' && R() < 0.55) add(pick(of('birds')), { x: dir > 0 ? r(150, 500) : r(1400, 1750), y: r(200, 340), h: r(100, 150), depth: 0.3, opacity: 0.85, drift: dir * r(28, 45), flip: dir < 0 });
@@ -90,7 +94,7 @@ export function compose(seed: number, o: { move: Move; mood: Mood; duration: num
 
   // coups de pinceau : 2 ou 3, répartis dans le plan, le long des bords (InkEvents.tsx)
   const n = 2 + (R() < 0.5 ? 1 : 0);
-  const ink: InkEvent[] = edgeStrokes(Math.floor(R() * 1e6), Array.from({ length: n }, (_, i) => 1 + ((o.duration - 3.5) * (i + r(0.1, 0.8))) / n));
+  const ink: InkEvent[] = !o.strokes ? [] : edgeStrokes(Math.floor(R() * 1e6), Array.from({ length: n }, (_, i) => 1 + ((o.duration - 3.5) * (i + r(0.1, 0.8))) / n));
   pieces.sort((a, b) => a.depth - b.depth);
   return { pieces, ink, move: o.move, mood: o.mood, dir };
 }
