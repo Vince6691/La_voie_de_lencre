@@ -2,7 +2,29 @@
 // attaque appuyée (起筆), corps qui s'affine, sortie effilée (出鋒) — ou un lavis gris plus large.
 // L'encre est plus dense à l'attaque, s'éclaircit vers la sortie, puis sèche et pâlit sans disparaître.
 import React from 'react';
-import { H, InkEvent, W, rng } from './layout';
+import { H, InkEvent, W, rng } from './common';
+
+export type Edge = 'l' | 'r' | 'b' | 't';
+// place des coups de pinceau le long des bords du cadre (jamais vers le centre) aux instants donnés.
+// edges : bords permis (par défaut côtés et bas ; le haut laisse le ciel libre) ; wash : part de lavis gris
+export function edgeStrokes(seed: number, times: number[], o: { edges?: Edge[]; wash?: number } = {}): InkEvent[] {
+  const R = rng(seed);
+  const r = (a: number, b: number) => a + (b - a) * R();
+  const edges = o.edges ?? ['l', 'r', 'l', 'r', 'b'];
+  return times.map((t) => {
+    const edge = edges[Math.floor(R() * edges.length)];
+    const down = R() < 0.5;
+    const [x, y, angle] =
+      edge === 'l' ? [r(60, 300), down ? r(120, 420) : r(620, 960), (down ? 1 : -1) * Math.PI / 2 + r(-0.45, 0.45)]
+      : edge === 'r' ? [r(1620, 1860), down ? r(120, 420) : r(620, 960), (down ? 1 : -1) * Math.PI / 2 + r(-0.45, 0.45)]
+      : edge === 'b' ? [R() < 0.5 ? r(160, 520) : r(1400, 1760), r(940, 1010), (R() < 0.5 ? 0 : Math.PI) + r(-0.25, 0.25)]
+      : [R() < 0.5 ? r(160, 520) : r(1400, 1760), r(60, 130), (R() < 0.5 ? 0 : Math.PI) + r(-0.25, 0.25)];
+    // un trait qui sortirait du cadre est retourné vers l'intérieur
+    const len = 420 * 1.3, ex = x + Math.cos(angle) * len, ey = y + Math.sin(angle) * len;
+    const a2 = ex < 30 || ex > W - 30 || ey < 30 || ey > H - 30 ? angle + Math.PI : angle;
+    return { type: R() < (o.wash ?? 0.3) ? 'wash' : 'stroke', t, x, y, size: r(0.75, 1.25), angle: a2, seed: Math.floor(R() * 1e6) };
+  });
+}
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (a: number, b: number, v: number) => { const u = clamp((v - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -47,6 +69,7 @@ function outline(e: InkEvent, p: number, len: number, width: number, wash: boole
   return { d: d + 'Z', from: pts[0], to: pts[3] };
 }
 
+// à poser au-dessus d'un fond, dans une Sequence : t = temps local en secondes
 export const InkEvents: React.FC<{ events: InkEvent[]; t: number; night?: boolean }> = ({ events, t, night }) => {
   const ink = night ? '#0d0f14' : '#1b1814';
   return (

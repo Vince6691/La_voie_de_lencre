@@ -8,7 +8,8 @@ export type Piece = {
   el: El; x: number; y: number; h: number; flip: boolean; depth: number; opacity: number;
   drift?: number; breathe?: boolean;
 };
-export type InkEvent = { type: 'stroke' | 'wash'; t: number; x: number; y: number; size: number; angle: number; seed: number };
+export type { InkEvent } from './common';
+import type { InkEvent } from './common';
 export type Move = 'pan' | 'push' | 'rise' | 'focus' | 'still';
 export type Mood = 'jour' | 'aube' | 'nuit' | 'brume';
 export type Shot = { pieces: Piece[]; ink: InkEvent[]; move: Move; mood: Mood; dir: 1 | -1 };
@@ -23,14 +24,9 @@ const ROLE: Record<string, string> = {
 };
 const role = (e: El) => ROLE[e.file] ?? (e.family === 'vie' ? 'scene' : e.family);
 
-export const rng = (seed: number) => () => {
-  seed = (seed + 0x6d2b79f5) | 0;
-  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-};
-
-export const W = 1920, H = 1080;
+export { rng, W, H } from './common';
+import { rng, W, H } from './common';
+import { edgeStrokes } from './InkEvents';
 
 export function compose(seed: number, o: { move: Move; mood: Mood; duration: number; dir?: 1 | -1 }): Shot {
   const R = rng(seed);
@@ -92,24 +88,9 @@ export function compose(seed: number, o: { move: Move; mood: Mood; duration: num
     add(el, { x, y, h, depth: 0.85, opacity: 1, flip });
   });
 
-  // coups de pinceau : ils longent un bord du cadre (côtés, haut, bas), jamais vers le centre
-  const ink: InkEvent[] = [];
+  // coups de pinceau : 2 ou 3, répartis dans le plan, le long des bords (InkEvents.tsx)
   const n = 2 + (R() < 0.5 ? 1 : 0);
-  for (let i = 0; i < n; i++) {
-    const t = 1 + ((o.duration - 3.5) * (i + r(0.1, 0.8))) / n;
-    const edge = pick(['l', 'r', 'l', 'r', 'b']); // pas en haut : le ciel (soleil, lune, oiseaux) reste libre
-    const down = R() < 0.5;
-    const [x, y, angle] =
-      edge === 'l' ? [r(60, 300), down ? r(120, 420) : r(620, 960), (down ? 1 : -1) * Math.PI / 2 + r(-0.45, 0.45)]
-      : edge === 'r' ? [r(1620, 1860), down ? r(120, 420) : r(620, 960), (down ? 1 : -1) * Math.PI / 2 + r(-0.45, 0.45)]
-      : edge === 'b' ? [R() < 0.5 ? r(160, 520) : r(1400, 1760), r(940, 1010), (R() < 0.5 ? 0 : Math.PI) + r(-0.25, 0.25)]
-      : [R() < 0.5 ? r(160, 520) : r(1400, 1760), r(60, 130), (R() < 0.5 ? 0 : Math.PI) + r(-0.25, 0.25)];
-    // un trait qui partirait hors du cadre est retourné vers l'intérieur
-    const len = 420 * 1.3;
-    const ex = x + Math.cos(angle) * len, ey = y + Math.sin(angle) * len;
-    const a2 = ex < 30 || ex > W - 30 || ey < 30 || ey > H - 30 ? angle + Math.PI : angle;
-    ink.push({ type: R() < 0.7 ? 'stroke' : 'wash', t, x, y, size: r(0.75, 1.25), angle: a2, seed: Math.floor(R() * 1e6) });
-  }
+  const ink: InkEvent[] = edgeStrokes(Math.floor(R() * 1e6), Array.from({ length: n }, (_, i) => 1 + ((o.duration - 3.5) * (i + r(0.1, 0.8))) / n));
   pieces.sort((a, b) => a.depth - b.depth);
   return { pieces, ink, move: o.move, mood: o.mood, dir };
 }
