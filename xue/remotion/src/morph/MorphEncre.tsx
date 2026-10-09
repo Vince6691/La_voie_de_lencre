@@ -2,11 +2,13 @@
 // propagation (tools/build_morph.py). Un seuil avance sur le champ : derrière lui la couleur, juste devant une
 // zone de 3D délavée en gris (la couleur arrive après la forme), au bord un liseré d'encre humide, au-delà le
 // lavis posé sur le papier xuan. Sens to3d : la couleur naît au point focal ; sens toInk : l'encre gagne depuis
-// les bords et s'arrête autour du sujet, qui reste en 3D au milieu d'un décor shuimo.
+// les bords et s'arrête autour du sujet, qui reste en 3D au milieu d'un décor shuimo. Sens fade : pas de
+// frontière ; la couleur entre par le cœur du personnage (<nom>_couleur.png) et s'arrête en se délavant de façon
+// irrégulière vers ses extrémités (bouts des manches, pieds, pinceau), comme une photo passée sur les bords.
 import React, { useEffect, useRef, useState } from 'react';
 import { AbsoluteFill, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 
-export type MorphProps = { name: string; dir: 'to3d' | 'toInk'; focus: [number, number]; end: number };
+export type MorphProps = { name: string; dir: 'to3d' | 'toInk' | 'fade'; focus: [number, number]; end: number };
 
 const smooth = (a: number, b: number, v: number) => { const u = Math.min(1, Math.max(0, (v - a) / (b - a))); return u * u * (3 - 2 * u); };
 const easeInOut = (u: number) => { const v = Math.min(1, Math.max(0, u)); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
@@ -20,26 +22,26 @@ const pixels = (img: HTMLImageElement, w: number, h: number) => {
   return x.getImageData(0, 0, w, h).data;
 };
 
-function useMorphData(name: string) {
+function useMorphData(name: string, fade: boolean) {
   const [data, setData] = useState<Data | null>(null);
   const [handle] = useState(() => delayRender(`images ${name}`));
   useEffect(() => {
-    Promise.all([`morph/${name}_3d.jpg`, `morph/${name}_encre.jpg`, `morph/${name}_champ.png`, 'shuimo/paper.jpg'].map((f) => load(staticFile(f)))).then(([d3, enc, ch, paper]) => {
+    Promise.all([`morph/${name}_3d.jpg`, `morph/${name}_encre.jpg`, fade ? `morph/${name}_couleur.png` : `morph/${name}_champ.png`, 'shuimo/paper.jpg'].map((f) => load(staticFile(f)))).then(([d3, enc, ch, paper]) => {
       const w = d3.naturalWidth, h = d3.naturalHeight;
       const col = pixels(d3, w, h), e = pixels(enc, w, h), p = pixels(paper, w, h), field = pixels(ch, w, h);
       const ink = new Uint8ClampedArray(w * h * 4), washed = new Uint8ClampedArray(w * h * 4);
       for (let i = 0; i < w * h * 4; i += 4) {
         // lavis posé sur le papier (multiplication) ; 3D délavée : gris chaud éclairci
         for (let k = 0; k < 3; k++) ink[i + k] = (e[i + k] * p[i + k]) / 255;
+        // photo passée : couleur presque éteinte (28 %), éclaircie, posée sur le papier
         const g = 0.3 * col[i] + 0.59 * col[i + 1] + 0.11 * col[i + 2];
-        const v = 70 + 0.72 * g;
-        washed[i] = v * 1.0 * (p[i] / 255); washed[i + 1] = v * 0.985 * (p[i + 1] / 255); washed[i + 2] = v * 0.96 * (p[i + 2] / 255);
+        for (let k = 0; k < 3; k++) washed[i + k] = ((g * 0.72 + col[i + k] * 0.28) * 0.8 + 51) * (p[i + k] / 255);
         ink[i + 3] = washed[i + 3] = 255;
       }
       setData({ w, h, ink, washed, col, field });
       continueRender(handle);
     });
-  }, [name, handle]);
+  }, [name, fade, handle]);
   return data;
 }
 
@@ -47,7 +49,7 @@ export const MorphEncre: React.FC<MorphProps> = ({ name, dir, focus, end }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
-  const data = useMorphData(name);
+  const data = useMorphData(name, dir === 'fade');
   const ref = useRef<HTMLCanvasElement>(null);
   // seuil : to3d 0 → end (la couleur s'ouvre), toInk 1,15 → end (l'encre se referme autour du sujet)
   const u = easeInOut((t - 1.0) / 4.8);
@@ -57,6 +59,19 @@ export const MorphEncre: React.FC<MorphProps> = ({ name, dir, focus, end }) => {
     const { w, h, ink, washed, col, field } = data;
     const ctx = ref.current.getContext('2d')!;
     const out = ctx.createImageData(w, h), o = out.data;
+    if (dir === 'fade') {
+      // g : 0 → 1 ; quantité de couleur c = smooth(1 − g, 1 − g + 0,4, P) ; c < ½ : de l'encre vers la photo passée,
+      // c > ½ : de la photo passée vers la pleine couleur
+      const g = u;
+      for (let i = 0; i < w * h * 4; i += 4) {
+        const c = smooth(1 - g, 1.4 - g, field[i] / 255);
+        const lo = Math.min(1, c * 2), hi = Math.max(0, c * 2 - 1);
+        for (let k = 0; k < 3; k++) o[i + k] = (ink[i + k] * (1 - lo) + washed[i + k] * lo) * (1 - hi) + col[i + k] * hi;
+        o[i + 3] = 255;
+      }
+      ctx.putImageData(out, 0, 0);
+      return;
+    }
     const rG = r + 0.07; // la zone grise précède la couleur
     for (let i = 0; i < w * h * 4; i += 4) {
       const f = field[i] / 255;
@@ -71,7 +86,7 @@ export const MorphEncre: React.FC<MorphProps> = ({ name, dir, focus, end }) => {
       o[i + 3] = 255;
     }
     ctx.putImageData(out, 0, 0);
-  }, [data, r, dir]);
+  }, [data, r, u, dir]);
   const s = 1 + 0.07 * easeInOut(t / 8);
   return (
     <AbsoluteFill style={{ background: '#f8f5ee', overflow: 'hidden' }}>
