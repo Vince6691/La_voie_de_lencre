@@ -2,10 +2,12 @@ import React from 'react';
 import { Composition } from 'remotion';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
+import { SHUIMO_DEMO_SECONDS, ShuimoDemo } from './shuimo/ShuimoDemo';
 
 export const FPS = 30;
 
 export const RemotionRoot: React.FC = () => (
+  <>
   <Composition
     id="Xue"
     component={Xue}
@@ -15,4 +17,7 @@ export const RemotionRoot: React.FC = () => (
     height={1080}
     defaultProps={{ three: true, captions: false, inkTransitions: true } satisfies XueProps}
   />
+  {/* fond shuimo (banque d'éléments assets/shuimo) : démo de 30 s, quatre plans */}
+  <Composition id="ShuimoDemo" component={ShuimoDemo} durationInFrames={Math.round(SHUIMO_DEMO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  </>
 );

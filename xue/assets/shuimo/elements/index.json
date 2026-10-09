@@ -1,0 +1,762 @@
+[
+ {
+  "file": "lointain_a1.png",
+  "family": "lointain",
+  "sheet": "01_lointain_a",
+  "w": 458,
+  "h": 157,
+  "edges": ""
+ },
+ {
+  "file": "lointain_a2.png",
+  "family": "lointain",
+  "sheet": "01_lointain_a",
+  "w": 549,
+  "h": 126,
+  "edges": ""
+ },
+ {
+  "file": "lointain_a3.png",
+  "family": "lointain",
+  "sheet": "01_lointain_a",
+  "w": 490,
+  "h": 176,
+  "edges": ""
+ },
+ {
+  "file": "lointain_a4.png",
+  "family": "lointain",
+  "sheet": "01_lointain_a",
+  "w": 459,
+  "h": 142,
+  "edges": ""
+ },
+ {
+  "file": "lointain_a5.png",
+  "family": "lointain",
+  "sheet": "01_lointain_a",
+  "w": 488,
+  "h": 190,
+  "edges": ""
+ },
+ {
+  "file": "lointain_a6.png",
+  "family": "lointain",
+  "sheet": "01_lointain_a",
+  "w": 510,
+  "h": 116,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b1.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 441,
+  "h": 137,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b2.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 600,
+  "h": 116,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b3.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 492,
+  "h": 139,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b4.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 476,
+  "h": 152,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b5.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 472,
+  "h": 121,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b6.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 498,
+  "h": 155,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b7.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 481,
+  "h": 258,
+  "edges": "r"
+ },
+ {
+  "file": "lointain_b8.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 509,
+  "h": 136,
+  "edges": ""
+ },
+ {
+  "file": "lointain_b9.png",
+  "family": "lointain",
+  "sheet": "01_lointain_b",
+  "w": 567,
+  "h": 102,
+  "edges": ""
+ },
+ {
+  "file": "pic_a1.png",
+  "family": "pic",
+  "sheet": "02_pics_a",
+  "w": 106,
+  "h": 174,
+  "edges": ""
+ },
+ {
+  "file": "pic_a2.png",
+  "family": "pic",
+  "sheet": "02_pics_a",
+  "w": 285,
+  "h": 207,
+  "edges": ""
+ },
+ {
+  "file": "pic_a3.png",
+  "family": "pic",
+  "sheet": "02_pics_a",
+  "w": 281,
+  "h": 174,
+  "edges": ""
+ },
+ {
+  "file": "pic_a4.png",
+  "family": "pic",
+  "sheet": "02_pics_a",
+  "w": 213,
+  "h": 234,
+  "edges": ""
+ },
+ {
+  "file": "pic_a5.png",
+  "family": "pic",
+  "sheet": "02_pics_a",
+  "w": 372,
+  "h": 206,
+  "edges": ""
+ },
+ {
+  "file": "pic_a6.png",
+  "family": "pic",
+  "sheet": "02_pics_a",
+  "w": 353,
+  "h": 195,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_a1.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_a",
+  "w": 758,
+  "h": 849,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_a2.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_a",
+  "w": 616,
+  "h": 559,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_a3.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_a",
+  "w": 515,
+  "h": 908,
+  "edges": "r"
+ },
+ {
+  "file": "premier_rochers_pins_a4.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_a",
+  "w": 597,
+  "h": 655,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_a5.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_a",
+  "w": 559,
+  "h": 641,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_a6.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_a",
+  "w": 568,
+  "h": 745,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_b1.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_b",
+  "w": 603,
+  "h": 714,
+  "edges": "l"
+ },
+ {
+  "file": "premier_rochers_pins_b2.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_b",
+  "w": 566,
+  "h": 454,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_b3.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_b",
+  "w": 516,
+  "h": 729,
+  "edges": "r"
+ },
+ {
+  "file": "premier_rochers_pins_b4.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_b",
+  "w": 575,
+  "h": 564,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_b5.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_b",
+  "w": 587,
+  "h": 478,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_b6.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_b",
+  "w": 581,
+  "h": 644,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_c1.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_c",
+  "w": 668,
+  "h": 780,
+  "edges": "l"
+ },
+ {
+  "file": "premier_rochers_pins_c2.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_c",
+  "w": 606,
+  "h": 525,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_c3.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_c",
+  "w": 494,
+  "h": 887,
+  "edges": "r"
+ },
+ {
+  "file": "premier_rochers_pins_c4.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_c",
+  "w": 560,
+  "h": 742,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_c5.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_c",
+  "w": 554,
+  "h": 540,
+  "edges": ""
+ },
+ {
+  "file": "premier_rochers_pins_c6.png",
+  "family": "premier",
+  "sheet": "03_rochers_pins_c",
+  "w": 515,
+  "h": 633,
+  "edges": ""
+ },
+ {
+  "file": "premier_bambous_branches_a1.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_a",
+  "w": 524,
+  "h": 995,
+  "edges": "t"
+ },
+ {
+  "file": "premier_bambous_branches_a2.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_a",
+  "w": 521,
+  "h": 896,
+  "edges": "t"
+ },
+ {
+  "file": "premier_bambous_branches_a3.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_a",
+  "w": 689,
+  "h": 596,
+  "edges": "r"
+ },
+ {
+  "file": "premier_bambous_branches_a4.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_a",
+  "w": 620,
+  "h": 687,
+  "edges": "l"
+ },
+ {
+  "file": "premier_bambous_branches_a5.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_a",
+  "w": 614,
+  "h": 676,
+  "edges": ""
+ },
+ {
+  "file": "premier_bambous_branches_a6.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_a",
+  "w": 578,
+  "h": 345,
+  "edges": "r"
+ },
+ {
+  "file": "premier_bambous_branches_b1.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_b",
+  "w": 594,
+  "h": 1002,
+  "edges": "tl"
+ },
+ {
+  "file": "premier_bambous_branches_b2.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_b",
+  "w": 490,
+  "h": 946,
+  "edges": "t"
+ },
+ {
+  "file": "premier_bambous_branches_b3.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_b",
+  "w": 691,
+  "h": 587,
+  "edges": "r"
+ },
+ {
+  "file": "premier_bambous_branches_b4.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_b",
+  "w": 603,
+  "h": 677,
+  "edges": "l"
+ },
+ {
+  "file": "premier_bambous_branches_b5.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_b",
+  "w": 607,
+  "h": 626,
+  "edges": ""
+ },
+ {
+  "file": "premier_bambous_branches_b6.png",
+  "family": "premier",
+  "sheet": "04_bambous_branches_b",
+  "w": 724,
+  "h": 338,
+  "edges": "r"
+ },
+ {
+  "file": "vie_a1.png",
+  "family": "vie",
+  "sheet": "05_vie_a",
+  "w": 437,
+  "h": 627,
+  "edges": ""
+ },
+ {
+  "file": "vie_a2.png",
+  "family": "vie",
+  "sheet": "05_vie_a",
+  "w": 276,
+  "h": 141,
+  "edges": ""
+ },
+ {
+  "file": "vie_a3.png",
+  "family": "vie",
+  "sheet": "05_vie_a",
+  "w": 397,
+  "h": 291,
+  "edges": ""
+ },
+ {
+  "file": "vie_a4.png",
+  "family": "vie",
+  "sheet": "05_vie_a",
+  "w": 449,
+  "h": 178,
+  "edges": ""
+ },
+ {
+  "file": "vie_a5.png",
+  "family": "vie",
+  "sheet": "05_vie_a",
+  "w": 509,
+  "h": 482,
+  "edges": ""
+ },
+ {
+  "file": "vie_a6.png",
+  "family": "vie",
+  "sheet": "05_vie_a",
+  "w": 307,
+  "h": 303,
+  "edges": ""
+ },
+ {
+  "file": "vie_b1.png",
+  "family": "vie",
+  "sheet": "05_vie_b",
+  "w": 465,
+  "h": 546,
+  "edges": ""
+ },
+ {
+  "file": "vie_b2.png",
+  "family": "vie",
+  "sheet": "05_vie_b",
+  "w": 344,
+  "h": 544,
+  "edges": ""
+ },
+ {
+  "file": "vie_b3.png",
+  "family": "vie",
+  "sheet": "05_vie_b",
+  "w": 399,
+  "h": 168,
+  "edges": ""
+ },
+ {
+  "file": "vie_b4.png",
+  "family": "vie",
+  "sheet": "05_vie_b",
+  "w": 529,
+  "h": 259,
+  "edges": ""
+ },
+ {
+  "file": "vie_b5.png",
+  "family": "vie",
+  "sheet": "05_vie_b",
+  "w": 529,
+  "h": 466,
+  "edges": ""
+ },
+ {
+  "file": "vie_b6.png",
+  "family": "vie",
+  "sheet": "05_vie_b",
+  "w": 310,
+  "h": 341,
+  "edges": ""
+ },
+ {
+  "file": "ciel_a1.png",
+  "family": "ciel",
+  "sheet": "06_ciel_a",
+  "w": 299,
+  "h": 301,
+  "edges": ""
+ },
+ {
+  "file": "ciel_a2.png",
+  "family": "ciel",
+  "sheet": "06_ciel_a",
+  "w": 401,
+  "h": 196,
+  "edges": ""
+ },
+ {
+  "file": "ciel_a3.png",
+  "family": "ciel",
+  "sheet": "06_ciel_a",
+  "w": 253,
+  "h": 259,
+  "edges": ""
+ },
+ {
+  "file": "ciel_a4.png",
+  "family": "ciel",
+  "sheet": "06_ciel_a",
+  "w": 198,
+  "h": 245,
+  "edges": ""
+ },
+ {
+  "file": "ciel_a5.png",
+  "family": "ciel",
+  "sheet": "06_ciel_a",
+  "w": 405,
+  "h": 183,
+  "edges": "r"
+ },
+ {
+  "file": "ciel_b1.png",
+  "family": "ciel",
+  "sheet": "06_ciel_b",
+  "w": 387,
+  "h": 397,
+  "edges": ""
+ },
+ {
+  "file": "ciel_b2.png",
+  "family": "ciel",
+  "sheet": "06_ciel_b",
+  "w": 281,
+  "h": 304,
+  "edges": ""
+ },
+ {
+  "file": "ciel_b3.png",
+  "family": "ciel",
+  "sheet": "06_ciel_b",
+  "w": 384,
+  "h": 250,
+  "edges": ""
+ },
+ {
+  "file": "ciel_b4.png",
+  "family": "ciel",
+  "sheet": "06_ciel_b",
+  "w": 275,
+  "h": 294,
+  "edges": ""
+ },
+ {
+  "file": "ciel_b5.png",
+  "family": "ciel",
+  "sheet": "06_ciel_b",
+  "w": 392,
+  "h": 179,
+  "edges": "r"
+ },
+ {
+  "file": "brume_a1.png",
+  "family": "brume",
+  "sheet": "07_brume_a",
+  "w": 1383,
+  "h": 225,
+  "edges": ""
+ },
+ {
+  "file": "brume_a2.png",
+  "family": "brume",
+  "sheet": "07_brume_a",
+  "w": 786,
+  "h": 413,
+  "edges": ""
+ },
+ {
+  "file": "brume_a3.png",
+  "family": "brume",
+  "sheet": "07_brume_a",
+  "w": 756,
+  "h": 317,
+  "edges": ""
+ },
+ {
+  "file": "brume_a4.png",
+  "family": "brume",
+  "sheet": "07_brume_a",
+  "w": 841,
+  "h": 262,
+  "edges": ""
+ },
+ {
+  "file": "brume_a5.png",
+  "family": "brume",
+  "sheet": "07_brume_a",
+  "w": 623,
+  "h": 365,
+  "edges": ""
+ },
+ {
+  "file": "brume_a6.png",
+  "family": "brume",
+  "sheet": "07_brume_a",
+  "w": 681,
+  "h": 335,
+  "edges": ""
+ },
+ {
+  "file": "brume_a7.png",
+  "family": "brume",
+  "sheet": "07_brume_a",
+  "w": 499,
+  "h": 514,
+  "edges": ""
+ },
+ {
+  "file": "brume_b1.png",
+  "family": "brume",
+  "sheet": "07_brume_b",
+  "w": 766,
+  "h": 556,
+  "edges": ""
+ },
+ {
+  "file": "brume_b2.png",
+  "family": "brume",
+  "sheet": "07_brume_b",
+  "w": 802,
+  "h": 217,
+  "edges": ""
+ },
+ {
+  "file": "brume_b3.png",
+  "family": "brume",
+  "sheet": "07_brume_b",
+  "w": 778,
+  "h": 466,
+  "edges": ""
+ },
+ {
+  "file": "brume_b4.png",
+  "family": "brume",
+  "sheet": "07_brume_b",
+  "w": 783,
+  "h": 325,
+  "edges": ""
+ },
+ {
+  "file": "brume_b5.png",
+  "family": "brume",
+  "sheet": "07_brume_b",
+  "w": 692,
+  "h": 353,
+  "edges": "l"
+ },
+ {
+  "file": "brume_b6.png",
+  "family": "brume",
+  "sheet": "07_brume_b",
+  "w": 537,
+  "h": 665,
+  "edges": ""
+ },
+ {
+  "file": "brume_b7.png",
+  "family": "brume",
+  "sheet": "07_brume_b",
+  "w": 452,
+  "h": 495,
+  "edges": ""
+ },
+ {
+  "file": "brume_c1.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 727,
+  "h": 481,
+  "edges": ""
+ },
+ {
+  "file": "brume_c2.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 664,
+  "h": 182,
+  "edges": ""
+ },
+ {
+  "file": "brume_c3.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 808,
+  "h": 376,
+  "edges": ""
+ },
+ {
+  "file": "brume_c4.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 794,
+  "h": 259,
+  "edges": ""
+ },
+ {
+  "file": "brume_c5.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 946,
+  "h": 326,
+  "edges": "l"
+ },
+ {
+  "file": "brume_c6.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 502,
+  "h": 411,
+  "edges": ""
+ },
+ {
+  "file": "brume_c7.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 764,
+  "h": 326,
+  "edges": ""
+ },
+ {
+  "file": "brume_c8.png",
+  "family": "brume",
+  "sheet": "07_brume_c",
+  "w": 522,
+  "h": 553,
+  "edges": ""
+ }
+]

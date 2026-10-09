@@ -20,4 +20,8 @@ fs.writeFileSync(`${here}/src/data/timeline.json`, tl);
 // extrait vidéo de la divination (le seul fichier du dossier)
 const vids = fs.readdirSync(`${X}/assets/video`).filter((f) => f.endsWith('.mp4'));
 if (vids.length) cp(`${X}/assets/video/${vids[0]}`, `${here}/public/video/divination.mp4`);
+// banque shuimo (tools/build_shuimo.py) : éléments détourés, papier, index
+for (const f of fs.readdirSync(`${X}/assets/shuimo/elements`)) if (f.endsWith('.png')) cp(`${X}/assets/shuimo/elements/${f}`, `${here}/public/shuimo/elements/${f}`);
+cp(`${X}/assets/shuimo/paper.jpg`, `${here}/public/shuimo/paper.jpg`);
+cp(`${X}/assets/shuimo/elements/index.json`, `${here}/src/data/shuimo.json`);
 console.log('synchronisé');
