@@ -4,6 +4,7 @@ import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
 import { SHUIMO_DEMO_SECONDS, ShuimoDemo, ShuimoDemoProps } from './shuimo/ShuimoDemo';
 import { MorphEncre, MorphProps } from './morph/MorphEncre';
+import { SHUIMO_XUE_SECONDS, ShuimoXue } from './shuimo_xue/ShuimoXue';
 
 export const FPS = 30;
 
@@ -28,5 +29,7 @@ export const RemotionRoot: React.FC = () => (
     defaultProps={{ name: 'vieil_homme', dir: 'toInk', focus: [0.67, 0.52], end: 0.27 } satisfies MorphProps} />
   <Composition id="MorphVieilHommeDelave" component={MorphEncre} durationInFrames={8 * FPS} fps={FPS} width={1280} height={720}
     defaultProps={{ name: 'vieil_homme', dir: 'fade', focus: [0.67, 0.45], end: 1 } satisfies MorphProps} />
+  {/* essai « tout shuimo » : scènes Shang et Zhou du 學 sur papier, voix existante */}
+  <Composition id="ShuimoXue" component={ShuimoXue} durationInFrames={Math.round(SHUIMO_XUE_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   </>
 );
