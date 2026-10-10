@@ -1,4 +1,4 @@
-# 學 / 学 — proposition tout shuimo, voix off v2 (≈ 5 min)
+# 學 / 学 — proposition tout shuimo, voix off v2 (≈ 4 min 50)
 
 Skill `voix-off-modo`, mouture v2 : caractère + question en 10 s, voyage d'époque en époque avec phrase-repère,
 relance à chaque saut, retournement aux deux tiers, réponse avant la maxime, le caractère aujourd'hui, passerelle.
@@ -30,8 +30,7 @@ un dictionnaire… et deux mains qui s'effacent. ⏸ Pour les retrouver, il faut
 ## 3. Shang — 0:32
 Vers 1250 avant notre ère, à Anyang, capitale des Shang. Les devins posent une tige de bronze brûlante contre une
 carapace de tortue. L'écaille craque. Dans la fissure, ils lisent la réponse des ancêtres… puis ils la gravent. ⏸
-C'est là que notre signe apparaît. Au centre, des baguettes croisées : yáo. Les uns y voient des bâtonnets à
-compter, d'autres les lignes de la divination. Dessous, un toit. Et de chaque côté… deux mains, tendues vers les
+C'est là que notre signe apparaît. Au centre, des baguettes croisées : yáo. Dessous, un toit. Et de chaque côté… deux mains, tendues vers les
 baguettes. Des mains qui comptent, qui montrent, qui manipulent. ⏸
 Pourtant, sous ce toit, il manque quelqu'un.
 > plan : estampage du plastron tamponné sur le papier, fissures 卜 qui s'ouvrent, signe révélé en blanc ;
@@ -40,18 +39,17 @@ Pourtant, sous ce toit, il manque quelqu'un.
 
 `[ROULEAU 1 — Shang → Zhou, 5 s, version validée : 學 Shang en curseur, il se change en signe Zhou]`
 
-## 4. Zhou — 1:24
+## 4. Zhou — 1:18
 Deux siècles plus tard, les Zhou règnent. Leurs inscriptions ne sont plus gravées dans l'os : elles sont coulées dans
 le bronze, au fond même des grands vases rituels. ⏸
-Et sous le toit, un nouveau venu se glisse : un enfant. Une grosse tête, deux bras ouverts. ⏸ Cette fois, tout est
+Et sous le toit, un nouveau venu se glisse : un enfant. ⏸ Cette fois, tout est
 dit. Des mains transmettent, sous un toit, à un enfant.
-Sur l'un de ces vases, un roi fait enseigner le tir à l'arc aux jeunes nobles… dans la salle d'étude. Le geste passe
-de la main du maître à celle de l'élève.
+Sur l'un de ces vases, un roi fait enseigner le tir à l'arc aux jeunes nobles… dans la salle d'étude.
 > plan : estampage du bronze, l'enfant arrive en azurite avec un éclat ; puis le Grand Étang et le pavillon du
 > 學宮 en lavis (fond-shuimo, seed 9) ; archers : image 3D qui se « délave » dans l'encre (encre-3d, mode délavé),
 > le maître et l'élève restent en couleur au cœur.
 
-## 5. Qin — 2:16 (après le rouleau)
+## 5. Qin — 2:00 (après le rouleau)
 `[ROULEAU 2 — Zhou → Qin, 3,5 s, plus rapide, en sens inverse de la caméra du premier : pas de silence avant
 l'impact, impact sec]`
 
@@ -62,7 +60,7 @@ Les deux mains sont toujours là. Pour l'instant.
 > plan : six variantes régionales du signe posées en désordre sur le papier, balayées par un grand coup de pinceau
 > (coup-de-pinceau) qui laisse le seul 小篆, tracé en symétrie autour d'un axe ; paysage d'hiver, minéral.
 
-## 6. Xu Shen — 2:42
+## 6. Xu Shen — 2:27
 Vers l'an 100, sous les Han, un lettré se lance dans un travail immense : expliquer la forme de chaque caractère.
 Il s'appelle Xu Shen. Son livre, le Shuowen jiezi, en analyse plus de neuf mille. ⏸
 Notre signe y reçoit sa définition : apprendre, c'est s'éveiller. Et le toit ? C'est l'obscurité qui couvre encore
@@ -70,21 +68,21 @@ l'esprit.
 > plan : portrait de Xu Shen peint trait à trait en 3 s (« portrait imaginé »), à l'encre sur le papier ;
 > lattes du Shuowen (斆，覺悟也…冂，尚矇也) ; à « l'obscurité », un lavis sombre couvre le toit puis se lève.
 
-## 7. Le retournement — 3:10
+## 7. Le retournement — 2:55
 Mais au même moment, dans les bureaux de l'empire, les scribes écrivent vite. Très vite. Le pinceau aplatit les
 courbes, coupe les boucles. Les deux mains se figent en un bloc carré, qui ressemble à un mortier. Leur sens s'efface.
-⏸ L'écriture régulière fixe enfin la forme : seize traits. Seize traits, c'est long. Alors, dans la cursive, la main
+⏸ L'écriture régulière fixe enfin la forme : seize traits. Seize traits, c'est long. Au fil des copies, la main
 pressée réduit tout le haut à trois petits traits. ⏸⏸
 Les mains n'ont pas été effacées par un décret. Elles l'ont été par d'autres mains : celles des scribes pressés.
 > plan : accélération — traits de pinceau rapides, papier qui défile ; les mains vermillon se délavent (pigment qui
 > pâlit irrégulièrement depuis les bords, comme le délavé de encre-3d) et se figent en 臼 gris ; 楷書 tracé dans
-> l'ordre (16 traits, compteur) ; un seul coup de cursive balaie le haut → ⺍. Silence long, puis la phrase.
+> l'ordre (16 traits, compteur) ; le haut se resserre en ⺍ (fondu des traits, pas de police cursive). Silence long, puis la phrase.
 
 `[ROULEAU 3 — Han → aujourd'hui, 6 s, le plus long : le compteur file de 100 à 1956, sceaux 宋 et 元 qui clignent
 au passage (les livres populaires) ; arrivée sur un paysage contemporain, aube]`
 
-## 8. Aujourd'hui — 4:09
-Cette abréviation court déjà dans les livres populaires des Song et des Yuan. Au XXe siècle, le Japon, puis la Chine,
+## 8. Aujourd'hui — 3:54
+Au XXe siècle, le Japon, puis la Chine,
 l'adoptent officiellement. Huit traits. ⏸
 Alors le pinceau reprend tout depuis le début : des baguettes pour compter, un toit pour abriter, deux mains pour
 montrer, un enfant pour recevoir. Ainsi naît xué : apprendre.
@@ -94,7 +92,7 @@ l'université. Pour le reconnaître : trois petits traits, un toit… et dessous
 > fondent dans 学 ; 学校 / 学生 / 大学 calligraphiés sur des enseignes (coups de pinceau) ; l'enfant azurite
 > s'allume une dernière fois dans 学.
 
-## 9. Chute et passerelle — 4:52
+## 9. Chute et passerelle — 4:30
 Les mains se sont effacées du signe. Pas du geste. ⏸ Depuis trois mille ans, apprendre, c'est recevoir ce que
 d'autres mains transmettent.
 Ces baguettes et cet enfant, on les retrouve dans un autre caractère. Mais cette fois, la main tient un bâton.
@@ -105,9 +103,8 @@ Ces baguettes et cet enfant, on les retrouve dans un autre caractère. Mais cett
 ---
 
 ## Chiffres
-≈ 585 mots, débit visé 125 mots/min + 14,5 s de rouleaux + pauses (1,5 s) → **≈ 5 min 15**. Pour tenir 4 min 30 : couper la phrase sur les livres Song–Yuan (le rouleau 3 les montre), la deuxième lecture de 爻, et resserrer Zhou (≈ 70 mots de moins).
-Relances : « il manque quelqu'un » (1:15) · rouleau 1 (1:19) · rouleau 2 (2:13) · « Pour l'instant » (2:40) · retournement
-(3:10) · rouleau 3 (4:03) · « toujours l'enfant » (4:50). Sauts d'époque annoncés : « Vers 1250 avant notre ère », « Deux siècles plus tard », « 221 avant notre ère »,
+≈ 585 mots, débit visé 125 mots/min + 14,5 s de rouleaux + pauses (1,5 s) → **≈ 4 min 50** après les coupes validées (Song–Yuan dit par le rouleau 3 seulement, une seule lecture de 爻, Zhou resserré, cursive supprimée).
+Relances : à chaque fin de bloc d'époque et à chaque rouleau. Sauts d'époque annoncés : « Vers 1250 avant notre ère », « Deux siècles plus tard », « 221 avant notre ère »,
 « Vers l'an 100 », « Au XXe siècle ».
 
 ## Ce qui change par rapport à la v1 (2:53, fond noir)
