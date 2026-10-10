@@ -28,7 +28,9 @@ const MOOD: Record<Shot['mood'], React.CSSProperties | null> = {
   brume: { background: 'linear-gradient(180deg, rgba(250,248,243,0.15) 0%, rgba(250,248,243,0.5) 55%, rgba(250,248,243,0.25) 100%)' },
 };
 
-export const ShuimoBackground: React.FC<{ shot: Shot; duration: number; halo?: boolean }> = ({ shot, duration, halo = true }) => {
+// scroll (px) : défilement latéral du rouleau (transition entre époques) — chaque plan glisse d'autant plus vite
+// qu'il est proche (parallaxe) ; scrollSpeed (px/s) : flou de vitesse sur les plans rapides
+export const ShuimoBackground: React.FC<{ shot: Shot; duration: number; halo?: boolean; scroll?: number; scrollSpeed?: number }> = ({ shot, duration, halo = true, scroll = 0, scrollSpeed = 0 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
@@ -36,11 +38,15 @@ export const ShuimoBackground: React.FC<{ shot: Shot; duration: number; halo?: b
   const paper = cam(0);
   return (
     <AbsoluteFill style={{ overflow: 'hidden', background: '#f8f5ee' }}>
-      <Img src={staticFile('shuimo/paper.jpg')} style={{ position: 'absolute', width: W, height: H, objectFit: 'cover', transform: `scale(${paper.s * 1.02})` }} />
+      {scroll === 0
+        ? <Img src={staticFile('shuimo/paper.jpg')} style={{ position: 'absolute', width: W, height: H, objectFit: 'cover', transform: `scale(${paper.s * 1.02})` }} />
+        : <AbsoluteFill style={{ backgroundImage: `url(${staticFile('shuimo/paper.jpg')})`, backgroundSize: `${W * 1.25}px ${H}px`, backgroundRepeat: 'repeat-x', backgroundPositionX: -scroll * 0.6 }} />}
       {shot.pieces.map((p, i) => {
         const c = cam(p.depth);
         const h = p.h * c.s, w = (h * p.el.w) / p.el.h;
-        const x = W / 2 + (p.x + (p.drift ?? 0) * t - W / 2) * c.s + c.tx;
+        const spd = 0.35 + 0.9 * p.depth;
+        const x = W / 2 + (p.x + (p.drift ?? 0) * t - W / 2) * c.s + c.tx - scroll * spd;
+        const blur = c.blur + Math.min(7, (Math.abs(scrollSpeed) * spd) / 450);
         const y = H / 2 + (p.y - H / 2) * c.s + c.ty;
         const op = p.opacity * (p.breathe ? 0.82 + 0.18 * Math.sin(t * 0.45 + i * 1.7) : 1);
         return (
@@ -49,7 +55,7 @@ export const ShuimoBackground: React.FC<{ shot: Shot; duration: number; halo?: b
             src={staticFile(`shuimo/elements/${p.el.file}`)}
             style={{
               position: 'absolute', left: x - w / 2, top: y - h / 2, width: w, height: h, opacity: op,
-              transform: p.flip ? 'scaleX(-1)' : undefined, filter: c.blur > 0.05 ? `blur(${c.blur.toFixed(2)}px)` : undefined,
+              transform: p.flip ? 'scaleX(-1)' : undefined, filter: blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : undefined,
             }}
           />
         );

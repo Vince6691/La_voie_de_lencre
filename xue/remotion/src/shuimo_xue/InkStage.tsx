@@ -28,8 +28,10 @@ const GL = glyphs as unknown as Record<string, G>;
 // minutage (secondes depuis le début de la composition)
 export const T = {
   plastronIn: [5.6, 7.0], crack1: [7.3, 8.2], crack2: [8.0, 8.9], jiaguIn: [9.6, 11.0],
-  plastronOut: [11.9, 13.2], yao: 13.3, roof: 17.96, hand: 20.2, jiaguOut: [22.6, 23.8],
-  bronzeIn: [25.2, 27.0], jinwenIn: [27.6, 29.0], bronzeOut: [32.3, 33.6], jinwenColor: [33.6, 34.6], child: 36.7,
+  plastronOut: [11.9, 13.2], yao: 13.3, roof: 17.96, hand: 20.2,
+  // rouleau du temps : le signe Shang voyage au centre pendant que le paysage défile, puis devient le signe Zhou
+  travel: [22.4, 26.9], jiaguOut: [26.0, 27.2], jinwenIn: [26.2, 27.4],
+  bronzeIn: [29.4, 31.2], bronzeOut: [36.5, 37.8], jinwenColor: [37.8, 38.8], child: 40.9,
 };
 
 const load = (src: string) => new Promise<HTMLImageElement>((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; });
@@ -89,10 +91,12 @@ export const InkStage: React.FC = () => {
     };
 
     // glyphe : couleur par composante, posé dans une boîte carrée de côté size centrée en (x, y)
-    const glyph = (c: CanvasRenderingContext2D, name: string, size: number, color: (comp: string) => number[], glow?: (comp: string) => number) => {
+    const glyph = (c: CanvasRenderingContext2D, name: string, size: number, color: (comp: string) => number[], glow?: (comp: string) => number, alpha?: (comp: string) => number) => {
       const k = size / 400;
       for (const g of glyphPaths(name)) {
-        c.save(); c.translate(cx - size / 2, cy - size / 2); c.scale(k, k);
+        const a = alpha ? alpha(g.c) : 1;
+        if (a <= 0) continue;
+        c.save(); c.globalAlpha = a; c.translate(cx - size / 2, cy - size / 2); c.scale(k, k);
         const gl = glow ? glow(g.c) : 0;
         if (gl > 0) { c.shadowColor = `rgba(${PIGMENT[g.c].join(',')},${0.55 * gl})`; c.shadowBlur = 30 * gl; }
         c.fillStyle = css(color(g.c)); c.fill(g.path); c.restore();
@@ -122,19 +126,23 @@ export const InkStage: React.FC = () => {
     const dry = seg(t, T.plastronOut[0] + 0.3, T.plastronOut[1] + 0.3); // blanc → encre
     const lit: Record<string, number> = { yao: seg(t, T.yao, T.yao + 0.8), roof: seg(t, T.roof, T.roof + 0.8), hand: seg(t, T.hand, T.hand + 0.8) };
     layer((c) => glyph(c, 'jiaguwen', 560, (comp) => mix(mix(PAPERWHITE, INK, dry), PIGMENT[comp], lit[comp] ?? 0)),
-      [cx - 300, cy - 300, 600, 600], jIn, t >= T.jiaguOut[0] ? 0.2 : 0.07, t < T.jiaguOut[0] ? 0.5 : 0);
+      [cx - 300, cy - 300, 600, 600], jIn, t >= T.jiaguOut[0] ? 0.12 : 0.07, t < T.jiaguOut[0] ? 0.5 : 0);
 
     // ── Zhou : feuille d'estampage de bronze, inscription révélée en blanc, puis à l'encre et en pigments
     const bw = 740, bh = 860, bbox = [cx - bw / 2, cy - bh / 2, bw, bh];
     const bIn = seg(t, T.bronzeIn[0], T.bronzeIn[1]) * (1 - seg(t, T.bronzeOut[0], T.bronzeOut[1]));
     layer((c) => c.drawImage(res.bronze, bbox[0], bbox[1], bw, bh), bbox, bIn, t >= T.bronzeOut[0] ? 0.22 : 0.07);
+    // signe Zhou : arrive en pigments (sans l'enfant), devient l'inscription blanche quand l'estampage est tamponné
+    // autour de lui, puis l'estampage sèche : encre, pigments, et l'enfant apparaît
     const nIn = seg(t, T.jinwenIn[0], T.jinwenIn[1]);
+    const whiten = seg(t, T.bronzeIn[0] + 0.5, T.bronzeIn[1] + 0.3);
     const dry2 = seg(t, T.bronzeOut[0] + 0.3, T.bronzeOut[1] + 0.3);
     const col2 = seg(t, T.jinwenColor[0], T.jinwenColor[1]), childLit = seg(t, T.child, T.child + 0.9);
     layer((c) => glyph(c, 'jinwen', 600,
-      (comp) => mix(mix(PAPERWHITE, INK, dry2), PIGMENT[comp], comp === 'child' ? childLit : col2),
-      (comp) => (comp === 'child' ? childLit * (1 - 0.6 * seg(t, T.child + 1.2, T.child + 2.4)) : 0)),
-      [cx - 320, cy - 320, 640, 640], nIn, 0.07, 0.5);
+      (comp) => mix(mix(mix(PIGMENT[comp], PAPERWHITE, whiten), INK, dry2), PIGMENT[comp], comp === 'child' ? childLit : col2),
+      (comp) => (comp === 'child' ? childLit * (1 - 0.6 * seg(t, T.child + 1.2, T.child + 2.4)) : 0),
+      (comp) => (comp === 'child' ? childLit : 1)),
+      [cx - 320, cy - 320, 640, 640], nIn, 0.12, 0);
   }, [res, t]);
 
   return <canvas ref={ref} width={W} height={H} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;
