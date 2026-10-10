@@ -16,7 +16,7 @@ Style extrait des 10 dernières vidéos longues (analyse complète : `voix-off/S
    ou un objet intime : ce sont les vidéos qui marchent le mieux (信, 家).
 4. Choisir une scène filmable par composante (pour l'image : une scène = un plan).
 
-## Structure (format long 2:30–3:30)
+## Structure v1 (format long 2:30–3:30, vidéos existantes)
 | Bloc | Contenu | Mots |
 |---|---|---|
 | Accroche froide | paradoxe, légende au passé simple, citation d'autorité (chinois lu + traduction), promesse dramatique, ou inventaire (« Du bambou, des poils, de l'encre. ») — jamais le nom du caractère | 20–40 |
@@ -24,7 +24,7 @@ Style extrait des 10 dernières vidéos longues (analyse complète : `voix-off/S
 | Synthèse | « Alors le pinceau unit / rapproche… » + récapitulatif en un souffle (« Le toit protège, le cochon nourrit. ») + « Ainsi naît / Voici / Ensemble, ils forment » **pinyin**, sens en apposition | 30–45 |
 | Chute | maxime : antithèse (« n'est pas de…, mais de… »), anaphore (« Là où…, Là où… »), triade négative (« un corps sans nom, une lame sans manche, une bouche sans voix »), ou durée (« depuis plus de 3000 ans… ») | 15–35 |
 
-Total **200–300 mots** (≈ 90 mots/min, la musique respire entre les blocs). Marquer les respirations `[musique]`
+Mouture v1 (historique) : total **200–300 mots** (≈ 90 mots/min, la musique respire entre les blocs). Marquer les respirations `[musique]`
 entre les blocs dans le script.
 
 **Format mystère** (≈ 1:30, 140 mots) : « Ce caractère a plus de 3000 ans. Mais d'où vient-il ? Remontons le temps. »
@@ -51,11 +51,42 @@ citation finale.
 - Écrire pour l'oreille : pas de parenthèses, pas de chiffres romains, nombres en lettres si la voix de synthèse
   hésite ; noms chinois en orthographe que la voix prononce bien (tester).
 
+## Mouture v2 — rétention (par défaut pour les nouvelles vidéos)
+Validée avec l'utilisateur : garder le ton, les signes décrits en traits, le pinceau, la maxime, et **le voyage**
+(chaque composante = un lieu, une époque, un décor différent : c'est l'intérêt de la chaîne, ne pas le réduire à un
+seul protagoniste). Le fil conducteur est **le caractère lui-même**, qui voyage d'époque en époque, et la question
+posée au début. Durée libre : **3 à 5 min** si le voyage le justifie.
+
+1. **0–10 s : le caractère à l'écran + une question concrète** (« Regardez sous le toit : ce n'est pas un homme,
+   c'est un cochon. Pourquoi ? »). La première phrase confirme la promesse du titre.
+2. **Une question ouverte au début, résolue juste avant la maxime** ; des indices à chaque étape du voyage.
+3. **Une relance toutes les 30–40 s**, à chaque changement d'époque : « Pourtant… », fausse piste, chiffre
+   surprenant, retournement. Un vrai retournement aux deux tiers.
+4. **2 phrases concrètes pour 1 poétique** (fait, date, objet, geste) ; les maximes restent rares.
+5. **Débit 115–130 mots/min** ; respirations musicales de 1–2 s, un seul silence long avant la révélation ; pas de
+   queue musicale à la fin.
+6. **Annoncer chaque saut d'époque** en une phrase-repère (« Mille ans plus tard, à Chang'an… ») : c'est le moment
+   du rouleau du temps à l'image (skill `rouleau-du-temps`).
+7. **Le caractère aujourd'hui** (10–15 s avant la maxime) : où on le voit, dans quels mots, comment le reconnaître.
+8. **Passerelle** après la maxime vers une autre vidéo (« Ce toit, on le retrouve dans un autre caractère… »).
+À tester : un « vous » ponctuel (« Regardez », « Devinez ») ; une phrase-signature de série.
+
+| Temps (4–5 min) | Bloc | Mots |
+|---|---|---|
+| 0–10 s | caractère + question | 25–35 |
+| 10–40 s | enjeu, première époque | 60–80 |
+| 0:40–3:30 | 3–5 étapes du voyage (composante ou forme ancienne), relance à chaque saut | 70–100 chacune |
+| ~3:00 | retournement / fausse piste démentie | 40–60 |
+| 3:30–4:10 | « Alors le pinceau unit… » + réponse à la question | 50–70 |
+| 4:10–4:35 | le caractère aujourd'hui | 30–45 |
+| 4:35–4:50 | maxime + passerelle | 25–40 |
+Total 3 min ≈ 350–400 mots ; 4–5 min ≈ 480–620 mots.
+
 ## Livrable
 1. Le script, découpé en blocs (`## Accroche`, `## Composante — 宀 le toit`, …, `## Synthèse`, `## Chute`), avec
    `[musique]` entre les blocs et, pour chaque bloc, une ligne `> plan :` décrivant l'image (scène, signe tracé,
    évolution).
-2. Le compte de mots et la durée estimée (mots / 90 × 60 s).
+2. Le compte de mots et la durée estimée (v2 : mots / 120 × 60 s ; v1 : mots / 90 × 60 s).
 3. 3 titres (question ou curiosité, figure d'autorité si possible) et la phrase d'accroche de la miniature.
 
 ## Vérification
