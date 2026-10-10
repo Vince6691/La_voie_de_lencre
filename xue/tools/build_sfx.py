@@ -1,5 +1,5 @@
-"""Sons du rouleau du temps → assets/shuimo_xue/ : rouleau.wav (souffle de papier qui glisse, 4,6 s, enfle avec la
-vitesse de la caméra) et gong.wav (gong de bronze discret, au tampon du sceau de la nouvelle époque).
+"""Sons du rouleau du temps (remotion/src/rouleau/TimeScroll.tsx) → assets/rouleau/ : rouleau.wav (5 s : souffle qui enfle avec la
+vitesse, glissando de guzheng, silence, impact grave) et gong.wav (gong discret quand le sceau se pose).
 python3 tools/build_sfx.py"""
 import wave
 import numpy as np
@@ -58,7 +58,7 @@ boom = np.sin(2 * np.pi * (42 + 16 * np.exp(-ti / 0.15)) * ti) * np.exp(-ti / 0.
 thump = signal.lfilter(*signal.butter(2, 300 / (SR / 2)), rng.standard_normal(len(ti))) * np.exp(-ti / 0.06) * 4
 wood = (0.9 * np.sin(2 * np.pi * 820 * ti) * np.exp(-ti / 0.045) + 0.45 * np.sin(2 * np.pi * 1340 * ti) * np.exp(-ti / 0.025))
 imp[i0:] = 1.0 * boom + 0.5 * thump + 0.35 * wood
-save('assets/shuimo_xue/rouleau.wav', 0.55 * wh + 0.35 * gl / (np.abs(gl).max() + 1e-9) + 0.9 * imp / (np.abs(imp).max() + 1e-9))
+save('assets/rouleau/rouleau.wav', 0.55 * wh + 0.35 * gl / (np.abs(gl).max() + 1e-9) + 0.9 * imp / (np.abs(imp).max() + 1e-9))
 
 # gong : partiels inharmoniques, attaque douce, longue décroissance
 dur = 4.0; t = np.arange(int(SR * dur)) / SR
@@ -66,12 +66,6 @@ g = np.zeros_like(t)
 for f, a, d in ((110, 1.0, 2.8), (178, 0.55, 2.2), (247, 0.35, 1.6), (330, 0.22, 1.1), (521, 0.12, 0.7)):
     g += a * np.sin(2 * np.pi * f * t * (1 + 0.002 * np.exp(-t))) * np.exp(-t / d)
 g *= 1 - np.exp(-t / 0.012)
-save('assets/shuimo_xue/gong.wav', g)
-print('sons → assets/shuimo_xue/rouleau.wav, gong.wav')
+save('assets/rouleau/gong.wav', g)
+print('sons → assets/rouleau/rouleau.wav, gong.wav')
 
-# tac : bloc de bois (木魚) — deux résonances brèves et un souffle d'attaque, au moment où le curseur arrive
-dur = 0.5; t = np.arange(int(SR * dur)) / SR
-k = 0.9 * np.sin(2 * np.pi * 820 * t) * np.exp(-t / 0.045) + 0.45 * np.sin(2 * np.pi * 1340 * t) * np.exp(-t / 0.025)
-k += 0.25 * rng.standard_normal(len(t)) * np.exp(-t / 0.004)
-save('assets/shuimo_xue/tac.wav', k)
-print('son → assets/shuimo_xue/tac.wav')

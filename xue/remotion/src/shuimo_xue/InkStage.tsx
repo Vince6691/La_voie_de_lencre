@@ -5,6 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import glyphs from '../data/realglyphs.json';
+import { TimeScrollConfig, arrivePose, cursorPose, morphK as tsMorph } from '../rouleau/TimeScroll';
 
 const W = 1920, H = 1080;
 export const INK = [29, 25, 21];
@@ -34,38 +35,10 @@ export const T = {
   bronzeIn: [29.9, 31.7], bronzeOut: [37.0, 38.3], jinwenColor: [38.3, 39.3], child: 41.4,
 };
 
-// ── frise des époques (rouleau du temps) : sceaux régulièrement espacés au centre de l'image ; le petit 學 en est
-// le curseur. u = avancement de la traversée (0 → 1).
-export const SEALS = [
-  { zh: '商', date: '−1250' }, { zh: '周', date: '−1046' }, { zh: '秦', date: '−221' }, { zh: '漢', date: '−206' },
-  { zh: '唐', date: '618' }, { zh: '宋', date: '960' }, { zh: '今', date: '1956' },
-];
-export const TL = { y: 640, x0: 360, dx: 200, cursorY: 522, small: 0.26 };
-export const sealX = (i: number) => TL.x0 + i * TL.dx;
-export const travelU = (t: number) => (t - T.travel[0]) / (T.travel[1] - T.travel[0]);
-const ease = (u: number) => { const v = clamp(u); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
-const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
-// déroulé du voyage (u de 0 à 1) : 0–0,12 la caméra recule, la frise se trace ; 0,12–0,72 accélération franche puis
-// freinage (96 % du trajet) ; 0,72–0,80 ralenti d'approche ; 0,80 impact sur 周 ; 0,80–0,86 la caméra plonge ;
-// 0,86–1 le sceau s'envole, retour au plan normal. travelM = avancement du curseur, du compteur et du paysage.
-export const IMPACT = 0.8;
-export function travelM(u: number) {
-  if (u <= 0.12) return 0;
-  if (u < 0.72) { const e = (u - 0.12) / 0.6; return 0.96 * (e < 0.5 ? 16 * e ** 5 : 1 - (-2 * e + 2) ** 5 / 2); }
-  if (u < IMPACT) return 0.96 + 0.04 * (1 - (1 - (u - 0.72) / (IMPACT - 0.72)) ** 3);
-  return 1;
-}
-// part du signe Zhou pendant la glissade (le signe Shang se change en signe Zhou, sans l'enfant)
-export const morphK = (t: number) => smooth(0.3, 0.85, travelM(travelU(t)));
-// les deux signes suivent le curseur ; le signe Zhou grandit ensuite au centre
-export function glyphPose(name: 'jiaguwen' | 'jinwen', t: number) {
-  const u = travelU(t), cx = 960, cy = 560;
-  const k = ease(u / 0.12), m = travelM(u);
-  const cur = { x: lerp(lerp(cx, sealX(0), k), sealX(1), m), y: lerp(cy, TL.cursorY, k), s: lerp(1, TL.small, k) };
-  if (name === 'jiaguwen' || u < 0.86) return cur;
-  const g = ease((u - 0.86) / 0.14);
-  return { x: lerp(sealX(1), cx, g), y: lerp(TL.cursorY, cy, g), s: lerp(TL.small, 1, g) };
-}
+// ── rouleau du temps (src/rouleau/TimeScroll.tsx) : Shang → Zhou ; le signe Shang est le curseur de la frise et se
+// change en signe Zhou pendant la glissade (sans l'enfant, qui attend la voix), puis le signe Zhou grandit au centre
+export const TRAVEL: TimeScrollConfig = { at: T.travel[0], duration: T.travel[1] - T.travel[0], from: 0, to: 1, years: [-1250, -1046] };
+export const glyphPose = (name: 'jiaguwen' | 'jinwen', t: number) => (name === 'jiaguwen' ? cursorPose(TRAVEL, t) : arrivePose(TRAVEL, t));
 
 const load = (src: string) => new Promise<HTMLImageElement>((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; });
 
@@ -160,7 +133,7 @@ export const InkStage: React.FC = () => {
     }, pbox, pIn, t >= T.plastronOut[0] ? 0.22 : 0.07); // l'encre sèche en fondu large, pas en taches
     // signe Shang : blanc dans l'estampage, puis encre sur le papier, puis composantes en pigments
     const jIn = seg(t, T.jiaguIn[0], T.jiaguIn[1]);
-    const mk = morphK(t);
+    const mk = tsMorph(TRAVEL, t);
     const dry = seg(t, T.plastronOut[0] + 0.3, T.plastronOut[1] + 0.3); // blanc → encre
     const lit: Record<string, number> = { yao: seg(t, T.yao, T.yao + 0.8), roof: seg(t, T.roof, T.roof + 0.8), hand: seg(t, T.hand, T.hand + 0.8) };
     if (mk < 1) layer((c) => glyph(c, 'jiaguwen', 560, (comp) => mix(mix(PAPERWHITE, INK, dry), PIGMENT[comp], lit[comp] ?? 0), undefined, () => 1 - mk),

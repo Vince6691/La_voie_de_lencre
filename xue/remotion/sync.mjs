@@ -29,4 +29,6 @@ for (const f of fs.readdirSync(`${X}/assets/morph`)) cp(`${X}/assets/morph/${f}`
 // version tout shuimo (tools/build_estampages.py) : estampages, bruit des fondus ; glyphes réels en JSON
 for (const f of fs.readdirSync(`${X}/assets/shuimo_xue`)) cp(`${X}/assets/shuimo_xue/${f}`, `${here}/public/shuimo_xue/${f}`);
 fs.writeFileSync(`${here}/src/data/realglyphs.json`, fs.readFileSync(`${X}/src/realglyphs.js`, 'utf8').split('=').slice(1).join('=').trim().replace(/;$/, ''));
+// rouleau du temps (tools/build_sfx.py) : sons
+for (const f of fs.readdirSync(`${X}/assets/rouleau`)) cp(`${X}/assets/rouleau/${f}`, `${here}/public/rouleau/${f}`);
 console.log('synchronisé');
