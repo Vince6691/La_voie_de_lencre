@@ -55,7 +55,7 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   // montagnes lointaines : une chaîne continue de bandes qui se chevauchent
   const baseFar = r(470, 540);
   for (let x = r(-350, -100); x < W + 300;) {
-    const el = pickNew(of('lointain')), w = r(820, 1250), h = (w * el.h) / el.w;
+    const el = pickNew(of('lointain').filter((e) => !e.edges.includes('l') && !e.edges.includes('r'))), w = r(820, 1250), h = (w * el.h) / el.w;
     add(el, { x: x + w / 2, y: baseFar - h / 2 + r(-25, 25), h, depth: 0.12, opacity: r(0.6, 0.85) });
     x += w * r(0.5, 0.78);
   }
@@ -65,22 +65,36 @@ export function compose(seed: number, o: ComposeOptions): Shot {
     add(el, { x: r(200, 1700), y: r(520, 600), h: (w * el.h) / el.w, depth: 0.22, opacity: r(0.3, 0.5), drift: r(-14, 14), breathe: true });
   }
   // pics du plan moyen, plutôt sur les côtés
-  const wide = of('massif').length > 0; // massifs larges : 2 ou 3 par plan suffisent
-  const peaks = wide
-    ? [r(150, 480), r(1440, 1770), ...(R() < 0.35 ? [r(720, 1200)] : [])]
-    : [r(60, 460), r(1460, 1860), ...(R() < 0.5 ? [r(560, 760)] : []), ...(R() < 0.4 ? [r(1160, 1360)] : [])];
   const peakAt: { x: number; base: number; h: number }[] = [];
-  peaks.forEach((x) => {
-    // massifs (groupes de sommets reliés, planche 08) ; à défaut, pics isolés de la planche 02
-    const massif = of('massif').length > 0;
-    const el = pickNew(massif ? of('massif') : of('pic'));
-    const h = massif ? Math.min(r(560, 880) * el.h / el.w, 460) : r(300, 500), base = r(730, 810);
-    add(el, { x, y: base - h / 2, h, depth: 0.38, opacity: r(0.78, 0.95) });
-    peakAt.push({ x, base, h });
-  });
+  const massifs = of('massif');
+  if (massifs.length) {
+    // massifs (planches 08) : un massif coupé par le bord de sa planche est calé contre un bord du cadre, côté coupé
+    // hors champ (retourné en miroir si besoin) ; un massif entier se place librement
+    const over = 150; // marge hors cadre : travelling et zoom ne découvrent pas la coupure
+    (['l', 'r'] as const).forEach((side) => {
+      if (R() < 0.12) return; // parfois un seul massif, plus d'air
+      const free = massifs.filter((e) => !used.has(e.file));
+      if (!free.length) return;
+      const el = pick(free); used.add(el.file);
+      const w = r(780, 1050), h = (w * el.h) / el.w, base = r(745, 800);
+      const cut = el.edges.includes('l') || el.edges.includes('r');
+      const x = cut ? (side === 'l' ? w / 2 - over : W - w / 2 + over) : side === 'l' ? r(200, 480) : r(1440, 1720);
+      // le côté coupé doit tomber hors champ : à gauche il faut 'l', à droite 'r' (sinon miroir)
+      const flip = el.edges === 'lr' ? R() < 0.5 : cut ? !el.edges.includes(side) : R() < 0.5;
+      add(el, { x, y: base - h / 2, h, depth: 0.38, opacity: r(0.78, 0.95), flip });
+      peakAt.push({ x: side === 'l' ? 320 : 1600, base, h });
+    });
+  } else {
+    // ancienne banque : pics isolés
+    [r(60, 460), r(1460, 1860)].forEach((x) => {
+      const el = pickNew(of('pic')), h = r(300, 500), base = r(730, 810);
+      add(el, { x, y: base - h / 2, h, depth: 0.38, opacity: r(0.78, 0.95) });
+      peakAt.push({ x, base, h });
+    });
+  }
   // détail de vie (cascade, pavillon, pont, sentier) au pied d'un pic
   if (R() < 0.5) {
-    const p = pick(peakAt.slice(0, 2));
+    const p = pick(peakAt.length ? peakAt : [{ x: 400, base: 770, h: 300 }]);
     add(pick(of('scene')), { x: p.x + r(-120, 120), y: p.base - r(60, 140), h: r(150, 230), depth: 0.4, opacity: 0.85 });
   }
   // brume basse

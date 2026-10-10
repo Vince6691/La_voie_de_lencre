@@ -41,6 +41,8 @@ const shot = compose(37, { move: 'rise', mood: 'jour', duration: 8 });   // grai
 ## Règles
 - Plan moyen : **massifs** (planches `08_massifs_*`, groupes de sommets reliés). Les pics isolés de l'ancienne
   planche 02 ont été retirés (« pics étranges, dupliqués ») ; un élément n'apparaît qu'une fois par plan (`pickNew`).
+  Un massif coupé par le bord de sa planche (`edges` l/r) est calé contre un bord du cadre, côté coupé hors champ
+  (miroir si besoin) ; le détourage fond le côté coupé dans la brume (long fondu irrégulier).
 - Le centre reste au contenu : massifs et premiers plans sur les côtés, halo de papier derrière le caractère.
 - Style des éléments : encre moderne minimaliste, un seul accent vermillon (soleil). Pour enrichir la banque,
   reprendre le bloc de style de `PROMPTS.md`, une planche d'éléments séparés sur fond blanc pur, nommée

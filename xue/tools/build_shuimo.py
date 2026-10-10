@@ -50,12 +50,17 @@ def split(rgba, family):
         crop[..., 3] *= ndimage.binary_dilation(lab[y0:y1, x0:x1] == i, iterations=pad)  # rien d'un voisin
         # touche-t-il un bord de la planche ? (bambou qui entre par le haut, falaise coupée…)
         edges = ''.join(s for s, c in (('t', y0 == 0), ('b', y1 == H), ('l', x0 == 0), ('r', x1 == W)) if c)
-        # massif ou chaîne coupés par le bord de la planche : le côté coupé s'efface en douceur (pas de tranche nette)
-        if family in ('massif', 'lointain'):
-            ww = crop.shape[1]; ramp = np.linspace(0, 1, max(2, int(ww * 0.18)))
-            ramp = ramp * ramp * (3 - 2 * ramp)
-            if 'l' in edges: crop[:, :len(ramp), 3] *= ramp[None, :]
-            if 'r' in edges: crop[:, -len(ramp):, 3] *= ramp[::-1][None, :]
+        # massif ou chaîne coupés par le bord de la planche : le côté coupé s'efface dans la brume — long fondu
+        # irrégulier (la limite ondule d'une rangée à l'autre), pour qu'aucune tranche ne se voie dans le cadre
+        if family in ('massif', 'lointain') and ('l' in edges or 'r' in edges):
+            hh, ww = crop.shape[:2]
+            L = ww * (0.4 if family == 'massif' else 0.18)
+            wob = ndimage.gaussian_filter1d(np.random.default_rng(i).standard_normal(hh), 30)
+            wob = (wob / (np.abs(wob).max() + 1e-6))[:, None] * 0.3 * L
+            xs = np.arange(ww, dtype=np.float32)[None, :]
+            sm = lambda u: u * u * (3 - 2 * u)
+            if 'l' in edges: crop[..., 3] *= sm(np.clip((xs - wob) / L, 0, 1))
+            if 'r' in edges: crop[..., 3] *= sm(np.clip((ww - 1 - xs - wob) / L, 0, 1))
         out.append((crop, (x0, y0), edges))
     # ordre de lecture : rangées puis colonnes
     rows = sorted(out, key=lambda e: e[1][1])
