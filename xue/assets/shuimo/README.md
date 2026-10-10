@@ -5,14 +5,14 @@
   générés par `python3 tools/build_shuimo.py [--sheet]` (planche de contrôle : `out/preview/shuimo_elements.png`).
 - `paper.jpg` : papier xuan généré par le même script.
 
-Familles : `lointain` (bandes de montagnes pâles), `pic` (plan moyen), `premier` (rochers, pins, bambous, branches —
+Familles : `lointain` (bandes de montagnes pâles), `massif` (plan moyen : groupes de sommets reliés, planches 08 ; remplacent les pics isolés de l'ancienne planche 02), `premier` (rochers, pins, bambous, branches —
 `edges` indique le bord par lequel l'élément entre dans le cadre), `vie` (cascade, barque, pavillon, pont, sentier,
 oiseaux), `ciel` (soleils, lunes, nuage), `brume` (nappes et lavis).
 
 ## Dans Remotion (`remotion/src/shuimo/`)
 
 - `layout.ts` : `compose(graine, { move, mood, duration, clouds?, mist?, strokes? })` compose un plan — ciel, chaîne
-  lointaine, pics sur les côtés, détail de vie, oiseaux ou barque, premiers plans en coin. Même graine → même plan.
+  lointaine, massifs sur les côtés, détail de vie, oiseaux ou barque, premiers plans en coin. Même graine → même plan.
   Par défaut : nuages du ciel (`clouds`), sans brouillard entre les plans (`mist: true` le remet) ni coups de
   pinceau (`strokes: true`).
 - `ShuimoBackground.tsx` : rendu en parallaxe (profondeur 0 lointain → 1 tout près). Mouvements : `pan`, `push`,

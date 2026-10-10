@@ -120,54 +120,6 @@
   "edges": ""
  },
  {
-  "file": "pic_a1.png",
-  "family": "pic",
-  "sheet": "02_pics_a",
-  "w": 106,
-  "h": 174,
-  "edges": ""
- },
- {
-  "file": "pic_a2.png",
-  "family": "pic",
-  "sheet": "02_pics_a",
-  "w": 285,
-  "h": 207,
-  "edges": ""
- },
- {
-  "file": "pic_a3.png",
-  "family": "pic",
-  "sheet": "02_pics_a",
-  "w": 281,
-  "h": 174,
-  "edges": ""
- },
- {
-  "file": "pic_a4.png",
-  "family": "pic",
-  "sheet": "02_pics_a",
-  "w": 213,
-  "h": 234,
-  "edges": ""
- },
- {
-  "file": "pic_a5.png",
-  "family": "pic",
-  "sheet": "02_pics_a",
-  "w": 372,
-  "h": 206,
-  "edges": ""
- },
- {
-  "file": "pic_a6.png",
-  "family": "pic",
-  "sheet": "02_pics_a",
-  "w": 353,
-  "h": 195,
-  "edges": ""
- },
- {
   "file": "premier_rochers_pins_a1.png",
   "family": "premier",
   "sheet": "03_rochers_pins_a",
@@ -758,5 +710,53 @@
   "w": 522,
   "h": 553,
   "edges": ""
+ },
+ {
+  "file": "massif_a1.png",
+  "family": "massif",
+  "sheet": "08_massifs_a",
+  "w": 1792,
+  "h": 651,
+  "edges": "lr"
+ },
+ {
+  "file": "massif_a2.png",
+  "family": "massif",
+  "sheet": "08_massifs_a",
+  "w": 1792,
+  "h": 621,
+  "edges": "lr"
+ },
+ {
+  "file": "massif_b1.png",
+  "family": "massif",
+  "sheet": "08_massifs_b",
+  "w": 1792,
+  "h": 673,
+  "edges": "lr"
+ },
+ {
+  "file": "massif_b2.png",
+  "family": "massif",
+  "sheet": "08_massifs_b",
+  "w": 1792,
+  "h": 609,
+  "edges": "lr"
+ },
+ {
+  "file": "massif_c1.png",
+  "family": "massif",
+  "sheet": "08_massifs_c",
+  "w": 1711,
+  "h": 706,
+  "edges": "l"
+ },
+ {
+  "file": "massif_c2.png",
+  "family": "massif",
+  "sheet": "08_massifs_c",
+  "w": 1764,
+  "h": 629,
+  "edges": "r"
  }
 ]

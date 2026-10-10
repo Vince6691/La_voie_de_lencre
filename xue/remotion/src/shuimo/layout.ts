@@ -65,7 +65,10 @@ export function compose(seed: number, o: ComposeOptions): Shot {
     add(el, { x: r(200, 1700), y: r(520, 600), h: (w * el.h) / el.w, depth: 0.22, opacity: r(0.3, 0.5), drift: r(-14, 14), breathe: true });
   }
   // pics du plan moyen, plutôt sur les côtés
-  const peaks = [r(60, 460), r(1460, 1860), ...(R() < 0.5 ? [r(560, 760)] : []), ...(R() < 0.4 ? [r(1160, 1360)] : [])];
+  const wide = of('massif').length > 0; // massifs larges : 2 ou 3 par plan suffisent
+  const peaks = wide
+    ? [r(150, 480), r(1440, 1770), ...(R() < 0.35 ? [r(720, 1200)] : [])]
+    : [r(60, 460), r(1460, 1860), ...(R() < 0.5 ? [r(560, 760)] : []), ...(R() < 0.4 ? [r(1160, 1360)] : [])];
   const peakAt: { x: number; base: number; h: number }[] = [];
   peaks.forEach((x) => {
     // massifs (groupes de sommets reliés, planche 08) ; à défaut, pics isolés de la planche 02
