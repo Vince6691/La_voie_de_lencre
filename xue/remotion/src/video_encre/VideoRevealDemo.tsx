@@ -5,6 +5,22 @@ import { RevealMode, VideoReveal } from './VideoReveal';
 
 const SEG = 10, FPS = 30;
 export const VIDEO_REVEAL_DEMO_SECONDS = 3 * SEG;
+export const VIDEO_REVEAL_DEMO2_SECONDS = 2 * SEG;
+const ITEMS2: [RevealMode, string, string][] = [
+  ['goutte', 'exemples_videos/exemple_plan_fixe.mp4', '4 · goutte d\'encre dans l\'eau'],
+  ['rouleau', 'exemples_videos/exemple_plan_fixe.mp4', '5 · rouleau suspendu'],
+];
+export const VideoRevealDemo2: React.FC = () => (
+  <AbsoluteFill style={{ background: '#f3eee4' }}>
+    <Img src={staticFile('shuimo/paper.jpg')} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+    {ITEMS2.map(([mode, src, label], i) => (
+      <Sequence key={mode} from={i * SEG * FPS} durationInFrames={SEG * FPS}>
+        <Sequence from={6}><VideoReveal src={src} mode={mode} inDur={mode === 'rouleau' ? 4.2 : 3.4} outDur={mode === 'rouleau' ? 3.2 : 2.6} playbackRate={0.8} zoom={1} /></Sequence>
+        <Title text={label} />
+      </Sequence>
+    ))}
+  </AbsoluteFill>
+);
 const ITEMS: [RevealMode, string, string][] = [
   ['glyphe', 'exemples_videos/exemple_plan_fixe.mp4', '1 · à travers le caractère'],
   ['lavis', 'exemples_videos/exemple_plan_fixe.mp4', '2 · lavis, puis taches de couleur'],

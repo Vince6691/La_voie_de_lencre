@@ -6,10 +6,14 @@
 //  « pinceau » : trois larges coups de pinceau (gauche → droite, droite → gauche, gauche → droite) peignent la vidéo,
 //                bords effilochés, blanc volant en bout de trait ; sortie : trois coups d'encre recouvrent l'image puis
 //                l'encre pâlit jusqu'au papier.
+//  « goutte »  : une goutte d'encre tombe au centre et se diffuse comme dans l'eau (volutes, liseré d'encre, halo de
+//                fumée) en ouvrant l'image ; sortie : l'image passe à l'encre et coule vers le bas en traînées.
+//  « rouleau » : un rouleau suspendu (montage de soie, bâton, rouleau de bois) se déroule de haut en bas avec la scène
+//                peinte, puis la caméra entre dans la peinture jusqu'au plein écran ; sortie : l'inverse.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AbsoluteFill, OffthreadVideo, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 
-export type RevealMode = 'glyphe' | 'lavis' | 'pinceau';
+export type RevealMode = 'glyphe' | 'lavis' | 'pinceau' | 'goutte' | 'rouleau';
 export type VideoRevealProps = {
   src: string; mode: RevealMode; glyph?: string; inDur?: number; outDur?: number; outAt?: number;
   startFrom?: number; playbackRate?: number; zoom?: number;
@@ -125,6 +129,45 @@ export const VideoReveal: React.FC<VideoRevealProps> = ({ src, mode, glyph = '�
       return;
     }
 
+    // ── rouleau suspendu : compositing de canevas
+    if (mode === 'rouleau') {
+      const unroll = tt < oAt ? ease(ui / 0.45) : 1 - ease((uo - 0.55) / 0.45);
+      const zoom = tt < oAt ? ease((ui - 0.5) / 0.5) : 1 - ease(uo / 0.5);
+      o.clearRect(0, 0, PW, PH);
+      const wP = 0.28 * PW, hP = 0.66 * PH, x0 = (PW - wP) / 2, y0 = 0.2 * PH;
+      const cw = PH * (wP / hP), cx0 = (PW - cw) / 2; // recadrage portrait de la vidéo
+      const L = (a: number, b: number) => a + (b - a) * zoom;
+      const R = { x: L(x0, 0), y: L(y0, 0), w: L(wP, PW), h: L(hP, PH) };
+      const S = { x: L(cx0, 0), y: 0, w: L(cw, PW), h: PH };
+      const k = R.w / wP; // échelle du montage
+      const vis = unroll; // part déroulée (de haut en bas)
+      // montage de soie, bâton du haut, cordon
+      const m = { side: 30 * k, top: 70 * k, bot: 46 * k };
+      o.save();
+      o.shadowColor = 'rgba(40,30,20,0.35)'; o.shadowBlur = 30 * k; o.shadowOffsetY = 10 * k;
+      o.fillStyle = '#e8dcc2';
+      o.fillRect(R.x - m.side, R.y - m.top, R.w + 2 * m.side, m.top + R.h * vis + m.bot * Math.min(1, vis * 4));
+      o.restore();
+      o.fillStyle = '#c7b28a'; o.fillRect(R.x - 8 * k, R.y - 8 * k, R.w + 16 * k, R.h * vis + 16 * k * Math.min(1, vis * 4)); // liseré de brocart
+      o.fillStyle = '#efe6d2'; o.fillRect(R.x - 4 * k, R.y - 4 * k, R.w + 8 * k, R.h * vis + 8 * k * Math.min(1, vis * 4));
+      // la peinture : partie déroulée de la vidéo
+      if (vis > 0) o.drawImage(work, S.x, S.y, S.w, S.h * vis, R.x, R.y, R.w, R.h * vis);
+      // bâton du haut et cordon
+      o.fillStyle = '#5a3d26'; o.fillRect(R.x - m.side - 10 * k, R.y - m.top - 6 * k, R.w + 2 * m.side + 20 * k, 12 * k);
+      o.strokeStyle = '#7a5a3a'; o.lineWidth = 3 * k; o.beginPath();
+      o.moveTo(R.x - m.side, R.y - m.top - 6 * k); o.lineTo(R.x + R.w / 2, R.y - m.top - 70 * k); o.lineTo(R.x + R.w + m.side, R.y - m.top - 6 * k); o.stroke();
+      // rouleau de bois du bas (avec ses pommeaux), qui descend en se déroulant
+      const ry = R.y + R.h * vis + m.bot * Math.min(1, vis * 4);
+      const g = o.createLinearGradient(0, ry - 12 * k, 0, ry + 12 * k);
+      g.addColorStop(0, '#3e2817'); g.addColorStop(0.5, '#8a6440'); g.addColorStop(1, '#2e1d10');
+      o.fillStyle = g; o.fillRect(R.x - m.side - 6 * k, ry - 11 * k, R.w + 2 * m.side + 12 * k, 22 * k);
+      o.fillStyle = '#c9a46a';
+      [R.x - m.side - 18 * k, R.x + R.w + m.side + 6 * k].forEach((bx) => o.fillRect(bx, ry - 14 * k, 12 * k, 28 * k));
+      // à la fin de la plongée, la peinture seule
+      if (zoom > 0.97) o.drawImage(work, 0, 0);
+      return;
+    }
+
     const v = wx.getImageData(0, 0, PW, PH), d = v.data;
     const { paper, n1, n2, blot } = res;
     const { L, Lb, tmp } = bufs.current;
@@ -143,6 +186,50 @@ export const VideoReveal: React.FC<VideoRevealProps> = ({ src, mode, glyph = '�
       }
       return clamp((0.34 * Math.pow(clamp((0.9 - L[i]) / 0.9), 1.3) + smooth(0.1, 0.45, gr) * 0.8) * (0.8 + 0.35 * n1[i]));
     };
+
+    if (mode === 'goutte') {
+      if (tt < oAt) {
+        // goutte qui tombe (0–16 %), puis diffusion en volutes depuis le centre
+        const R = 1.3 * ease((ui - 0.15) / 0.85), drift = tt * 7;
+        for (let i = 0, p = 0; i < PW * PH; i++, p += 4) {
+          const xi = i % PW, yi = (i - xi) / PW;
+          const dn = Math.hypot((xi / PW - 0.5) * 1.78, yi / PH - 0.5) / 1.02;
+          const lf = n2[Math.floor(yi / 5) * PW + Math.floor((xi / 5 + drift) % PW)], fine = n1[i];
+          const f = dn + (0.34 * (lf - 0.5) + 0.12 * (fine - 0.5)) * (0.35 + 0.65 * Math.min(1, R * 2));
+          const V = R <= 0 ? 0 : ui >= 1 ? 1 : smooth(R, R - 0.035, f);
+          const e = (f - R + 0.012) / 0.022, fringe = R > 0 && ui < 1 ? Math.exp(-e * e) : 0; // liseré d'encre
+          const hz = R > 0 && ui < 1 ? 0.4 * smooth(R + 0.14, R, f) * (1 - V) * smooth(0.35, 0.7, lf) : 0; // fumée
+          const a = Math.max(V, hz, 0.85 * fringe);
+          if (a <= 0.001) { d[p + 3] = 0; continue; }
+          for (let k = 0; k < 3; k++) {
+            const vid = d[p + k] * V + paper[p + k] * (1 - V);
+            const smoke = paper[p + k] * 0.55 + INK[k] * 0.45;
+            const c = (vid * V + smoke * hz * (1 - V)) / Math.max(1e-3, V + hz * (1 - V));
+            d[p + k] = c * (1 - 0.85 * fringe) + INK[k] * 0.85 * fringe;
+          }
+          d[p + 3] = a * 255;
+        }
+        o.putImageData(v, 0, 0);
+        if (ui < 0.17) { // la goutte
+          const u = ui / 0.16, gy = -20 + (PH / 2 + 20) * u * u;
+          o.fillStyle = `rgb(${INK.join(',')})`; o.beginPath(); o.ellipse(PW / 2, gy, 9, 13, 0, 0, 7); o.fill();
+        }
+        return;
+      }
+      // sortie : passage à l'encre, puis l'image coule vers le bas en traînées de vitesses différentes
+      const src = new Uint8ClampedArray(d), inkMix = ease(uo / 0.35), run = Math.pow(ease((uo - 0.2) / 0.8), 1.4);
+      for (let i = 0, p = 0; i < PW * PH; i++, p += 4) {
+        const xi = i % PW, yi = (i - xi) / PW;
+        const sp = 0.55 + 1.1 * n1[Math.floor(xi / 6) + 50 * PW]; // vitesse de la traînée (par colonne)
+        const off = run * PH * 1.25 * sp, sy = Math.round(yi - off);
+        if (sy < 0) { d[p + 3] = 0; continue; }
+        const j = sy * PW + xi, q = j * 4, ink = inkOf(j);
+        for (let k = 0; k < 3; k++) { const inkV = paper[q + k] * (1 - ink) + INK[k] * ink; d[p + k] = src[q + k] * (1 - inkMix) + inkV * inkMix; }
+        d[p + 3] = 255 * smooth(0, 60 + 120 * sp, yi - off) * (1 - smooth(0.85, 1, uo));
+      }
+      o.putImageData(v, 0, 0);
+      return;
+    }
 
     if (mode === 'lavis') {
       // entrée : encre tamponnée (0–35 %), puis taches de couleur ; sortie : la couleur rentre dans les taches, l'encre pâlit
