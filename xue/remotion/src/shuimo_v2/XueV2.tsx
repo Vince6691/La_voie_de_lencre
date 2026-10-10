@@ -113,6 +113,20 @@ const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; inMod
   );
 };
 
+// carte (moteur Canvas, variante papier) en fondu sur [from, to] ; draw(ctx, u, E, t) avec u = avancement 0–1
+const MapPanel: React.FC<{ from: number; to: number; draw: (ctx: CanvasRenderingContext2D, u: number, E: any, t: number) => void }> = ({ from, to, draw }) => {
+  const t = useT();
+  const a = win(t, from, to, 0.6);
+  if (a <= 0) return null;
+  return (
+    <AbsoluteFill style={{ opacity: a }}>
+      <Paper />
+      <Draw draw={(ctx, tt, E) => draw(ctx, clamp((tt - from) / (to - from)), E, tt)} />
+    </AbsoluteFill>
+  );
+};
+const ease = (u: number) => { const v = clamp(u); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
+
 // ── cartouches, étiquettes, textes
 const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({ zh, name, dates, a }) => (
   <div style={{ position: 'absolute', left: 110, top: 90, display: 'flex', alignItems: 'center', gap: 26, opacity: a }}>
@@ -155,7 +169,7 @@ const Opening: React.FC = () => {
         if (k < 1) {
           ctx.save(); ctx.globalAlpha = a * (1 - k);
           E.drawStrokes(ctx, 'xue_trad', {
-            x: 960, y, size, progress: 16 * seg(tt, A1 - 0.3, A1 + 1.9), brush: true,
+            x: 960, y, size, progress: 16 * seg(tt, A1 - 0.3, A1 + 1.9), brush: false,
             color: (c: string) => (c === 'hand' ? rgb(INK.map((v, i) => Math.round(v + (VERM[i] - v) * lit))) : inkCss),
             alpha: (c: string) => (c === 'hand' ? 1 - 0.9 * handGone * (1 - seg(tt, A2 + 2.6, A2 + 3.2)) : 1),
             glow: lit * (1 - handGone) * 30, glowColor: rgb(VERM, 0.6),
@@ -165,7 +179,7 @@ const Opening: React.FC = () => {
         // 学 (8 traits) en fondu croisé
         if (k > 0) {
           ctx.save(); ctx.globalAlpha = a * k;
-          E.drawStrokes(ctx, 'xue_simp', { x: 960, y, size, brush: true, color: () => inkCss });
+          E.drawStrokes(ctx, 'xue_simp', { x: 960, y, size, brush: false, color: () => inkCss });
           ctx.restore();
         }
       }} />
@@ -191,6 +205,20 @@ const ShangZhou: React.FC = () => {
         {/* « il manque quelqu'un » : un vide lumineux sous le toit */}
         <AbsoluteFill style={{ background: 'radial-gradient(circle at 50% 66%, rgba(255,250,236,0.95) 0, rgba(255,250,236,0) 9%)', opacity: win(t, manque, R1 - 0.2, 0.8) }} />
       </TimeScrollStage>
+      {/* cartes : Anyang, capitale des Shang ; Hao, capitale des Zhou */}
+      <MapPanel from={A3 - 0.3} to={at('b03', 'devins') + 0.2} draw={(ctx, u, E, tt) => {
+        const z = ease(u / 0.9), v = { lon: 108 + 6 * z, lat: 33 + 2.2 * z, k: 36 + 59 * z };
+        E.drawMap(ctx, tt, v, { paper: true, rivers: seg(u, 0, 0.4), riverLabels: win(u, 0.35, 0.8, 0.1) });
+        E.region(ctx, v, 'shang', 'rgba(192,57,43,0.22)', seg(u, 0.55, 0.75));
+        E.marker(ctx, tt, v, E.CITIES.anyang, 'Anyang', 'dernière capitale des Shang', seg(u, 0.4, 0.5), '#c0392b');
+      }} />
+      <MapPanel from={A4 - 0.5} to={at('b04', 'bronze') + 0.1} draw={(ctx, u, E, tt) => {
+        const v = { lon: 111.5, lat: 35, k: 88 };
+        E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
+        E.region(ctx, v, 'shang', 'rgba(192,57,43,0.22)', 1 - seg(u, 0.1, 0.4));
+        E.region(ctx, v, 'zhou', 'rgba(52,132,98,0.35)', seg(u, 0.15, 0.4));
+        E.marker(ctx, tt, v, E.CITIES.hao, 'Hao', 'capitale des Zhou', seg(u, 0.3, 0.45), '#348462', -1);
+      }} />
       {/* les devins (clip), puis le tir à l'arc au 學宮 (clip) */}
       <Clip src="feu" from={at('b03', 'devins') - 0.4} len={TT.plastronIn[0] - at('b03', 'devins') + 1.8} inMode="brume" outMode="delave" focus={[0.62, 0.78]} />
       <Clip src="feu" from={vase - 0.3} len={R2 - vase + 0.6} inMode="centre" outMode="brume" focus={[0.55, 0.7]} startFrom={1} rate={0.9} />
@@ -244,6 +272,12 @@ const Qin: React.FC = () => {
           }
         }} />
       </TimeScrollStage>
+ <MapPanel from={A5 - 0.3} to={at('b05', 'royaumes') + 0.3} draw={(ctx, u, E, tt) => {
+        const v = { lon: 112.5, lat: 32.5, k: 44 };
+        E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
+        E.region(ctx, v, 'qin', 'rgba(192,57,43,0.45)', 1, ease(seg(u, 0.35, 0.9)), E.CITIES.xianyang);
+        E.marker(ctx, tt, v, E.CITIES.xianyang, 'Xianyang', 'capitale des Qin', seg(u, 0.3, 0.4), '#c0392b', -1);
+      }} />
       <EraTag zh="秦" name="QIN" dates="221 av. J.-C. · le petit sceau" a={tagIn(TR2, t) * (1 - seg(t, A6 - 0.6, A6))} />
       <Caption text="Li Si 李斯 · le petit sceau 小篆" a={win(t, min + 1.0, sym + 2)} />
     </AbsoluteFill>
@@ -307,14 +341,14 @@ const Retournement: React.FC = () => {
         const ka = seg(tt, reg - 0.2, reg + 0.4) * (1 - seg(tt, cop + 1.0, cop + 2.4));
         if (ka > 0) {
           ctx.save(); ctx.globalAlpha = ka;
-          E.drawStrokes(ctx, 'xue_trad', { x: 960, y: 540, size: 600, progress: 16 * seg(tt, reg, reg + 3.6), brush: true, color: (c: string) => (c === 'hand' ? rgb(GRAY) : inkCss) });
+          E.drawStrokes(ctx, 'xue_trad', { x: 960, y: 540, size: 600, progress: 16 * seg(tt, reg, reg + 3.6), brush: false, color: (c: string) => (c === 'hand' ? rgb(GRAY) : inkCss) });
           ctx.restore();
         }
         // au fil des copies : le haut se resserre en trois petits traits (fondu, pas de cursive)
         const si = seg(tt, cop + 1.0, cop + 2.6);
         if (si > 0) {
           ctx.save(); ctx.globalAlpha = si;
-          E.drawStrokes(ctx, 'xue_simp', { x: 960, y: 540, size: 600, brush: true, color: (c: string) => (c === 'fusion' ? rgb(FUSION) : inkCss) });
+          E.drawStrokes(ctx, 'xue_simp', { x: 960, y: 540, size: 600, brush: false, color: (c: string) => (c === 'fusion' ? rgb(FUSION) : inkCss) });
           ctx.restore();
         }
       }} />
@@ -347,7 +381,7 @@ const Today: React.FC = () => {
           const x = 960 + 360 * syn, s = 560 - 120 * syn;
           ctx.save(); ctx.globalAlpha = out;
           E.drawStrokes(ctx, 'xue_simp', {
-            x, y: 520, size: s, progress: 8 * seg(tt, huit - 0.2, huit + 2.2), brush: true,
+            x, y: 520, size: s, progress: 8 * seg(tt, huit - 0.2, huit + 2.2), brush: false,
             color: (c: string) => (c === 'child' ? rgb(childGlow > 0 ? PIGMENT.child : INK) : c === 'roof' && win(tt, rec + 1.1, rec + 2.4, 0.3) > 0 ? rgb(PIGMENT.roof) : c === 'fusion' && win(tt, rec, rec + 1.3, 0.3) > 0 ? rgb(FUSION) : inkCss),
             glow: 26 * Math.min(1, childGlow), glowColor: rgb(PIGMENT.child, 0.6),
           });
@@ -356,6 +390,12 @@ const Today: React.FC = () => {
         {/* passerelle : 教, la main tient un bâton */}
         <div style={{ position: 'absolute', width: '100%', top: 260, textAlign: 'center', fontFamily: 'ShuimoKai', fontSize: 480, lineHeight: 1, color: inkCss, opacity: seg(t, autre + 0.2, autre + 1.4), textShadow: `0 0 ${40 * seg(t, baton, baton + 0.6)}px ${rgb(VERM, 0.8)}` }}>教</div>
       </TimeScrollStage>
+      <MapPanel from={A8 - 0.3} to={at('b08', 'huit') + 0.2} draw={(ctx, u, E, tt) => {
+        const v = { lon: 126, lat: 36, k: 40 + 6 * u };
+        E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
+        E.marker(ctx, tt, v, E.CITIES.tokyo, 'Japon · 1949', '当用漢字字体表', seg(u, 0.15, 0.25), '#c4882a', -1);
+        E.marker(ctx, tt, v, E.CITIES.beijing, 'Chine · 1956', '汉字简化方案', seg(u, 0.45, 0.55), '#c0392b', -1);
+      }} />
       <EraTag zh="今" name="AUJOURD'HUI" dates="Japon 1949 · Chine 1956 · 8 traits" a={tagIn(TR3, t) * (1 - seg(t, A9, A9 + 0.6))} />
       {parts.map(([k, zh, col, verb], i) => (
         <Label key={k} x={140} y={790 + i * 62} zh={zh} text={`pour ${verb}`} color={col} a={win(t, at('b08', k), nait + 0.6, 0.4)} />

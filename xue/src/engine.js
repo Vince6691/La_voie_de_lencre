@@ -821,16 +821,19 @@
   E.landPath = landPath;
   function drawMapGeo(ctx, t, v, o) {
     const G = window.GEODATA;
-    // mer d'encre
-    const sea = ctx.createRadialGradient(W / 2, H / 2, 200, W / 2, H / 2, 1300);
-    sea.addColorStop(0, '#1d3036'); sea.addColorStop(1, '#0b1418');
-    ctx.fillStyle = sea; ctx.fillRect(0, 0, W, H);
-    ctx.save(); ctx.strokeStyle = 'rgba(160,200,200,0.05)'; ctx.lineWidth = 1;
+    // o.paper : carte posée sur le papier xuan (mer = papier, rides et habillage à l'encre) ; sinon mer d'encre
+    const P = !!o.paper;
+    if (!P) {
+      const sea = ctx.createRadialGradient(W / 2, H / 2, 200, W / 2, H / 2, 1300);
+      sea.addColorStop(0, '#1d3036'); sea.addColorStop(1, '#0b1418');
+      ctx.fillStyle = sea; ctx.fillRect(0, 0, W, H);
+    }
+    ctx.save(); ctx.strokeStyle = P ? 'rgba(60,70,75,0.06)' : 'rgba(160,200,200,0.05)'; ctx.lineWidth = 1;
     for (let y = -40; y < H + 40; y += 14) { ctx.beginPath(); for (let x = 0; x <= W; x += 40) ctx.lineTo(x, y + Math.sin(x / 90 + y) * 3); ctx.stroke(); }
     ctx.restore();
     // rides côtières gravées
     ctx.save(); ctx.lineJoin = 'round';
-    [[34, 0.05], [22, 0.07], [12, 0.1]].forEach(([w, a]) => { landPath(ctx, v); ctx.lineWidth = w; ctx.strokeStyle = `rgba(190,215,205,${a})`; ctx.stroke(); });
+    [[34, 0.05], [22, 0.07], [12, 0.1]].forEach(([w, a]) => { landPath(ctx, v); ctx.lineWidth = w; ctx.strokeStyle = P ? `rgba(70,90,95,${a * 1.3})` : `rgba(190,215,205,${a})`; ctx.stroke(); });
     ctx.restore();
     // terres parchemin
     ctx.save();
@@ -891,16 +894,19 @@
       E.text(ctx, '長江  Yangzi', p2[0], p2[1] + 30, { font: 'Kai', size: 30, color: '#1f4d66', alpha: a, glow: 8, glowColor: 'rgba(240,220,180,0.9)' });
     }
     // rose des vents
+    const deco = P ? '#5b4f44' : '#e8d3a6';
     ctx.save(); ctx.translate(W - 150, H - 170); ctx.globalAlpha = 0.75;
-    ctx.strokeStyle = '#e8d3a6'; ctx.fillStyle = '#e8d3a6'; ctx.lineWidth = 2;
+    ctx.strokeStyle = deco; ctx.fillStyle = deco; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(0, 0, 46, 0, 7); ctx.stroke();
     for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); ctx.beginPath(); ctx.moveTo(0, -62); ctx.lineTo(9, 0); ctx.lineTo(-9, 0); ctx.closePath(); i === 3 ? ctx.fill() : ctx.stroke(); }
     ctx.restore();
-    E.text(ctx, 'N', W - 150, H - 250, { font: 'Cinzel', weight: 700, size: 26, color: '#e8d3a6', alpha: 0.8 });
+    E.text(ctx, 'N', W - 150, H - 250, { font: 'Cinzel', weight: 700, size: 26, color: deco, alpha: 0.8 });
     // cadre
-    ctx.save(); ctx.strokeStyle = 'rgba(232,211,166,0.55)'; ctx.lineWidth = 3; ctx.strokeRect(36, 36, W - 72, H - 72);
-    ctx.lineWidth = 1; ctx.strokeRect(46, 46, W - 92, H - 92); ctx.restore();
-    E.text(ctx, 'Sources : Natural Earth ; historical-basemaps', W - 60, H - 58, { size: 20, weight: 500, align: 'right', color: '#d8c7a0', alpha: 0.55 });
+    if (!P) {
+      ctx.save(); ctx.strokeStyle = 'rgba(232,211,166,0.55)'; ctx.lineWidth = 3; ctx.strokeRect(36, 36, W - 72, H - 72);
+      ctx.lineWidth = 1; ctx.strokeRect(46, 46, W - 92, H - 92); ctx.restore();
+    }
+    E.text(ctx, 'Sources : Natural Earth ; historical-basemaps', W - 60, H - 58, { size: 20, weight: 500, align: 'right', color: P ? '#6b5d50' : '#d8c7a0', alpha: 0.55 });
   }
 
   E.drawMap = function (ctx, t, v, o = {}) {
