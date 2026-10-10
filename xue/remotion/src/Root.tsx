@@ -1,5 +1,6 @@
 import React from 'react';
 import { Composition } from 'remotion';
+import { VIDEO_REVEAL_DEMO_SECONDS, VideoRevealDemo } from './video_encre/VideoRevealDemo';
 import { XUE_V2_SECONDS, XueV2 } from './shuimo_v2/XueV2';
 import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
@@ -37,6 +38,7 @@ export const RemotionRoot: React.FC = () => (
   {/* rouleau du temps seul (src/rouleau) : 周 → 秦, curseur par défaut */}
   <Composition id="VideoEncreDemo" component={VideoEncreDemo} durationInFrames={VIDEO_ENCRE_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   <Composition id="XueV2" component={XueV2} durationInFrames={Math.round(XUE_V2_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="VideoRevealDemo" component={VideoRevealDemo} durationInFrames={VIDEO_REVEAL_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   <Composition id="RouleauDemo" component={RouleauDemo} durationInFrames={ROULEAU_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   </>
 );
