@@ -52,3 +52,21 @@ Sheet of five separate isolated elements in a row with wide white gaps, nothing 
 [STYLE BLOCK]
 Sheet of six separate isolated elements in a 3×2 grid with wide white gaps, nothing touching: six different soft horizontal ink-wash mist bands and washes, very light grey (5–20% density), each with irregular wet edges fading to nothing: a long thin band, a wide soft cloud, a wispy band with gaps, a low rolling fog bank, a diagonal veil, a circular soft bloom of diluted ink. No outlines at all, only diluted washes.
 ```
+
+## 08_massifs — massifs du plan moyen (remplacent les pics isolés de la planche 02)
+
+Les pics isolés et répétés de la planche 02 font artificiel : un plan moyen crédible est fait de **groupes de
+sommets reliés** par leurs flancs, de hauteurs différentes, qui s'enfoncent dans la brume. Deux massifs larges par
+planche (un par moitié d'image), **en haute définition** (2K ou 4K), pour des contours nets en 1080p. Générer
+plusieurs planches (08_massifs_a, _b, _c…) en variant la description : plus il y a de massifs différents, moins on
+voit de répétitions.
+
+```
+[STYLE BLOCK — en remplaçant « Landscape 3:2 » par « Landscape 16:9, 4K »]
+Sheet of two separate wide mountain massifs, one in the upper half and one in the lower half of the image, with a wide band of pure white between them, nothing touching, nothing cropped by the image edges. Each massif is a single connected group of five to eight peaks of different heights joined by their slopes and ridges, like a real mountain range seen from a distance: one dominant summit off-centre, smaller shoulders and lower ridges trailing away on both sides, a few deep valleys between them. Medium grey ink (35–60% density) on the nearest ridges, lighter on the ones behind (two depths inside the same massif), crisp ridgelines with graded washes downward, a few sparse pines as tiny dots on the ridges. The base of each massif dissolves softly into white mist along a horizontal line; no ground, no water, no reflections. Variety: the upper massif is tall and steep (karst needles clustered together), the lower massif is broad and rolling (rounded summits).
+```
+
+Variantes à demander (une par planche) : « the upper massif is a long ridge rising from left to right to a cliff,
+the lower one a cluster of three tall peaks with a waterfall thread » ; « the upper massif has a flat-topped table
+mountain with cliffs, the lower one is a jagged sawtooth ridge » ; « both massifs lower and wider, gentle rounded
+hills seen through haze ».

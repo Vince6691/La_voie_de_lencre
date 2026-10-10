@@ -13,7 +13,7 @@ from scipy import ndimage
 SRC = 'assets/shuimo/planches'
 OUT = 'assets/shuimo/elements'
 UP = 2  # agrandissement (les planches font 896 × 1200)
-FAMILY = {'01': 'lointain', '02': 'pic', '03': 'premier', '04': 'premier', '05': 'vie', '06': 'ciel', '07': 'brume'}
+FAMILY = {'01': 'lointain', '02': 'pic', '03': 'premier', '04': 'premier', '05': 'vie', '06': 'ciel', '07': 'brume', '08': 'massif'}
 
 
 def cutout(path):

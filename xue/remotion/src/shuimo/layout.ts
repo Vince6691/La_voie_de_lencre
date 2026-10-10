@@ -35,6 +35,9 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   const R = rng(seed);
   const r = (a: number, b: number) => a + (b - a) * R();
   const pick = <T,>(a: T[]) => a[Math.floor(R() * a.length)];
+  // jamais deux fois le même élément dans un plan (sauf si la famille est épuisée)
+  const used = new Set<string>();
+  const pickNew = (a: El[]) => { const free = a.filter((e) => !used.has(e.file)); const e = pick(free.length ? free : a); used.add(e.file); return e; };
   const of = (k: string) => EL.filter((e) => role(e) === k);
   const pieces: Piece[] = [];
   const add = (el: El, p: Omit<Piece, 'el' | 'flip'> & { flip?: boolean }) => pieces.push({ el, flip: p.flip ?? R() < 0.5, ...p });
@@ -52,7 +55,7 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   // montagnes lointaines : une chaîne continue de bandes qui se chevauchent
   const baseFar = r(470, 540);
   for (let x = r(-350, -100); x < W + 300;) {
-    const el = pick(of('lointain')), w = r(820, 1250), h = (w * el.h) / el.w;
+    const el = pickNew(of('lointain')), w = r(820, 1250), h = (w * el.h) / el.w;
     add(el, { x: x + w / 2, y: baseFar - h / 2 + r(-25, 25), h, depth: 0.12, opacity: r(0.6, 0.85) });
     x += w * r(0.5, 0.78);
   }
@@ -65,7 +68,10 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   const peaks = [r(60, 460), r(1460, 1860), ...(R() < 0.5 ? [r(560, 760)] : []), ...(R() < 0.4 ? [r(1160, 1360)] : [])];
   const peakAt: { x: number; base: number; h: number }[] = [];
   peaks.forEach((x) => {
-    const el = pick(of('pic')), h = r(300, 500), base = r(730, 810);
+    // massifs (groupes de sommets reliés, planche 08) ; à défaut, pics isolés de la planche 02
+    const massif = of('massif').length > 0;
+    const el = pickNew(massif ? of('massif') : of('pic'));
+    const h = massif ? Math.min(r(560, 880) * el.h / el.w, 460) : r(300, 500), base = r(730, 810);
     add(el, { x, y: base - h / 2, h, depth: 0.38, opacity: r(0.78, 0.95) });
     peakAt.push({ x, base, h });
   });
@@ -83,7 +89,7 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   // premiers plans dans un ou deux coins
   const sides: ('l' | 'r')[] = R() < 0.4 ? ['l', 'r'] : [R() < 0.5 ? 'l' : 'r'];
   sides.forEach((s) => {
-    const el = pick(of('premier'));
+    const el = pickNew(of('premier'));
     const top = el.edges.includes('t');
     const h = top ? r(440, 580) : r(470, 680), w = (h * el.w) / el.h;
     const natural = el.edges.includes('l') ? 'l' : el.edges.includes('r') ? 'r' : null;
