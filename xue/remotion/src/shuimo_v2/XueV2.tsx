@@ -164,7 +164,7 @@ const Opening: React.FC = () => {
         const handGone = seg(tt, mains + 2.6, mains + 4.2); // « plus personne ne les voit »
         const lit = seg(tt, mains, mains + 0.6);
         const simp = seg(tt, at('b02', 'huit') - 0.1, at('b02', 'huit') + 0.5) * (1 - seg(tt, at('b02', 'seize'), at('b02', 'seize') + 0.6));
-        const k = Math.max(simp, seg(tt, mains + 3.2, mains + 4.2) * (1 - seg(tt, A2 - 0.2, A2 + 0.3))); // part de 学
+        const k = Math.max(simp, seg(tt, mains + 3.2, mains + 4.2) * (1 - seg(tt, at('b02', 'seize'), at('b02', 'seize') + 0.6))); // part de 学 : de « plus personne ne les voit » à « seize »
         // 學 : 16 traits en 2,2 s, puis les mains vermillon qui pâlissent jusqu'à disparaître
         if (k < 1) {
           ctx.save(); ctx.globalAlpha = a * (1 - k);
@@ -360,26 +360,71 @@ const Retournement: React.FC = () => {
 };
 
 // ════════════════ 8–9. (rouleau 3) aujourd'hui : 8 traits, synthèse, l'école ; chute et passerelle
+// bandeau des écritures : 甲骨文 → 學 → 学, rubans de composantes, la composante citée reste en couleur, le reste grisé
+const FORMS: [string, string, string][] = [['real:jiaguwen', '甲骨文', 'Shang'], ['real:jinwen', '金文', 'Zhou'], ['real:xiaozhuan', '小篆', 'Qin'], ['real:lishu', '隸書', 'Han'], ['font:kai_xue_trad', '楷書', 'Tang'], ['font:kai_xue_simp', '学', 'XXe s.']];
+const CUE_OF: Record<string, string> = { yao: 'baguettes', roof: 'toit', hand: 'mains', child: 'enfant' };
+const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) => {
+  const y = 430, x0 = 260, dx = 280, sz = 230;
+  // composante en vedette : la dernière citée (jusqu'à « Ainsi naît »)
+  const order = ['yao', 'roof', 'hand', 'child'];
+  let hi = '', k = 0;
+  for (const c of order) { const s0 = at('b08', CUE_OF[c]); if (tt >= s0 - 0.1) { hi = c; k = seg(tt, s0 - 0.1, s0 + 0.4); } }
+  if (tt > at('b08', 'nait') - 0.3) k *= 1 - seg(tt, at('b08', 'nait') - 0.3, at('b08', 'nait') + 0.2);
+  const GREY = [168, 160, 150];
+  const mixc = (c1: number[], c2: number[], u: number) => c1.map((v, i) => Math.round(v + (c2[i] - v) * u));
+  FORMS.forEach(([key, zh, fr], i) => {
+    const appear = seg(tt, at('b08', 'pinceau') - 0.2 + i * 0.12, at('b08', 'pinceau') + 0.3 + i * 0.12) * a;
+    if (appear <= 0) return;
+    const late = i === 5;
+    const base = (c: string) => (late && (c === 'hand' || c === 'yao') ? FUSION : PIGMENT[c] ?? INK);
+    const color = (c: string) => {
+      const on = late && (hi === 'hand' || hi === 'yao') ? c === 'hand' || c === 'yao' : c === hi;
+      return rgb(on || !hi ? base(c) : mixc(base(c), GREY, k));
+    };
+    const alpha = (c: string) => (!hi || c === hi || (late && (hi === 'hand' || hi === 'yao') && (c === 'hand' || c === 'yao')) ? 1 : 1 - 0.55 * k);
+    const x = x0 + i * dx;
+    ctx.save(); ctx.globalAlpha = appear;
+    if (key.startsWith('real:')) E.drawRealGlyph(ctx, key.slice(5), { x, y, size: sz, color, alpha });
+    else E.drawFontGlyph(ctx, key.slice(5), { x, y, size: sz, color, alpha });
+    E.text(ctx, zh, x, y + 165, { font: 'Kai', size: 44, color: inkCss, alpha: appear });
+    E.text(ctx, fr, x, y + 215, { font: 'Cormorant', size: 30, weight: 700, color: '#6b5d50', alpha: appear });
+    ctx.restore();
+  });
+  // rubans : où vit chaque composante ; mains et baguettes se fondent en ⺍
+  const rows: [string, number, number, string][] = [['hand', 0, 4, 'mains'], ['yao', 0, 4, 'baguettes'], ['roof', 0, 5, 'toit'], ['child', 1, 5, 'enfant']];
+  const grow = seg(tt, at('b08', 'pinceau'), at('b08', 'pinceau') + 1.2);
+  rows.forEach(([c, a0, a1, lab], j) => {
+    const yy = 760 + j * 46, xa = x0 + a0 * dx - 60, xb = x0 + a1 * dx + 60;
+    const col = !hi || hi === c ? PIGMENT[c] : mixc(PIGMENT[c], GREY, k);
+    const al = a * grow * (!hi || hi === c ? 1 : 1 - 0.5 * k);
+    ctx.save(); ctx.globalAlpha = al; ctx.strokeStyle = rgb(col); ctx.lineWidth = 12; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(xa, yy); ctx.lineTo(xa + (xb - xa) * grow, yy); ctx.stroke();
+    if (c === 'hand' || c === 'yao') {
+      ctx.strokeStyle = rgb(FUSION); ctx.beginPath(); ctx.moveTo(xb, yy); ctx.quadraticCurveTo(xb + 90, yy, x0 + 5 * dx - 40, 783); ctx.lineTo(x0 + 5 * dx + 60, 783); ctx.stroke();
+    }
+    ctx.restore();
+    E.text(ctx, lab, xa - 20, yy, { font: 'Cormorant', size: 28, weight: 700, align: 'right', color: rgb(col), alpha: al });
+  });
+  E.text(ctx, '⺍', x0 + 4.6 * dx, 735, { font: 'Kai', size: 50, color: rgb(FUSION), alpha: a * grow });
+};
+
 const Today: React.FC = () => {
   const t = useT();
   const huit = at('b08', 'huit'), pin = at('b08', 'pinceau'), nait = at('b08', 'nait'), ecole = at('b08', 'ecole'), mots = at('b08', 'mots'), rec = at('b08', 'reconnaitre');
   const autre = at('b09', 'autre'), baton = at('b09', 'baton');
-  const parts: [string, string, number[], string][] = [['baguettes', '爻', PIGMENT.yao, 'compter'], ['toit', '宀', PIGMENT.roof, 'abriter'], ['mains', '𦥑', PIGMENT.hand, 'montrer'], ['enfant', '子', PIGMENT.child, 'recevoir']];
   return (
     <AbsoluteFill>
       <TimeScrollStage cfg={TR3} defaultCursor fromLandscape={{ seed: 3, since: R3 - 3 }} toLandscape={{ seed: 30, until: XUE_V2_SECONDS + 1, mood: 'aube' }}>
         <Draw draw={(ctx, tt, E) => {
           const out = 1 - seg(tt, autre - 0.3, autre + 0.6);
           if (out <= 0 || tt < huit - 0.3) return;
-          // synthèse : le signe Zhou en pigments, à gauche, puis 学 au centre
-          const syn = win(tt, pin, nait + 0.6, 0.6);
-          if (syn > 0) {
-            const lit = (c: string) => seg(tt, at('b08', ({ yao: 'baguettes', roof: 'toit', hand: 'mains', child: 'enfant' } as Record<string, string>)[c]), at('b08', ({ yao: 'baguettes', roof: 'toit', hand: 'mains', child: 'enfant' } as Record<string, string>)[c]) + 0.5);
-            E.drawRealGlyph(ctx, 'jinwen', { x: 560, y: 520, size: 440, opacity: syn, color: (c: string) => rgb(PIGMENT[c] ?? INK), alpha: (c: string) => 0.25 + 0.75 * lit(c) });
-          }
+          // synthèse : bandeau des six écritures (repris de la version fond noir, adapté au papier) ; à chaque
+          // composante citée, elle reste en pigment dans toutes les formes et le reste du signe se grise
+          const syn = win(tt, pin - 0.2, nait + 0.5, 0.7);
+          if (syn > 0) drawBand(ctx, E, tt, syn);
           const childGlow = win(tt, rec + 2.2, autre, 0.5) + 0.6 * win(tt, nait, nait + 2, 0.4);
-          const x = 960 + 360 * syn, s = 560 - 120 * syn;
-          ctx.save(); ctx.globalAlpha = out;
+          const x = 960, s = 560;
+          ctx.save(); ctx.globalAlpha = out * (1 - syn);
           E.drawStrokes(ctx, 'xue_simp', {
             x, y: 520, size: s, progress: 8 * seg(tt, huit - 0.2, huit + 2.2), brush: false,
             color: (c: string) => (c === 'child' ? rgb(childGlow > 0 ? PIGMENT.child : INK) : c === 'roof' && win(tt, rec + 1.1, rec + 2.4, 0.3) > 0 ? rgb(PIGMENT.roof) : c === 'fusion' && win(tt, rec, rec + 1.3, 0.3) > 0 ? rgb(FUSION) : inkCss),
@@ -397,9 +442,6 @@ const Today: React.FC = () => {
         E.marker(ctx, tt, v, E.CITIES.beijing, 'Chine · 1956', '汉字简化方案', seg(u, 0.45, 0.55), '#c0392b', -1);
       }} />
       <EraTag zh="今" name="AUJOURD'HUI" dates="Japon 1949 · Chine 1956 · 8 traits" a={tagIn(TR3, t) * (1 - seg(t, A9, A9 + 0.6))} />
-      {parts.map(([k, zh, col, verb], i) => (
-        <Label key={k} x={140} y={790 + i * 62} zh={zh} text={`pour ${verb}`} color={col} a={win(t, at('b08', k), nait + 0.6, 0.4)} />
-      ))}
       <Caption text="xué · apprendre" a={win(t, nait, ecole)} y={900} size={44} />
       <div style={{ position: 'absolute', width: '100%', top: 860, display: 'flex', justifyContent: 'center', gap: 120, fontFamily: 'ShuimoKai', fontSize: 64, color: inkCss }}>
         <span style={{ opacity: win(t, mots + 0.2, rec + 0.3) }}>学生<div style={{ fontFamily: 'ShuimoLatin', fontSize: 26, textAlign: 'center' }}>l'élève</div></span>

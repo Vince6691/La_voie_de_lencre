@@ -502,6 +502,7 @@
     const D = window.STROKES[key];
     const masks = brushMasks(key, !!o.brush); // o.brush : encre au pinceau (blanc volant), sur papier
     const prog = o.progress ?? D.strokes.length;
+    const base = ctx.globalAlpha; // opacité de l'appelant (fondus), multipliée par celle de chaque composante
     const place = (img) => ctx.drawImage(img, o.x - o.size / 2, o.y - o.size / 2, o.size, o.size);
     D.strokes.forEach((_, i) => {
       const p = clamp(prog - i);
@@ -510,7 +511,7 @@
       const a = o.alpha ? o.alpha(c) : 1;
       if (a <= 0) return;
       ctx.save();
-      ctx.globalAlpha = a;
+      ctx.globalAlpha = a * base;
       if (o.glow) { ctx.shadowColor = o.glowColor || o.color(c); ctx.shadowBlur = o.glow * 0.5; } // halo discret
       const ink = tinted(masks[i], o.color(c));
       if (p >= 1) { place(ink); ctx.restore(); return; }
