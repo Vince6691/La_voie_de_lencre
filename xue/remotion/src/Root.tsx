@@ -1,5 +1,6 @@
 import React from 'react';
 import { Composition } from 'remotion';
+import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
 import { SHUIMO_DEMO_SECONDS, ShuimoDemo, ShuimoDemoProps } from './shuimo/ShuimoDemo';
@@ -33,6 +34,7 @@ export const RemotionRoot: React.FC = () => (
   {/* essai « tout shuimo » : scènes Shang et Zhou du 學 sur papier, voix existante */}
   <Composition id="ShuimoXue" component={ShuimoXue} durationInFrames={Math.round(SHUIMO_XUE_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   {/* rouleau du temps seul (src/rouleau) : 周 → 秦, curseur par défaut */}
+  <Composition id="VideoEncreDemo" component={VideoEncreDemo} durationInFrames={VIDEO_ENCRE_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   <Composition id="RouleauDemo" component={RouleauDemo} durationInFrames={ROULEAU_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   </>
 );

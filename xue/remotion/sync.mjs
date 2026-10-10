@@ -31,4 +31,6 @@ for (const f of fs.readdirSync(`${X}/assets/shuimo_xue`)) cp(`${X}/assets/shuimo
 fs.writeFileSync(`${here}/src/data/realglyphs.json`, fs.readFileSync(`${X}/src/realglyphs.js`, 'utf8').split('=').slice(1).join('=').trim().replace(/;$/, ''));
 // rouleau du temps (tools/build_sfx.py) : sons
 for (const f of fs.readdirSync(`${X}/assets/rouleau`)) cp(`${X}/assets/rouleau/${f}`, `${here}/public/rouleau/${f}`);
+// clips vidéo d'exemple (Seedance / Veo) pour les tests d'intégration encre
+for (const f of fs.readdirSync(`${X}/assets/exemples_videos`)) cp(`${X}/assets/exemples_videos/${f}`, `${here}/public/exemples_videos/${f}`);
 console.log('synchronisé');
