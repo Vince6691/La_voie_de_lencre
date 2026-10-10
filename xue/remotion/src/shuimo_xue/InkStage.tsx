@@ -29,9 +29,9 @@ const GL = glyphs as unknown as Record<string, G>;
 export const T = {
   plastronIn: [5.6, 7.0], crack1: [7.3, 8.2], crack2: [8.0, 8.9], jiaguIn: [9.6, 11.0],
   plastronOut: [11.9, 13.2], yao: 13.3, roof: 17.96, hand: 20.2,
-  // rouleau du temps : le signe Shang voyage au centre pendant que le paysage défile, puis devient le signe Zhou
-  travel: [22.4, 26.9], jiaguOut: [25.95, 26.25], jinwenIn: [25.95, 26.25],
-  bronzeIn: [29.4, 31.2], bronzeOut: [36.5, 37.8], jinwenColor: [37.8, 38.8], child: 40.9,
+  // rouleau du temps : le signe Shang devient le curseur de la frise et se change en signe Zhou pendant le voyage
+  travel: [22.4, 27.4],
+  bronzeIn: [29.9, 31.7], bronzeOut: [37.0, 38.3], jinwenColor: [38.3, 39.3], child: 41.4,
 };
 
 // ── frise des époques (rouleau du temps) : sceaux régulièrement espacés au centre de l'image ; le petit 學 en est
@@ -45,14 +45,25 @@ export const sealX = (i: number) => TL.x0 + i * TL.dx;
 export const travelU = (t: number) => (t - T.travel[0]) / (T.travel[1] - T.travel[0]);
 const ease = (u: number) => { const v = clamp(u); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
-// signe Shang : rétrécit vers le sceau 商, glisse jusqu'au sceau 周 ; signe Zhou : part du sceau 周 et grandit au centre
+// déroulé du voyage (u de 0 à 1) : 0–0,12 la caméra recule, la frise se trace ; 0,12–0,72 accélération franche puis
+// freinage (96 % du trajet) ; 0,72–0,80 ralenti d'approche ; 0,80 impact sur 周 ; 0,80–0,86 la caméra plonge ;
+// 0,86–1 le sceau s'envole, retour au plan normal. travelM = avancement du curseur, du compteur et du paysage.
+export const IMPACT = 0.8;
+export function travelM(u: number) {
+  if (u <= 0.12) return 0;
+  if (u < 0.72) { const e = (u - 0.12) / 0.6; return 0.96 * (e < 0.5 ? 16 * e ** 5 : 1 - (-2 * e + 2) ** 5 / 2); }
+  if (u < IMPACT) return 0.96 + 0.04 * (1 - (1 - (u - 0.72) / (IMPACT - 0.72)) ** 3);
+  return 1;
+}
+// part du signe Zhou pendant la glissade (le signe Shang se change en signe Zhou, sans l'enfant)
+export const morphK = (t: number) => smooth(0.3, 0.85, travelM(travelU(t)));
+// les deux signes suivent le curseur ; le signe Zhou grandit ensuite au centre
 export function glyphPose(name: 'jiaguwen' | 'jinwen', t: number) {
   const u = travelU(t), cx = 960, cy = 560;
-  if (name === 'jiaguwen') {
-    const k = ease(u / 0.13), m = ease((u - 0.13) / 0.67);
-    return { x: lerp(lerp(cx, sealX(0), k), sealX(1), m), y: lerp(cy, TL.cursorY, k), s: lerp(1, TL.small, k) };
-  }
-  const g = u <= 0 ? 1 : ease((u - 0.84) / 0.16);
+  const k = ease(u / 0.12), m = travelM(u);
+  const cur = { x: lerp(lerp(cx, sealX(0), k), sealX(1), m), y: lerp(cy, TL.cursorY, k), s: lerp(1, TL.small, k) };
+  if (name === 'jiaguwen' || u < 0.86) return cur;
+  const g = ease((u - 0.86) / 0.14);
   return { x: lerp(sealX(1), cx, g), y: lerp(TL.cursorY, cy, g), s: lerp(TL.small, 1, g) };
 }
 
@@ -148,11 +159,12 @@ export const InkStage: React.FC = () => {
       });
     }, pbox, pIn, t >= T.plastronOut[0] ? 0.22 : 0.07); // l'encre sèche en fondu large, pas en taches
     // signe Shang : blanc dans l'estampage, puis encre sur le papier, puis composantes en pigments
-    const jIn = seg(t, T.jiaguIn[0], T.jiaguIn[1]) * (1 - seg(t, T.jiaguOut[0], T.jiaguOut[1]));
+    const jIn = seg(t, T.jiaguIn[0], T.jiaguIn[1]);
+    const mk = morphK(t);
     const dry = seg(t, T.plastronOut[0] + 0.3, T.plastronOut[1] + 0.3); // blanc → encre
     const lit: Record<string, number> = { yao: seg(t, T.yao, T.yao + 0.8), roof: seg(t, T.roof, T.roof + 0.8), hand: seg(t, T.hand, T.hand + 0.8) };
-    layer((c) => glyph(c, 'jiaguwen', 560, (comp) => mix(mix(PAPERWHITE, INK, dry), PIGMENT[comp], lit[comp] ?? 0)),
-      boxOf('jiaguwen', 600), jIn, t >= T.jiaguOut[0] ? 0.12 : 0.07, t < T.jiaguOut[0] ? 0.5 : 0);
+    if (mk < 1) layer((c) => glyph(c, 'jiaguwen', 560, (comp) => mix(mix(PAPERWHITE, INK, dry), PIGMENT[comp], lit[comp] ?? 0), undefined, () => 1 - mk),
+      boxOf('jiaguwen', 600), jIn, 0.07, 0.5);
 
     // ── Zhou : feuille d'estampage de bronze, inscription révélée en blanc, puis à l'encre et en pigments
     const bw = 740, bh = 860, bbox = [cx - bw / 2, cy - bh / 2, bw, bh];
@@ -160,14 +172,14 @@ export const InkStage: React.FC = () => {
     layer((c) => c.drawImage(res.bronze, bbox[0], bbox[1], bw, bh), bbox, bIn, t >= T.bronzeOut[0] ? 0.22 : 0.07);
     // signe Zhou : arrive en pigments (sans l'enfant), devient l'inscription blanche quand l'estampage est tamponné
     // autour de lui, puis l'estampage sèche : encre, pigments, et l'enfant apparaît
-    const nIn = seg(t, T.jinwenIn[0], T.jinwenIn[1]);
+    const nIn = t >= T.travel[0] ? 1 : 0;
     const whiten = seg(t, T.bronzeIn[0] + 0.5, T.bronzeIn[1] + 0.3);
     const dry2 = seg(t, T.bronzeOut[0] + 0.3, T.bronzeOut[1] + 0.3);
     const col2 = seg(t, T.jinwenColor[0], T.jinwenColor[1]), childLit = seg(t, T.child, T.child + 0.9);
     layer((c) => glyph(c, 'jinwen', 600,
       (comp) => mix(mix(mix(PIGMENT[comp], PAPERWHITE, whiten), INK, dry2), PIGMENT[comp], comp === 'child' ? childLit : col2),
       (comp) => (comp === 'child' ? childLit * (1 - 0.6 * seg(t, T.child + 1.2, T.child + 2.4)) : 0),
-      (comp) => (comp === 'child' ? childLit : 1)),
+      (comp) => (comp === 'child' ? childLit : mk)),
       boxOf('jinwen', 640), nIn, 0.12, 0);
   }, [res, t]);
 
