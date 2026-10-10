@@ -150,16 +150,14 @@ const YearCounter: React.FC = () => {
   );
 };
 
-// ── caméra : recule pour montrer le rouleau entier (bâtons, montage de soie, table), plonge sur le sceau 周 à
-// l'impact, puis revient au plan normal pendant que le sceau s'envole
+// ── caméra : recule pour montrer le rouleau entier (bâtons, montage de soie, table), puis, en un seul mouvement
+// continu, revient au plan normal pendant l'approche et l'envol du sceau ; à l'impact, une brève secousse (3 %)
 function camera(u: number) {
   const id = { z: 1, fx: 960, fy: 540 };
   if (u <= 0 || u >= 1) return id;
-  if (u < 0.12) return { z: lerp(1, 0.8, ease(u / 0.12)), fx: 960, fy: 540 };
-  if (u < 0.76) return { z: 0.8 + 0.015 * Math.sin(Math.PI * (u - 0.12) / 0.64), fx: 960, fy: 540 };
-  if (u < 0.86) { const k = ease((u - 0.76) / 0.1); return { z: lerp(0.8, 2.0, k), fx: lerp(960, sealX(1), k), fy: lerp(540, TL.y, k) }; }
-  const k = ease((u - 0.86) / 0.14);
-  return { z: lerp(2.0, 1, k), fx: lerp(sealX(1), 960, k), fy: lerp(TL.y, 540, k) };
+  const back = u < 0.12 ? ease(u / 0.12) : 1 - ease((u - 0.72) / 0.28);
+  const punch = u > IMPACT ? 0.03 * Math.exp(-(u - IMPACT) / 0.025) : 0;
+  return { z: (1 - 0.2 * back) * (1 + punch), fx: 960, fy: 540 };
 }
 const Camera: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const t = useCurrentFrame() / useVideoConfig().fps;
@@ -228,13 +226,14 @@ const Vignette: React.FC = () => {
   const k = Math.min(1, scrollSpeed(t) / MAXSPEED) * 0.75 + 0.25 * seg(u, 0.05, 0.15) * (1 - seg(u, 0.84, 0.95));
   return <AbsoluteFill style={{ background: 'radial-gradient(ellipse 62% 58% at 50% 52%, rgba(20,14,10,0) 55%, rgba(20,14,10,0.55) 100%)', opacity: k }} />;
 };
-// le sceau 周, agrandi par la plongée, s'envole vers le cartouche (écran)
+// le sceau 周 s'envole de la frise vers le cartouche (écran) : il part de sa place à l'écran au moment de l'envol
 const FlyingSeal: React.FC = () => {
   const t = useCurrentFrame() / useVideoConfig().fps;
   const u = travelU(t);
   if (u <= 0.86 || u >= 0.985) return null;
+  const c = camera(0.86), sx = 960 + (sealX(1) - c.fx) * c.z, sy = 540 + (TL.y - c.fy) * c.z;
   const k = ease((u - 0.86) / 0.12);
-  return <Seal zh="周" x={lerp(960, TAG.x, k)} y={lerp(540, TAG.y, k)} size={lerp(128, TAG.size, k)} fill={1} glow={0.5 * (1 - k)} />;
+  return <Seal zh="周" x={lerp(sx, TAG.x, k)} y={lerp(sy, TAG.y, k)} size={lerp(64 * c.z * 1.15, TAG.size, k)} fill={1} glow={0.5 * (1 - k)} />;
 };
 
 const Fade: React.FC<{ len: number; faint: number; children: React.ReactNode }> = ({ len, faint, children }) => {
