@@ -9,7 +9,8 @@ import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { INK, InkStage, InkTiming, PIGMENT } from '../shuimo_xue/InkStage';
 import { TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
-import { VideoEncre } from '../video_encre/VideoEncre';
+import { VideoReveal } from '../video_encre/VideoReveal';
+import { CloudReveal } from '../video_encre/CloudReveal';
 import { loadLegacy, W } from '../legacy';
 import cuesData from '../data/cues_sx.json';
 
@@ -102,14 +103,30 @@ const Fade: React.FC<{ len: number; faint: number; children: React.ReactNode }> 
 };
 const Paper: React.FC = () => <AbsoluteFill style={{ background: `#f3eee4 url(${staticFile('shuimo/paper.jpg')}) center/cover` }} />;
 
-// clip vidéo intégré au papier (exemples réutilisés en attendant les clips Seedance)
+// clip vidéo plein cadre (exemples réutilisés en attendant les clips Seedance) : entrée par les nuages, ou à travers
+// le caractère quand un caractère est à l'écran juste avant ; sortie par les coups de pinceau dans tous les cas
 const CLIPS = { feu: 'exemples_videos/exemple_plan_fixe.mp4', astre: 'exemples_videos/exemple_transformation.mp4' };
-const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; inMode: 'brume' | 'centre'; outMode: 'delave' | 'brume'; focus: [number, number]; rate?: number; startFrom?: number }> = ({ src, from, len, inMode, outMode, focus, rate = 0.85, startFrom = 0 }) => {
+const CLIP_SRC_SECONDS = 7.8; // durée utile des clips d'exemple
+const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry: 'nuages' | 'glyphe'; inDur?: number }> = ({ src, from, len, entry, inDur = 3.2 }) => {
   const { fps } = useVideoConfig();
+  const rate = Math.min(0.9, CLIP_SRC_SECONDS / len); // ralenti si le plan est plus long que le clip
+  if (entry === 'glyphe') {
+    return (
+      <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(len * fps)}>
+        <VideoReveal src={CLIPS[src]} mode="glyphe" outMode="pinceau" inDur={inDur} outDur={2.4} playbackRate={rate} zoom={1} />
+      </Sequence>
+    );
+  }
+  const cl = inDur + 0.4; // nuages qui se referment puis s'écartent, puis la vidéo seule jusqu'aux coups de pinceau
   return (
-    <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(len * fps)}>
-      <VideoEncre src={CLIPS[src]} focus={focus} inMode={inMode} outMode={outMode} inDur={2.4} outDur={2.2} playbackRate={rate} startFrom={startFrom} />
-    </Sequence>
+    <>
+      <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(cl * fps)}>
+        <CloudReveal src={CLIPS[src]} inDur={inDur} exit={false} playbackRate={rate} />
+      </Sequence>
+      <Sequence from={Math.round((from + cl) * fps)} durationInFrames={Math.round((len - cl) * fps)}>
+        <VideoReveal src={CLIPS[src]} mode="pinceau" inDur={0.001} outDur={2.4} startFrom={cl * rate} playbackRate={rate} zoom={1} />
+      </Sequence>
+    </>
   );
 };
 
@@ -220,8 +237,8 @@ const ShangZhou: React.FC = () => {
         E.marker(ctx, tt, v, E.CITIES.hao, 'Hao', 'capitale des Zhou', seg(u, 0.3, 0.45), '#348462', -1);
       }} />
       {/* les devins (clip), puis le tir à l'arc au 學宮 (clip) */}
-      <Clip src="feu" from={at('b03', 'devins') - 0.4} len={TT.plastronIn[0] - at('b03', 'devins') + 1.8} inMode="brume" outMode="delave" focus={[0.62, 0.78]} />
-      <Clip src="feu" from={vase - 0.3} len={R2 - vase + 0.6} inMode="centre" outMode="brume" focus={[0.55, 0.7]} startFrom={1} rate={0.9} />
+      <Clip src="feu" from={at('b03', 'devins') - 0.4} len={TT.plastronIn[0] - at('b03', 'devins') + 1.8} entry="nuages" />
+      <Clip src="feu" from={vase - 0.3} len={R2 - vase + 0.6} entry="glyphe" />
       <EraTag zh="商" name="SHANG" dates="Anyang · v. 1250 av. J.-C." a={win(t, A3 + 0.3, R1 + 0.4, 0.8)} />
       <EraTag zh="周" name="ZHOU" dates="XIe siècle av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
       <Label x={1270} y={430} zh="爻" text="yáo · baguettes croisées" color={PIGMENT.yao} a={win(t, TT.yao + 0.3, R1, 0.6)} />
@@ -328,7 +345,7 @@ const Retournement: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Landscape seed={3} from={A7 - 1} to={R3 + 2} move="pan" mood="jour" faint={0.4} />
-      <Clip src="astre" from={A7 - 0.2} len={apl - A7 + 1.6} inMode="centre" outMode="delave" focus={[0.5, 0.45]} rate={1.1} />
+      <Clip src="astre" from={A7 - 0.2} len={apl - A7 + 1.6} entry="glyphe" inDur={2.6} />
       <Draw draw={(ctx, tt, E) => {
         // écriture des clercs : les mains vermillon pâlissent et se figent en bloc gris
         const li = seg(tt, apl + 0.6, apl + 1.6) * (1 - seg(tt, reg - 0.6, reg));

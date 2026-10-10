@@ -17,7 +17,7 @@ import { AbsoluteFill, OffthreadVideo, continueRender, delayRender, staticFile, 
 
 export type RevealMode = 'glyphe' | 'lavis' | 'pinceau' | 'goutte' | 'rouleau' | 'brouillard';
 export type VideoRevealProps = {
-  src: string; mode: RevealMode; glyph?: string; inDur?: number; outDur?: number; outAt?: number;
+  src: string; mode: RevealMode; outMode?: RevealMode; glyph?: string; inDur?: number; outDur?: number; outAt?: number;
   startFrom?: number; playbackRate?: number; zoom?: number;
 };
 
@@ -99,23 +99,28 @@ function useRes(glyph: string) {
   return r;
 }
 
-export const VideoReveal: React.FC<VideoRevealProps> = ({ src, mode, glyph = '學', inDur = 3, outDur = 2.4, outAt, startFrom = 0, playbackRate = 1, zoom = 1.04 }) => {
+export const VideoReveal: React.FC<VideoRevealProps> = ({ src, mode: inMode, outMode, glyph = '學', inDur = 3, outDur = 2.4, outAt, startFrom = 0, playbackRate = 1, zoom = 1.04 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
   const t = frame / fps, total = durationInFrames / fps, oAt = outAt ?? total - outDur;
   const res = useRes(glyph);
   const out = useRef<HTMLCanvasElement>(null);
   const tRef = useRef(t); tRef.current = t;
+  // la capture attend le premier dessin (sinon course : l'image peut partir avant que la vidéo soit montée)
+  const [firstPaint] = useState(() => delayRender('premier dessin vidéo'));
+  const painted = useRef(false);
   const bufs = useRef<{ work: HTMLCanvasElement; mask: HTMLCanvasElement; L: Float32Array; Lb: Float32Array; tmp: Float32Array } | null>(null);
 
   const paint = useCallback((img: CanvasImageSource) => {
     if (!res || !out.current) return;
+    if (!painted.current) { painted.current = true; continueRender(firstPaint); } // le dessin qui suit est synchrone
     if (!bufs.current) {
       const mk = () => { const c = document.createElement('canvas'); c.width = PW; c.height = PH; return c; };
       bufs.current = { work: mk(), mask: mk(), L: new Float32Array(PW * PH), Lb: new Float32Array(PW * PH), tmp: new Float32Array(PW * PH) };
     }
     const { work, mask } = bufs.current;
     const tt = tRef.current, ui = clamp(tt / inDur), uo = clamp((tt - oAt) / outDur);
+    const mode = tt < oAt ? inMode : outMode ?? inMode; // entrée et sortie peuvent différer
     const o = out.current.getContext('2d')!;
     const wx = work.getContext('2d', { willReadFrequently: true })!;
     wx.globalCompositeOperation = 'source-over'; wx.drawImage(img, 0, 0, PW, PH);
@@ -328,7 +333,7 @@ export const VideoReveal: React.FC<VideoRevealProps> = ({ src, mode, glyph = '�
       }
     }
     o.putImageData(v, 0, 0);
-  }, [res, inDur, oAt, outDur, mode, glyph]);
+  }, [res, inDur, oAt, outDur, inMode, outMode, glyph, firstPaint]);
 
   const sc = 1 + (zoom - 1) * (t / total);
   return (

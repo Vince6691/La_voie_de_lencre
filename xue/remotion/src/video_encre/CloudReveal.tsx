@@ -21,12 +21,12 @@ const CLOUDS = (() => {
   return out.sort((a, b) => a.depth - b.depth);
 })();
 
-export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: number; startFrom?: number; playbackRate?: number }> = ({ src, inDur = 3.6, outDur = 3.2, startFrom = 0, playbackRate = 1 }) => {
+export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: number; exit?: boolean; startFrom?: number; playbackRate?: number }> = ({ src, inDur = 3.6, outDur = 3.2, exit = true, startFrom = 0, playbackRate = 1 }) => {
   const { fps, durationInFrames } = useVideoConfig();
-  const t = useCurrentFrame() / fps, total = durationInFrames / fps, oAt = total - outDur;
+  const t = useCurrentFrame() / fps, total = durationInFrames / fps, oAt = exit ? total - outDur : Infinity; // exit = false : entrée seule (la sortie est confiée à un autre effet)
   const inPh = t < oAt, u = inPh ? clamp(t / inDur) : clamp((t - oAt) / outDur);
   // couverture c : 0 → 1 (les nuages se referment) puis 1 → 0 (ils s'écartent)
-  const close = (k: number) => ease(clamp((u - k) / 0.42)), open = (k: number) => ease(clamp((u - 0.52 - k * 0.5) / 0.46));
+  const close = (k: number) => ease(clamp((u - k) / 0.42)), open = (k: number) => ease(clamp((u - 0.52 - k * 0.5) / (0.48 - k * 0.5))); // tous ouverts à u = 1
   const showVid = inPh ? u >= 0.47 : u < 0.47;
   const core = Math.min(close(0.1), 1 - open(0.05)); // voile de papier au cœur, pour qu'aucun trou ne laisse voir le changement
   return (
