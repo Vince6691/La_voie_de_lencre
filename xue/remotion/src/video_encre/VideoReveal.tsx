@@ -10,10 +10,12 @@
 //                fumée) en ouvrant l'image ; sortie : l'image passe à l'encre et coule vers le bas en traînées.
 //  « rouleau » : un rouleau suspendu (montage de soie, bâton, rouleau de bois) se déroule de haut en bas avec la scène
 //                peinte, puis la caméra entre dans la peinture jusqu'au plein écran ; sortie : l'inverse.
+//  « brouillard » : une brume épaisse monte et cache le décor shuimo, puis se déchire en nappes et se dissipe sur la
+//                scène 3D plein cadre ; sortie : la brume revient, cache la scène, puis se dissipe sur le shuimo.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AbsoluteFill, OffthreadVideo, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 
-export type RevealMode = 'glyphe' | 'lavis' | 'pinceau' | 'goutte' | 'rouleau';
+export type RevealMode = 'glyphe' | 'lavis' | 'pinceau' | 'goutte' | 'rouleau' | 'brouillard';
 export type VideoRevealProps = {
   src: string; mode: RevealMode; glyph?: string; inDur?: number; outDur?: number; outAt?: number;
   startFrom?: number; playbackRate?: number; zoom?: number;
@@ -32,7 +34,7 @@ const pixels = (img: CanvasImageSource, w: number, h: number) => {
   return x.getImageData(0, 0, w, h).data;
 };
 
-type Res = { paper: Uint8ClampedArray; n1: Float32Array; n2: Float32Array; blot: Float32Array; anchor: [number, number] };
+type Res = { paper: Uint8ClampedArray; n1: Float32Array; n2: Float32Array; blot: Float32Array; fog1: Float32Array; fog2: Float32Array; anchor: [number, number] };
 
 // point du glyphe le plus « profond » (centre du trait le plus épais, près du centre) : distance de chanfrein
 function deepestPoint(glyph: string, F: number): [number, number] {
@@ -52,7 +54,8 @@ function deepestPoint(glyph: string, F: number): [number, number] {
   return [(bx - S / 2) * k, (by - S / 2) * k];
 }
 
-const GF = 600; // taille du glyphe à l'écran de traitement (720 px de haut)
+const GF = 600;
+const FW = PW + 800; // nappes de brume plus larges que l'écran : elles glissent sans raccord // taille du glyphe à l'écran de traitement (720 px de haut)
 
 function useRes(glyph: string) {
   const [r, setR] = useState<Res | null>(null);
@@ -77,7 +80,19 @@ function useRes(glyph: string) {
         });
         blot[i] = m;
       }
-      setR({ paper: pp, n1, n2, blot, anchor: deepestPoint(glyph, GF) });
+      // nappes de brume : bruit réduit puis agrandi avec lissage (pas de pavés), deux échelles
+      const smoothNoise = (div: number, flip: boolean) => {
+        const sm = document.createElement('canvas'); sm.width = Math.round(FW / div); sm.height = Math.round(PH / div);
+        const g = sm.getContext('2d')!; if (flip) { g.translate(sm.width, sm.height); g.scale(-1, -1); }
+        g.drawImage(noise as HTMLImageElement, 0, 0, sm.width, sm.height);
+        const big = document.createElement('canvas'); big.width = FW; big.height = PH;
+        const b = big.getContext('2d', { willReadFrequently: true })!; b.imageSmoothingQuality = 'high'; b.filter = `blur(${div * 0.5}px)`;
+        b.drawImage(sm, 0, 0, FW, PH);
+        const px = b.getImageData(0, 0, FW, PH).data, f = new Float32Array(FW * PH);
+        for (let i = 0; i < FW * PH; i++) f[i] = px[i * 4] / 255;
+        return f;
+      };
+      setR({ paper: pp, n1, n2, blot, fog1: smoothNoise(14, false), fog2: smoothNoise(9, true), anchor: deepestPoint(glyph, GF) });
       continueRender(h);
     });
   }, [glyph, h]);
@@ -186,6 +201,31 @@ export const VideoReveal: React.FC<VideoRevealProps> = ({ src, mode, glyph = '�
       }
       return clamp((0.34 * Math.pow(clamp((0.9 - L[i]) / 0.9), 1.3) + smooth(0.1, 0.45, gr) * 0.8) * (0.8 + 0.35 * n1[i]));
     };
+
+    if (mode === 'brouillard') {
+      // couvrir (brume qui s'épaissit) puis découvrir (brume qui se déchire) ; la vidéo n'existe que sous la brume pleine
+      const inPh = tt < oAt, u = inPh ? ui : uo;
+      const cover = smooth(0, 0.42, u), clear = clamp((u - 0.48) / 0.52); // progressions linéaires : la brume se déchire lentement
+      const showVid = inPh ? u >= 0.42 : u < 0.5;
+      const d1 = tt * 60, d2 = tt * 35; // dérive des nappes (px)
+      for (let i = 0, p = 0; i < PW * PH; i++, p += 4) {
+        const xi = i % PW, yi = (i - xi) / PW;
+        const a1 = res.fog1[yi * FW + xi + Math.min(799, Math.floor(d1))];
+        const a2 = res.fog2[yi * FW + xi + Math.max(0, 799 - Math.floor(d2))];
+        const fogN = 0.55 * a1 + 0.35 * a2 + 0.1 * (yi / PH); // nappes, un peu plus denses en bas
+        // densité : montée (le seuil descend), puis déchirure (le seuil remonte)
+        const tu = 0.98 - 0.85 * cover, up = smooth(tu - 0.13, tu + 0.13, fogN);
+        const td = 0.12 + 0.88 * Math.pow(clear, 0.8), down = smooth(td - 0.12, td + 0.12, fogN); // la brume reste là où elle est dense
+        const f = u < 0.45 ? up : clear > 0 ? down : 1;
+        const V = showVid ? 1 : 0;
+        const a = Math.max(V, f);
+        if (a <= 0.001) { d[p + 3] = 0; continue; }
+        for (let k = 0; k < 3; k++) { const fg = 246 - 5 * k - 8 * a2; d[p + k] = (d[p + k] * V * (1 - f) + fg * f) / Math.max(1e-3, V * (1 - f) + f); }
+        d[p + 3] = a * 255;
+      }
+      o.putImageData(v, 0, 0);
+      return;
+    }
 
     if (mode === 'goutte') {
       if (tt < oAt) {

@@ -2,6 +2,20 @@
 import React from 'react';
 import { AbsoluteFill, Img, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { RevealMode, VideoReveal } from './VideoReveal';
+import { ShuimoBackground } from '../shuimo/ShuimoBackground';
+import { compose } from '../shuimo/layout';
+
+// démo 6 : la brume cache le paysage shuimo, se dissipe sur la scène 3D, puis revient et rend le paysage
+export const VIDEO_REVEAL_DEMO3_SECONDS = 13;
+export const VideoRevealDemo3: React.FC = () => {
+  const shot = compose(14, { move: 'pan', mood: 'aube', duration: 13 });
+  return (
+    <AbsoluteFill style={{ background: '#f3eee4' }}>
+      <ShuimoBackground shot={shot} duration={13} />
+      <Sequence from={45} durationInFrames={9 * 30}><VideoReveal src="exemples_videos/exemple_plan_fixe.mp4" mode="brouillard" inDur={3.6} outDur={3.2} playbackRate={0.8} zoom={1} /></Sequence>
+    </AbsoluteFill>
+  );
+};
 
 const SEG = 10, FPS = 30;
 export const VIDEO_REVEAL_DEMO_SECONDS = 3 * SEG;
