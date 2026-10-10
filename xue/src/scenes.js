@@ -605,11 +605,11 @@
       ctx.save(); ctx.globalAlpha = seg(vt, 0.6, 1.0); ctx.strokeStyle = '#3b2512'; ctx.lineWidth = 4;
       [top + 110, top + 680].forEach((y) => { ctx.beginPath(); ctx.moveTo(x0 + 60, y); ctx.lineTo(x0 - 7 * dx - 60, y); ctx.stroke(); });
       ctx.restore();
-      // portrait imaginé de Xu Shen (白描) peint trait par trait pendant « Vers l'an 100, le lettré Xu Shen compose… »,
+      // portrait imaginé de Xu Shen (白描) peint trait par trait en 3 s sur « Vers l'an 100, le lettré Xu Shen… »,
       // puis il s'efface pour le 學 sigillaire qu'on va lire
       const portA = 1 - seg(vt, 4.8, 5.1);
       if (portA > 0) {
-        E.drawPortrait(ctx, { x: 415, y: 590, height: 600, progress: seg(vt, 0.3, 4.75), color: '#f4e7c8', alpha: portA, glow: 10, tip: true });
+        E.drawPortrait(ctx, { x: 415, y: 590, height: 600, progress: seg(vt, 0.3, 2.15), color: '#f4e7c8', alpha: portA, glow: 10, tip: true });
         E.text(ctx, 'portrait imaginé', 415, 915, { font: 'Cormorant', size: 28, color: '#cdbd9a', alpha: 0.85 * portA * seg(vt, 0.6, 1.2) });
       }
       const glyphA = seg(vt, 5.1, 5.5);
