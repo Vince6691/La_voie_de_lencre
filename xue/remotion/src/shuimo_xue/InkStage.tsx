@@ -30,9 +30,31 @@ export const T = {
   plastronIn: [5.6, 7.0], crack1: [7.3, 8.2], crack2: [8.0, 8.9], jiaguIn: [9.6, 11.0],
   plastronOut: [11.9, 13.2], yao: 13.3, roof: 17.96, hand: 20.2,
   // rouleau du temps : le signe Shang voyage au centre pendant que le paysage défile, puis devient le signe Zhou
-  travel: [22.4, 26.9], jiaguOut: [26.0, 27.2], jinwenIn: [26.2, 27.4],
+  travel: [22.4, 26.9], jiaguOut: [25.95, 26.25], jinwenIn: [25.95, 26.25],
   bronzeIn: [29.4, 31.2], bronzeOut: [36.5, 37.8], jinwenColor: [37.8, 38.8], child: 40.9,
 };
+
+// ── frise des époques (rouleau du temps) : sceaux régulièrement espacés au centre de l'image ; le petit 學 en est
+// le curseur. u = avancement de la traversée (0 → 1).
+export const SEALS = [
+  { zh: '商', date: '−1250' }, { zh: '周', date: '−1046' }, { zh: '秦', date: '−221' }, { zh: '漢', date: '−206' },
+  { zh: '唐', date: '618' }, { zh: '宋', date: '960' }, { zh: '今', date: '1956' },
+];
+export const TL = { y: 640, x0: 360, dx: 200, cursorY: 522, small: 0.26 };
+export const sealX = (i: number) => TL.x0 + i * TL.dx;
+export const travelU = (t: number) => (t - T.travel[0]) / (T.travel[1] - T.travel[0]);
+const ease = (u: number) => { const v = clamp(u); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
+const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
+// signe Shang : rétrécit vers le sceau 商, glisse jusqu'au sceau 周 ; signe Zhou : part du sceau 周 et grandit au centre
+export function glyphPose(name: 'jiaguwen' | 'jinwen', t: number) {
+  const u = travelU(t), cx = 960, cy = 560;
+  if (name === 'jiaguwen') {
+    const k = ease(u / 0.13), m = ease((u - 0.13) / 0.67);
+    return { x: lerp(lerp(cx, sealX(0), k), sealX(1), m), y: lerp(cy, TL.cursorY, k), s: lerp(1, TL.small, k) };
+  }
+  const g = u <= 0 ? 1 : ease((u - 0.84) / 0.16);
+  return { x: lerp(sealX(1), cx, g), y: lerp(TL.cursorY, cy, g), s: lerp(TL.small, 1, g) };
+}
 
 const load = (src: string) => new Promise<HTMLImageElement>((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; });
 
@@ -81,6 +103,10 @@ export const InkStage: React.FC = () => {
     out.clearRect(0, 0, W, H);
     const L = res.layer.getContext('2d', { willReadFrequently: true })!;
     const cx = 960, cy = 560;
+    const boxOf = (name: 'jiaguwen' | 'jinwen', side: number) => {
+      const p = glyphPose(name, t), d = side * p.s;
+      return [Math.max(0, p.x - d / 2), Math.max(0, p.y - d / 2), Math.min(d, W), Math.min(d, H)];
+    };
 
     // une couche : dessin → masque d'encre → posée sur la sortie
     const layer = (draw: (c: CanvasRenderingContext2D) => void, box: number[], p: number, s?: number, radial?: number) => {
@@ -91,12 +117,12 @@ export const InkStage: React.FC = () => {
     };
 
     // glyphe : couleur par composante, posé dans une boîte carrée de côté size centrée en (x, y)
-    const glyph = (c: CanvasRenderingContext2D, name: string, size: number, color: (comp: string) => number[], glow?: (comp: string) => number, alpha?: (comp: string) => number) => {
-      const k = size / 400;
+    const glyph = (c: CanvasRenderingContext2D, name: 'jiaguwen' | 'jinwen', size0: number, color: (comp: string) => number[], glow?: (comp: string) => number, alpha?: (comp: string) => number) => {
+      const pose = glyphPose(name, t), size = size0 * pose.s, k = size / 400;
       for (const g of glyphPaths(name)) {
         const a = alpha ? alpha(g.c) : 1;
         if (a <= 0) continue;
-        c.save(); c.globalAlpha = a; c.translate(cx - size / 2, cy - size / 2); c.scale(k, k);
+        c.save(); c.globalAlpha = a; c.translate(pose.x - size / 2, pose.y - size / 2); c.scale(k, k);
         const gl = glow ? glow(g.c) : 0;
         if (gl > 0) { c.shadowColor = `rgba(${PIGMENT[g.c].join(',')},${0.55 * gl})`; c.shadowBlur = 30 * gl; }
         c.fillStyle = css(color(g.c)); c.fill(g.path); c.restore();
@@ -126,7 +152,7 @@ export const InkStage: React.FC = () => {
     const dry = seg(t, T.plastronOut[0] + 0.3, T.plastronOut[1] + 0.3); // blanc → encre
     const lit: Record<string, number> = { yao: seg(t, T.yao, T.yao + 0.8), roof: seg(t, T.roof, T.roof + 0.8), hand: seg(t, T.hand, T.hand + 0.8) };
     layer((c) => glyph(c, 'jiaguwen', 560, (comp) => mix(mix(PAPERWHITE, INK, dry), PIGMENT[comp], lit[comp] ?? 0)),
-      [cx - 300, cy - 300, 600, 600], jIn, t >= T.jiaguOut[0] ? 0.12 : 0.07, t < T.jiaguOut[0] ? 0.5 : 0);
+      boxOf('jiaguwen', 600), jIn, t >= T.jiaguOut[0] ? 0.12 : 0.07, t < T.jiaguOut[0] ? 0.5 : 0);
 
     // ── Zhou : feuille d'estampage de bronze, inscription révélée en blanc, puis à l'encre et en pigments
     const bw = 740, bh = 860, bbox = [cx - bw / 2, cy - bh / 2, bw, bh];
@@ -142,7 +168,7 @@ export const InkStage: React.FC = () => {
       (comp) => mix(mix(mix(PIGMENT[comp], PAPERWHITE, whiten), INK, dry2), PIGMENT[comp], comp === 'child' ? childLit : col2),
       (comp) => (comp === 'child' ? childLit * (1 - 0.6 * seg(t, T.child + 1.2, T.child + 2.4)) : 0),
       (comp) => (comp === 'child' ? childLit : 1)),
-      [cx - 320, cy - 320, 640, 640], nIn, 0.12, 0);
+      boxOf('jinwen', 640), nIn, 0.12, 0);
   }, [res, t]);
 
   return <canvas ref={ref} width={W} height={H} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;

@@ -39,3 +39,10 @@ for f, a, d in ((110, 1.0, 2.8), (178, 0.55, 2.2), (247, 0.35, 1.6), (330, 0.22,
 g *= 1 - np.exp(-t / 0.012)
 save('assets/shuimo_xue/gong.wav', g)
 print('sons → assets/shuimo_xue/rouleau.wav, gong.wav')
+
+# tac : bloc de bois (木魚) — deux résonances brèves et un souffle d'attaque, au moment où le curseur arrive
+dur = 0.5; t = np.arange(int(SR * dur)) / SR
+k = 0.9 * np.sin(2 * np.pi * 820 * t) * np.exp(-t / 0.045) + 0.45 * np.sin(2 * np.pi * 1340 * t) * np.exp(-t / 0.025)
+k += 0.25 * rng.standard_normal(len(t)) * np.exp(-t / 0.004)
+save('assets/shuimo_xue/tac.wav', k)
+print('son → assets/shuimo_xue/tac.wav')

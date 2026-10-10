@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Audio, Img, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose } from '../shuimo/layout';
-import { INK, InkStage, PIGMENT, T, seg } from './InkStage';
+import { INK, InkStage, PIGMENT, SEALS, T, TL, seg, sealX } from './InkStage';
 import gain from '../data/audio_gain.json';
 
 export const SHUIMO_XUE_SECONDS = 43.0;
@@ -83,21 +83,69 @@ const SkyCycles: React.FC = () => {
   );
 };
 
-// compteur d'années : 1250 → 1046 av. J.-C., vite au milieu, flou de vitesse ; 商 → 周 dessous
+// ── frise des époques au centre : un trait d'encre se trace, les sceaux se posent ; le petit 學 (dessiné par
+// InkStage) glisse de 商 à 周 ; à l'arrivée « tac », le sceau 周 se remplit et scintille, puis s'envole vers le haut à
+// gauche où il devient le cartouche de l'époque ; la frise s'efface. Le compteur d'années est au-dessus.
+const TAG = { x: 110 + 46, y: 90 + 46, size: 92 }; // centre et taille du sceau du cartouche (EraTag)
+const Seal: React.FC<{ zh: string; x: number; y: number; size: number; fill: number; glow?: number; a?: number }> = ({ zh, x, y, size, fill, glow = 0, a = 1 }) => (
+  <div style={{
+    position: 'absolute', left: x - size / 2, top: y - size / 2, width: size, height: size, opacity: a, borderRadius: size * 0.11,
+    background: rgb(PIGMENT.hand, 0.92 * fill), border: `${Math.max(2, size * 0.045)}px solid ${rgb(PIGMENT.hand, 0.55 + 0.4 * fill)}`, boxSizing: 'border-box',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: size * 0.68, lineHeight: 1,
+    color: fill > 0.5 ? '#f6eee0' : rgb(PIGMENT.hand, 0.85), boxShadow: glow > 0 ? `0 0 ${36 * glow}px ${10 * glow}px rgba(235,120,60,${0.55 * glow})` : 'none',
+  }}>{zh}</div>
+);
+const Timeline: React.FC = () => {
+  const t = useCurrentFrame() / useVideoConfig().fps;
+  const u = travelU(t);
+  if (u <= 0 || u >= 1.02) return null;
+  const out = 1 - seg(u, 0.86, 0.97);
+  const line = seg(u, 0, 0.12);
+  const click = 0.8, flash = Math.exp(-(((u - click) / 0.025) ** 2)) * (u > click - 0.03 ? 1 : 0);
+  const fly = (() => { const v = Math.min(1, Math.max(0, (u - 0.84) / 0.14)); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; })();
+  const x0 = sealX(0) - 100, x1 = sealX(SEALS.length - 1) + 100;
+  return (
+    <AbsoluteFill>
+      {/* papier sous la frise, pour la lisibilité sur le paysage */}
+      <AbsoluteFill style={{ background: 'radial-gradient(ellipse 48% 22% at 50% 57%, rgba(250,247,240,0.85), rgba(250,247,240,0))', opacity: line * out }} />
+      <svg width={1920} height={1080} style={{ position: 'absolute', inset: 0, opacity: out }}>
+        <path d={`M${x0},${TL.y} L${x0 + (x1 - x0) * line},${TL.y + 1}`} stroke={inkCss} strokeWidth={3} strokeLinecap="round" fill="none" opacity={0.75} />
+      </svg>
+      {SEALS.map((sl, i) => {
+        const pop = seg(u, 0.02 + i * 0.013, 0.06 + i * 0.013);
+        if (pop <= 0) return null;
+        const isZhou = i === 1, done = i === 0 || (isZhou && u >= click);
+        const fillK = i === 0 ? 1 : isZhou ? seg(u, click, click + 0.03) : 0;
+        const size = 64 * (0.6 + 0.4 * pop) * (isZhou ? 1 + 0.28 * flash : 1);
+        const a = pop * out * (isZhou && u > 0.84 ? 0 : 1) * (done || isZhou ? 1 : 0.55);
+        return (
+          <React.Fragment key={sl.zh}>
+            <Seal zh={sl.zh} x={sealX(i)} y={TL.y} size={size} fill={fillK} glow={isZhou ? flash : 0} a={a} />
+            <div style={{ position: 'absolute', left: sealX(i) - 60, width: 120, top: TL.y + 46, textAlign: 'center', fontFamily: 'ShuimoLatin', fontSize: 24, color: '#6b5d50', opacity: pop * out * (done || isZhou ? 0.9 : 0.5) }}>{sl.date}</div>
+          </React.Fragment>
+        );
+      })}
+      {/* le sceau 周 s'envole et devient celui du cartouche */}
+      {u > 0.84 && fly < 1 && (
+        <Seal zh="周" x={sealX(1) + (TAG.x - sealX(1)) * fly} y={TL.y + (TAG.y - TL.y) * fly} size={64 + (TAG.size - 64) * fly} fill={1} glow={0.4 * (1 - fly)} />
+      )}
+    </AbsoluteFill>
+  );
+};
+
+// compteur d'années au-dessus de la frise : 1250 → 1046 av. J.-C., vite au milieu, flou de vitesse
 const YearCounter: React.FC = () => {
   const t = useCurrentFrame() / useVideoConfig().fps;
   const u = travelU(t);
   if (u <= 0 || u >= 1) return null;
-  const a = seg(u, 0.06, 0.18) * (1 - seg(u, 0.86, 0.98));
-  const e = easeTravel(u), year = Math.round(1250 - (1250 - 1046) * e);
-  const blur = Math.min(3.5, Math.abs(easeTravel(u + 0.01) - e) * 120);
+  const a = seg(u, 0.06, 0.16) * (1 - seg(u, 0.84, 0.95));
+  const m = Math.min(1, Math.max(0, (u - 0.13) / 0.67)), e = m < 0.5 ? 4 * m * m * m : 1 - Math.pow(-2 * m + 2, 3) / 2;
+  const year = Math.round(1250 - (1250 - 1046) * e);
+  const blur = Math.min(3, (u > 0.2 && u < 0.72 ? 1 : 0) * 2.2 * Math.sin(Math.PI * m));
   return (
-    <div style={{ position: 'absolute', width: '100%', top: 120, textAlign: 'center', opacity: a }}>
-      <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 76, letterSpacing: 4, color: rgb(PIGMENT.hand), filter: `blur(${blur.toFixed(2)}px)` }}>
-        {year} <span style={{ fontSize: 40, fontWeight: 500 }}>av. J.-C.</span>
-      </div>
-      <div style={{ fontFamily: 'ShuimoKai', fontSize: 40, color: inkCss, marginTop: 6, letterSpacing: 18 }}>
-        <span style={{ opacity: 1 - 0.65 * e }}>商</span><span style={{ opacity: 0.45 }}> ··· </span><span style={{ opacity: 0.35 + 0.65 * e }}>周</span>
+    <div style={{ position: 'absolute', width: '100%', top: 330, textAlign: 'center', opacity: a }}>
+      <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 84, letterSpacing: 4, color: rgb(PIGMENT.hand), filter: `blur(${blur.toFixed(2)}px)` }}>
+        {year} <span style={{ fontSize: 42, fontWeight: 500 }}>av. J.-C.</span>
       </div>
     </div>
   );
@@ -111,7 +159,7 @@ const Fade: React.FC<{ len: number; faint: number; children: React.ReactNode }> 
 
 // cartouche d'époque : sceau vermillon + nom + dates, en haut à gauche
 const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number; stamp?: boolean }> = ({ zh, name, dates, a, stamp }) => (
-  <div style={{ position: 'absolute', left: 110, top: 90, display: 'flex', alignItems: 'center', gap: 26, opacity: a, transform: stamp ? `scale(${1.25 - 0.25 * a})` : `translateY(${(1 - a) * 10}px)`, transformOrigin: '46px 46px' }}>
+  <div style={{ position: 'absolute', left: 110, top: 90, display: 'flex', alignItems: 'center', gap: 26, opacity: a, transform: stamp ? 'none' : `translateY(${(1 - a) * 10}px)`, transformOrigin: '46px 46px' }}>
     <div style={{ width: 92, height: 92, background: rgb(PIGMENT.hand, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 64, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>{zh}</div>
     <div>
       <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss }}>{name}</div>
@@ -130,7 +178,7 @@ const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: n
 const Overlays: React.FC = () => {
   const t = useCurrentFrame() / useVideoConfig().fps;
   const shang = seg(t, 1.0, 1.8) * (1 - seg(t, 8.8, 9.6));
-  const zhou = seg(t, T.travel[1] - 0.3, T.travel[1] - 0.05); // tamponné à l'arrivée
+  const zhou = seg(t, T.travel[0] + 0.98 * (T.travel[1] - T.travel[0]), T.travel[1] + 0.05); // le sceau volant s'y pose
   const out1 = 1 - seg(t, T.travel[0], T.travel[0] + 0.6);
   const cap = (a: number, b: number) => seg(t, a, a + 0.5) * (1 - seg(t, b, b + 0.5));
   return (
@@ -167,12 +215,14 @@ export const ShuimoXue: React.FC = () => {
       <TravelLandscape seed={9} from={T.travel[0]} to={SHUIMO_XUE_SECONDS + 1.3} mood="jour" role="to" />
       <SkyCycles />
       <InkStage />
+      <Timeline />
       <YearCounter />
       <Overlays />
       <Audio src={staticFile('voice/s02.wav')} volume={gain.voice_gain} />
       {/* souffle du papier pendant le défilement, gong au tampon du sceau */}
       <Sequence from={Math.round(T.travel[0] * fps)}><Audio src={staticFile('shuimo_xue/rouleau.wav')} volume={0.5} /></Sequence>
-      <Sequence from={Math.round((T.travel[1] - 0.3) * fps)}><Audio src={staticFile('shuimo_xue/gong.wav')} volume={0.32} /></Sequence>
+      <Sequence from={Math.round((T.travel[0] + 0.8 * (T.travel[1] - T.travel[0])) * fps)}><Audio src={staticFile('shuimo_xue/tac.wav')} volume={0.55} /></Sequence>
+      <Sequence from={Math.round((T.travel[1] - 0.1) * fps)}><Audio src={staticFile('shuimo_xue/gong.wav')} volume={0.22} /></Sequence>
       <Sequence from={Math.round(S03_AT * fps)}>
         <Audio src={staticFile('voice/s03.wav')} endAt={Math.round(S03_END * fps)}
           volume={(f) => gain.voice_gain * interpolate(f / fps, [S03_END - 0.4, S03_END], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />
