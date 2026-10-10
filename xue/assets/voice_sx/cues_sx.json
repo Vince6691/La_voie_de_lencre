@@ -2,88 +2,88 @@
  "b01": {
   "duration": 9.9,
   "cues": {
-   "mains": 4.4,
-   "ou": 9.04
+   "mains": 5.66,
+   "ou": 9.02
   }
  },
  "b02": {
   "duration": 14.72,
   "cues": {
-   "huit": 3.04,
-   "seize": 3.01,
-   "retrouver": 11.28
+   "huit": 2.03,
+   "seize": 3.07,
+   "retrouver": 11.31
   }
  },
  "b03": {
   "duration": 33.66,
   "cues": {
-   "devins": 4.94,
-   "signe": 16.48,
-   "yao": 18.58,
-   "toit": 21.92,
-   "mains": 22.72,
-   "manque": 30.94
+   "devins": 4.93,
+   "signe": 16.53,
+   "yao": 18.61,
+   "toit": 21.97,
+   "mains": 23.73,
+   "manque": 31.01
   }
  },
  "b04": {
-  "duration": 25.4,
+  "duration": 25.8,
   "cues": {
-   "bronze": 2.98,
-   "enfant": 11.02,
-   "dit": 14.22,
-   "vase": 18.42
+   "bronze": 2.89,
+   "enfant": 10.09,
+   "dit": 14.45,
+   "vase": 20.13
   }
  },
  "b05": {
   "duration": 22.76,
   "cues": {
-   "royaumes": 5.4,
-   "ministre": 9.94,
-   "symetrie": 14.18,
-   "mains": 20.12
+   "royaumes": 5.42,
+   "ministre": 9.98,
+   "symetrie": 15.82,
+   "mains": 20.14
   }
  },
  "b06": {
   "duration": 22.86,
   "cues": {
-   "lettre": 8.04,
-   "livre": 10.02,
-   "definition": 12.56,
-   "toit": 18.32
+   "lettre": 7.97,
+   "livre": 10.05,
+   "definition": 14.85,
+   "toit": 19.73
   }
  },
  "b07": {
   "duration": 33.58,
   "cues": {
-   "aplatit": 5.8,
-   "figent": 9.1,
-   "reguliere": 15.38,
-   "copies": 21.0,
-   "reponse": 27.08
+   "aplatit": 5.79,
+   "figent": 9.15,
+   "reguliere": 15.39,
+   "copies": 22.19,
+   "reponse": 27.15
   }
  },
  "b08": {
   "duration": 34.23,
   "cues": {
-   "huit": 6.84,
-   "pinceau": 7.67,
-   "baguettes": 11.12,
-   "toit": 12.72,
-   "mains": 14.28,
-   "enfant": 16.2,
-   "nait": 18.08,
-   "ecole": 21.54,
-   "mots": 24.56,
-   "reconnaitre": 28.7
+   "huit": 5.73,
+   "pinceau": 6.85,
+   "baguettes": 9.57,
+   "toit": 11.17,
+   "mains": 12.85,
+   "enfant": 14.29,
+   "nait": 16.21,
+   "ecole": 19.17,
+   "mots": 22.77,
+   "reconnaitre": 28.69
   }
  },
  "b09": {
   "duration": 15.91,
   "cues": {
-   "geste": 2.36,
+   "geste": 2.28,
    "depuis": 3.64,
-   "autre": 8.72,
-   "baton": 13.14
+   "autre": 8.76,
+   "baton": 13.16
   }
  }
 }

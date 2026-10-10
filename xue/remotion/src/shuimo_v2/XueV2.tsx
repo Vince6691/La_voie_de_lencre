@@ -155,12 +155,12 @@ const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number }> =
   </div>
 );
 const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: number[]; a: number; align?: 'left' | 'right' }> = ({ x, y, zh, text, color, a, align = 'left' }) => (
-  <div style={{ position: 'absolute', top: y - 30, ...(align === 'left' ? { left: x } : { right: 1920 - x }), opacity: a, display: 'flex', alignItems: 'baseline', gap: 14, flexDirection: align === 'left' ? 'row' : 'row-reverse' }}>
-    <span style={{ fontFamily: 'ShuimoKai', fontSize: 52, color: rgb(color) }}>{zh}</span>
-    <span style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 34, color: '#4a3f36' }}>{text}</span>
+  <div style={{ position: 'absolute', top: y - 50, ...(align === 'left' ? { left: x } : { right: 1920 - x }), opacity: a, display: 'flex', alignItems: 'baseline', gap: 14, flexDirection: align === 'left' ? 'row' : 'row-reverse' }}>
+    <span style={{ fontFamily: 'ShuimoKai', fontSize: 100, color: rgb(color) }}>{zh}</span>
+    <span style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 66, fontWeight: 600, color: '#3b322b', textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{text}</span>
   </div>
 );
-const Caption: React.FC<{ text: string; a: number; y?: number; size?: number }> = ({ text, a, y = 1000, size = 30 }) => (
+const Caption: React.FC<{ text: string; a: number; y?: number; size?: number }> = ({ text, a, y = 990, size = 38 }) => (
   <div style={{ position: 'absolute', width: '100%', top: y, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: size, color: '#5b4f44', opacity: a }}>{text}</div>
 );
 const win = (t: number, a: number, b: number, f = 0.5) => seg(t, a, a + f) * (1 - seg(t, b - f, b));
@@ -241,10 +241,10 @@ const ShangZhou: React.FC = () => {
       <Clip src="feu" from={vase - 0.3} len={R2 - vase + 0.6} entry="glyphe" />
       <EraTag zh="商" name="SHANG" dates="Anyang · v. 1250 av. J.-C." a={win(t, A3 + 0.3, R1 + 0.4, 0.8)} />
       <EraTag zh="周" name="ZHOU" dates="XIe siècle av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
-      <Label x={1270} y={430} zh="爻" text="yáo · baguettes croisées" color={PIGMENT.yao} a={win(t, TT.yao + 0.3, R1, 0.6)} />
-      <Label x={1270} y={700} zh="宀" text="le toit" color={PIGMENT.roof} a={win(t, TT.roof + 0.3, R1, 0.6)} />
-      <Label x={650} y={430} zh="𦥑" text="deux mains" color={PIGMENT.hand} a={win(t, TT.hand + 0.3, R1, 0.6)} align="right" />
-      <Label x={1290} y={820} zh="子" text="l'enfant" color={PIGMENT.child} a={win(t, TT.child + 0.4, vase - 0.4, 0.6)} />
+      <Label x={1220} y={420} zh="爻" text="baguettes" color={PIGMENT.yao} a={win(t, TT.yao + 0.3, R1, 0.6)} />
+      <Label x={1220} y={720} zh="宀" text="le toit" color={PIGMENT.roof} a={win(t, TT.roof + 0.3, R1, 0.6)} />
+      <Label x={700} y={420} zh="𦥑" text="deux mains" color={PIGMENT.hand} a={win(t, TT.hand + 0.3, R1, 0.6)} align="right" />
+      <Label x={1240} y={840} zh="子" text="l'enfant" color={PIGMENT.child} a={win(t, TT.child + 0.4, vase - 0.4, 0.6)} />
       <Caption text="estampage d'un plastron de tortue · fissures de divination 卜" a={win(t, TT.plastronIn[0] + 0.6, TT.plastronOut[1])} />
       <Caption text="inscription coulée dans le bronze · vase rituel, Zhou de l'Ouest" a={win(t, TT.bronzeIn[1], TT.bronzeOut[1])} />
       <Caption text="le tir à l'arc enseigné dans la salle d'étude 學宮 · inscription du Jing gui 靜簋 (clip d'exemple)" a={win(t, vase + 1.5, R2 - 0.6)} />
@@ -313,14 +313,9 @@ const XuShen: React.FC = () => {
         E.drawPortrait(ctx, { x: 560, y: 590, height: 640, progress: seg(tt, lettre - 0.6, lettre + 2.4), color: '#2a231d', alpha: 1 - seg(tt, A7 - 0.8, A7) });
         const g = seg(tt, A6 + 0.4, A6 + 1.6) * (1 - seg(tt, A7 - 0.8, A7));
         if (g > 0) {
-          E.drawRealGlyph(ctx, 'xiaozhuan', { x: 1300, y: 470, size: 470, opacity: g, color: () => inkCss });
-          // le toit : l'obscurité qui couvre encore l'esprit
-          const dark = win(tt, toit, A7 - 0.4, 0.8);
-          if (dark > 0) {
-            const gr = ctx.createRadialGradient(1300, 330, 20, 1300, 340, 300);
-            gr.addColorStop(0, `rgba(29,25,21,${0.55 * dark})`); gr.addColorStop(1, 'rgba(29,25,21,0)');
-            ctx.fillStyle = gr; ctx.fillRect(1000, 120, 600, 420);
-          }
+          // « Et le toit ? C'est l'obscurité qui couvre encore l'esprit » : le toit s'allume en malachite
+          const roofLit = win(tt, toit - 0.1, A7 - 0.4, 0.5);
+          E.drawRealGlyph(ctx, 'xiaozhuan', { x: 1300, y: 470, size: 470, opacity: g, color: (c: string) => (c === 'roof' && roofLit > 0 ? rgb(PIGMENT.roof) : inkCss), alpha: (c: string) => (c === 'roof' ? 1 : 1 - 0.55 * roofLit), glow: 22 * roofLit, glowColor: rgb(PIGMENT.roof, 0.5) });
         }
       }} />
       <EraTag zh="漢" name="HAN" dates="v. 100 · Xu Shen 许慎" a={seg(t, A6 + 0.2, A6 + 1.2) * (1 - seg(t, R3, R3 + 0.4))} />
@@ -381,16 +376,17 @@ const Retournement: React.FC = () => {
 const FORMS: [string, string, string][] = [['real:jiaguwen', '甲骨文', 'Shang'], ['real:jinwen', '金文', 'Zhou'], ['real:xiaozhuan', '小篆', 'Qin'], ['real:lishu', '隸書', 'Han'], ['font:kai_xue_trad', '楷書', 'Tang'], ['font:kai_xue_simp', '学', 'XXe s.']];
 const CUE_OF: Record<string, string> = { yao: 'baguettes', roof: 'toit', hand: 'mains', child: 'enfant' };
 const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) => {
-  const y = 430, x0 = 260, dx = 280, sz = 230;
+  const y = 380, x0 = 360, dx = 265, sz = 230;
   // composante en vedette : la dernière citée (jusqu'à « Ainsi naît »)
   const order = ['yao', 'roof', 'hand', 'child'];
   let hi = '', k = 0;
-  for (const c of order) { const s0 = at('b08', CUE_OF[c]); if (tt >= s0 - 0.1) { hi = c; k = seg(tt, s0 - 0.1, s0 + 0.4); } }
+  for (const c of order) { const s0 = at('b08', CUE_OF[c]); if (tt >= s0 - 0.05) { hi = c; k = seg(tt, s0 - 0.05, s0 + 0.3); } }
   if (tt > at('b08', 'nait') - 0.3) k *= 1 - seg(tt, at('b08', 'nait') - 0.3, at('b08', 'nait') + 0.2);
   const GREY = [168, 160, 150];
   const mixc = (c1: number[], c2: number[], u: number) => c1.map((v, i) => Math.round(v + (c2[i] - v) * u));
   FORMS.forEach(([key, zh, fr], i) => {
-    const appear = seg(tt, at('b08', 'pinceau') - 0.2 + i * 0.12, at('b08', 'pinceau') + 0.3 + i * 0.12) * a;
+    const t0 = at('b08', 'baguettes') - 0.7;
+    const appear = seg(tt, t0 + i * 0.08, t0 + 0.4 + i * 0.08) * a;
     if (appear <= 0) return;
     const late = i === 5;
     const base = (c: string) => (late && (c === 'hand' || c === 'yao') ? FUSION : PIGMENT[c] ?? INK);
@@ -403,24 +399,24 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
     ctx.save(); ctx.globalAlpha = appear;
     if (key.startsWith('real:')) E.drawRealGlyph(ctx, key.slice(5), { x, y, size: sz, color, alpha });
     else E.drawFontGlyph(ctx, key.slice(5), { x, y, size: sz, color, alpha });
-    E.text(ctx, zh, x, y + 165, { font: 'Kai', size: 44, color: inkCss, alpha: appear });
-    E.text(ctx, fr, x, y + 215, { font: 'Cormorant', size: 30, weight: 700, color: '#6b5d50', alpha: appear });
+    E.text(ctx, zh, x, y + 172, { font: 'Kai', size: 64, color: inkCss, alpha: appear });
+    E.text(ctx, fr, x, y + 236, { font: 'Cormorant', size: 48, weight: 700, color: '#5b4f44', alpha: appear });
     ctx.restore();
   });
   // rubans : où vit chaque composante ; mains et baguettes se fondent en ⺍
   const rows: [string, number, number, string][] = [['hand', 0, 4, 'mains'], ['yao', 0, 4, 'baguettes'], ['roof', 0, 5, 'toit'], ['child', 1, 5, 'enfant']];
-  const grow = seg(tt, at('b08', 'pinceau'), at('b08', 'pinceau') + 1.2);
+  const grow = seg(tt, at('b08', 'baguettes') - 0.5, at('b08', 'baguettes') + 0.4);
   rows.forEach(([c, a0, a1, lab], j) => {
-    const yy = 760 + j * 46, xa = x0 + a0 * dx - 60, xb = x0 + a1 * dx + 60;
+    const yy = 760 + j * 72, xa = x0 + a0 * dx - 60, xb = x0 + a1 * dx + 60;
     const col = !hi || hi === c ? PIGMENT[c] : mixc(PIGMENT[c], GREY, k);
     const al = a * grow * (!hi || hi === c ? 1 : 1 - 0.5 * k);
-    ctx.save(); ctx.globalAlpha = al; ctx.strokeStyle = rgb(col); ctx.lineWidth = 12; ctx.lineCap = 'round';
+    ctx.save(); ctx.globalAlpha = al; ctx.strokeStyle = rgb(col); ctx.lineWidth = 16; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(xa, yy); ctx.lineTo(xa + (xb - xa) * grow, yy); ctx.stroke();
     if (c === 'hand' || c === 'yao') {
-      ctx.strokeStyle = rgb(FUSION); ctx.beginPath(); ctx.moveTo(xb, yy); ctx.quadraticCurveTo(xb + 90, yy, x0 + 5 * dx - 40, 783); ctx.lineTo(x0 + 5 * dx + 60, 783); ctx.stroke();
+      ctx.strokeStyle = rgb(FUSION); ctx.beginPath(); ctx.moveTo(xb, yy); ctx.quadraticCurveTo(xb + 90, yy, x0 + 5 * dx - 40, 796); ctx.lineTo(x0 + 5 * dx + 60, 796); ctx.stroke();
     }
     ctx.restore();
-    E.text(ctx, lab, xa - 20, yy, { font: 'Cormorant', size: 28, weight: 700, align: 'right', color: rgb(col), alpha: al });
+    E.text(ctx, lab, xa - 24, yy, { font: 'Cormorant', size: 56, weight: 700, align: 'right', color: rgb(col), alpha: al });
   });
   E.text(ctx, '⺍', x0 + 4.6 * dx, 735, { font: 'Kai', size: 50, color: rgb(FUSION), alpha: a * grow });
 };
@@ -437,7 +433,7 @@ const Today: React.FC = () => {
           if (out <= 0 || tt < huit - 0.3) return;
           // synthèse : bandeau des six écritures (repris de la version fond noir, adapté au papier) ; à chaque
           // composante citée, elle reste en pigment dans toutes les formes et le reste du signe se grise
-          const syn = win(tt, pin - 0.2, nait + 0.5, 0.7);
+          const syn = win(tt, at('b08', 'baguettes') - 0.7, nait + 0.5, 0.6); // après le tracé complet de 学
           if (syn > 0) drawBand(ctx, E, tt, syn);
           const childGlow = win(tt, rec + 2.2, autre, 0.5) + 0.6 * win(tt, nait, nait + 2, 0.4);
           const x = 960, s = 560;
