@@ -83,7 +83,7 @@ au passage (les livres populaires) ; arrivée sur un paysage contemporain, aube]
 
 ## 8. Aujourd'hui — 3:54
 Au XXe siècle, le Japon, puis la Chine,
-l'adoptent officiellement. Huit traits. ⏸
+adoptent officiellement cette forme abrégée. Huit traits. ⏸
 Alors le pinceau reprend tout depuis le début : des baguettes pour compter, un toit pour abriter, deux mains pour
 montrer, un enfant pour recevoir. Ainsi naît xué : apprendre.
 On le lit aujourd'hui à l'entrée de chaque école, xuéxiào. Il ouvre xuéshēng, l'élève, et ferme dàxué,

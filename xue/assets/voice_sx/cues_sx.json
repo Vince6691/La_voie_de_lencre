@@ -1,0 +1,89 @@
+{
+ "b01": {
+  "duration": 9.9,
+  "cues": {
+   "mains": 4.4,
+   "ou": 9.04
+  }
+ },
+ "b02": {
+  "duration": 14.72,
+  "cues": {
+   "huit": 3.04,
+   "seize": 3.01,
+   "retrouver": 11.28
+  }
+ },
+ "b03": {
+  "duration": 33.66,
+  "cues": {
+   "devins": 4.94,
+   "signe": 16.48,
+   "yao": 18.58,
+   "toit": 21.92,
+   "mains": 22.72,
+   "manque": 30.94
+  }
+ },
+ "b04": {
+  "duration": 25.4,
+  "cues": {
+   "bronze": 2.98,
+   "enfant": 11.02,
+   "dit": 14.22,
+   "vase": 18.42
+  }
+ },
+ "b05": {
+  "duration": 22.76,
+  "cues": {
+   "royaumes": 5.4,
+   "ministre": 9.94,
+   "symetrie": 14.18,
+   "mains": 20.12
+  }
+ },
+ "b06": {
+  "duration": 22.86,
+  "cues": {
+   "lettre": 8.04,
+   "livre": 10.02,
+   "definition": 12.56,
+   "toit": 18.32
+  }
+ },
+ "b07": {
+  "duration": 33.58,
+  "cues": {
+   "aplatit": 5.8,
+   "figent": 9.1,
+   "reguliere": 15.38,
+   "copies": 21.0,
+   "reponse": 27.08
+  }
+ },
+ "b08": {
+  "duration": 34.71,
+  "cues": {
+   "huit": 6.82,
+   "pinceau": 7.78,
+   "baguettes": 11.22,
+   "toit": 12.76,
+   "mains": 14.3,
+   "enfant": 16.34,
+   "nait": 19.32,
+   "ecole": 21.76,
+   "mots": 24.86,
+   "reconnaitre": 27.8
+  }
+ },
+ "b09": {
+  "duration": 15.91,
+  "cues": {
+   "geste": 2.36,
+   "depuis": 3.64,
+   "autre": 8.72,
+   "baton": 13.14
+  }
+ }
+}

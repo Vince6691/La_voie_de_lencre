@@ -64,7 +64,10 @@ function glyphPaths(name: string) {
   return GL[name].paths.map((p) => ({ c: p.c, path: new Path2D(p.d) }));
 }
 
-export const InkStage: React.FC = () => {
+export type InkTiming = typeof T;
+// T et travel : minutage et rouleau du temps (par défaut ceux de l'essai ; la version v2 passe les siens)
+export const InkStage: React.FC<{ T?: InkTiming; travel?: TimeScrollConfig }> = ({ T: TT = T, travel = TRAVEL }) => {
+  const poseOf = (name: 'jiaguwen' | 'jinwen', t: number) => (name === 'jiaguwen' ? cursorPose(travel, t) : arrivePose(travel, t));
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
@@ -88,7 +91,7 @@ export const InkStage: React.FC = () => {
     const L = res.layer.getContext('2d', { willReadFrequently: true })!;
     const cx = 960, cy = 560;
     const boxOf = (name: 'jiaguwen' | 'jinwen', side: number) => {
-      const p = glyphPose(name, t), d = side * p.s;
+      const p = poseOf(name, t), d = side * p.s;
       return [Math.max(0, p.x - d / 2), Math.max(0, p.y - d / 2), Math.min(d, W), Math.min(d, H)];
     };
 
@@ -102,7 +105,7 @@ export const InkStage: React.FC = () => {
 
     // glyphe : couleur par composante, posé dans une boîte carrée de côté size centrée en (x, y)
     const glyph = (c: CanvasRenderingContext2D, name: 'jiaguwen' | 'jinwen', size0: number, color: (comp: string) => number[], glow?: (comp: string) => number, alpha?: (comp: string) => number) => {
-      const pose = glyphPose(name, t), size = size0 * pose.s, k = size / 400;
+      const pose = poseOf(name, t), size = size0 * pose.s, k = size / 400;
       for (const g of glyphPaths(name)) {
         const a = alpha ? alpha(g.c) : 1;
         if (a <= 0) continue;
@@ -115,11 +118,11 @@ export const InkStage: React.FC = () => {
 
     // ── Shang : estampage du plastron, fissures, signe révélé en blanc, puis l'estampage sèche
     const pw = 686, ph = 900, pbox = [cx - pw / 2, cy - ph / 2, pw, ph];
-    const pIn = seg(t, T.plastronIn[0], T.plastronIn[1]) * (1 - seg(t, T.plastronOut[0], T.plastronOut[1]));
+    const pIn = seg(t, TT.plastronIn[0], TT.plastronIn[1]) * (1 - seg(t, TT.plastronOut[0], TT.plastronOut[1]));
     layer((c) => {
       c.drawImage(res.plastron, pbox[0], pbox[1], pw, ph);
       // fissures 卜 : une fente verticale puis une branche, brûlées dans l'os (claires dans l'estampage)
-      const cracks: [number[], number, number, number][] = [[T.crack1, cx + 150, cy - 240, 1], [T.crack2, cx - 165, cy + 200, -1]];
+      const cracks: [number[], number, number, number][] = [[TT.crack1, cx + 150, cy - 240, 1], [TT.crack2, cx - 165, cy + 200, -1]];
       cracks.forEach(([[a, b], x, y, dir]) => {
         const u = seg(t, a, b);
         if (u <= 0) return;
@@ -130,28 +133,28 @@ export const InkStage: React.FC = () => {
         c.stroke();
         if (br > 0) { c.beginPath(); c.moveTo(x + 2, y + 38); c.lineTo(x + 2 + dir * 58 * br, y + 38 + 18 * br); c.stroke(); }
       });
-    }, pbox, pIn, t >= T.plastronOut[0] ? 0.22 : 0.07); // l'encre sèche en fondu large, pas en taches
+    }, pbox, pIn, t >= TT.plastronOut[0] ? 0.22 : 0.07); // l'encre sèche en fondu large, pas en taches
     // signe Shang : blanc dans l'estampage, puis encre sur le papier, puis composantes en pigments
-    const jIn = seg(t, T.jiaguIn[0], T.jiaguIn[1]);
-    const mk = tsMorph(TRAVEL, t);
-    const dry = seg(t, T.plastronOut[0] + 0.3, T.plastronOut[1] + 0.3); // blanc → encre
-    const lit: Record<string, number> = { yao: seg(t, T.yao, T.yao + 0.8), roof: seg(t, T.roof, T.roof + 0.8), hand: seg(t, T.hand, T.hand + 0.8) };
+    const jIn = seg(t, TT.jiaguIn[0], TT.jiaguIn[1]);
+    const mk = tsMorph(travel, t);
+    const dry = seg(t, TT.plastronOut[0] + 0.3, TT.plastronOut[1] + 0.3); // blanc → encre
+    const lit: Record<string, number> = { yao: seg(t, TT.yao, TT.yao + 0.8), roof: seg(t, TT.roof, TT.roof + 0.8), hand: seg(t, TT.hand, TT.hand + 0.8) };
     if (mk < 1) layer((c) => glyph(c, 'jiaguwen', 560, (comp) => mix(mix(PAPERWHITE, INK, dry), PIGMENT[comp], lit[comp] ?? 0), undefined, () => 1 - mk),
       boxOf('jiaguwen', 600), jIn, 0.07, 0.5);
 
     // ── Zhou : feuille d'estampage de bronze, inscription révélée en blanc, puis à l'encre et en pigments
     const bw = 740, bh = 860, bbox = [cx - bw / 2, cy - bh / 2, bw, bh];
-    const bIn = seg(t, T.bronzeIn[0], T.bronzeIn[1]) * (1 - seg(t, T.bronzeOut[0], T.bronzeOut[1]));
-    layer((c) => c.drawImage(res.bronze, bbox[0], bbox[1], bw, bh), bbox, bIn, t >= T.bronzeOut[0] ? 0.22 : 0.07);
+    const bIn = seg(t, TT.bronzeIn[0], TT.bronzeIn[1]) * (1 - seg(t, TT.bronzeOut[0], TT.bronzeOut[1]));
+    layer((c) => c.drawImage(res.bronze, bbox[0], bbox[1], bw, bh), bbox, bIn, t >= TT.bronzeOut[0] ? 0.22 : 0.07);
     // signe Zhou : arrive en pigments (sans l'enfant), devient l'inscription blanche quand l'estampage est tamponné
     // autour de lui, puis l'estampage sèche : encre, pigments, et l'enfant apparaît
-    const nIn = t >= T.travel[0] ? 1 : 0;
-    const whiten = seg(t, T.bronzeIn[0] + 0.5, T.bronzeIn[1] + 0.3);
-    const dry2 = seg(t, T.bronzeOut[0] + 0.3, T.bronzeOut[1] + 0.3);
-    const col2 = seg(t, T.jinwenColor[0], T.jinwenColor[1]), childLit = seg(t, T.child, T.child + 0.9);
+    const nIn = t >= TT.travel[0] ? 1 : 0;
+    const whiten = seg(t, TT.bronzeIn[0] + 0.5, TT.bronzeIn[1] + 0.3);
+    const dry2 = seg(t, TT.bronzeOut[0] + 0.3, TT.bronzeOut[1] + 0.3);
+    const col2 = seg(t, TT.jinwenColor[0], TT.jinwenColor[1]), childLit = seg(t, TT.child, TT.child + 0.9);
     layer((c) => glyph(c, 'jinwen', 600,
       (comp) => mix(mix(mix(PIGMENT[comp], PAPERWHITE, whiten), INK, dry2), PIGMENT[comp], comp === 'child' ? childLit : col2),
-      (comp) => (comp === 'child' ? childLit * (1 - 0.6 * seg(t, T.child + 1.2, T.child + 2.4)) : 0),
+      (comp) => (comp === 'child' ? childLit * (1 - 0.6 * seg(t, TT.child + 1.2, TT.child + 2.4)) : 0),
       (comp) => (comp === 'child' ? childLit : mk)),
       boxOf('jinwen', 640), nIn, 0.12, 0);
   }, [res, t]);
