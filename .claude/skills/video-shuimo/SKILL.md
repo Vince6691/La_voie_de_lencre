@@ -30,6 +30,9 @@ Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temp
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
 
 ## Principes
+- **Toujours dialoguer avec l'utilisateur en français.**
+- **Vidéo autonome** : un renvoi à un épisode précédent est permis, mais on réexplique toujours les bases (un caractère
+  = un assemblage de petits dessins ; ce que représente chaque composante), quitte à se répéter d'un épisode à l'autre.
 - **Proposer, puis faire valider** à chaque étape (2–4 options, recommandation en premier) ; ne pas demander ce
   que ce document fixe déjà.
 - **Le voyage** est l'identité de la chaîne : chaque étape = une époque, un lieu, un support. Pas de protagoniste
@@ -95,13 +98,30 @@ absolue (`sequence` : clips, silences, rouleaux, pause avant la révélation). L
 | **Portrait** | `E.drawPortrait` à l'encre, tracé en 3 s, mention « portrait imaginé » |
 | **Mise en valeur d'une composante** | l'allumer en pigment + halo, le reste pâlit — **jamais de voile noir** (incompris) |
 | **Clips 3D (Seedance 8–15 s)** | plein cadre, jamais de fenêtre partielle. **Entrée** : à travers le caractère (`VideoReveal mode="glyphe"`) **si un caractère est à l'écran juste avant**, sinon mer de nuages (`CloudReveal`, nuages aquarelle de la banque). **Sortie** : coups de pinceau (`outMode="pinceau"`) dans tous les cas. Ralentir le clip si le plan est plus long (`rate = min(0.9, durée_clip / durée_plan)`) |
-| **Synthèse** | bandeau des écritures (甲骨文 → 學 → 学) + rubans de composantes ; il arrive **après** le tracé final et chaque composante citée par la voix reste en couleur, le reste grisé, exactement sur son mot |
+| **Synthèse** | **obligatoire, voir « Scène récapitulative » ci-dessous** (bandeau horizontal de toutes les formes, chaque composante clignote dans toutes les formes sur son mot) |
 | **Fin** | maxime, passerelle vers le caractère suivant (esquissé), coupe nette sur un écran de fin ; pas de queue musicale |
 | **Textes** | lisibles sur téléphone : étiquettes ≥ 66 px (caractère ≥ 100 px), légendes ≥ 38 px, rubans ≥ 56 px |
 | **Musique** | `musique.py` : bourdon + guzheng, creux sous les rouleaux et la pause avant la révélation, coupure nette |
 
 Révélations disponibles mais non retenues (sur demande) : lavis + taches, goutte d'encre, rouleau suspendu
 (`VideoReveal`), brume (`VideoEncre`, jugée bizarre).
+
+## Scène récapitulative (obligatoire, à chaque épisode)
+C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduire à un simple tracé.
+- **Voix** (≈ 30–40 s, bloc de synthèse avant la chute) : « Reprenons. Dans toutes ses formes, il garde N dessins. » puis
+  **chaque composante nommée seule, dans une phrase courte** (« Les baguettes : deux croix, pour compter. L'enfant, juste
+  dessous. Et la main, qui tient le bâton. »), puis l'accident d'écriture s'il y en a un (une phrase), puis « Ainsi naît
+  … » et les mots courants. Pas de récit époque par époque (jugé trop long).
+- **Image** : bandeau **horizontal** de toutes les formes réelles (os → bronze → bambou → petit sceau → clercs →
+  régulière), étiquettes écriture + époque sous chaque forme, et un **ruban de couleur par composante** sous le bandeau.
+- **Clignotement** : sur le mot de chaque composante (repère Scribe), elle **clignote trois fois dans toutes les formes à
+  la fois**, dans son pigment constant, le reste du bandeau passe au gris, son ruban s'épaissit. Les sous-parties suivent
+  leur composante (ex. bâton avec la main).
+- **Accident d'écriture** (ex. faux 孝 des Han) : seule la forme concernée reste nette et grossit, la partie fautive en ocre,
+  le faux caractère au-dessus, barré au moment de la réfutation.
+- **Fin** : toutes les couleurs reviennent ensemble sur « Ainsi naît », puis mots courants (教室 / 教师…).
+- Implémentation de référence : `drawBand` dans `xue/remotion/src/shuimo_jiao/JiaoV1.tsx` (phases calées sur les repères
+  `formes`, `yao`, `enfant`, `main`, `han`, `pasde`, `naissance` du bloc).
 
 ## Étape 5 — Vérifier, puis rendre
 - Images fixes aux instants clés (`npx remotion still … --scale=0.25`, planche contact) ; demi-résolution pour juger
