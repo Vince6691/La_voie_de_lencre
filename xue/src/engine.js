@@ -547,13 +547,15 @@
   // ───────── portrait au trait (白描) peint trait par trait (window.PORTRAIT, tools/build_portrait.py)
   // o : x, y (centre), height, progress [0, 1], color, alpha, glow, tip
   // chaque trait du squelette avance le long de sa polyligne et dévoile l'encre vectorisée sous lui
-  let portraitData = null;
+  let portraitCache = {};
   const portraitOff = document.createElement('canvas');
   E.drawPortrait = function (ctx, o) {
-    const P = window.PORTRAIT;
+    // o.key : portrait d'épisode (window.PORTRAITS[key], outils/video_shuimo/portrait.py) ; sinon Xu Shen
+    const P = o.key ? (window.PORTRAITS || {})[o.key] : window.PORTRAIT;
     if (!P || (o.alpha ?? 1) <= 0) return;
-    if (!portraitData) {
-      portraitData = {
+    const ck = o.key || '';
+    if (!portraitCache[ck]) {
+      portraitCache[ck] = {
         ink: new Path2D(P.ink),
         strokes: P.strokes.map((s) => {
           const pts = []; for (let i = 3; i < s.length; i += 2) pts.push([s[i], s[i + 1]]);
@@ -562,6 +564,7 @@
         }),
       };
     }
+    const portraitData = portraitCache[ck];
     const k = o.height / P.h, w = Math.ceil(P.w * k), h = Math.ceil(P.h * k);
     if (portraitOff.width !== w || portraitOff.height !== h) { portraitOff.width = w; portraitOff.height = h; }
     const c = portraitOff.getContext('2d');

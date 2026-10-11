@@ -48,7 +48,8 @@ if (fs.existsSync(EP)) for (const p of fs.readdirSync(EP)) {
     if (fs.existsSync(`${e}/${dir}`)) for (const f of fs.readdirSync(`${e}/${dir}`)) if (ok(f)) cp(`${e}/${dir}/${f}`, `${here}/public/episodes/${p}/${dir}/${f}`);
   }
   if (fs.existsSync(`${e}/voix/reperes.json`)) cp(`${e}/voix/reperes.json`, `${here}/src/data/episodes/${p}.json`);
-  if (fs.existsSync(`${e}/glyphes/donnees.js`)) extra += fs.readFileSync(`${e}/glyphes/donnees.js`, 'utf8');
+  // glyphes/donnees.js (donnees_glyphes.py) et glyphes/portrait_*.js (portrait.py)
+  if (fs.existsSync(`${e}/glyphes`)) for (const f of fs.readdirSync(`${e}/glyphes`).sort()) if (f.endsWith('.js')) extra += fs.readFileSync(`${e}/glyphes/${f}`, 'utf8');
 }
 fs.mkdirSync(`${here}/public/legacy`, { recursive: true });
 fs.writeFileSync(`${here}/public/legacy/episodes.js`, extra || '// aucun épisode\n');

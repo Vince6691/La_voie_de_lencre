@@ -3,8 +3,7 @@
 // Confucius (Lu, carte et itinéraire) → le bâton du 學記 → Xu Shen → le faux 孝 des copistes Han → académies Song
 // (carte) → aujourd'hui (synthèse) → passerelle 文. Ligne de temps lue dans les repères (outils/video_shuimo,
 // episodes/jiao/voix/reperes.json, « _ligne »), jamais recalculée ici.
-// En attente des éléments fournis : clips Seedance A et B (clips d'exemple en place), dessin 白描 de Confucius
-// (cartouche « à fournir » en place).
+// En attente : clips Seedance A et B (clips d'exemple en place).
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
@@ -264,7 +263,7 @@ const ShangLu: React.FC = () => {
   );
 };
 
-// ════════════════ 4. Confucius : dessin 白描 (à fournir), 有教無類, carte de Lu et itinéraire
+// ════════════════ 4. Confucius : dessin 白描 peint trait à trait, 有教無類, carte de Lu et itinéraire
 // villes (lon, lat) : Qufu (Lu) et étapes simplifiées du voyage (Shiji, Kongzi shijia)
 const QUFU = [117.0, 35.6];
 const ROUTE: [string, number[]][] = [['Qufu', QUFU], ['Wei', [115.0, 35.7]], ['Cao', [115.55, 35.07]], ['Song', [115.65, 34.42]], ['Zheng', [113.72, 34.4]], ['Chen', [114.88, 33.73]], ['Cai', [114.3, 33.25]], ['Wei', [115.0, 35.7]], ['Qufu', QUFU]];
@@ -274,15 +273,12 @@ const Confucius: React.FC = () => {
   const mapFrom = disc - 0.3, mapTo = A('b05') - 0.45;
   return (
     <AbsoluteFill>
-      {/* dessin 白描 de Confucius sous l'abricotier : en attente de l'image (Nano Banana) — cartouche provisoire */}
+      {/* dessin 白描 de Confucius sous l'abricotier (episodes/jiao/images/confucius_baimiao_1.jpg), peint trait à trait en 3 s */}
       <AbsoluteFill style={{ opacity: win(t, conf - 0.8, mapFrom + 0.6, 0.7) }}>
         <Paper />
-        <div style={{ position: 'absolute', left: 260, top: 180, width: 860, height: 700, border: '4px dashed rgba(91,79,68,0.55)', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18 }}>
-          <div style={{ fontFamily: 'ShuimoKai', fontSize: 120, color: rgb(INK, 0.75) }}>白描</div>
-          <div style={{ fontFamily: 'ShuimoLatin', fontSize: 48, fontWeight: 600, color: '#5b4f44' }}>Confucius sous l'abricotier</div>
-          <div style={{ fontFamily: 'ShuimoLatin', fontSize: 34, color: '#8a7a6a' }}>dessin à fournir · peint trait à trait en 3 s</div>
-        </div>
+        <Landscape seed={9} from={A4 - 1} to={mapFrom + 1} move="still" mood="aube" faint={0.35} />
         <Draw draw={(ctx, tt, E) => {
+          E.drawPortrait(ctx, { key: 'confucius', x: 700, y: 560, height: 780, progress: seg(tt, conf - 0.6, conf + 2.6), color: '#2a231d' });
           // 有教無類 vertical, 教 en pigments
           const a = seg(tt, regle - 1.6, regle - 0.6);
           if (a <= 0) return;
@@ -297,8 +293,8 @@ const Confucius: React.FC = () => {
           });
         }} />
       </AbsoluteFill>
-      <Caption text="portrait imaginé" a={win(t, conf + 0.4, mapFrom, 0.5)} y={890} size={28} />
-      <Caption text="有教無類 · « enseigner à tous, sans distinction » (Entretiens, XV, 39)" a={win(t, regle + 0.2, mapFrom, 0.5)} y={960} />
+      <Caption text="portrait imaginé" a={win(t, conf + 0.4, mapFrom, 0.5)} y={1036} size={26} />
+      <Caption text="有教無類 · « enseigner à tous, sans distinction » (Entretiens, XV, 39)" a={win(t, regle + 0.2, mapFrom, 0.5)} y={980} />
       <MapPanel from={mapFrom} to={mapTo} draw={(ctx, u, E, tt) => {
         const z = ease(seg(tt, mapFrom, mapFrom + 2)), v = { lon: 116.5 - 1.2 * z, lat: 35.2 - 0.6 * z, k: 150 + 110 * z };
         E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
