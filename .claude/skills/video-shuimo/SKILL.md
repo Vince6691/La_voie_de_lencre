@@ -77,11 +77,11 @@ appliquer, recalculer la durée).
     générer **2 prises** pour les blocs à noms sensibles et faire choisir à l'oreille (je ne peux pas écouter).
 - **Émotion (validé, dosage « discret »)** : balises eleven_v4 en anglais entre crochets, **une seule aux changements de
   ton** (elle vaut jusqu'à la suivante) : `[curious]` pour une question ou une énigme, `[warmly]` pour une maxime ou un
-  moment tendre, `[softly]` pour une révélation calme. **Jamais** `[whispers]` ni `[softly]` sur la question d'accroche
-  (jugé bizarre), pas de `[dramatically]`, pas de majuscules d'insistance. Les balises apparaissent comme des « mots »
+  moment tendre. **Jamais** `[whispers]` ni `[softly]` (la voix les rend en chuchotement, refusé), pas de `[dramatically]`, pas de majuscules d'insistance. Les balises apparaissent comme des « mots »
   dans Scribe : sans effet sur les repères (ne pas les mettre dans les `reperes_cles`).
 - **Caractère chinois isolé** (ex. le caractère étudié en tout début d'accroche) : la voix le prononce mal (« xiu a »
-  pour 教) ; écrire sa prononciation en **IPA entre barres obliques** (`/tɕjâʊ/`), validé à l'oreille. Dans une phrase,
+  pour 教) ; écrire sa prononciation en IPA (`/tɕjâʊ/`) ou en pinyin (« Jiào ») ; attention : « /tɕjâʊ/. » suivi d'un point a
+  produit deux « jiao » d'affilée — toujours faire écouter le début de l'accroche. Dans une phrase,
   le caractère passe bien.
 - Nombres en lettres ; « … » pour une respiration. Textes dans `VOIX.md`.
 - `python3 outils/video_shuimo/voix_prep.py <episode>/episode.json` : silences rognés, −18 LUFS → `voix/bNN.wav`.
