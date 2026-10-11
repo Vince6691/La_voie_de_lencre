@@ -8,24 +8,26 @@
   }
  },
  "b02": {
-  "duration": 7.31,
+  "duration": 12.69,
   "cues": {
-   "dessin": 2.15,
-   "os": 4.55
+   "assemblages": 2.17,
+   "dessin": 8.01,
+   "os": 10.05
   }
  },
  "b03": {
-  "duration": 37.06,
+  "duration": 39.46,
   "cues": {
-   "ateliers": 1.88,
-   "maitre": 12.36,
-   "eleve": 19.88,
-   "signe": 21.32,
-   "yao": 24.72,
-   "enfant": 29.08,
-   "baton": 33.4,
-   "main": 34.16,
-   "doigts": 35.51
+   "ateliers": 1.87,
+   "maitre": 11.91,
+   "eleve": 19.31,
+   "signe": 20.75,
+   "yao": 24.19,
+   "xue": 27.63,
+   "enfant": 31.07,
+   "baton": 35.51,
+   "main": 36.31,
+   "doigts": 37.65
   }
  },
  "b04": {
@@ -81,16 +83,20 @@
   }
  },
  "b09": {
-  "duration": 26.08,
+  "duration": 31.51,
   "cues": {
-   "traits": 4.13,
-   "yao": 8.25,
-   "enfant": 9.73,
-   "main": 11.49,
-   "pasde": 13.73,
-   "naissance": 18.05,
-   "classe": 22.73,
-   "maitre": 25.53
+   "traits": 2.36,
+   "reprenons": 5.16,
+   "formes": 8.12,
+   "yao": 9.4,
+   "enfant": 12.44,
+   "main": 14.52,
+   "han": 16.84,
+   "xiao": 19.4,
+   "pasde": 21.0,
+   "naissance": 23.32,
+   "classe": 28.04,
+   "maitre": 30.96
   }
  },
  "b10": {
@@ -110,26 +116,26 @@
    },
    "b02": {
     "debut": 19.39,
-    "duree": 7.31
+    "duree": 12.69
    },
    "b03": {
-    "debut": 27.7,
-    "duree": 37.06
+    "debut": 33.08,
+    "duree": 39.46
    },
    "b04": {
-    "debut": 70.76,
+    "debut": 78.54,
     "duree": 30.8
    },
    "b05": {
-    "debut": 102.36,
+    "debut": 110.14,
     "duree": 15.8
    },
    "b06": {
-    "debut": 122.56,
+    "debut": 130.34,
     "duree": 26.17
    },
    "b07": {
-    "debut": 149.53,
+    "debut": 157.31,
     "duree": 32.65,
     "pause": {
      "coupe": 16.48,
@@ -137,39 +143,39 @@
     }
    },
    "b08": {
-    "debut": 191.08,
+    "debut": 198.86,
     "duree": 32.14
    },
    "b09": {
-    "debut": 225.22,
-    "duree": 26.08
+    "debut": 233.0,
+    "duree": 31.51
    },
    "b10": {
-    "debut": 252.3,
+    "debut": 265.51,
     "duree": 20.98
    }
   },
   "rouleaux": [
    {
-    "debut": 65.46,
+    "debut": 73.24,
     "duree": 5
    },
    {
-    "debut": 118.76,
+    "debut": 126.54,
     "duree": 3.5
    },
    {
-    "debut": 184.68,
+    "debut": 192.46,
     "duree": 6
    }
   ],
   "pauses": [
    [
-    166.01,
+    173.79,
     1.7
    ]
   ],
-  "fin": 273.78,
-  "total": 276.98
+  "fin": 286.99,
+  "total": 290.19
  }
 }

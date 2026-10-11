@@ -176,13 +176,20 @@ const Opening: React.FC = () => {
         if (toOld < 1) {
           const left = seg(tt, xiao + 0.6, xiao + 1.3), hand = seg(tt, baton - 0.2, baton + 0.5);
           const shake = seg(tt, ment - 0.1, ment + 0.2) * (1 - seg(tt, ment + 1.0, ment + 1.6));
-          ctx.save(); ctx.globalAlpha = 1 - toOld;
-          E.drawStrokes(ctx, 'jiao_kai', {
-            x: 960, y: 520, size: 600, progress: 11 * seg(tt, A1 - 0.3, A1 + 2.0), brush: false,
-            color: (c: string) => (c === 'hand' ? rgb(mixc(INK, P.hand, hand)) : rgb(mixc(INK, OCRE, left))),
-            glow: 22 * Math.max(hand, left) * (1 - seg(tt, ment + 1, ment + 2)), glowColor: rgb(hand > left ? P.hand : OCRE, 0.5),
-          });
-          ctx.restore();
+          // « des assemblages de petits dessins » : les trois parties s'écartent, chacune dans son pigment
+          const asm = at('b02', 'assemblages'), sep = seg(tt, asm, asm + 0.9) * (1 - seg(tt, dessin - 0.6, dessin));
+          const OFF: Record<string, number[]> = { yao: [-110, -80], child: [-110, 90], hand: [130, 0] };
+          for (const part of ['yao', 'child', 'hand']) {
+            const [ox, oy] = OFF[part];
+            ctx.save(); ctx.globalAlpha = 1 - toOld; ctx.translate(ox * sep, oy * sep);
+            E.drawStrokes(ctx, 'jiao_kai', {
+              x: 960, y: 520, size: 600, progress: 11 * seg(tt, A1 - 0.3, A1 + 2.0), brush: false,
+              alpha: (c: string) => (c === part ? 1 : 0),
+              color: (c: string) => rgb(mixc(c === 'hand' ? mixc(INK, P.hand, hand) : mixc(INK, OCRE, left), P[c], sep)),
+              glow: 22 * Math.max(hand, left) * (1 - seg(tt, ment + 1, ment + 2)), glowColor: rgb(hand > left ? P.hand : OCRE, 0.5),
+            });
+            ctx.restore();
+          }
           if (shake > 0) {
             ctx.save(); ctx.globalAlpha = (1 - toOld) * 0.45 * shake; ctx.translate(shake * 6 * Math.sin(tt * 55), 0);
             E.drawStrokes(ctx, 'jiao_kai', { x: 960, y: 520, size: 600, brush: false, color: () => rgb(OCRE), alpha: (c: string) => (c === 'hand' ? 0 : 1) });
@@ -194,6 +201,7 @@ const Opening: React.FC = () => {
       <Caption text="教 · jiào · enseigner" a={win(t, A1 + 1.4, xiao - 0.2)} y={880} size={48} />
       <Caption text="孝 · xiào · la piété filiale ?" a={win(t, xiao + 0.8, baton - 0.3)} y={880} size={48} />
       <Caption text="攵 · une main qui tient un bâton" a={win(t, baton + 0.2, ment)} y={880} size={48} />
+      <Caption text="trois petits dessins assemblés" a={win(t, at('b02', 'assemblages') + 0.6, dessin - 0.2, 0.4)} y={900} size={46} />
       <Caption text="le même caractère, gravé sur os · v. 1200 av. J.-C." a={win(t, dessin + 0.6, os + 1.6, 0.4)} y={880} size={44} />
     </AbsoluteFill>
   );
@@ -245,6 +253,12 @@ const ShangLu: React.FC = () => {
           }
         }} />
       </TimeScrollStage>
+      <Draw draw={(ctx, tt, E) => {
+        const x = at('b03', 'xue'), a = win(tt, x - 0.3, at('b03', 'enfant') - 0.2, 0.5);
+        if (a <= 0) return;
+        E.drawRealGlyph(ctx, 'jinwen', { x: 380, y: 500, size: 340, opacity: a, color: (c: string) => rgb(c === 'yao' ? P.yao : mixc(INK, GREY, 0.5)), glow: 24 * a, glowColor: rgb(P.yao, 0.6) });
+      }} />
+      <div style={{ position: 'absolute', left: 380 - 220, width: 440, top: 700, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 52, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b03', 'xue') + 0.2, at('b03', 'enfant') - 0.2, 0.4) }}>學 · apprendre</div>
       <ClipShot src="atelier" from={at('b03', 'ateliers') - 0.6} len={mait - at('b03', 'ateliers') + 0.4} entry="nuages" />
       <EraTag zh="商" name="SHANG" dates="Anyang · XIIIe–XIe s. av. J.-C." a={win(t, A3 + 0.3, R1 + 0.4, 0.8)} />
       <EraTag zh="魯" name="LU" dates="Printemps et Automnes · v. 500 av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
@@ -427,20 +441,20 @@ const Retournement: React.FC = () => {
           if (xv > 0) {
             const old = seg(tt, vieil - 0.1, vieil + 0.6), kid = seg(tt, vieil + 1.6, vieil + 2.3);
             ctx.save(); ctx.globalAlpha = out * xv;
-            E.drawStrokes(ctx, 'xiao_kai', { x: 1340, y: 500, size: 440, progress: 7 * seg(tt, vrai, vrai + 1.4), brush: false,
+            E.drawStrokes(ctx, 'xiao_kai', { x: 1180, y: 500, size: 440, progress: 7 * seg(tt, vrai, vrai + 1.4), brush: false,
               color: (c: string) => rgb(c === 'old' ? mixc(INK, OCRE, old) : mixc(INK, P.child, kid)) });
             ctx.restore();
           }
           const ne = seg(tt, ress - 0.2, ress + 0.5);
-          if (ne > 0) E.text(ctx, '≠', 960, 500, { font: 'Cormorant', size: 220, weight: 700, color: rgb(P.hand), alpha: out * ne });
+          if (ne > 0) E.text(ctx, '≠', 880, 500, { font: 'Cormorant', size: 220, weight: 700, color: rgb(P.hand), alpha: out * ne });
         }} />
       </TimeScrollStage>
       <Caption text="écriture des clercs 隸書 · stèle de Kong Zhou 孔宙碑 (164)" a={win(t, tas + 0.6, gl, 0.5)} />
       <Caption text="孝 ? — la gauche glisse vers un signe connu" a={win(t, gl + 0.6, rep_ - 0.2, 0.5)} size={42} />
       <Caption text="sur les os et les bronzes : baguettes 爻 + enfant 子" a={win(t, jam + 0.4, at('b07', 'vrai') - 0.2, 0.5)} size={42} />
-      <Label x={1340 + 230} y={330} zh="老" text="un vieillard" color={OCRE} a={win(t, at('b07', 'vieillard') + 0.3, R3 - 0.3, 0.5)} />
-      <Label x={1340 + 230} y={680} zh="子" text="qui le porte" color={P.child} a={win(t, at('b07', 'vieillard') + 1.8, R3 - 0.3, 0.5)} />
-      <div style={{ position: 'absolute', left: 1340 - 300, width: 600, top: 800, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 46, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b07', 'vrai') + 0.8, R3 - 0.3, 0.5) }}>孝 · la piété filiale</div>
+      <Label x={1420} y={360} zh="老" text="un vieillard" color={OCRE} a={win(t, at('b07', 'vieillard') + 0.3, R3 - 0.3, 0.5)} />
+      <Label x={1420} y={660} zh="子" text="qui le porte" color={P.child} a={win(t, at('b07', 'vieillard') + 1.8, R3 - 0.3, 0.5)} />
+      <div style={{ position: 'absolute', left: 1180 - 300, width: 600, top: 800, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 46, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b07', 'vrai') + 0.8, R3 - 0.3, 0.5) }}>孝 · la piété filiale</div>
       <div style={{ position: 'absolute', left: 580 - 300, width: 600, top: 800, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 46, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b07', 'vrai') + 0.8, R3 - 0.3, 0.5) }}>教 · enseigner (os)</div>
       <Caption text="une ressemblance née du pinceau — aucun lien de sens" a={win(t, at('b07', 'ressemblance') + 0.3, R3 - 0.2, 0.5)} size={44} y={960} />
       <Caption text="Han · le pinceau des copistes" a={win(t, A7 + 0.2, geste + 2, 0.5)} y={980} size={34} />
@@ -494,33 +508,47 @@ const Song: React.FC = () => {
 const FORMS: [string, string, string][] = [['real:jiao_jiaguwen', '甲骨文', 'Shang'], ['real:jiao_jinwen', '金文', 'Zhou'], ['real:jiao_zhanguo', '楚簡', 'Chu'], ['real:jiao_xiaozhuan', '小篆', 'Qin'], ['real:jiao_lishu', '隸書', 'Han'], ['kai:jiao_kai', '楷書', "aujourd'hui"]];
 const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) => {
   const y = 380, x0 = 480, dx = 228, sz = 220;
-  const cues: [string, number][] = [['yao', at('b09', 'yao')], ['child', at('b09', 'enfant')], ['hand', at('b09', 'main')]];
-  let hi = '', k = 0;
-  for (const [c, s0] of cues) if (tt >= s0 - 0.05) { hi = c; k = seg(tt, s0 - 0.05, s0 + 0.3); }
-  const nait = at('b09', 'naissance');
-  if (tt > nait - 0.3) k *= 1 - seg(tt, nait - 0.3, nait + 0.2);
-  const same = (c: string) => !hi || c === hi || (c === 'stick' && hi === 'hand'); // le bâton suit la main
-  const color = (c: string) => rgb(same(c) ? P[c] : mixc(P[c], GREY, k));
-  const alpha = (c: string) => (same(c) ? 1 : 1 - 0.55 * k);
+  const yao = at('b09', 'yao'), enf = at('b09', 'enfant'), main = at('b09', 'main'), han = at('b09', 'han'), pas = at('b09', 'pasde'), nait = at('b09', 'naissance');
+  // phase : composante citée (elle clignote dans les six formes, le reste grisé) ; puis les Han ; puis tout en couleur
+  const hi = tt >= pas ? '' : tt >= han ? 'han' : tt >= main ? 'hand' : tt >= enf ? 'child' : tt >= yao ? 'yao' : '';
+  const t0 = hi === 'yao' ? yao : hi === 'child' ? enf : hi === 'hand' ? main : hi === 'han' ? han : pas;
+  const k = hi ? seg(tt, t0 - 0.05, t0 + 0.3) : 1 - seg(tt, pas - 0.1, pas + 0.5);
+  const blink = hi && hi !== 'han' ? 0.5 + 0.5 * Math.cos(Math.min(3, (tt - t0) / 0.32) * Math.PI * 2) : 0; // trois clignements
+  const isHi = (c: string) => c === hi || (hi === 'hand' && c === 'stick');
+  const color = (i: number) => (c: string) => {
+    if (hi === 'han') return rgb(i === 4 && c !== 'hand' ? OCRE : mixc(P[c], GREY, k));
+    return rgb(!hi || isHi(c) ? P[c] : mixc(P[c], GREY, k));
+  };
+  const alpha = (i: number) => (c: string) => (hi === 'han' ? (i === 4 ? 1 : 1 - 0.6 * k) : !hi || isHi(c) ? 1 : 1 - 0.55 * k);
   FORMS.forEach(([key, zh, fr], i) => {
-    const t0 = at('b09', 'yao') - 1.0;
-    const appear = seg(tt, t0 + i * 0.08, t0 + 0.4 + i * 0.08) * a;
+    const appear = seg(tt, at('b09', 'formes') - 0.6 + i * 0.12, at('b09', 'formes') - 0.2 + i * 0.12) * a;
     if (appear <= 0) return;
-    const x = x0 + i * dx;
+    const x = x0 + i * dx, big = hi === 'han' && i === 4 ? 1.25 * k + (1 - k) : 1, s2 = sz * big;
+    const glow = hi && hi !== 'han' ? 26 * blink * k : 0, gc = hi === 'hand' ? P.hand : P[hi] ?? INK;
     ctx.save(); ctx.globalAlpha = appear;
-    if (key.startsWith('real:')) E.drawRealGlyph(ctx, key.slice(5), { x, y, size: sz, color, alpha });
-    else E.drawStrokes(ctx, key.slice(4), { x, y, size: sz * 0.9, brush: false, color, alpha });
+    if (key.startsWith('real:')) E.drawRealGlyph(ctx, key.slice(5), { x, y, size: s2, color: color(i), alpha: alpha(i), glow, glowColor: rgb(gc, 0.8) });
+    else E.drawStrokes(ctx, key.slice(4), { x, y, size: s2 * 0.9, brush: false, color: color(i), alpha: alpha(i), glow, glowColor: rgb(gc, 0.8) });
     E.text(ctx, zh, x, y + 168, { font: 'Kai', size: 60, color: inkCss, alpha: appear });
     E.text(ctx, fr, x, y + 228, { font: 'Cormorant', size: 44, weight: 700, color: '#5b4f44', alpha: appear });
     ctx.restore();
   });
-  const rows: [string, number, number, string][] = [['yao', 0, 5, 'baguettes'], ['child', 0, 5, 'enfant'], ['hand', 0, 5, 'main au bâton']];
-  const grow = seg(tt, at('b09', 'yao') - 0.6, at('b09', 'yao') + 0.3);
-  rows.forEach(([c, a0, a1, lab], j) => {
-    const yy = 790 + j * 76, xa = x0 + a0 * dx - 60, xb = x0 + a1 * dx + 60;
-    const col = !hi || hi === c ? P[c] : mixc(P[c], GREY, k);
-    const al = a * grow * (!hi || hi === c ? 1 : 1 - 0.5 * k);
-    ctx.save(); ctx.globalAlpha = al; ctx.strokeStyle = rgb(col); ctx.lineWidth = 16; ctx.lineCap = 'round';
+  // Han : un 孝 barré au-dessus du 隸書
+  const hx = win(tt, han + 0.6, pas + 0.8, 0.4) * a;
+  if (hx > 0) {
+    const x = x0 + 4 * dx;
+    E.text(ctx, '孝', x, y - 200, { font: 'Kai', size: 110, color: rgb(OCRE), alpha: hx });
+    ctx.save(); ctx.globalAlpha = hx * seg(tt, at('b09', 'xiao') + 0.6, at('b09', 'xiao') + 1.2); ctx.strokeStyle = rgb(P.hand); ctx.lineWidth = 10; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x - 70, y - 250); ctx.lineTo(x + 70, y - 150); ctx.stroke(); ctx.restore();
+  }
+  // rubans : où vit chaque composante, à travers les six formes
+  const rows: [string, string][] = [['yao', 'baguettes'], ['child', 'enfant'], ['hand', 'main au bâton']];
+  const grow = seg(tt, yao - 0.6, yao + 0.6);
+  rows.forEach(([c, lab], j) => {
+    const yy = 790 + j * 76, xa = x0 - 60, xb = x0 + 5 * dx + 60;
+    const on = !hi || hi === c || hi === 'han';
+    const col = on ? P[c] : mixc(P[c], GREY, k);
+    const al = a * grow * (on ? 1 : 1 - 0.5 * k) * (hi === c ? 0.75 + 0.25 * blink : 1);
+    ctx.save(); ctx.globalAlpha = al; ctx.strokeStyle = rgb(col); ctx.lineWidth = hi === c ? 22 : 16; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(xa, yy); ctx.lineTo(xa + (xb - xa) * grow, yy); ctx.stroke(); ctx.restore();
     E.text(ctx, lab, xa - 24, yy, { font: 'Cormorant', size: 56, weight: 700, align: 'right', color: rgb(col), alpha: al });
   });
@@ -535,7 +563,7 @@ const Today: React.FC = () => {
       <Paper />
       <Landscape seed={30} from={A9 - 1.5} to={END + 0.5} move="pan" mood="aube" faint={0.6} />
       <Draw draw={(ctx, tt, E) => {
-        const syn = win(tt, yao - 1.0, nait + 0.6, 0.6);
+        const syn = win(tt, at('b09', 'formes') - 0.8, nait + 0.6, 0.6);
         if (syn > 0) drawBand(ctx, E, tt, syn);
         // 教 en 11 traits (compteur), puis après la synthèse ; fiche à la chute
         const main = (1 - syn) * (1 - seg(tt, wen - 0.4, wen + 0.4));
@@ -553,9 +581,10 @@ const Today: React.FC = () => {
           E.drawRealGlyph(ctx, 'wen_jinwen', { x: 960, y: 500, size: 560, opacity: w, color: (c: string) => (c === 'heart' ? rgb(mixc(INK, P.heart, heart)) : inkCss), glow: 30 * heart, glowColor: rgb(P.hand, 0.6) });
         }
       }} />
-      <Caption text="11 traits · identique en Chine et au Japon" a={win(t, tr, yao - 1.1, 0.4)} y={880} size={46} />
+      <Caption text="11 traits · identique en Chine et au Japon" a={win(t, tr, at('b09', 'formes') - 0.9, 0.4)} y={880} size={46} />
+      <Caption text="trois dessins, dans toutes les formes" a={win(t, at('b09', 'formes'), yao - 0.1, 0.4)} y={1010} size={42} />
       <Caption text="jiào · enseigner" a={win(t, nait + 0.6, cl - 0.2, 0.4)} y={880} size={52} />
-      <Caption text="pas de 孝 : des baguettes, un enfant, une main qui réveille" a={win(t, at('b09', 'pasde') - 0.1, nait - 0.2, 0.4)} y={1000} size={44} />
+      <Caption text="pas de piété filiale : des baguettes, un enfant, une main qui réveille" a={win(t, at('b09', 'pasde') - 0.1, nait - 0.2, 0.4)} y={1010} size={42} />
       <div style={{ position: 'absolute', width: '100%', top: 840, display: 'flex', justifyContent: 'center', gap: 160, fontFamily: 'ShuimoKai', fontSize: 72, color: inkCss }}>
         <span style={{ opacity: win(t, cl - 0.2, A10 - 0.3) }}>教室<div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, textAlign: 'center' }}>la salle de classe</div></span>
         <span style={{ opacity: win(t, mt - 0.4, A10 - 0.3) }}>教师<div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, textAlign: 'center' }}>le maître</div></span>

@@ -70,6 +70,7 @@
    "mentait": "mentait"
   },
   "b02": {
+   "assemblages": "des assemblages",
    "dessin": "tout premier",
    "os": "gravé sur"
   },
@@ -79,6 +80,7 @@
    "eleve": "Un élève",
    "signe": "Sur ces mêmes",
    "yao": "deux croix",
+   "xue": "les mêmes que",
    "enfant": "un enfant, la",
    "baton": "un bâton",
    "main": "tenu par une",
@@ -123,10 +125,14 @@
   },
   "b09": {
    "traits": "onze traits",
-   "yao": "des baguettes pour",
-   "enfant": "un enfant penché",
-   "main": "une main qui",
-   "pasde": "Pas de piété",
+   "reprenons": "Reprenons",
+   "formes": "trois dessins",
+   "yao": "Les baguettes",
+   "enfant": "L'enfant",
+   "main": "Et la main",
+   "han": "Sous les",
+   "xiao": "prend l'air",
+   "pasde": "mais ce n'est",
    "naissance": "Ainsi naît",
    "classe": "la salle de classe",
    "maitre": "le maître"
