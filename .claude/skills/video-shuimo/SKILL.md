@@ -6,10 +6,14 @@ description: Chef d'orchestre d'une vidéo longue 墨道 « tout shuimo » à pa
 # Vidéo 墨道 « tout shuimo » — de l'input (un caractère) à la vidéo
 
 **Input : un caractère.** Modèle validé par l'utilisateur : le 學 en shuimo, composition `XueV2`
-(`xue/remotion/src/shuimo_v2/XueV2.tsx`), proposition et textes dans `xue/shuimo_v2/` (PROPOSITION.md, VOIX.md),
-aperçu `xue/out/preview/xue_shuimo_v2d_720.mp4`. Partir de ce code pour un nouveau caractère : un dossier
-`src/shuimo_<pinyin>/` sur le même plan, mêmes outils (`tools/prep_voice_sx.py`, `cues_sx.py`, `bed_sx.py` à
-généraliser par un paramètre de dossier).
+(`xue/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `xue/shuimo_v2/`
+(PROPOSITION.md, VOIX.md, episode.json), aperçu `xue/out/preview/xue_shuimo_v2d_720.mp4`.
+
+**Outils communs : `outils/video_shuimo/`** (README) — `voix_prep.py`, `reperes.py`, `musique.py`, pilotés par
+l'`episode.json` de l'épisode (modèle : `modele_episode.json`). Pour un nouveau caractère : dossier
+`episodes/<pinyin>/` (PROPOSITION.md, VOIX.md, episode.json, voix/, voix/mots/, audio/), composition
+`src/shuimo_<pinyin>/` dans le projet Remotion commun `xue/remotion` (copier `XueV2` et lire la ligne de temps
+`_ligne` du fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`.
 
 Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `coup-de-pinceau`, `encre-3d`,
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
@@ -36,14 +40,15 @@ appliquer, recalculer la durée).
   - un nom isolé d'un caractère (周) peut sortir mal : tournure de l'ancienne vidéo « viennent les 周 » ;
     générer **2 prises** pour les blocs à noms sensibles et faire choisir à l'oreille (je ne peux pas écouter).
 - Nombres en lettres ; « … » pour une respiration. Textes dans `VOIX.md`.
-- `prep_voice_sx.py` : silences rognés, −18 LUFS → `assets/voice_sx/bNN.wav`.
+- `python3 outils/video_shuimo/voix_prep.py <episode>/episode.json` : silences rognés, −18 LUFS → `voix/bNN.wav`.
 
 ## Étape 3 — Synchronisation mot à mot (indispensable)
 Ne jamais estimer la position des mots : transcrire chaque prise avec **Scribe** (`creative_transcribe_audio`,
 `connect_from` = le nœud de la prise ; gratuit) ; pour une prise non active d'un nœud à plusieurs variations,
-l'épingler d'abord (`creative_add_flow_asset_node`). Télécharger `words_download_url` → `assets/voice_sx/mots/bNN.json`,
-puis `cues_sx.py` (expressions-clés → début exact du premier mot) → `cues_sx.json`. Toute l'animation se cale sur
-`at(bloc, repère)`.
+l'épingler d'abord (`creative_add_flow_asset_node`). Télécharger `words_download_url` → `voix/mots/bNN.json`, puis
+`reperes.py` : expressions-clés (`reperes_cles` de l'episode.json) → début exact du premier mot, et ligne de temps
+absolue (`sequence` : clips, silences, rouleaux, pause avant la révélation). Toute l'animation se cale sur
+`at(bloc, repère)` ; ne jamais coder les temps en dur.
 
 ## Étape 4 — Montage (composants validés)
 | Élément | Règle validée |
@@ -59,7 +64,7 @@ puis `cues_sx.py` (expressions-clés → début exact du premier mot) → `cues_
 | **Synthèse** | bandeau des écritures (甲骨文 → 學 → 学) + rubans de composantes ; il arrive **après** le tracé final et chaque composante citée par la voix reste en couleur, le reste grisé, exactement sur son mot |
 | **Fin** | maxime, passerelle vers le caractère suivant (esquissé), coupe nette sur un écran de fin ; pas de queue musicale |
 | **Textes** | lisibles sur téléphone : étiquettes ≥ 66 px (caractère ≥ 100 px), légendes ≥ 38 px, rubans ≥ 56 px |
-| **Musique** | `bed_sx.py` : bourdon + guzheng, creux sous les rouleaux et le silence avant la révélation, coupure nette |
+| **Musique** | `musique.py` : bourdon + guzheng, creux sous les rouleaux et la pause avant la révélation, coupure nette |
 
 Révélations disponibles mais non retenues (sur demande) : lavis + taches, goutte d'encre, rouleau suspendu
 (`VideoReveal`), brume (`VideoEncre`, jugée bizarre).
@@ -76,5 +81,5 @@ Révélations disponibles mais non retenues (sur demande) : lavis + taches, gout
   `useLayoutEffect` ; `drawStrokes` respecte l'opacité de l'appelant (`ctx.globalAlpha`).
 - Vidéo dans un canvas (`onVideoFrame`) : retenir la capture jusqu'au premier dessin (`delayRender`), sinon images
   vides aléatoires.
-- `src/data/` est ignoré par git : les données générées vivent dans `assets/` et `sync.mjs` les copie.
+- `src/data/` est ignoré par git : les données générées vivent dans le dossier de l'épisode et `sync.mjs` les copie.
 - Ne jamais `pkill -f` un motif présent dans sa propre commande (tue le shell) : `TaskStop` ou `ps | grep "[m]otif"`.

@@ -1,0 +1,124 @@
+{
+ "voix": "../assets/voice_sx",
+ "reperes": "../assets/voice_sx/cues_sx.json",
+ "musique": "../assets/audio/bed_sx.wav",
+ "debut": 0.6,
+ "sequence": [
+  {
+   "clip": "b01",
+   "apres": 0.9
+  },
+  {
+   "clip": "b02",
+   "apres": 1.0
+  },
+  {
+   "clip": "b03",
+   "apres": 0.7
+  },
+  {
+   "rouleau": 5,
+   "apres": 0.3
+  },
+  {
+   "clip": "b04",
+   "apres": 0.8
+  },
+  {
+   "rouleau": 3.5,
+   "apres": 0.3
+  },
+  {
+   "clip": "b05",
+   "apres": 1.0
+  },
+  {
+   "clip": "b06",
+   "apres": 1.0
+  },
+  {
+   "clip": "b07",
+   "pause": {
+    "repere": "reponse",
+    "decalage": -0.12,
+    "duree": 1.7
+   },
+   "apres": 0.8
+  },
+  {
+   "rouleau": 6,
+   "apres": 0.4
+  },
+  {
+   "clip": "b08",
+   "apres": 1.0
+  },
+  {
+   "clip": "b09",
+   "apres": 0.5
+  }
+ ],
+ "queue": 3.2,
+ "reperes_cles": {
+  "b01": {
+   "mains": "deux mains",
+   "ou": "Où sont"
+  },
+  "b02": {
+   "huit": "huit traits",
+   "seize": "Il en fallait",
+   "retrouver": "Pour les retrouver"
+  },
+  "b03": {
+   "devins": "Les devins",
+   "signe": "C'est là",
+   "yao": "Au centre",
+   "toit": "Dessous",
+   "mains": "Et de chaque",
+   "manque": "Pourtant"
+  },
+  "b04": {
+   "bronze": "Leurs inscriptions",
+   "enfant": "Et sous le toit",
+   "dit": "Cette fois",
+   "vase": "Sur l'un"
+  },
+  "b05": {
+   "royaumes": "Jusque-là",
+   "ministre": "Son ministre",
+   "symetrie": "Les courbes",
+   "mains": "Les deux mains"
+  },
+  "b06": {
+   "lettre": "Il s'appelle",
+   "livre": "Son livre",
+   "definition": "Notre signe",
+   "toit": "Et le toit"
+  },
+  "b07": {
+   "aplatit": "Le pinceau aplatit",
+   "figent": "Les deux mains se figent",
+   "reguliere": "L'écriture régulière",
+   "copies": "Au fil des copies",
+   "reponse": "Les mains n'ont pas"
+  },
+  "b08": {
+   "huit": "Huit traits",
+   "pinceau": "Alors le pinceau",
+   "baguettes": "des baguettes",
+   "toit": "un toit pour",
+   "mains": "deux mains pour",
+   "enfant": "un enfant pour",
+   "nait": "Ainsi naît",
+   "ecole": "On le lit",
+   "mots": "Il ouvre",
+   "reconnaitre": "Pour le reconnaître"
+  },
+  "b09": {
+   "geste": "Pas du geste",
+   "depuis": "Depuis trois",
+   "autre": "Ces baguettes",
+   "baton": "Mais cette fois"
+  }
+ }
+}
