@@ -1,9 +1,12 @@
 ---
-name: video-caractere
-description: Chef d'orchestre de la création complète d'une vidéo longue 墨道 à partir d'un seul caractère chinois — recherche étymologique, angle et question, voix off (skill voix-off-modo, mouture v2), choix libre et motivé des éléments visuels (fond noir, fond shuimo, rouleau du temps, encre ↔ 3D, coups de pinceau, fiche, cartes, objets 3D, portrait), storyboard, voix ElevenLabs, montage Remotion, aperçus téléphone, rendu final et paquet YouTube — avec des questions et propositions à l'utilisateur à chaque étape clé. Utiliser quand l'utilisateur donne un caractère et demande « fais la vidéo de 福 », « nouvelle vidéo sur 茶 », « on attaque 家 », « crée l'épisode », ou veut lancer / planifier / storyboarder une vidéo complète de la série.
+name: video-fond-noir
+description: Chef d'orchestre d'une vidéo longue 墨道 « fond noir » à partir d'un seul caractère chinois — le style de la première vidéo du 學 (moteur Canvas sur fond sombre, glyphes réels lumineux, métamorphoses par composante, cartes, objets 3D, portrait) — recherche étymologique, angle et question, voix off (voix-off-modo v2), choix motivé des éléments, storyboard, voix ElevenLabs, montage Remotion, aperçus téléphone, rendu final et paquet YouTube, avec questions et propositions à chaque étape. Utiliser quand l'utilisateur veut une vidéo complète sur fond noir (« version fond noir », « comme la première vidéo du 學 ») ; pour une vidéo sur papier et paysages à l'encre, utiliser video-shuimo.
 ---
 
-# Vidéo 墨道 complète — de l'input (un caractère) à la vidéo publiée
+# Vidéo 墨道 « fond noir » — de l'input (un caractère) à la vidéo publiée
+
+Style de référence : `xue/remotion/src/Xue.tsx` (rendu `xue/rendu/xue_remotion.mp4`). Pour le style papier / paysages
+à l'encre, voir la skill `video-shuimo` (validée sur le 學, composition `XueV2`).
 
 **Input : un caractère** (ex. 家). Tout le reste se décide avec l'utilisateur, par étapes. Modèle complet existant :
 `xue/` (學, README, SCRIPT.md, tools/, remotion/). Skills appelées : `voix-off-modo`, `fiche-caractere`,
