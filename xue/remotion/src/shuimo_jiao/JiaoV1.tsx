@@ -338,16 +338,20 @@ const Confucius: React.FC = () => {
       <Caption text="portrait imaginé" a={win(t, conf + 0.4, mapFrom, 0.5)} y={1036} size={26} />
       <MapPanel from={A4 - 0.5} to={conf - 0.3} draw={(ctx, u, E, tt) => {
         const z = ease(seg(tt, at('b04', 'lu') - 0.5, at('b04', 'lu') + 1.5)), v = { lon: 114.5 + 2 * z, lat: 34.5 + 0.8 * z, k: 60 + 70 * z };
-        E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
-        E.region(ctx, v, 'zhou_states', 'rgba(52,132,98,0.18)', seg(tt, at('b04', 'royaumes') - 0.6, at('b04', 'royaumes') + 0.4));
+        const vb = { lon: 114.5, lat: 34.5, k: 55 };
+        E.mapLayer(ctx, v, vb, 130, 'jiao_lu', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
+        E.mapLayer(ctx, v, vb, 130, 'jiao_lu_reg', (c: CanvasRenderingContext2D, w: any) => E.region(c, w, 'zhou_states', 'rgba(52,132,98,0.18)', 1), seg(tt, at('b04', 'royaumes') - 0.6, at('b04', 'royaumes') + 0.4));
+        E.mapDeco(ctx, { paper: true });
         E.marker(ctx, tt, v, QUFU, 'Lu', 'capitale : Qufu', seg(tt, at('b04', 'lu'), at('b04', 'lu') + 0.4), '#c0392b', 1);
       }} />
       <Caption text="les royaumes rivaux de l'ancien empire Zhou" a={win(t, at('b04', 'royaumes') + 0.2, at('b04', 'lu') + 0.2, 0.4)} y={980} size={40} />
       <Caption text="有教無類 · « enseigner à tous, sans distinction » (Entretiens, XV, 39)" a={win(t, regle + 0.2, mapFrom, 0.5)} y={980} />
       <MapPanel from={mapFrom} to={mapTo} draw={(ctx, u, E, tt) => {
         const z = ease(seg(tt, mapFrom, mapFrom + 2)), v = { lon: 116.5 - 1.2 * z, lat: 35.2 - 0.6 * z, k: 150 + 110 * z };
-        E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
-        E.region(ctx, v, 'zhou_states', 'rgba(52,132,98,0.12)', seg(tt, mapFrom + 0.2, mapFrom + 1.2));
+        const vb = { lon: 116.5, lat: 35.2, k: 140 };
+        E.mapLayer(ctx, v, vb, 260, 'jiao_route', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
+        E.mapLayer(ctx, v, vb, 260, 'jiao_route_reg', (c: CanvasRenderingContext2D, w: any) => E.region(c, w, 'zhou_states', 'rgba(52,132,98,0.12)', 1), seg(tt, mapFrom + 0.2, mapFrom + 1.2));
+        E.mapDeco(ctx, { paper: true });
         E.marker(ctx, tt, v, QUFU, 'Qufu', 'royaume de Lu', seg(tt, mapFrom + 0.5, mapFrom + 0.9), '#c0392b', 1);
         // itinéraire tracé au pinceau (pointillé) de royaume en royaume, puis retour à Lu
         const k = seg(tt, routes - 0.2, mapTo - 1.0) * (ROUTE.length - 1);
@@ -518,7 +522,8 @@ const Song: React.FC = () => {
       <Landscape seed={22} from={A8 - 1} to={out + 0.8} move="rise" mood="brume" />
       <MapPanel from={acad - 0.6} to={gr + 0.8} draw={(ctx, u, E, tt) => {
         const z = ease(seg(tt, zx, gr)), v = { lon: 114.2 + 1.7 * z, lat: 31.5 - 1.9 * z, k: 70 + 160 * z };
-        E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
+        E.mapLayer(ctx, v, { lon: 114.2, lat: 31.5, k: 65 }, 230, 'jiao_song', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
+        E.mapDeco(ctx, { paper: true });
         ACADEMIES.forEach(([zh, fr, p, side], i) => {
           const a = seg(tt, acad + 0.3 + i * 0.5, acad + 0.7 + i * 0.5) * (i === 0 ? 1 : 1 - seg(tt, zx, zx + 1));
           E.marker(ctx, tt, v, p, zh, fr, a, i === 0 ? '#c0392b' : '#348462', side);
