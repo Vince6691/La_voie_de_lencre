@@ -315,7 +315,7 @@ const Confucius: React.FC = () => {
       <Paper />
       <Landscape seed={9} from={A4 - 1.5} to={A('b05') + 0.5} move="pan" mood="aube" faint={0.7} />
       {/* dessin 白描 de Confucius sous l'abricotier (episodes/jiao/images/confucius_baimiao_1.jpg), peint trait à trait en 3 s */}
-      <AbsoluteFill style={{ opacity: win(t, conf - 0.8, mapFrom + 0.6, 0.7) }}>
+      {win(t, conf - 0.8, mapFrom + 0.6, 0.7) > 0 && <AbsoluteFill style={{ opacity: win(t, conf - 0.8, mapFrom + 0.6, 0.7) }}>
         <Paper />
         <Landscape seed={9} from={A4 - 1} to={mapFrom + 1} move="still" mood="aube" faint={0.35} />
         <Draw draw={(ctx, tt, E) => {
@@ -333,7 +333,7 @@ const Confucius: React.FC = () => {
             } else E.text(ctx, ch, 1480, y, { font: 'Kai', size: 140, color: inkCss, alpha: ai });
           });
         }} />
-      </AbsoluteFill>
+      </AbsoluteFill>}
       </Cam>
       <Caption text="portrait imaginé" a={win(t, conf + 0.4, mapFrom, 0.5)} y={1036} size={26} />
       <MapPanel from={A4 - 0.5} to={conf - 0.3} draw={(ctx, u, E, tt) => {
