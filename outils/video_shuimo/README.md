@@ -11,6 +11,25 @@ et la documentation en tête de `episode.py`).
 | `musique.py` | bourdon + guzheng, creux sous les rouleaux et les pauses, coupure nette | `reperes` → `musique` |
 | `episode.py` | lecture de `episode.json`, calcul de la ligne de temps | (module) |
 
+## Schéma d'un épisode (toujours le même)
+Créé par `python3 nouvel_episode.py <pinyin> <caractère>` :
+```
+episodes/<pinyin>/
+  PROPOSITION.md   question, réponse, maxime, blocs avec « > plan : », rouleaux, durée, titres
+  VOIX.md          textes envoyés au synthétiseur (bNN: …)
+  SOURCES.md       étymologie, sources, fait / hypothèse / légende, points à vérifier
+  episode.json     voix, repères, musique, séquence, repères-clés (pour les outils)
+  voix/            bNN.mp3 (prise retenue), bNN.wav, segments.json, reperes.json
+  voix/mots/       bNN.json — minutage mot à mot ElevenLabs Scribe de la prise retenue
+  voix/prises/     toutes les prises (bNN_take1.mp3, bNN_take2.mp3…), pour comparer
+  clips/           clips Seedance renommés : NN_scene.mp4 (ex. 03_devins.mp4)
+  images/          images Nano Banana (images de départ des clips, références)
+  audio/           musique.wav
+  apercus/         aperçus 720p (ignorés par git si trop lourds)
+```
+Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (le projet Remotion commun), chemins ajoutés à `sync.mjs`.
+Noms : dossier et composition en pinyin sans tons ; clips de voix `b01`… dans l'ordre des blocs.
+
 ## Enchaînement
 ```sh
 cd outils/video_shuimo

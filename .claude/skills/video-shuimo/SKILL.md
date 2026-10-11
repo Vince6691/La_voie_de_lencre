@@ -10,10 +10,21 @@ description: Chef d'orchestre d'une vidéo longue 墨道 « tout shuimo » à pa
 (PROPOSITION.md, VOIX.md, episode.json), aperçu `xue/out/preview/xue_shuimo_v2d_720.mp4`.
 
 **Outils communs : `outils/video_shuimo/`** (README) — `voix_prep.py`, `reperes.py`, `musique.py`, pilotés par
-l'`episode.json` de l'épisode (modèle : `modele_episode.json`). Pour un nouveau caractère : dossier
-`episodes/<pinyin>/` (PROPOSITION.md, VOIX.md, episode.json, voix/, voix/mots/, audio/), composition
-`src/shuimo_<pinyin>/` dans le projet Remotion commun `xue/remotion` (copier `XueV2` et lire la ligne de temps
-`_ligne` du fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`.
+l'`episode.json` de l'épisode (modèle : `modele_episode.json`).
+
+**Chaque épisode suit TOUJOURS le même schéma** — le créer avec
+`python3 outils/video_shuimo/nouvel_episode.py <pinyin> <caractère>` (jamais à la main), puis respecter :
+```
+episodes/<pinyin>/
+  PROPOSITION.md · VOIX.md · SOURCES.md · episode.json
+  voix/ (bNN.mp3 retenu, bNN.wav, segments.json, reperes.json)
+  voix/mots/ (bNN.json, minutage Scribe)   voix/prises/ (toutes les prises)
+  clips/ (NN_scene.mp4, clips Seedance renommés)   images/ (Nano Banana)   audio/ (musique.wav)   apercus/
+```
+Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (copier `XueV2`, lire la ligne de temps `_ligne` du
+fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`. Les fichiers
+déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce schéma dès leur arrivée. (Le 學, épisode
+pilote, est resté dans `xue/` ; ne pas le prendre comme modèle de rangement.)
 
 Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `coup-de-pinceau`, `encre-3d`,
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
