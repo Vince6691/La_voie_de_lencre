@@ -48,7 +48,7 @@ const rgb = (c: number[], a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 const mixc = (a: number[], b: number[], k: number) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
 const inkCss = rgb(INK);
 // pigments constants : 爻 gomme-gutte, 子 azurite, main au bâton 攴 vermillon ; le 孝 « fantôme » en ocre pâle
-const P: Record<string, number[]> = { yao: PIGMENT.yao, child: PIGMENT.child, hand: PIGMENT.hand, old: [176, 138, 92], body: INK, heart: PIGMENT.hand };
+const P: Record<string, number[]> = { yao: PIGMENT.yao, child: PIGMENT.child, hand: PIGMENT.hand, stick: [120, 72, 38], old: [176, 138, 92], body: INK, heart: PIGMENT.hand };
 const OCRE = [176, 138, 92], GREY = [168, 160, 150];
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
@@ -100,7 +100,7 @@ const CLIPS = { atelier: 'exemples_videos/exemple_plan_fixe.mp4', baguette: 'exe
 const CLIP_SRC_SECONDS = 7.8;
 const ClipShot: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry: 'nuages' | 'glyphe'; inDur?: number }> = ({ src, from, len, entry, inDur = 3.2 }) => {
   const { fps } = useVideoConfig();
-  const rate = Math.min(0.9, CLIP_SRC_SECONDS / len);
+  const rate = Math.min(0.9, (0.85 * CLIP_SRC_SECONDS) / len); // marge : la fin des clips peut tomber au noir
   if (entry === 'glyphe') {
     return (
       <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(len * fps)}>
@@ -159,55 +159,42 @@ const compColor = (lit: Record<string, number>, dim = 0, hi = '') => (c: string)
   return rgb(col);
 };
 
-// ════════════════ 1–2. Accroche (教 tracé, le faux 孝, le bâton) et rappel du 學
+// ════════════════ 1–2. Accroche (教 tracé, le faux 孝, le bâton), puis le tout premier dessin, gravé sur l'os
 const Opening: React.FC = () => {
   const t = useT();
   const A1 = A('b01'), xiao = at('b01', 'xiao'), baton = at('b01', 'baton'), ment = at('b01', 'mentait');
-  const xue = at('b02', 'xue'), armee = at('b02', 'armee'), classe = at('b02', 'classe');
+  const dessin = at('b02', 'dessin'), os = at('b02', 'os');
   return (
     <AbsoluteFill>
       <Paper />
-      <Landscape seed={14} from={classe - 0.4} to={A('b03') + 14} move="push" mood="aube" />
+      <Landscape seed={14} from={os - 0.2} to={A('b03') + 14} move="push" mood="aube" />
       <Draw draw={(ctx, tt, E) => {
-        // 教 en 11 traits ; la gauche s'allume en ocre (« on croit lire 孝 »), la main au bâton en vermillon
-        const a = 1 - seg(tt, xue - 0.6, xue);
-        if (a > 0) {
+        const toOld = seg(tt, dessin - 0.3, dessin + 0.9); // 教 moderne → premier dessin (os)
+        const shrink = seg(tt, os + 0.6, os + 2.4), sz = 600 * (1 - 0.92 * shrink), y = 520 - 30 * shrink;
+        const out = 1 - seg(tt, os + 2.0, os + 2.6);
+        if (out <= 0) return;
+        if (toOld < 1) {
           const left = seg(tt, xiao + 0.6, xiao + 1.3), hand = seg(tt, baton - 0.2, baton + 0.5);
           const shake = seg(tt, ment - 0.1, ment + 0.2) * (1 - seg(tt, ment + 1.0, ment + 1.6));
-          const dx = shake * 6 * Math.sin(tt * 55);
-          ctx.save(); ctx.globalAlpha = a;
+          ctx.save(); ctx.globalAlpha = 1 - toOld;
           E.drawStrokes(ctx, 'jiao_kai', {
             x: 960, y: 520, size: 600, progress: 11 * seg(tt, A1 - 0.3, A1 + 2.0), brush: false,
             color: (c: string) => (c === 'hand' ? rgb(mixc(INK, P.hand, hand)) : rgb(mixc(INK, OCRE, left))),
             glow: 22 * Math.max(hand, left) * (1 - seg(tt, ment + 1, ment + 2)), glowColor: rgb(hand > left ? P.hand : OCRE, 0.5),
           });
           ctx.restore();
-          // tremblement du faux 孝 : un double décalé de la gauche
           if (shake > 0) {
-            ctx.save(); ctx.globalAlpha = a * 0.45 * shake; ctx.translate(dx, 0);
+            ctx.save(); ctx.globalAlpha = (1 - toOld) * 0.45 * shake; ctx.translate(shake * 6 * Math.sin(tt * 55), 0);
             E.drawStrokes(ctx, 'jiao_kai', { x: 960, y: 520, size: 600, brush: false, color: () => rgb(OCRE), alpha: (c: string) => (c === 'hand' ? 0 : 1) });
             ctx.restore();
           }
         }
-        // rappel du 學 : 學 (bronze) à gauche, mains vermillon ; 教 (os) à droite ; les deux mains s'éteignent,
-        // la main au bâton s'allume
-        const r = win(tt, xue - 0.3, classe + 0.6, 0.6);
-        if (r > 0) {
-          const off = seg(tt, armee - 2.6, armee - 1.6), arm = seg(tt, armee - 0.2, armee + 0.5);
-          const shrink = seg(tt, classe + 0.2, classe + 1.6);
-          E.drawRealGlyph(ctx, 'jinwen', { x: 600, y: 500, size: 460 * (1 - 0.6 * shrink), opacity: r,
-            color: (c: string) => rgb(c === 'hand' ? mixc(P.hand, GREY, off) : c === 'child' ? P.child : c === 'yao' ? P.yao : INK),
-            alpha: (c: string) => (c === 'hand' ? 1 - 0.6 * off : 1) });
-          E.drawRealGlyph(ctx, 'jiao_jiaguwen', { x: 1320, y: 500, size: 460 * (1 - 0.6 * shrink), opacity: r,
-            color: (c: string) => rgb(c === 'hand' ? mixc(INK, P.hand, arm) : c === 'child' ? P.child : P.yao),
-            glow: 26 * arm * (1 - shrink), glowColor: rgb(P.hand, 0.6) });
-        }
+        if (toOld > 0) E.drawRealGlyph(ctx, 'jiao_jiaguwen', { x: 960, y, size: sz, opacity: toOld * out, color: () => inkCss });
       }} />
       <Caption text="教 · jiào · enseigner" a={win(t, A1 + 1.4, xiao - 0.2)} y={880} size={48} />
       <Caption text="孝 · xiào · la piété filiale ?" a={win(t, xiao + 0.8, baton - 0.3)} y={880} size={48} />
       <Caption text="攵 · une main qui tient un bâton" a={win(t, baton + 0.2, ment)} y={880} size={48} />
-      <Caption text="學 · apprendre" a={win(t, xue + 0.2, classe, 0.4)} y={820} size={48} />
-      <div style={{ position: 'absolute', left: 1320 - 200, width: 400, top: 820, textAlign: 'center', fontFamily: 'ShuimoLatin', fontSize: 48, color: '#5b4f44', opacity: win(t, xue + 0.6, classe, 0.4) }}>教 · enseigner</div>
+      <Caption text="le même caractère, gravé sur os · v. 1200 av. J.-C." a={win(t, dessin + 0.6, os + 1.6, 0.4)} y={880} size={44} />
     </AbsoluteFill>
   );
 };
@@ -242,12 +229,18 @@ const ShangLu: React.FC = () => {
           // pendant le rouleau il devient le curseur de la frise et se change en signe de bronze
           const reveal = seg(tt, sig, sig + 1.2);
           if (reveal > 0 && tt < R1 + TR1.duration! + 0.1) {
-            const lit = { yao: seg(tt, yao, yao + 0.7), child: seg(tt, enf, enf + 0.7), hand: seg(tt, bat, bat + 0.7) };
+            const main = at('b03', 'main'), doigts = at('b03', 'doigts');
+            const lit = { yao: seg(tt, yao, yao + 0.7), child: seg(tt, enf, enf + 0.7), stick: seg(tt, bat, bat + 0.6), hand: seg(tt, main, main + 0.6) };
+            // zoom sur le bâton et la main (à droite du signe), puis retour avant le rouleau
+            const zm = seg(tt, bat - 0.4, bat + 0.8) * (1 - seg(tt, R1 - 1.2, R1 - 0.2));
+            const pulse = win(tt, doigts, doigts + 1.4, 0.3);
             const dry = seg(tt, sig + 0.8, sig + 1.8);
             const mk = morphK(TR1, tt);
             const p = cursorPose(TR1, tt), q = arrivePose(TR1, tt);
             const col = (c: string) => rgb(mixc(mixc([240, 233, 219], INK, dry), P[c], lit[c as keyof typeof lit] ?? 0));
-            if (mk < 1) E.drawRealGlyph(ctx, 'jiao_jiaguwen', { x: p.x, y: p.y, size: 600 * p.s, reveal: () => reveal, opacity: 1 - mk, color: col });
+            const zs = 1 + 0.55 * zm, zx = p.x - 0.11 * 600 * zs * zm, zy = p.y - 0.05 * 600 * zs * zm;
+            if (mk < 1) E.drawRealGlyph(ctx, 'jiao_jiaguwen', { x: zx, y: zy, size: 600 * p.s * zs, reveal: () => reveal, opacity: 1 - mk, color: col,
+              alpha: (c: string) => (c === 'hand' || c === 'stick' ? 1 : 1 - 0.55 * zm), glow: 30 * pulse, glowColor: rgb(P.hand, 0.7) });
             if (mk > 0) E.drawRealGlyph(ctx, 'jiao_jinwen', { x: q.x, y: q.y, size: 600 * q.s, opacity: mk * (1 - seg(tt, R1 + TR1.duration! - 0.3, R1 + TR1.duration! + 0.1)), color: (c: string) => rgb(P[c]) });
           }
         }} />
@@ -256,9 +249,11 @@ const ShangLu: React.FC = () => {
       <EraTag zh="商" name="SHANG" dates="Anyang · XIIIe–XIe s. av. J.-C." a={win(t, A3 + 0.3, R1 + 0.4, 0.8)} />
       <EraTag zh="魯" name="LU" dates="Printemps et Automnes · v. 500 av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
       <Caption text="os d'exercice : la colonne du maître, la copie de l'élève" a={win(t, mait + 1.2, sig)} />
-      <Label x={1240} y={330} zh="爻" text="baguettes" color={P.yao} a={win(t, yao + 0.3, R1, 0.6)} />
-      <Label x={1240} y={720} zh="子" text="l'enfant" color={P.child} a={win(t, enf + 0.3, R1, 0.6)} />
-      <Label x={680} y={520} zh="攴" text="main au bâton" color={P.hand} a={win(t, bat + 0.3, R1, 0.6)} align="right" />
+      <Label x={1240} y={330} zh="爻" text="baguettes" color={P.yao} a={win(t, yao + 0.3, bat - 0.4, 0.6)} />
+      <Label x={1240} y={720} zh="子" text="l'enfant" color={P.child} a={win(t, enf + 0.3, bat - 0.4, 0.6)} />
+      <Label x={1260} y={300} zh="卜" text="le bâton" color={P.stick} a={win(t, at('b03', 'baton') + 0.3, R1 - 0.3, 0.6)} />
+      <Label x={1260} y={760} zh="又" text="la main" color={P.hand} a={win(t, at('b03', 'main') + 0.3, R1 - 0.3, 0.6)} />
+      <Caption text="trois doigts vers le haut, qui serrent le bâton" a={win(t, at('b03', 'doigts') + 0.2, R1 - 0.3, 0.5)} y={960} size={42} />
     </AbsoluteFill>
   );
 };
@@ -273,6 +268,9 @@ const Confucius: React.FC = () => {
   const mapFrom = disc - 0.3, mapTo = A('b05') - 0.45;
   return (
     <AbsoluteFill>
+      {/* fond continu (jamais d'écran vide entre le rouleau, la carte et le dessin) */}
+      <Paper />
+      <Landscape seed={9} from={A4 - 1.5} to={A('b05') + 0.5} move="pan" mood="aube" faint={0.7} />
       {/* dessin 白描 de Confucius sous l'abricotier (episodes/jiao/images/confucius_baimiao_1.jpg), peint trait à trait en 3 s */}
       <AbsoluteFill style={{ opacity: win(t, conf - 0.8, mapFrom + 0.6, 0.7) }}>
         <Paper />
@@ -294,6 +292,13 @@ const Confucius: React.FC = () => {
         }} />
       </AbsoluteFill>
       <Caption text="portrait imaginé" a={win(t, conf + 0.4, mapFrom, 0.5)} y={1036} size={26} />
+      <MapPanel from={A4 - 0.5} to={conf - 0.3} draw={(ctx, u, E, tt) => {
+        const z = ease(seg(tt, at('b04', 'lu') - 0.5, at('b04', 'lu') + 1.5)), v = { lon: 114.5 + 2 * z, lat: 34.5 + 0.8 * z, k: 60 + 70 * z };
+        E.drawMap(ctx, tt, v, { paper: true, rivers: 1 });
+        E.region(ctx, v, 'zhou_states', 'rgba(52,132,98,0.18)', seg(tt, at('b04', 'royaumes') - 0.6, at('b04', 'royaumes') + 0.4));
+        E.marker(ctx, tt, v, QUFU, 'Lu', 'capitale : Qufu', seg(tt, at('b04', 'lu'), at('b04', 'lu') + 0.4), '#c0392b', 1);
+      }} />
+      <Caption text="les royaumes rivaux de l'ancien empire Zhou" a={win(t, at('b04', 'royaumes') + 0.2, at('b04', 'lu') + 0.2, 0.4)} y={980} size={40} />
       <Caption text="有教無類 · « enseigner à tous, sans distinction » (Entretiens, XV, 39)" a={win(t, regle + 0.2, mapFrom, 0.5)} y={980} />
       <MapPanel from={mapFrom} to={mapTo} draw={(ctx, u, E, tt) => {
         const z = ease(seg(tt, mapFrom, mapFrom + 2)), v = { lon: 116.5 - 1.2 * z, lat: 35.2 - 0.6 * z, k: 150 + 110 * z };
@@ -405,7 +410,7 @@ const Retournement: React.FC = () => {
           const back = seg(tt, jam, jam + 1.0); // « le 孝 n'a jamais été là » : pigments d'origine
           const leftCol = (c: string) => rgb(c === 'hand' ? P.hand : mixc(mixc(P[c], OCRE, gold), P[c], back));
           if (lis < 1) E.drawRealGlyph(ctx, 'jiao_xiaozhuan', { x: 960, y: 520, size: 560, opacity: out * (1 - lis) * seg(tt, A7 - 0.4, A7 + 0.6), color: (c: string) => rgb(P[c]) });
-          if (lis > 0) E.drawRealGlyph(ctx, 'jiao_lishu', { x: 960, y: 520, size: 560, opacity: out * lis * (1 - 0.85 * gold), color: leftCol });
+          if (lis > 0) E.drawRealGlyph(ctx, 'jiao_lishu', { x: 960, y: 520, size: 560, opacity: out * lis * (1 - 0.85 * gold) * (1 - seg(tt, at('b07', 'vrai') - 0.8, at('b07', 'vrai'))), color: leftCol });
           // le 孝 « déjà connu » se superpose en ocre à gauche, puis se dissout
           const ghost = seg(tt, gl + 0.4, gl + 1.4) * (1 - seg(tt, rep_ - 0.2, rep_ + 0.8));
           if (ghost > 0) {
@@ -413,14 +418,31 @@ const Retournement: React.FC = () => {
             E.drawStrokes(ctx, 'xiao_kai', { x: 860, y: 520, size: 420, brush: false, color: () => rgb(OCRE), glow: 20, glowColor: rgb(OCRE, 0.5) });
             ctx.restore();
           }
-          // réponse : le signe ancien revient, baguettes et enfant dans leurs pigments
+          // réponse : le signe ancien revient (baguettes, enfant, bâton, main), puis le vrai 孝 en face, puis ≠
+          const vrai = at('b07', 'vrai'), vieil = at('b07', 'vieillard'), ress = at('b07', 'ressemblance');
           const anc = seg(tt, jam - 0.2, jam + 0.8);
-          if (anc > 0) E.drawRealGlyph(ctx, 'jiao_jiaguwen', { x: 1500, y: 520, size: 380, opacity: out * anc, color: (c: string) => rgb(P[c]), glow: 20 * anc, glowColor: rgb(P.child, 0.4) });
+          const side = seg(tt, vrai - 0.6, vrai + 0.4); // le lishu s'efface, l'ancien glisse à gauche
+          if (anc > 0) E.drawRealGlyph(ctx, 'jiao_jiaguwen', { x: 1500 - 920 * side, y: 520, size: 380 + 60 * side, opacity: out * anc, color: (c: string) => rgb(P[c]) });
+          const xv = seg(tt, vrai - 0.2, vrai + 0.8);
+          if (xv > 0) {
+            const old = seg(tt, vieil - 0.1, vieil + 0.6), kid = seg(tt, vieil + 1.6, vieil + 2.3);
+            ctx.save(); ctx.globalAlpha = out * xv;
+            E.drawStrokes(ctx, 'xiao_kai', { x: 1340, y: 500, size: 440, progress: 7 * seg(tt, vrai, vrai + 1.4), brush: false,
+              color: (c: string) => rgb(c === 'old' ? mixc(INK, OCRE, old) : mixc(INK, P.child, kid)) });
+            ctx.restore();
+          }
+          const ne = seg(tt, ress - 0.2, ress + 0.5);
+          if (ne > 0) E.text(ctx, '≠', 960, 500, { font: 'Cormorant', size: 220, weight: 700, color: rgb(P.hand), alpha: out * ne });
         }} />
       </TimeScrollStage>
       <Caption text="écriture des clercs 隸書 · stèle de Kong Zhou 孔宙碑 (164)" a={win(t, tas + 0.6, gl, 0.5)} />
       <Caption text="孝 ? — la gauche glisse vers un signe connu" a={win(t, gl + 0.6, rep_ - 0.2, 0.5)} size={42} />
-      <Caption text="sur les os et les bronzes : baguettes 爻 + enfant 子" a={win(t, jam + 0.4, R3 - 0.3, 0.5)} size={42} />
+      <Caption text="sur les os et les bronzes : baguettes 爻 + enfant 子" a={win(t, jam + 0.4, at('b07', 'vrai') - 0.2, 0.5)} size={42} />
+      <Label x={1340 + 230} y={330} zh="老" text="un vieillard" color={OCRE} a={win(t, at('b07', 'vieillard') + 0.3, R3 - 0.3, 0.5)} />
+      <Label x={1340 + 230} y={680} zh="子" text="qui le porte" color={P.child} a={win(t, at('b07', 'vieillard') + 1.8, R3 - 0.3, 0.5)} />
+      <div style={{ position: 'absolute', left: 1340 - 300, width: 600, top: 800, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 46, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b07', 'vrai') + 0.8, R3 - 0.3, 0.5) }}>孝 · la piété filiale</div>
+      <div style={{ position: 'absolute', left: 580 - 300, width: 600, top: 800, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 46, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b07', 'vrai') + 0.8, R3 - 0.3, 0.5) }}>教 · enseigner (os)</div>
+      <Caption text="une ressemblance née du pinceau — aucun lien de sens" a={win(t, at('b07', 'ressemblance') + 0.3, R3 - 0.2, 0.5)} size={44} y={960} />
       <Caption text="Han · le pinceau des copistes" a={win(t, A7 + 0.2, geste + 2, 0.5)} y={980} size={34} />
     </AbsoluteFill>
   );
@@ -477,8 +499,9 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
   for (const [c, s0] of cues) if (tt >= s0 - 0.05) { hi = c; k = seg(tt, s0 - 0.05, s0 + 0.3); }
   const nait = at('b09', 'naissance');
   if (tt > nait - 0.3) k *= 1 - seg(tt, nait - 0.3, nait + 0.2);
-  const color = (c: string) => rgb(!hi || c === hi ? P[c] : mixc(P[c], GREY, k));
-  const alpha = (c: string) => (!hi || c === hi ? 1 : 1 - 0.55 * k);
+  const same = (c: string) => !hi || c === hi || (c === 'stick' && hi === 'hand'); // le bâton suit la main
+  const color = (c: string) => rgb(same(c) ? P[c] : mixc(P[c], GREY, k));
+  const alpha = (c: string) => (same(c) ? 1 : 1 - 0.55 * k);
   FORMS.forEach(([key, zh, fr], i) => {
     const t0 = at('b09', 'yao') - 1.0;
     const appear = seg(tt, t0 + i * 0.08, t0 + 0.4 + i * 0.08) * a;
@@ -532,6 +555,7 @@ const Today: React.FC = () => {
       }} />
       <Caption text="11 traits · identique en Chine et au Japon" a={win(t, tr, yao - 1.1, 0.4)} y={880} size={46} />
       <Caption text="jiào · enseigner" a={win(t, nait + 0.6, cl - 0.2, 0.4)} y={880} size={52} />
+      <Caption text="pas de 孝 : des baguettes, un enfant, une main qui réveille" a={win(t, at('b09', 'pasde') - 0.1, nait - 0.2, 0.4)} y={1000} size={44} />
       <div style={{ position: 'absolute', width: '100%', top: 840, display: 'flex', justifyContent: 'center', gap: 160, fontFamily: 'ShuimoKai', fontSize: 72, color: inkCss }}>
         <span style={{ opacity: win(t, cl - 0.2, A10 - 0.3) }}>教室<div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, textAlign: 'center' }}>la salle de classe</div></span>
         <span style={{ opacity: win(t, mt - 0.4, A10 - 0.3) }}>教师<div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, textAlign: 'center' }}>le maître</div></span>

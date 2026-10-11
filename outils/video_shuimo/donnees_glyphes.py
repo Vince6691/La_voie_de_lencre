@@ -7,7 +7,7 @@ Lit la section « glyphes » de episode.json :
                      "defaut": "hand", "polys": [[composante, [[x, y]…]]…]}},
     "traits": {clé: {"src": "glyphes/traits/教.json", "comp": ["yao", "yao", …]}}
   }
-- reels : formes historiques (小學堂, CC0) découpées par composante (polygones dans la boîte 400, le premier qui
+- reels : (option « fusion » : seuil de partage d'un trait continu, 0,25 par défaut) formes historiques (小學堂, CC0) découpées par composante (polygones dans la boîte 400, le premier qui
   contient le pixel l'emporte ; un trait continu reste entier sauf partage réel), vectorisées (potrace) ;
   même format que xue/tools/build_real_glyphs.py → window.REALGLYPHS[clé] (E.drawRealGlyph).
 - traits : ordre et forme des traits (Make Me a Hanzi / hanzi-writer-data, Arphic Public License),
@@ -59,7 +59,7 @@ def reel(base, g):
     for i in range(1, n + 1):
         blob = lab == i
         names, counts = np.unique(owner[blob], return_counts=True)
-        if len(names) > 1 and counts.max() / counts.sum() > 1 - MERGE:
+        if len(names) > 1 and counts.max() / counts.sum() > 1 - g.get('fusion', MERGE):
             owner[blob] = names[counts.argmax()]
     paths, centers = [], {}
     for c in dict.fromkeys([g['defaut']] + [c for c, _ in g.get('polys', [])]):

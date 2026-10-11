@@ -2,7 +2,7 @@
 python3 portrait.py ../../episodes/<pinyin>/episode.json [--debug]
 
 Section « portraits » de episode.json :
-  "portraits": {clé: {"img": "images/confucius_baimiao_1.jpg", "largeur": 1700,
+  "portraits": {clé: {"img": "images/confucius_baimiao_1.jpg", "largeur": 1700, ["seuil": 150, "epaissir": 0,]
                       "zones": [[nom, part_du_temps, [x0, y0, x1, y1] en fractions de l'image, ou null = le reste]…]}}
 Les zones sont testées dans l'ordre (la première qui contient le milieu du trait l'emporte) et peintes dans cet ordre ;
 dans chaque zone, le pinceau va de proche en proche en partant du haut. Méthode de xue/tools/build_portrait.py :
@@ -24,7 +24,8 @@ def build(base, key, cfg, debug):
     lw = cfg.get('largeur', 1700)
     g = g.resize((lw, round(g.height * lw / g.width)), Image.LANCZOS)
     a = np.array(g).astype(float)
-    ink = ndimage.binary_opening(a < 150, np.ones((2, 2)))
+    ink = ndimage.binary_opening(a < cfg.get('seuil', 150), np.ones((2, 2)))
+    if cfg.get('epaissir'): ink = ndimage.binary_dilation(ink, iterations=cfg['epaissir'])  # traits trop fins pour l'écran
     lab, n = ndimage.label(ink)
     sizes = ndimage.sum(ink, lab, range(1, n + 1))
     ink = np.isin(lab, 1 + np.nonzero(sizes >= 12)[0])

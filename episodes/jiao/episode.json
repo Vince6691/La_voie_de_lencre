@@ -70,20 +70,23 @@
    "mentait": "mentait"
   },
   "b02": {
-   "xue": "Dans",
-   "armee": "armée",
-   "classe": "retournons"
+   "dessin": "tout premier",
+   "os": "gravé sur"
   },
   "b03": {
    "ateliers": "ateliers",
    "maitre": "un maître",
    "eleve": "Un élève",
    "signe": "Sur ces mêmes",
-   "yao": "les baguettes déjà",
-   "enfant": "le même enfant",
-   "baton": "elle tient"
+   "yao": "deux croix",
+   "enfant": "un enfant, la",
+   "baton": "un bâton",
+   "main": "tenu par une",
+   "doigts": "trois doigts"
   },
   "b04": {
+   "royaumes": "royaumes rivaux",
+   "lu": "petit royaume",
    "confucius": "Confucius",
    "abricotier": "abricotier",
    "regle": "Enseigner à tous",
@@ -106,7 +109,10 @@
    "tasse": "tasse les baguettes",
    "glisse": "le dessin glisse",
    "reponse": "Sur les os comme",
-   "jamais": "le 孝 n"
+   "jamais": "le 孝 n",
+   "vrai": "Le vrai",
+   "vieillard": "un vieillard",
+   "ressemblance": "Une ressemblance"
   },
   "b08": {
    "academies": "Partout naissent",
@@ -120,6 +126,7 @@
    "yao": "des baguettes pour",
    "enfant": "un enfant penché",
    "main": "une main qui",
+   "pasde": "Pas de piété",
    "naissance": "Ainsi naît",
    "classe": "la salle de classe",
    "maitre": "le maître"
@@ -181,8 +188,30 @@
         395
        ]
       ]
+     ],
+     [
+      "stick",
+      [
+       [
+        205,
+        110
+       ],
+       [
+        246,
+        110
+       ],
+       [
+        246,
+        222
+       ],
+       [
+        205,
+        222
+       ]
+      ]
      ]
-    ]
+    ],
+    "fusion": 0.12
    },
    "jiao_jinwen": {
     "img": "glyphes/jiao_xiaoxue/02.png",
@@ -441,7 +470,7 @@
  "portraits": {
   "confucius": {
    "img": "images/confucius_baimiao_1.jpg",
-   "largeur": 1700,
+   "largeur": 2752,
    "zones": [
     [
      "tête",
@@ -488,7 +517,9 @@
      0.1,
      null
     ]
-   ]
+   ],
+   "seuil": 190,
+   "epaissir": 2
   }
  }
 }

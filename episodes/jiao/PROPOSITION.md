@@ -33,8 +33,7 @@ main… qui tient un bâton. Enseigner, ce serait obéir, sous la menace ? ⏸ E
 > s'allume en ocre pâle ; à « un bâton », 攵 en vermillon ; à « mentait », le 孝 tremble légèrement.
 
 ## 2. L'enjeu et le rappel du 學 — 0:15
-Dans 學, apprendre, deux mains transmettaient le savoir à un enfant. Ici, il ne reste qu'une main… et elle est
-armée. ⏸ Pour comprendre, retournons dans la toute première salle de classe… celle où l'on apprenait à graver.
+Pour le savoir, il faut remonter au tout premier dessin de ce caractère… gravé sur des os, il y a plus de trois mille ans.
 > plan : 學 ancien en pigments à gauche (mains vermillon), 教 ancien à droite : les deux mains s'éteignent, la main
 > au bâton s'allume ; puis 教 se rétracte en point d'encre ; paysage shuimo Shang (aube, brume) qui se peint autour.
 
@@ -150,3 +149,10 @@ Sauts d'époque annoncés : « Il y a trente-deux siècles », « Sept siècles 
 
 ## À vérifier avant enregistrement
 Voir `SOURCES.md`.
+
+## Révision v2 (retours sur l'aperçu v1)
+- Vidéo autonome : plus de renvoi au 學 (bloc 2 réécrit, b03 sans « comme dans 學 »).
+- Main et bâton décrits et montrés séparément (卜 le bâton, 又 la main, zoom, « trois doigts vers le haut »).
+- Le faux 孝 réfuté explicitement : b07 montre le vrai 孝 (老 vieillard porté par 子) en face du signe ancien, « ≠ » ;
+  b09 « Pas de piété filiale : un élève, et quelqu'un qui le réveille ».
+- Textes exacts envoyés au synthétiseur : `VOIX.md`. Durée : 4 min 37.
