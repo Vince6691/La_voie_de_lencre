@@ -9,6 +9,8 @@ et la documentation en tête de `episode.py`).
 | `voix_prep.py` | silences rognés, −18 LUFS, pauses détectées | `voix/bNN.mp3` → `voix/bNN.wav`, `voix/segments.json` |
 | `reperes.py` | repères au mot près + ligne de temps absolue (clips, rouleaux, pauses, fin) | `voix/mots/bNN.json` (Scribe) → `reperes` |
 | `musique.py` | bourdon + guzheng, creux sous les rouleaux et les pauses, coupure nette | `reperes` → `musique` |
+| `xiaoxue.py` | formes historiques d'un caractère (小學堂, CC0) | caractère → `glyphes/<x>_xiaoxue/NN.png` + `index.json` |
+| `donnees_glyphes.py` | glyphes réels découpés par composante + traits Make Me a Hanzi | section `glyphes` de `episode.json` → `glyphes/donnees.js` |
 | `episode.py` | lecture de `episode.json`, calcul de la ligne de temps | (module) |
 
 ## Schéma d'un épisode (toujours le même)

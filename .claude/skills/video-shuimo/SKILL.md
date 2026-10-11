@@ -21,8 +21,8 @@ episodes/<pinyin>/
   voix/mots/ (bNN.json, minutage Scribe)   voix/prises/ (toutes les prises)
   clips/ (NN_scene.mp4, clips Seedance renommés)   images/ (Nano Banana)   audio/ (musique.wav)   apercus/
 ```
-Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (copier `XueV2`, lire la ligne de temps `_ligne` du
-fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`. Les fichiers
+Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (modèle à jour : `shuimo_jiao/JiaoV1.tsx`, qui lit la
+ligne de temps `_ligne` du fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`. Les fichiers
 déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce schéma dès leur arrivée. (Le 學, épisode
 pilote, est resté dans `xue/` ; ne pas le prendre comme modèle de rangement.)
 
@@ -56,6 +56,15 @@ d'ouverture, réponse, maxime, voyage en 7–9 blocs avec `> plan :` sous chaque
 durée cible 4–5 min, titres, points à vérifier. **Attendre la validation du texte** (l'utilisateur coupe souvent :
 appliquer, recalculer la durée).
 
+## Étape 1 bis — Glyphes (à trouver soi-même, jamais demandés à l'utilisateur)
+- Formes historiques : `python3 outils/video_shuimo/xiaoxue.py <caractère> episodes/<p>/glyphes/<p>_xiaoxue` (小學堂, CC0 ;
+  zdic et jsdelivr sont bloqués par le proxy). Planche contact, choix d'une forme par époque, noté dans `glyphes/SOURCE.md`.
+  Le texte du Shuowen renvoyé par 小學堂 fait foi pour la voix (ex. 教 : « 从攴，从𡥉 », pas « 从孝 »).
+- Traits (Make Me a Hanzi) : `npm pack hanzi-writer-data@2.0.1` puis extraire `package/<caractère>.json` → `glyphes/traits/`.
+- Section `glyphes` de `episode.json` (polygones de composantes dans la boîte 400, composante de chaque trait), puis
+  `python3 outils/video_shuimo/donnees_glyphes.py <episode.json>` → `glyphes/donnees.js` (chargé via `sync.mjs` →
+  `public/legacy/episodes.js`). Clés préfixées par le pinyin (`jiao_jiaguwen`, `jiao_kai`).
+
 ## Étape 2 — Voix (ElevenLabs)
 - Voix **« Chinese narration »** (`KpnSJfGwFIPSRbO89Nsr`), modèle `eleven_v4`, un clip par bloc, un flow par vidéo.
 - **Noms chinois écrits en caractères** dans le texte envoyé (la voix bascule en mandarin). Pièges vérifiés :
@@ -71,7 +80,8 @@ Ne jamais estimer la position des mots : transcrire chaque prise avec **Scribe**
 `connect_from` = le nœud de la prise ; gratuit) ; pour une prise non active d'un nœud à plusieurs variations,
 l'épingler d'abord (`creative_add_flow_asset_node`). Télécharger `words_download_url` → `voix/mots/bNN.json`, puis
 `reperes.py` : expressions-clés (`reperes_cles` de l'episode.json) → début exact du premier mot, et ligne de temps
-absolue (`sequence` : clips, silences, rouleaux, pause avant la révélation). Toute l'animation se cale sur
+absolue (`sequence` : clips, silences, rouleaux, pause avant la révélation). Les `reperes_cles` d'un bloc doivent être
+**dans l'ordre de la voix** (recherche séquentielle). Caractères partagés avec le japonais (教, 孝, 文, 宋…) : 2 prises. Toute l'animation se cale sur
 `at(bloc, repère)` ; ne jamais coder les temps en dur.
 
 ## Étape 4 — Montage (composants validés)
