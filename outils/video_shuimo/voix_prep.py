@@ -1,4 +1,5 @@
-"""Prépare les clips de voix d'un épisode : bNN.mp3 → silences de début et de fin rognés, −18 LUFS → bNN.wav ;
+"""Prépare les clips de voix d'un épisode : bNN.mp3 → silences de début et de fin rognés, tempo (« tempo » de episode.json,
+1 par défaut ; ex. 1.05 = voix 5 % plus rapide, sans changer la hauteur), −18 LUFS → bNN.wav ;
 détecte les pauses (> 0,22 s) → segments.json ({clip: {duration, starts}}). Usage : python3 voix_prep.py episode.json"""
 import glob, json, os, subprocess, sys, wave
 import numpy as np
@@ -6,13 +7,14 @@ import imageio_ffmpeg
 from episode import charger
 
 FF = imageio_ffmpeg.get_ffmpeg_exe()
-D = charger(sys.argv[1])['voix']
+CFG = charger(sys.argv[1]); D = CFG['voix']; TEMPO = CFG.get('tempo', 1)
 out = {}
 for mp3 in sorted(glob.glob(os.path.join(D, 'b*.mp3'))):
     n = os.path.basename(mp3)[:-4]
     wav = os.path.join(D, n + '.wav')
     subprocess.run([FF, '-y', '-loglevel', 'error', '-i', mp3, '-af',
-                    'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,loudnorm=I=-18:TP=-2:LRA=11',
+                    'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,'
+                    + (f'atempo={TEMPO},' if TEMPO != 1 else '') + 'loudnorm=I=-18:TP=-2:LRA=11',
                     '-ar', '44100', '-ac', '1', wav], check=True)
     w = wave.open(wav); sr = w.getframerate()
     a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(float) / 32768

@@ -3,18 +3,19 @@
  "reperes": "voix/reperes.json",
  "musique": "audio/musique.wav",
  "debut": 0.6,
+ "tempo": 1.05,
  "sequence": [
   {
    "clip": "b01",
-   "apres": 0.9
+   "apres": 0.6
   },
   {
    "clip": "b02",
-   "apres": 1.0
+   "apres": 0.7
   },
   {
    "clip": "b03",
-   "apres": 0.7
+   "apres": 0.4
   },
   {
    "rouleau": 5,
@@ -22,11 +23,11 @@
   },
   {
    "clip": "b04",
-   "apres": 0.8
+   "apres": 0.5
   },
   {
    "clip": "b05",
-   "apres": 0.6
+   "apres": 0.3
   },
   {
    "rouleau": 3.5,
@@ -34,7 +35,7 @@
   },
   {
    "clip": "b06",
-   "apres": 0.8
+   "apres": 0.5
   },
   {
    "clip": "b07",
@@ -43,23 +44,23 @@
     "decalage": -0.12,
     "duree": 1.7
    },
-   "apres": 0.8
+   "apres": 0.5
   },
   {
-   "rouleau": 6,
-   "apres": 0.4
+   "rouleau": 4.5,
+   "apres": 0.3
   },
   {
    "clip": "b08",
-   "apres": 2.0
+   "apres": 1.7
   },
   {
    "clip": "b09",
-   "apres": 1.0
+   "apres": 0.7
   },
   {
    "clip": "b10",
-   "apres": 0.5
+   "apres": 0.3
   }
  ],
  "queue": 3.2,

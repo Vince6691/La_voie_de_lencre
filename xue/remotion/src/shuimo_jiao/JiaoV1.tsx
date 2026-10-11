@@ -159,6 +159,27 @@ const compColor = (lit: Record<string, number>, dim = 0, hi = '') => (c: string)
   return rgb(col);
 };
 
+// ── caméra : poussées et panoramiques lents (clés [t, cx, cy, échelle, durée du mouvement]), respiration
+// permanente, petit « punch » (+3,5 %) sur les révélations ; neutre pendant les rouleaux (calm). Le monde (fonds,
+// glyphes, étiquettes) est dans la caméra ; légendes et cartouches restent fixes, hors caméra.
+type K = [number, number, number, number, number?];
+const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; children: React.ReactNode }> = ({ keys, punch = [], calm = [], children }) => {
+  const t = useT();
+  let [, cx, cy, s] = keys[0];
+  for (const [kt, x, y, z, d = 1.2] of keys.slice(1)) {
+    if (t <= kt) break;
+    const u = ease((t - kt) / d);
+    cx += (x - cx) * u; cy += (y - cy) * u; s += (z - s) * u;
+  }
+  s *= 1 + 0.014 * (0.5 - 0.5 * Math.cos((t * 2 * Math.PI) / 11));
+  cx += 10 * Math.sin((t * 2 * Math.PI) / 14); cy += 6 * Math.sin((t * 2 * Math.PI) / 17);
+  for (const p of punch) s *= 1 + 0.035 * seg(t, p, p + 0.12) * (1 - seg(t, p + 0.15, p + 0.65));
+  const amp = 1 - Math.max(0, ...calm.map(([a, b]) => win(t, a, b, 0.6)));
+  s = 1 + (s - 1) * amp;
+  cx = Math.min(1920 - 960 / s, Math.max(960 / s, cx)); cy = Math.min(1080 - 540 / s, Math.max(540 / s, cy));
+  return <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${960 - cx * s}px, ${540 - cy * s}px) scale(${s})` }}>{children}</AbsoluteFill>;
+};
+
 // ════════════════ 1–2. Accroche (教 tracé, le faux 孝, le bâton), puis le tout premier dessin, gravé sur l'os
 const Opening: React.FC = () => {
   const t = useT();
@@ -166,6 +187,8 @@ const Opening: React.FC = () => {
   const dessin = at('b02', 'dessin'), os = at('b02', 'os');
   return (
     <AbsoluteFill>
+      <Cam keys={[[0, 960, 540, 1], [xiao, 830, 520, 1.25, 1.0], [baton, 1110, 520, 1.25, 0.9], [ment - 0.4, 960, 540, 1, 1.2], [dessin - 0.2, 960, 520, 1.15, 1.4], [os + 0.4, 960, 540, 1.02, 2.0]]}
+        punch={[ment, dessin + 0.5]}>
       <Paper />
       <Landscape seed={14} from={os - 0.2} to={A('b03') + 14} move="push" mood="aube" />
       <Draw draw={(ctx, tt, E) => {
@@ -198,6 +221,7 @@ const Opening: React.FC = () => {
         }
         if (toOld > 0) E.drawRealGlyph(ctx, 'jiao_jiaguwen', { x: 960, y, size: sz, opacity: toOld * out, color: () => inkCss });
       }} />
+      </Cam>
       <Caption text="教 · jiào · enseigner" a={win(t, A1 + 1.4, xiao - 0.2)} y={880} size={48} />
       <Caption text="孝 · xiào · la piété filiale ?" a={win(t, xiao + 0.8, baton - 0.3)} y={880} size={48} />
       <Caption text="攵 · une main qui tient un bâton" a={win(t, baton + 0.2, ment)} y={880} size={48} />
@@ -214,6 +238,8 @@ const ShangLu: React.FC = () => {
   const A3 = A('b03'), mait = at('b03', 'maitre'), elev = at('b03', 'eleve'), sig = at('b03', 'signe'), yao = at('b03', 'yao'), enf = at('b03', 'enfant'), bat = at('b03', 'baton');
   return (
     <AbsoluteFill>
+      <Cam keys={[[A3, 960, 540, 1.02], [mait, 900, 430, 1.3, 1.6], [elev - 3.0, 1010, 600, 1.3, 2.6], [sig - 0.3, 960, 540, 1.02, 1.0], [yao, 960, 430, 1.12, 0.8], [at('b03', 'xue'), 820, 480, 1.08, 0.8], [enf, 960, 620, 1.12, 0.8], [bat - 0.5, 960, 540, 1, 0.6]]}
+        punch={[sig + 0.2]} calm={[[bat - 0.5, R1 + TR1.duration! + 0.4]]}>
       <TimeScrollStage cfg={TR1} under={<Landscape seed={14} from={A3 - 2} to={A3 + 14} move="pan" mood="aube" />}
         fromLandscape={{ seed: 5, since: mait - 1 }} toLandscape={{ seed: 9, until: A('b05') + 1 }}>
         <Draw draw={(ctx, tt, E) => {
@@ -259,12 +285,13 @@ const ShangLu: React.FC = () => {
         E.drawRealGlyph(ctx, 'jinwen', { x: 380, y: 500, size: 340, opacity: a, color: (c: string) => rgb(c === 'yao' ? P.yao : mixc(INK, GREY, 0.5)), glow: 24 * a, glowColor: rgb(P.yao, 0.6) });
       }} />
       <div style={{ position: 'absolute', left: 380 - 220, width: 440, top: 700, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 52, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b03', 'xue') + 0.2, at('b03', 'enfant') - 0.2, 0.4) }}>學 · apprendre</div>
+      <Label x={1240} y={330} zh="爻" text="baguettes" color={P.yao} a={win(t, yao + 0.3, bat - 0.4, 0.6)} />
+      <Label x={1240} y={720} zh="子" text="l'enfant" color={P.child} a={win(t, enf + 0.3, bat - 0.4, 0.6)} />
+      </Cam>
       <ClipShot src="atelier" from={at('b03', 'ateliers') - 0.6} len={mait - at('b03', 'ateliers') + 0.4} entry="nuages" />
       <EraTag zh="商" name="SHANG" dates="Anyang · XIIIe–XIe s. av. J.-C." a={win(t, A3 + 0.3, R1 + 0.4, 0.8)} />
       <EraTag zh="魯" name="LU" dates="Printemps et Automnes · v. 500 av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
       <Caption text="os d'exercice : la colonne du maître, la copie de l'élève" a={win(t, mait + 1.2, sig)} />
-      <Label x={1240} y={330} zh="爻" text="baguettes" color={P.yao} a={win(t, yao + 0.3, bat - 0.4, 0.6)} />
-      <Label x={1240} y={720} zh="子" text="l'enfant" color={P.child} a={win(t, enf + 0.3, bat - 0.4, 0.6)} />
       <Label x={1260} y={300} zh="卜" text="le bâton" color={P.stick} a={win(t, at('b03', 'baton') + 0.3, R1 - 0.3, 0.6)} />
       <Label x={1260} y={760} zh="又" text="la main" color={P.hand} a={win(t, at('b03', 'main') + 0.3, R1 - 0.3, 0.6)} />
       <Caption text="trois doigts vers le haut, qui serrent le bâton" a={win(t, at('b03', 'doigts') + 0.2, R1 - 0.3, 0.5)} y={960} size={42} />
@@ -282,6 +309,8 @@ const Confucius: React.FC = () => {
   const mapFrom = disc - 0.3, mapTo = A('b05') - 0.45;
   return (
     <AbsoluteFill>
+      <Cam keys={[[A4, 960, 540, 1.02], [conf - 0.8, 960, 540, 1.02, 0.6], [conf + 0.4, 720, 540, 1.16, 3.0], [abr, 700, 460, 1.26, 2.4], [regle - 1.9, 1300, 520, 1.2, 1.4], [mapFrom - 0.9, 960, 540, 1.02, 0.8]]}
+        punch={[regle - 0.6]}>
       {/* fond continu (jamais d'écran vide entre le rouleau, la carte et le dessin) */}
       <Paper />
       <Landscape seed={9} from={A4 - 1.5} to={A('b05') + 0.5} move="pan" mood="aube" faint={0.7} />
@@ -305,6 +334,7 @@ const Confucius: React.FC = () => {
           });
         }} />
       </AbsoluteFill>
+      </Cam>
       <Caption text="portrait imaginé" a={win(t, conf + 0.4, mapFrom, 0.5)} y={1036} size={26} />
       <MapPanel from={A4 - 0.5} to={conf - 0.3} draw={(ctx, u, E, tt) => {
         const z = ease(seg(tt, at('b04', 'lu') - 0.5, at('b04', 'lu') + 1.5)), v = { lon: 114.5 + 2 * z, lat: 34.5 + 0.8 * z, k: 60 + 70 * z };
@@ -351,6 +381,8 @@ const Baton: React.FC = () => {
   const A5 = A('b05'), bag = at('b05', 'baguettes'), fr = at('b05', 'frapper');
   return (
     <AbsoluteFill>
+      <Cam keys={[[A5 - 0.4, 960, 540, 1.02], [A5 - 0.3, 960, 520, 1.14, 1.0], [fr - 1.3, 960, 540, 1.02, 0.1], [fr - 1.0, 1110, 520, 1.22, 1.0], [R2 - 1.1, 960, 540, 1, 0.8]]}
+        punch={[fr]} calm={[[R2 - 0.3, R2 + TR2.duration! + 0.4]]}>
       <TimeScrollStage cfg={TR2} defaultCursor fromLandscape={{ seed: 9, since: A5 - 1 }} toLandscape={{ seed: 3, until: A('b07') + 1, mood: 'brume' }}>
         <Draw draw={(ctx, tt, E) => {
           // 教 au centre avant le clip (le clip entre par ses traits), puis de nouveau à « frapper » : la main pulse
@@ -362,6 +394,7 @@ const Baton: React.FC = () => {
           ctx.restore();
         }} />
       </TimeScrollStage>
+      </Cam>
       <ClipShot src="baguette" from={A5 + 0.6} len={fr - A5 - 1.4} entry="glyphe" inDur={2.6} />
       <Caption text="夏楚二物，收其威也 · Mémoire sur l'étude 學記" a={win(t, bag - 0.2, fr - 1.2, 0.5)} y={960} size={40} />
       <EraTag zh="漢" name="HAN" dates="v. 100 · Xu Shen 许慎" a={tagIn(TR2, t) * (1 - seg(t, A('b07'), A('b07') + 0.4))} />
@@ -376,6 +409,8 @@ const XuShen: React.FC = () => {
   const out = A('b07');
   return (
     <AbsoluteFill>
+      <Cam keys={[[A6 - 0.4, 960, 540, 1.02], [let_, 560, 560, 1.2, 2.6], [tape - 1.2, 1300, 560, 1.15, 1.4], [ex, 1300, 620, 1.2, 1.0], [g, 1260, 520, 1.3, 1.0], [out - 1.2, 960, 540, 1.02, 0.9]]}
+        punch={[bag]}>
       <Paper />
       <Landscape seed={3} from={A6 - 1} to={out + 1} move="still" mood="brume" faint={0.5} />
       <Draw draw={(ctx, tt, E) => {
@@ -390,8 +425,6 @@ const XuShen: React.FC = () => {
             glow: 18 * win(tt, bag, out, 0.5), glowColor: rgb(P.child, 0.4) });
         }
       }} />
-      <Caption text="portrait imaginé" a={win(t, let_ + 1.2, out - 0.5)} y={960} size={24} />
-      <EraTag zh="漢" name="HAN" dates="v. 100 · Xu Shen 许慎" a={1 - seg(t, out - 0.6, out)} />
       <div style={{ position: 'absolute', left: 1060, top: 730, width: 560, textAlign: 'center', opacity: win(t, tape - 0.4, ex - 0.2) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 56, color: inkCss }}>攴，小擊也</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, color: '#5b4f44', fontStyle: 'italic' }}>le bâton : « une petite tape »</div>
@@ -404,6 +437,9 @@ const XuShen: React.FC = () => {
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 56, color: inkCss }}>从攴，从<span style={{ color: rgb(P.yao) }}>爻</span><span style={{ color: rgb(P.child) }}>子</span></div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, color: '#5b4f44', fontStyle: 'italic' }}>Shuowen jiezi 說文解字 · v. 100</div>
       </div>
+      </Cam>
+      <Caption text="portrait imaginé" a={win(t, let_ + 1.2, out - 0.5)} y={960} size={24} />
+      <EraTag zh="漢" name="HAN" dates="v. 100 · Xu Shen 许慎" a={1 - seg(t, out - 0.6, out)} />
     </AbsoluteFill>
   );
 };
@@ -414,6 +450,8 @@ const Retournement: React.FC = () => {
   const A7 = A('b07'), geste = at('b07', 'geste'), tas = at('b07', 'tasse'), gl = at('b07', 'glisse'), rep_ = at('b07', 'reponse'), jam = at('b07', 'jamais');
   return (
     <AbsoluteFill>
+      <Cam keys={[[A7 - 0.3, 960, 540, 1.02], [tas - 0.2, 960, 520, 1.15, 1.2], [gl, 860, 520, 1.3, 1.2], [rep_ - 0.4, 960, 540, 1.02, 0.8], [at('b07', 'vieillard') - 0.2, 1180, 520, 1.18, 1.0], [at('b07', 'ressemblance') - 0.4, 960, 540, 1.02, 0.6]]}
+        punch={[jam, at('b07', 'ressemblance')]} calm={[[R3 - 0.4, R3 + TR3.duration! + 0.4]]}>
       <TimeScrollStage cfg={TR3} defaultCursor fromLandscape={{ seed: 3, since: A7 - 1 }} toLandscape={{ seed: 22, until: A('b09') + 1, mood: 'brume' }}>
         <Draw draw={(ctx, tt, E) => {
           const out = 1 - seg(tt, R3 - 0.8, R3 + 0.2);
@@ -449,13 +487,14 @@ const Retournement: React.FC = () => {
           if (ne > 0) E.text(ctx, '≠', 880, 500, { font: 'Cormorant', size: 220, weight: 700, color: rgb(P.hand), alpha: out * ne });
         }} />
       </TimeScrollStage>
-      <Caption text="écriture des clercs 隸書 · stèle de Kong Zhou 孔宙碑 (164)" a={win(t, tas + 0.6, gl, 0.5)} />
-      <Caption text="孝 ? — la gauche glisse vers un signe connu" a={win(t, gl + 0.6, rep_ - 0.2, 0.5)} size={42} />
-      <Caption text="sur les os et les bronzes : baguettes 爻 + enfant 子" a={win(t, jam + 0.4, at('b07', 'vrai') - 0.2, 0.5)} size={42} />
       <Label x={1420} y={360} zh="老" text="un vieillard" color={OCRE} a={win(t, at('b07', 'vieillard') + 0.3, R3 - 0.3, 0.5)} />
       <Label x={1420} y={660} zh="子" text="qui le porte" color={P.child} a={win(t, at('b07', 'vieillard') + 1.8, R3 - 0.3, 0.5)} />
       <div style={{ position: 'absolute', left: 1180 - 300, width: 600, top: 800, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 46, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b07', 'vrai') + 0.8, R3 - 0.3, 0.5) }}>孝 · la piété filiale</div>
       <div style={{ position: 'absolute', left: 580 - 300, width: 600, top: 800, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 46, fontWeight: 600, color: '#3b322b', opacity: win(t, at('b07', 'vrai') + 0.8, R3 - 0.3, 0.5) }}>教 · enseigner (os)</div>
+      </Cam>
+      <Caption text="écriture des clercs 隸書 · stèle de Kong Zhou 孔宙碑 (164)" a={win(t, tas + 0.6, gl, 0.5)} />
+      <Caption text="孝 ? — la gauche glisse vers un signe connu" a={win(t, gl + 0.6, rep_ - 0.2, 0.5)} size={42} />
+      <Caption text="sur les os et les bronzes : baguettes 爻 + enfant 子" a={win(t, jam + 0.4, at('b07', 'vrai') - 0.2, 0.5)} size={42} />
       <Caption text="une ressemblance née du pinceau — aucun lien de sens" a={win(t, at('b07', 'ressemblance') + 0.3, R3 - 0.2, 0.5)} size={44} y={960} />
       <Caption text="Han · le pinceau des copistes" a={win(t, A7 + 0.2, geste + 2, 0.5)} y={980} size={34} />
     </AbsoluteFill>
@@ -473,6 +512,8 @@ const Song: React.FC = () => {
   const out = A('b09');
   return (
     <AbsoluteFill>
+      <Cam keys={[[A8 - 0.3, 960, 540, 1.02], [gr + 0.6, 1300, 540, 1.16, 1.5], [refus - 0.3, 820, 540, 1.16, 1.2], [bat, 960, 540, 1.05, 1.5], [out - 0.8, 960, 540, 1.02, 0.6]]}
+        punch={[gr]}>
       <Paper />
       <Landscape seed={22} from={A8 - 1} to={out + 0.8} move="rise" mood="brume" />
       <MapPanel from={acad - 0.6} to={gr + 0.8} draw={(ctx, u, E, tt) => {
@@ -498,6 +539,7 @@ const Song: React.FC = () => {
         E.drawStrokes(ctx, 'jiao_kai', { x: 700, y: 540, size: 420, brush: false, color: (c: string) => (c === 'hand' ? rgb(mixc(P.hand, [214, 170, 160], pale)) : inkCss), alpha: (c: string) => (c === 'hand' ? 1 : 0.25 + 0.75 * pale) });
         ctx.restore();
       }} />
+      </Cam>
       <EraTag zh="宋" name="SONG" dates="1179 · Zhu Xi 朱熹" a={seg(t, A8 - 0.3, A8 + 0.4) * (1 - seg(t, out - 0.6, out))} />
       <Caption text="« apprendre largement, questionner, réfléchir, discerner, agir » — pas de règlement de punitions" a={win(t, refus + 0.4, bat - 0.2, 0.5)} size={36} y={960} />
     </AbsoluteFill>
@@ -560,6 +602,9 @@ const Today: React.FC = () => {
   const A10 = A('b10'), max = at('b10', 'maxime'), wen = at('b10', 'wen'), ori = at('b10', 'origine'), hom = at('b10', 'homme');
   return (
     <AbsoluteFill>
+      <Cam keys={[[A9 - 0.3, 960, 540, 1.02], [A9 + 0.2, 960, 500, 1.15, 3.0], [at('b09', 'formes') - 0.9, 960, 540, 1.02, 0.9], [at('b09', 'han') - 0.1, 1392, 400, 1.3, 1.0], [at('b09', 'pasde') - 0.1, 960, 540, 1.02, 1.0],
+        [nait + 0.4, 960, 500, 1.12, 1.2], [A10 - 0.5, 960, 540, 1.02, 1.0], [max, 960, 540, 1.08, 4.0], [wen - 0.4, 960, 540, 1.02, 0.6], [hom, 960, 470, 1.2, 1.6]]}
+        punch={[yao, at('b09', 'enfant'), at('b09', 'main'), at('b09', 'pasde'), nait]}>
       <Paper />
       <Landscape seed={30} from={A9 - 1.5} to={END + 0.5} move="pan" mood="aube" faint={0.6} />
       <Draw draw={(ctx, tt, E) => {
@@ -581,6 +626,7 @@ const Today: React.FC = () => {
           E.drawRealGlyph(ctx, 'wen_jinwen', { x: 960, y: 500, size: 560, opacity: w, color: (c: string) => (c === 'heart' ? rgb(mixc(INK, P.heart, heart)) : inkCss), glow: 30 * heart, glowColor: rgb(P.hand, 0.6) });
         }
       }} />
+      </Cam>
       <Caption text="11 traits · identique en Chine et au Japon" a={win(t, tr, at('b09', 'formes') - 0.9, 0.4)} y={880} size={46} />
       <Caption text="trois dessins, dans toutes les formes" a={win(t, at('b09', 'formes'), yao - 0.1, 0.4)} y={1010} size={42} />
       <Caption text="jiào · enseigner" a={win(t, nait + 0.6, cl - 0.2, 0.4)} y={880} size={52} />
@@ -616,6 +662,21 @@ const Win: React.FC<{ from: number; to: number; children: React.ReactNode }> = (
   return t >= from && t < to ? <>{children}</> : null;
 };
 
+// bruitages discrets (ElevenLabs text-to-sound, episodes/jiao/audio/sfx_*.wav) : pinceau sur les tracés, sceau sur les
+// révélations, gravure sur l'os d'exercice, gong sur les trois moments-clés (≠, « Ainsi naît », la maxime)
+type Sfx = ['pinceau' | 'sceau' | 'gravure' | 'gong', number, number];
+const sfx = (): Sfx[] => [
+  ['pinceau', A('b01') - 0.3, 0.45], ['pinceau', A('b01') + 0.8, 0.4], ['sceau', at('b02', 'dessin') + 0.4, 0.55],
+  ['gravure', at('b03', 'maitre') + 0.3, 0.4], ['gravure', at('b03', 'eleve') - 3.0, 0.35], ['sceau', at('b03', 'signe'), 0.55],
+  ['pinceau', at('b04', 'confucius') - 0.6, 0.4], ['pinceau', at('b04', 'regle') - 1.6, 0.4], ['sceau', at('b04', 'regle') - 0.6, 0.45],
+  ['sceau', at('b05', 'frapper'), 0.6],
+  ['pinceau', at('b06', 'lettre') - 0.2, 0.4], ['sceau', at('b06', 'tape') - 0.4, 0.4],
+  ['pinceau', at('b07', 'tasse') - 0.2, 0.45], ['pinceau', at('b07', 'vrai'), 0.4], ['gong', at('b07', 'ressemblance'), 0.5],
+  ['sceau', at('b08', 'grotte'), 0.45], ['pinceau', at('b08', 'refus') - 0.2, 0.35],
+  ['pinceau', A('b09') + 0.2, 0.4], ['gong', at('b09', 'naissance'), 0.5],
+  ['gong', at('b10', 'maxime') - 0.1, 0.45], ['pinceau', at('b10', 'wen') + 0.2, 0.4],
+];
+
 export const JiaoV1: React.FC = () => {
   const ready = useSetup();
   const { fps } = useVideoConfig();
@@ -643,6 +704,9 @@ export const JiaoV1: React.FC = () => {
         <Win from={A('b09') - 0.3} to={END}><Today /></Win>
         <Win from={END} to={JIAO_SECONDS + 1}><EndCard /></Win>
       </>}
+      {sfx().map(([n, tt, v], i) => (
+        <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/jiao/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
+      ))}
       {clips.map(voice)}
       <Audio src={staticFile('episodes/jiao/audio/musique.wav')} volume={0.55} />
     </AbsoluteFill>

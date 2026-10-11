@@ -9,6 +9,7 @@ from episode import charger, ligne_de_temps
 
 cfg = charger(sys.argv[1])
 D = cfg['voix']
+TEMPO = cfg.get('tempo', 1)  # voix accélérée par voix_prep.py : les temps Scribe (prise d'origine) sont divisés d'autant
 seg = json.load(open(f'{D}/segments.json'))
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 norm = lambda w: re.sub(r"[^\w']", '', w.lower())
@@ -28,7 +29,7 @@ for clip, cles in cfg['reperes_cles'].items():
         kt = [norm(k) for k in expr.split()]
         for i in range(k0, len(toks)):
             if i + len(kt) <= len(toks) and all(toks[i + j].startswith(k) for j, k in enumerate(kt)):
-                res[nom] = round(max(0, mots[i]['start'] - off), 2); k0 = i + 1; break
+                res[nom] = round(max(0, mots[i]['start'] - off) / TEMPO, 2); k0 = i + 1; break
         else:
             raise SystemExit(f'{clip} : « {expr} » introuvable dans la transcription')
     out[clip] = {'duration': seg[clip]['duration'], 'cues': res}
