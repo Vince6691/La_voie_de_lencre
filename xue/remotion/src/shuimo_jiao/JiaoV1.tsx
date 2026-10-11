@@ -17,7 +17,7 @@ import rep from '../data/episodes/jiao.json';
 
 type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b08' | 'b09' | 'b10';
 type Rep = Record<Clip, { duration: number; cues: Record<string, number> }> & {
-  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; fin: number; total: number };
+  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; fin: number; total: number; bruitages?: [string, number, number][] };
 };
 const R = rep as unknown as Rep;
 const L = R._ligne;
@@ -667,20 +667,9 @@ const Win: React.FC<{ from: number; to: number; children: React.ReactNode }> = (
   return t >= from && t < to ? <>{children}</> : null;
 };
 
-// bruitages discrets (ElevenLabs text-to-sound, episodes/jiao/audio/sfx_*.wav) : pinceau sur les tracés, sceau sur les
-// révélations, gravure sur l'os d'exercice, gong sur les trois moments-clés (≠, « Ainsi naît », la maxime)
-type Sfx = ['pinceau' | 'sceau' | 'gravure' | 'gong', number, number];
-const sfx = (): Sfx[] => [
-  ['pinceau', A('b01') - 0.3, 0.45], ['pinceau', A('b01') + 0.8, 0.4], ['sceau', at('b02', 'dessin') + 0.4, 0.55],
-  ['gravure', at('b03', 'maitre') + 0.3, 0.4], ['gravure', at('b03', 'eleve') - 3.0, 0.35], ['sceau', at('b03', 'signe'), 0.55],
-  ['pinceau', at('b04', 'confucius') - 0.6, 0.4], ['pinceau', at('b04', 'regle') - 1.6, 0.4], ['sceau', at('b04', 'regle') - 0.6, 0.45],
-  ['sceau', at('b05', 'frapper'), 0.6],
-  ['pinceau', at('b06', 'lettre') - 0.2, 0.4], ['sceau', at('b06', 'tape') - 0.4, 0.4],
-  ['pinceau', at('b07', 'tasse') - 0.2, 0.45], ['pinceau', at('b07', 'vrai'), 0.4], ['gong', at('b07', 'ressemblance'), 0.5],
-  ['sceau', at('b08', 'grotte'), 0.45], ['pinceau', at('b08', 'refus') - 0.2, 0.35],
-  ['pinceau', A('b09') + 0.2, 0.4], ['gong', at('b09', 'naissance'), 0.5],
-  ['gong', at('b10', 'maxime') - 0.1, 0.45], ['pinceau', at('b10', 'wen') + 0.2, 0.4],
-];
+// bruitages discrets (ElevenLabs text-to-sound, episodes/jiao/audio/sfx_*.wav) : liste dans episode.json « bruitages »,
+// résolue en temps absolus par reperes.py (_ligne.bruitages) — la même liste sert au mixage de bande_son.py
+const SFX = (L.bruitages ?? []) as [string, number, number][];
 
 export const JiaoV1: React.FC = () => {
   const ready = useSetup();
@@ -709,7 +698,7 @@ export const JiaoV1: React.FC = () => {
         <Win from={A('b09') - 0.3} to={END}><Today /></Win>
         <Win from={END} to={JIAO_SECONDS + 1}><EndCard /></Win>
       </>}
-      {sfx().map(([n, tt, v], i) => (
+      {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/jiao/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
       ))}
       {clips.map(voice)}

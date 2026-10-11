@@ -145,6 +145,7 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
 - Retours de l'utilisateur → corriger → images fixes → nouveau rendu. Commit et push à chaque étape.
 
 ## Pièges techniques rencontrés
+- Rendu complet : une tâche de fond est coupée à 2 h → `outils/video_shuimo/rendu_morceaux.sh` (bundle, morceaux de 3000 images ≈ 45 min chacun, puis assembler : bande son par ffmpeg via bande_son.py, sans rendu). Bruitages : liste `bruitages` d'episode.json (une seule source pour la composition et le mixage).
 - Cartes : ne jamais appeler `E.drawMap` à chaque image (5–6 s/image en rendu logiciel). Utiliser `E.mapLayer(ctx, v, vb, kmax, clé, dessin, alpha)` (fond dessiné une fois, puis agrandi) + `E.mapDeco` ; régions dans une couche à part dont on anime `alpha` ; modèle : cartes de `JiaoV1`.
 - Moteur Canvas (`loadLegacy`) : ne rendre les composants qu'une fois chargé (`ready`), dessiner en
   `useLayoutEffect` ; `drawStrokes` respecte l'opacité de l'appelant (`ctx.globalAlpha`).

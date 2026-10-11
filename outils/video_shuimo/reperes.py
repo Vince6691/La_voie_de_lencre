@@ -34,6 +34,13 @@ for clip, cles in cfg['reperes_cles'].items():
             raise SystemExit(f'{clip} : « {expr} » introuvable dans la transcription')
     out[clip] = {'duration': seg[clip]['duration'], 'cues': res}
 out['_ligne'] = ligne_de_temps(cfg, {c: v['duration'] for c, v in out.items()}, {c: v['cues'] for c, v in out.items()})
+# bruitages : [son, bloc, repère (ou null = début du bloc), décalage s, volume] → temps absolus (pause comprise)
+def _abs(clip, cue):
+    c = out['_ligne']['clips'][clip]
+    if cue is None: return c['debut']
+    v = out[clip]['cues'][cue]
+    return c['debut'] + v + (c['pause']['duree'] if c.get('pause') and v > c['pause']['coupe'] else 0)
+out['_ligne']['bruitages'] = [[n, round(_abs(b, r) + d, 3), vol] for n, b, r, d, vol in cfg.get('bruitages', [])]
 os.makedirs(os.path.dirname(cfg['reperes']), exist_ok=True)
 json.dump(out, open(cfg['reperes'], 'w', encoding='utf-8'), indent=1, ensure_ascii=False)
 L = out['_ligne']
