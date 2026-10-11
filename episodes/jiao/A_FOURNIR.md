@@ -2,16 +2,8 @@
 
 Déposer les fichiers tels quels (n'importe quel nom) : je les renomme et les range (`images/`, `clips/`, `glyphes/`).
 
-## 1. Glyphes anciens de 教 (indispensable) — comme pour le 學
-SVG vectorisés depuis zdic.net (ou PNG nets fond blanc), un fichier par époque :
-- `jiaguwen` — os oraculaire (de préférence la forme complète 爻 + 子 + 攴) ;
-- `jinwen` — bronze ;
-- `zhanguo` — Royaumes combattants (bambou Chu / Guodian si disponible) ;
-- `xiaozhuan` — petit sceau ;
-- `lishu` — écriture des clercs (là où le 孝 apparaît).
-Option : la variante jiaguwen **sans 子** (爻 + 攴), pour un plan bref.
-- **文** en jiaguwen (homme au torse orné), pour la passerelle finale.
-- **學** jinwen déjà disponible (`xue/assets/glyphs/`) pour le rappel du bloc 2 : rien à fournir.
+## 1. Glyphes anciens — FAIT (je les ai récupérés)
+19 formes de 教 et 26 de 文 téléchargées depuis 小學堂 (CC0) → `glyphes/` (voir `glyphes/SOURCE.md`). Rien à fournir.
 
 ## 2. Dessin 白描 de Confucius (indispensable) — même style que `xue/assets/portrait/xushen_a.jpg`
 Image 16:9, ≥ 1376 × 768, traits noirs purs sur fond blanc, aucun gris : je la vectorise et la peins trait par

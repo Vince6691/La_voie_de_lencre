@@ -34,16 +34,16 @@ main… qui tient un bâton. Enseigner, ce serait obéir, sous la menace ? ⏸ E
 
 ## 2. L'enjeu et le rappel du 學 — 0:15
 Dans 學, apprendre, deux mains transmettaient le savoir à un enfant. Ici, il ne reste qu'une main… et elle est
-armée. ⏸ Pour comprendre, il faut remonter trois mille ans, jusqu'aux premiers maîtres… et aux premiers élèves.
+armée. ⏸ Pour comprendre, retournons dans la toute première salle de classe… celle où l'on apprenait à graver.
 > plan : 學 ancien en pigments à gauche (mains vermillon), 教 ancien à droite : les deux mains s'éteignent, la main
 > au bâton s'allume ; puis 教 se rétracte en point d'encre ; paysage shuimo Shang (aube, brume) qui se peint autour.
 
 ## 3. Shang : l'os d'exercice — 0:32
-Vers 1200 avant notre ère, à Anyang, capitale des Shang. Les devins gravent leurs questions sur des os et des
-carapaces. Mais graver, cela s'apprend. ⏸ Sur un os, un maître a gravé une liste de jours, d'une main sûre. En
+Il y a trente-deux siècles, dans les ateliers royaux d'Anyang, capitale des Shang, on grave sur l'os les questions posées aux
+ancêtres. Mais graver, cela s'apprend. ⏸ Sur un os, un maître a gravé une liste de jours, d'une main sûre. En
 dessous, quelqu'un l'a recopiée… en tremblant. Un élève. ⏸
-Sur ces mêmes os apparaît notre signe. Des baguettes croisées, yáo, comme dans 學. Dessous, un enfant. Et à côté…
-une main qui tient un bâton.
+Sur ces mêmes os apparaît notre signe. On y reconnaît les baguettes déjà croisées dans 學, et le même enfant. Mais à côté, une
+main s'est levée… et elle tient un bâton.
 > plan : **clip Seedance A** (atelier de gravure : le maître grave, l'élève recopie), entrée par la mer de nuages,
 > sortie au pinceau ; estampage de l'os d'exercice (lignes du maître nettes, lignes de l'élève tremblées) ;
 > signe 教 jiaguwen révélé en blanc puis à l'encre, 爻 / 子 / 攴 prennent leurs pigments sur leurs mots.
@@ -52,7 +52,7 @@ une main qui tient un bâton.
 en passant le sceau 周]`
 
 ## 4. Confucius — 1:22
-Six siècles plus tard, l'empire des Zhou s'est morcelé en royaumes rivaux. Dans le petit royaume de Lu, un homme
+Sept siècles plus tard, l'empire des Zhou s'est morcelé en royaumes rivaux. Dans le petit royaume de Lu, un homme
 ouvre son enseignement à qui veut l'entendre : Confucius. ⏸ On raconte qu'il enseignait sous un abricotier. Sa règle
 tient en quatre caractères : 有教無類. Enseigner à tous, sans distinction. ⏸
 Ses disciples viennent des quatre coins du pays. Et quand Lu ne l'écoute plus, c'est lui qui part : quatorze ans
@@ -72,18 +72,21 @@ Alors, enseigner, c'est frapper ?
 
 `[ROULEAU 2 — Royaumes → Han, 3,5 s, rapide, sens inverse, impact sec]`
 
-## 6. Xu Shen — 2:42
-Vers l'an 100, le lettré Xu Shen répond dans son dictionnaire, le Shuowen jiezi. Ce bâton, écrit-il, c'est une
+## 6. Xu Shen (vers l'an 100, Han) — 2:42
+Vers l'an 100, la réponse vient d'un lettré penché sur son dictionnaire : Xu Shen. Ce bâton, écrit-il, c'est une
 petite tape. Pas un coup : une tape. ⏸ Et 教, c'est « ce que fait celui d'en haut, et que celui d'en bas
 imite ». On enseigne d'abord par l'exemple. ⏸
-Mais dans la même définition, Xu Shen écrit aussi : à gauche… 孝. La piété filiale.
+Et à gauche ? Xu Shen ne s'y trompe pas : il n'y voit pas la piété filiale, mais des baguettes posées sur un enfant.
 > plan : portrait de Xu Shen du 學 (réutilisé, rappel de la série), lattes du Shuowen
-> (教，上所施下所效也。从攴从孝 ; 攴，小擊也) ; à « petite tape », le vermillon s'adoucit.
+> (教，上所施下所效也。从攴从𡥉 ; 攴，小擊也) ; à « des baguettes posées sur un enfant », 𡥉 s'allume
+> en gomme-gutte et azurite ; à « petite tape », le vermillon s'adoucit.
 
 ## 7. Le retournement — 3:12
-Pourtant, sur les os et sur les bronzes, il n'y a jamais eu de 孝. ⏸ Sous les Han, les scribes écrivent vite. Le
-pinceau aplatit les baguettes, les serre contre l'enfant… et le dessin glisse vers un signe déjà connu. ⏸⏸
-Le 孝 n'a jamais été là. C'étaient des baguettes et un enfant, écrasés par le pinceau.
+Alors d'où vient notre 孝 ? ⏸ Ce qui s'est passé tient en un geste.
+Pour gagner de la place, le copiste des Han tasse les baguettes contre l'enfant. Les deux croix se couchent en
+quelques traits obliques… et le dessin glisse vers un signe que tout le monde connaît déjà. ⏸⏸
+Sur les os comme sur les bronzes, le 孝 n'a jamais été là. C'étaient des baguettes et un enfant, écrasés par le
+pinceau.
 > plan : 爻 (gomme-gutte) et 子 (azurite) du signe ancien se resserrent et se tassent en ocre jusqu'à coïncider
 > avec 孝 (fondu des formes, pas de superposition) ; silence long ; puis 孝 se dissout et 爻 + 子 reprennent
 > leurs pigments.
@@ -106,14 +109,14 @@ Le bâton n'a pas disparu. Mais il ne parle plus en premier.
 
 ## 9. Aujourd'hui et synthèse — 4:30
 Aujourd'hui, 教 n'a pas été simplifié : il s'écrit en onze traits, en Chine comme au Japon. ⏸
-Alors le pinceau reprend tout depuis le début : des baguettes pour compter, un enfant pour apprendre, une main
-qui tapote pour l'éveiller. Ainsi naît jiào : enseigner.
+Alors le pinceau unit des baguettes pour compter, un enfant penché dessus, et une main qui tapote pour
+l'éveiller. Ainsi naît jiào : enseigner.
 On le lit dans 教室, la salle de classe, et dans 教師, le maître.
 > plan : 教 tracé en 11 traits (compteur) ; bandeau des écritures (甲骨文 → 金文 → 小篆 → 隸書 → 教) + rubans des
 > composantes, chaque composante en couleur exactement sur son mot ; 教室 / 教师 sur enseignes (coups de pinceau).
 
 ## 10. Chute et passerelle — 4:52
-Le bâton est resté dans le signe. Mais depuis trois mille ans, il ne frappe pas : il réveille. ⏸ Enseigner, c'est
+Le bâton est resté dans le signe. Mais de l'os d'Anyang aux académies des montagnes, il sert d'abord à réveiller. ⏸ Enseigner, c'est
 frapper doucement à la porte d'un esprit.
 Et ce que l'on enseigne, la Chine l'appelle wén : la culture, l'écriture. À l'origine… un homme, le torse
 couvert de dessins.
@@ -126,8 +129,7 @@ couvert de dessins.
 ≈ 585 mots à 125 mots/min (≈ 4 min 40) + 14,5 s de rouleaux + transition + pauses → **≈ 5 min 10**
 (dépassement léger accepté). Si trop long à l'écoute : couper « Ses disciples viennent des quatre coins du pays »
 et « On enseigne d'abord par l'exemple » (−8 s).
-Sauts d'époque annoncés : « Vers 1200 avant notre ère », « Six siècles plus tard », « Vers l'an 100 »,
-« Sous les Han », « Mille ans plus tard », « Aujourd'hui ».
+Sauts d'époque annoncés : « Il y a trente-deux siècles », « Sept siècles plus tard », « Vers l'an 100 », « le copiste des Han », « Mille ans plus tard », « Aujourd'hui ».
 
 ## Titres possibles
 1. Pourquoi « enseigner » contient un bâton en chinois

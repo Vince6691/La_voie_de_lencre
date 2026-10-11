@@ -1,6 +1,8 @@
 # 教 — sources et points à vérifier
 
-- **Shuowen jiezi** (卷三下, 教部) : « 教，上所施下所效也。从攴从孝。» ; « 攴，小擊也。从又卜聲。»
+- **Shuowen jiezi** (卷三下, 教部), texte donné par 小學堂 : « 教，上所施下所效也。从攴，从𡥉。𧧿，古文教；𤕝，亦古文教。»
+  (𡥉 = 爻 sur 子). Certaines éditions / citations modernes donnent « 从攴从孝 » : **à confirmer** sur le 大徐本 et le 段注
+  (sites zdic et dict.variants.moe inaccessibles depuis le conteneur). Le texte de la voix ne dépend que de la version 𡥉. ; « 攴，小擊也。从又卜聲。»
   Le 學 du Shuowen est donné comme forme abrégée de 斆 (教部), d'où la parenté 教 / 學.
 - **小學堂** (Academia Sinica) et **zdic** : formes jiaguwen, jinwen, Chu (bambou), petit sceau, lishu de 教.
 - **Lunyu** 15.39 : 「子曰：有教無類。」
