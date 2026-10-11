@@ -134,6 +134,8 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
 ## Étape 5 — Vérifier, puis rendre
 - Images fixes aux instants clés (`npx remotion still … --scale=0.25`, planche contact) ; demi-résolution pour juger
   la taille des textes.
+- Juger la voix sans vidéo : `python3 outils/video_shuimo/bande_son.py <episode.json>` → `apercus/bande_son.mp3` (quelques
+  secondes) ; à proposer avant tout rendu quand seule la voix a changé.
 - Itérations rapides : `outils/video_shuimo/apercu.sh <Composition> scene <début> <fin>` (un passage en 540p, quelques
   minutes) ou `brouillon` (toute la vidéo en 360p) ; ne jamais dépasser `nproc` en concurrence (4 cœurs ici).
 - Rendu 720p (`apercu.sh <Composition> final`) : `--scale=0.6666666666666666 --crf=30`, puis loudnorm −14 LUFS → `xue/out/preview/`. Navigateur :
