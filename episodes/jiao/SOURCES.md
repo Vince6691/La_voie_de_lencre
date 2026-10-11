@@ -8,6 +8,11 @@
 - **Shiji, Kongzi shijia** : voyage de Confucius hors de Lu (≈ 497–484 av. n. è., « quatorze ans »).
 - **Zhuangzi, Yufu** : « 孔子遊乎緇帷之林，休坐乎杏壇之上 » — origine de l'« abricotier » (légende).
 
+- **Zhu Xi, 白鹿洞書院揭示** (1180) : principes affichés « 揭之楣間 » ; il écarte les « 規矩禁防之具 »
+  (règlements et interdictions) au profit de l'intelligence des principes.
+- **Quatre grandes académies Song** : 白鹿洞 (mont Lu, Jiangxi), 岳麓 (Changsha), 嵩陽 (Dengfeng), 應天府 (Shangqiu).
+- **文** (passerelle) : jiaguwen = homme de face, motif (tatouage) sur la poitrine — lecture courante, à vérifier.
+
 ## Fait / hypothèse / légende
 - **Fait** : formes anciennes de 教 = 爻 + 子 + 攴 (parfois sans 子) ; 攴 = main tenant un bâton / une baguette.
 - **Fait** : le 孝 de la forme moderne vient de la contraction de 爻 + 子 (隸變) ; 孝 ancien = 老 + 子, sans rapport.
@@ -23,7 +28,10 @@
 - « Six siècles plus tard » : 1200 → Confucius (551–479) ≈ 650 ans, OK.
 - Usage de 教 dans les inscriptions Shang (« 多子其教 » ?) : ne pas l'affirmer sans référence (non utilisé dans le texte).
 - Lecture de 夏楚 (bois de 槚 et épineux 荊/楚) ; formulation « l'une d'arbre, l'autre d'épines ».
-- 宗教 : mot ancien (bouddhisme) réemployé au XIXe s. pour « religion » via le japonais — « l'enseignement des
+- Zhu Xi relève Bailudong en 1179, le 揭示 date de 1180 : « En 1179… il y affiche » OK si formulé ainsi ;
+  « au-dessus de la porte » = 楣間 (linteau).
+- Liste et localisation des « quatre grandes académies » (listes variables selon les auteurs : parfois 石鼓 au lieu de 嵩陽).
+- 宗教 (coupé du texte) : mot ancien (bouddhisme) réemployé au XIXe s. pour « religion » via le japonais — « l'enseignement des
   ancêtres » est une glose : à reformuler (« l'enseignement des origines ») ou couper.
 - Frontières des royaumes des Printemps et Automnes (historical-basemaps, approximatives) ; itinéraire de Confucius
   (Lu → Wei → Cao → Song → Zheng → Chen → Cai → Chu marges → Wei → Lu), simplifié à l'écran.

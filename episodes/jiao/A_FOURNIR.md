@@ -10,6 +10,8 @@ SVG vectorisés depuis zdic.net (ou PNG nets fond blanc), un fichier par époque
 - `xiaozhuan` — petit sceau ;
 - `lishu` — écriture des clercs (là où le 孝 apparaît).
 Option : la variante jiaguwen **sans 子** (爻 + 攴), pour un plan bref.
+- **文** en jiaguwen (homme au torse orné), pour la passerelle finale.
+- **學** jinwen déjà disponible (`xue/assets/glyphs/`) pour le rappel du bloc 2 : rien à fournir.
 
 ## 2. Dessin 白描 de Confucius (indispensable) — même style que `xue/assets/portrait/xushen_a.jpg`
 Image 16:9, ≥ 1376 × 768, traits noirs purs sur fond blanc, aucun gris : je la vectorise et la peins trait par
@@ -45,15 +47,12 @@ Image de départ Nano Banana conseillée (style Pixar, mêmes réglages que les 
 > wooden rod, and lightly taps the edge of the boy's table with it — tok. The boy jolts upright, eyes wide, then
 > smiles sheepishly; the teacher's face softens. Camera at the boys' eye level, gentle dolly. No violence, no text.
 
-Option (si tu veux un 3e clip, bloc 4) : Confucius et ses disciples sur la route en char à bœufs, poussière dorée —
-sinon la carte avec itinéraire porte seule ce passage.
 
 ## 4. Optionnel
 - Une photo / estampage de l'os d'exercice (殷契粹編 1468) si tu la trouves : je le redessine en estampage fidèle ;
   sinon je le recompose (lignes nettes du maître / lignes tremblées de l'élève).
-- Ton choix de passerelle finale : 孝 (proposé), ou un autre caractère prévu au calendrier.
 
 ## Ce que je fais sans rien fournir
-Cartes (Anyang ; royaumes des Printemps et Automnes + itinéraire de Confucius), paysages shuimo, rouleaux du temps,
+Cartes (royaumes des Printemps et Automnes + itinéraire de Confucius ; académies 書院 des Song), paysages shuimo, rouleaux du temps,
 tracé 教 et 孝 (Make Me a Hanzi), lattes du Shuowen, portrait de Xu Shen (réutilisé), voix ElevenLabs, musique,
 montage et aperçus 720p.

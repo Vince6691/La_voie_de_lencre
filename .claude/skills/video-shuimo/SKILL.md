@@ -37,6 +37,19 @@ Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temp
 - **Téléphone** : aperçus 720p compressés et images fixes ; jamais de rendu 1080p complet sans demande. Un rendu
   720p de 4 min prend ≈ 50 min : n'en lancer qu'après vérification par images fixes.
 
+## Étape 0 — Questions de cadrage (OBLIGATOIRE, avant toute rédaction)
+Ne jamais écrire la proposition sans avoir posé ces questions (outil `AskUserQuestion`, 2–4 options chacune,
+recommandation en premier, éclairée par une recherche étymologique rapide) — même si la demande semble complète :
+1. **Angle / question d'ouverture** : 3–4 angles possibles pour ce caractère (mystère de forme, faux-ami, objet,
+   personnage, lien avec l'épisode précédent).
+2. **Époques et étapes du voyage** : lesquelles garder (multi-choix), et les grands sauts pour les rouleaux.
+3. **Cartes** : quel(s) lieu(x) et ce qu'elles montrent (capitale, royaumes, itinéraire, diffusion).
+4. **Dessin 白描 / portrait** : sujet (personnage historique, scène de maître et d'élève…), un seul ou plusieurs.
+5. **Clips 3D (Seedance)** : combien (0–3) et quelles scènes.
+6. **Durée et passerelle** : durée cible, caractère suivant annoncé à la fin, rappel des épisodes précédents.
+Reprendre dans les questions ce que l'utilisateur a déjà fixé (« au moins une carte » → demander laquelle, pas si).
+Consigner les réponses en tête de `PROPOSITION.md` (section « Cadrage »).
+
 ## Étape 1 — Recherche et proposition
 Recherche étymologique (Shuowen, 小學堂, zdic ; fait / hypothèse / légende). Puis **PROPOSITION.md** : question
 d'ouverture, réponse, maxime, voyage en 7–9 blocs avec `> plan :` sous chaque bloc, rouleaux entre les grands sauts,
