@@ -37,4 +37,19 @@ for (const f of fs.readdirSync(`${X}/assets/exemples_videos`)) cp(`${X}/assets/e
 cp(`${X}/assets/voice_sx/cues_sx.json`, `${here}/src/data/cues_sx.json`);
 for (const f of fs.readdirSync(`${X}/assets/voice_sx`)) if (f.endsWith('.wav')) cp(`${X}/assets/voice_sx/${f}`, `${here}/public/voice_sx/${f}`);
 if (fs.existsSync(`${X}/assets/audio/bed_sx.wav`)) cp(`${X}/assets/audio/bed_sx.wav`, `${here}/public/audio/bed_sx.wav`);
+// épisodes shuimo (episodes/<pinyin>/, outils/video_shuimo) : voix, musique, clips, images → public/episodes/<pinyin>/ ;
+// repères → src/data/episodes/<pinyin>.json ; glyphes de tous les épisodes → public/legacy/episodes.js (chargé par legacy.ts)
+const EP = path.resolve(X, '..', 'episodes');
+let extra = '';
+if (fs.existsSync(EP)) for (const p of fs.readdirSync(EP)) {
+  const e = `${EP}/${p}`;
+  if (!fs.existsSync(`${e}/episode.json`)) continue;
+  for (const [dir, ok] of [['voix', (f) => f.endsWith('.wav')], ['audio', (f) => f.endsWith('.wav')], ['clips', (f) => f.endsWith('.mp4')], ['images', (f) => /\.(png|jpe?g)$/.test(f)]]) {
+    if (fs.existsSync(`${e}/${dir}`)) for (const f of fs.readdirSync(`${e}/${dir}`)) if (ok(f)) cp(`${e}/${dir}/${f}`, `${here}/public/episodes/${p}/${dir}/${f}`);
+  }
+  if (fs.existsSync(`${e}/voix/reperes.json`)) cp(`${e}/voix/reperes.json`, `${here}/src/data/episodes/${p}.json`);
+  if (fs.existsSync(`${e}/glyphes/donnees.js`)) extra += fs.readFileSync(`${e}/glyphes/donnees.js`, 'utf8');
+}
+fs.mkdirSync(`${here}/public/legacy`, { recursive: true });
+fs.writeFileSync(`${here}/public/legacy/episodes.js`, extra || '// aucun épisode\n');
 console.log('synchronisé');

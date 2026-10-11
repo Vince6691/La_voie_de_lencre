@@ -18,9 +18,11 @@
  "b03": {
   "duration": 32.23,
   "cues": {
+   "ateliers": 1.97,
    "maitre": 12.33,
    "eleve": 20.17,
    "signe": 21.69,
+   "yao": 24.97,
    "enfant": 27.29,
    "baton": 31.29
   }
@@ -31,6 +33,7 @@
    "confucius": 10.19,
    "abricotier": 13.1,
    "regle": 18.74,
+   "disciples": 21.58,
    "routes": 27.82
   }
  },
@@ -44,6 +47,7 @@
  "b06": {
   "duration": 26.17,
   "cues": {
+   "lettre": 1.08,
    "tape": 7.96,
    "exemple": 13.46,
    "gauche": 19.4,
@@ -56,7 +60,8 @@
    "geste": 2.45,
    "tasse": 7.89,
    "glisse": 13.01,
-   "reponse": 16.85
+   "reponse": 16.85,
+   "jamais": 18.77
   }
  },
  "b08": {
@@ -64,6 +69,7 @@
   "cues": {
    "academies": 5.2,
    "zhuxi": 8.56,
+   "grotte": 14.56,
    "refus": 19.6,
    "baton": 28.64
   }
@@ -76,7 +82,8 @@
    "enfant": 9.82,
    "main": 11.58,
    "naissance": 13.7,
-   "classe": 18.62
+   "classe": 18.62,
+   "maitre": 21.54
   }
  },
  "b10": {
@@ -84,6 +91,7 @@
   "cues": {
    "maxime": 7.48,
    "wen": 11.32,
+   "origine": 17.16,
    "homme": 18.52
   }
  },
