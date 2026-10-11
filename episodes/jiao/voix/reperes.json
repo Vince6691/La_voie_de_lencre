@@ -1,0 +1,160 @@
+{
+ "b01": {
+  "duration": 17.89,
+  "cues": {
+   "xiao": 2.62,
+   "baton": 11.14,
+   "mentait": 17.5
+  }
+ },
+ "b02": {
+  "duration": 14.48,
+  "cues": {
+   "xue": 0,
+   "armee": 7.9,
+   "classe": 10.06
+  }
+ },
+ "b03": {
+  "duration": 32.23,
+  "cues": {
+   "maitre": 12.33,
+   "eleve": 20.17,
+   "signe": 21.69,
+   "enfant": 27.29,
+   "baton": 31.29
+  }
+ },
+ "b04": {
+  "duration": 30.8,
+  "cues": {
+   "confucius": 10.19,
+   "abricotier": 13.1,
+   "regle": 18.74,
+   "routes": 27.82
+  }
+ },
+ "b05": {
+  "duration": 15.8,
+  "cues": {
+   "baguettes": 7.99,
+   "frapper": 15.47
+  }
+ },
+ "b06": {
+  "duration": 26.17,
+  "cues": {
+   "tape": 7.96,
+   "exemple": 13.46,
+   "gauche": 19.4,
+   "baguettes": 24.44
+  }
+ },
+ "b07": {
+  "duration": 24.45,
+  "cues": {
+   "geste": 2.45,
+   "tasse": 7.89,
+   "glisse": 13.01,
+   "reponse": 16.85
+  }
+ },
+ "b08": {
+  "duration": 32.14,
+  "cues": {
+   "academies": 5.2,
+   "zhuxi": 8.56,
+   "refus": 19.6,
+   "baton": 28.64
+  }
+ },
+ "b09": {
+  "duration": 22.1,
+  "cues": {
+   "traits": 4.14,
+   "yao": 8.34,
+   "enfant": 9.82,
+   "main": 11.58,
+   "naissance": 13.7,
+   "classe": 18.62
+  }
+ },
+ "b10": {
+  "duration": 20.98,
+  "cues": {
+   "maxime": 7.48,
+   "wen": 11.32,
+   "homme": 18.52
+  }
+ },
+ "_ligne": {
+  "clips": {
+   "b01": {
+    "debut": 0.6,
+    "duree": 17.89
+   },
+   "b02": {
+    "debut": 19.39,
+    "duree": 14.48
+   },
+   "b03": {
+    "debut": 34.87,
+    "duree": 32.23
+   },
+   "b04": {
+    "debut": 73.1,
+    "duree": 30.8
+   },
+   "b05": {
+    "debut": 104.7,
+    "duree": 15.8
+   },
+   "b06": {
+    "debut": 124.9,
+    "duree": 26.17
+   },
+   "b07": {
+    "debut": 151.87,
+    "duree": 24.45,
+    "pause": {
+     "coupe": 16.73,
+     "duree": 1.7
+    }
+   },
+   "b08": {
+    "debut": 185.22,
+    "duree": 32.14
+   },
+   "b09": {
+    "debut": 219.36,
+    "duree": 22.1
+   },
+   "b10": {
+    "debut": 242.46,
+    "duree": 20.98
+   }
+  },
+  "rouleaux": [
+   {
+    "debut": 67.8,
+    "duree": 5
+   },
+   {
+    "debut": 121.1,
+    "duree": 3.5
+   },
+   {
+    "debut": 178.82,
+    "duree": 6
+   }
+  ],
+  "pauses": [
+   [
+    168.6,
+    1.7
+   ]
+  ],
+  "fin": 263.94,
+  "total": 267.14
+ }
+}

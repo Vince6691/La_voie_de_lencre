@@ -4,50 +4,31 @@
  "musique": "audio/musique.wav",
  "debut": 0.6,
  "sequence": [
-  {
-   "clip": "b01",
-   "apres": 0.9
-  },
-  {
-   "clip": "b02",
-   "apres": 1.0
-  },
-  {
-   "clip": "b03",
-   "apres": 0.7
-  },
-  {
-   "rouleau": 5,
-   "apres": 0.3
-  },
-  {
-   "clip": "b04",
-   "apres": 0.8
-  },
-  {
-   "clip": "b05",
-   "pause": {
-    "repere": "reponse",
-    "decalage": -0.12,
-    "duree": 1.7
-   },
-   "apres": 1.0
-  },
-  {
-   "clip": "b06",
-   "apres": 0.5
-  }
+  {"clip": "b01", "apres": 0.9},
+  {"clip": "b02", "apres": 1.0},
+  {"clip": "b03", "apres": 0.7},
+  {"rouleau": 5, "apres": 0.3},
+  {"clip": "b04", "apres": 0.8},
+  {"clip": "b05", "apres": 0.6},
+  {"rouleau": 3.5, "apres": 0.3},
+  {"clip": "b06", "apres": 0.8},
+  {"clip": "b07", "pause": {"repere": "reponse", "decalage": -0.12, "duree": 1.7}, "apres": 0.8},
+  {"rouleau": 6, "apres": 0.4},
+  {"clip": "b08", "apres": 2.0},
+  {"clip": "b09", "apres": 1.0},
+  {"clip": "b10", "apres": 0.5}
  ],
  "queue": 3.2,
  "reperes_cles": {
-  "b01": {
-   "mains": "deux mains"
-  },
-  "b03": {
-   "signe": "C'est là"
-  },
-  "b05": {
-   "reponse": "Les mains n'ont pas"
-  }
+  "b01": {"xiao": "À gauche", "baton": "un bâton", "mentait": "mentait"},
+  "b02": {"xue": "Dans", "armee": "armée", "classe": "retournons"},
+  "b03": {"maitre": "un maître", "eleve": "Un élève", "signe": "Sur ces mêmes", "enfant": "le même enfant", "baton": "elle tient"},
+  "b04": {"confucius": "Confucius", "abricotier": "abricotier", "regle": "Enseigner à tous", "routes": "quatorze ans"},
+  "b05": {"baguettes": "deux baguettes", "frapper": "frapper"},
+  "b06": {"tape": "petite tape", "exemple": "ce que fait", "gauche": "Et à gauche", "baguettes": "des baguettes posées"},
+  "b07": {"geste": "Ce qui s'est", "tasse": "tasse les baguettes", "glisse": "le dessin glisse", "reponse": "Sur les os comme"},
+  "b08": {"academies": "Partout naissent", "zhuxi": "En mille", "refus": "Mais il refuse", "baton": "Le bâton n'a"},
+  "b09": {"traits": "onze traits", "yao": "des baguettes pour", "enfant": "un enfant penché", "main": "une main qui", "naissance": "Ainsi naît", "classe": "la salle de classe"},
+  "b10": {"maxime": "Enseigner, c'est", "wen": "Et ce que", "homme": "un homme"}
  }
 }
