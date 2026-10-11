@@ -106,7 +106,9 @@ Révélations disponibles mais non retenues (sur demande) : lavis + taches, gout
 ## Étape 5 — Vérifier, puis rendre
 - Images fixes aux instants clés (`npx remotion still … --scale=0.25`, planche contact) ; demi-résolution pour juger
   la taille des textes.
-- Rendu 720p : `--scale=0.6666666666666666 --crf=30`, puis loudnorm −14 LUFS → `xue/out/preview/`. Navigateur :
+- Itérations rapides : `outils/video_shuimo/apercu.sh <Composition> scene <début> <fin>` (un passage en 540p, quelques
+  minutes) ou `brouillon` (toute la vidéo en 360p) ; ne jamais dépasser `nproc` en concurrence (4 cœurs ici).
+- Rendu 720p (`apercu.sh <Composition> final`) : `--scale=0.6666666666666666 --crf=30`, puis loudnorm −14 LUFS → `xue/out/preview/`. Navigateur :
   `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`.
 - Retours de l'utilisateur → corriger → images fixes → nouveau rendu. Commit et push à chaque étape.
 
