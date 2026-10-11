@@ -9,17 +9,21 @@ Déposer les fichiers tels quels (n'importe quel nom) : je les renomme et les ra
 Image 16:9, ≥ 1376 × 768, traits noirs purs sur fond blanc, aucun gris : je la vectorise et la peins trait par
 trait (`build_portrait.py`). Prompt Nano Banana :
 
-> Traditional Chinese baimiao line drawing, fine even black ink outlines only, no shading, no color, no gray wash,
-> pure white background, 16:9. An elderly teacher with a long thin beard, hair in a topknot under a small cloth cap,
-> wearing a wide-sleeved cross-collared robe tied with a sash, seated cross-legged on a woven reed mat on a low raised
-> stone platform, under a gnarled apricot tree in blossom whose branches frame the top of the image. One hand raised
-> in a gentle explaining gesture, the other resting on his knee. In front of him, three young students kneel on mats
-> in profile and three-quarter view, one holding an open roll of bamboo slips bound with cord, one listening with
-> hands joined in his sleeves. A low wooden table with an ink stone and bundled bamboo slips. Clean contour lines,
-> folds of the robes drawn with long continuous strokes, petals as small open outlines. Figures occupy the center
-> and right two thirds; left third mostly empty white. No text, no seal, no signature, no frame.
+> Traditional Chinese baimiao line drawing, fine even black ink outlines only, no shading, no hatching, no color, no gray
+> wash, pure white background, 16:9 landscape. An elderly teacher in his late sixties, broad forehead, long thin beard and
+> drooping moustache, hair gathered in a simple topknot tied with a cloth band, wearing a plain wide-sleeved robe with a
+> cross-collar closing to the right, a long sash knotted at the waist, seated cross-legged on a woven reed mat on a low
+> square earthen platform. Behind him a gnarled apricot tree in blossom leans in from the left, its branches arching over
+> his head, a few petals falling. One hand raised at chest height in a gentle explaining gesture, palm open, the other
+> hand resting on his knee. His face is calm and attentive, turned slightly toward his listeners. In front of him, lower in
+> the frame, four young disciples kneel on mats in three-quarter back and profile views, of different ages and builds: one
+> holds an open bundle of bamboo slips tied with two cords, one listens with hands joined inside his sleeves, one leans
+> forward, one writes with a brush on a slip. A small low wooden table with an ink stone and a rolled bundle of slips.
+> Composition: all figures and the tree inside the left two thirds of the image, the right third completely empty white
+> paper. Clean closed contour lines, long continuous strokes for robe folds, petals drawn as small open outlines, mat
+> weave suggested with a few lines only. No text, no calligraphy, no seal, no signature, no frame, no border.
 
-Livrer 2–3 variantes ; je choisis celle qui se vectorise le mieux (traits fermés, peu de hachures).
+Cadrage : le tiers droit reste vide (有教無類 s'y calligraphie dans le montage). Livrer 2–3 variantes ; je choisis celle qui se vectorise le mieux (traits fermés, peu de hachures).
 
 ## 3. Clips 3D Seedance (8–15 s, 16:9, sans texte ni sous-titres)
 Image de départ Nano Banana conseillée (style Pixar, mêmes réglages que les clips du 學).
