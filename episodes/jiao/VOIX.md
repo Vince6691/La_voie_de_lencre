@@ -1,5 +1,5 @@
 # 教 — textes envoyés au synthétiseur (ElevenLabs « Chinese narration », eleven_v4)
-Version v4 « discrète » : balises eleven_v4 aux changements de ton (validé). 教 seul en début de phrase → IPA /tɕjâʊ/ enchaînée « /tɕjâʊ/ : enseigner » (prise B retenue ; « /tɕjâʊ/. » seul donnait deux « jiao »). Jamais [softly]/[whispers] (chuchotement). Débit +5 % au montage (episode.json « tempo »).
+Version v4 « discrète » : balises eleven_v4 aux changements de ton (validé). 教 seul en début de phrase → IPA /tɕjâʊ/ enchaînée « /tɕjâʊ/ : enseigner » (prise B retenue ; « /tɕjâʊ/. » seul donnait deux « jiao »). Jamais [softly]/[whispers] (chuchotement).
 Noms chinois en caractères. Pièges japonais : 教, 孝, 文, 宋, 教室 existent aussi en japonais → **2 prises** pour
 b01, b06, b07, b08, b09, b10 (choix à l'oreille). Formes simplifiées propres au chinois quand elles existent
 (教师, 有教无类, 书院, 鲁, 汉, 许慎, 安阳) pour forcer le mandarin. Nombres en lettres.

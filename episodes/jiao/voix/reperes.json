@@ -1,181 +1,181 @@
 {
  "b01": {
-  "duration": 16.17,
+  "duration": 16.97,
   "cues": {
-   "xiao": 2.63,
-   "baton": 10.17,
-   "mentait": 15.85
+   "xiao": 2.76,
+   "baton": 10.68,
+   "mentait": 16.64
   }
  },
  "b02": {
-  "duration": 11.64,
+  "duration": 12.21,
   "cues": {
-   "assemblages": 2.01,
-   "dessin": 7.34,
-   "os": 9.21
+   "assemblages": 2.11,
+   "dessin": 7.71,
+   "os": 9.67
   }
  },
  "b03": {
-  "duration": 37.17,
+  "duration": 39.01,
   "cues": {
-   "ateliers": 1.84,
-   "maitre": 11.74,
-   "eleve": 18.91,
-   "signe": 20.05,
-   "yao": 23.25,
-   "xue": 26.37,
-   "enfant": 29.65,
-   "baton": 33.65,
-   "main": 34.41,
-   "doigts": 35.67
+   "ateliers": 1.93,
+   "maitre": 12.33,
+   "eleve": 19.85,
+   "signe": 21.05,
+   "yao": 24.41,
+   "xue": 27.69,
+   "enfant": 31.13,
+   "baton": 35.33,
+   "main": 36.13,
+   "doigts": 37.45
   }
  },
  "b04": {
-  "duration": 28.6,
+  "duration": 30.02,
   "cues": {
-   "royaumes": 3.26,
-   "lu": 4.78,
-   "confucius": 9.48,
-   "abricotier": 12.17,
-   "regle": 17.28,
-   "disciples": 20.02,
-   "routes": 25.89
+   "royaumes": 3.42,
+   "lu": 5.02,
+   "confucius": 9.95,
+   "abricotier": 12.78,
+   "regle": 18.14,
+   "disciples": 21.02,
+   "routes": 27.18
   }
  },
  "b05": {
-  "duration": 14.51,
+  "duration": 15.24,
   "cues": {
-   "baguettes": 7.44,
-   "frapper": 14.18
+   "baguettes": 7.81,
+   "frapper": 14.89
   }
  },
  "b06": {
-  "duration": 24.53,
+  "duration": 25.74,
   "cues": {
-   "lettre": 1.11,
-   "tape": 7.59,
-   "exemple": 12.74,
-   "gauche": 18.3,
-   "baguettes": 22.9
+   "lettre": 1.17,
+   "tape": 7.97,
+   "exemple": 13.38,
+   "gauche": 19.22,
+   "baguettes": 24.05
   }
  },
  "b07": {
-  "duration": 29.23,
+  "duration": 30.68,
   "cues": {
-   "geste": 2.25,
-   "tasse": 6.98,
-   "glisse": 11.51,
-   "reponse": 14.9,
-   "jamais": 16.73,
-   "vrai": 18.75,
-   "vieillard": 22.52,
-   "ressemblance": 27.39
+   "geste": 2.36,
+   "tasse": 7.32,
+   "glisse": 12.08,
+   "reponse": 15.64,
+   "jamais": 17.56,
+   "vrai": 19.68,
+   "vieillard": 23.64,
+   "ressemblance": 28.76
   }
  },
  "b08": {
-  "duration": 30.08,
+  "duration": 31.56,
   "cues": {
-   "academies": 4.93,
-   "zhuxi": 7.97,
-   "grotte": 13.53,
-   "refus": 18.26,
-   "baton": 26.72
+   "academies": 5.17,
+   "zhuxi": 8.37,
+   "grotte": 14.21,
+   "refus": 19.17,
+   "baton": 28.05
   }
  },
  "b09": {
-  "duration": 29.1,
+  "duration": 30.56,
   "cues": {
-   "traits": 1.96,
-   "reprenons": 4.67,
-   "formes": 7.29,
-   "yao": 8.43,
-   "enfant": 11.18,
-   "main": 13.12,
-   "han": 15.18,
-   "xiao": 17.42,
-   "pasde": 18.95,
-   "naissance": 21.23,
-   "classe": 25.84,
-   "maitre": 28.55
+   "traits": 2.05,
+   "reprenons": 4.9,
+   "formes": 7.65,
+   "yao": 8.85,
+   "enfant": 11.73,
+   "main": 13.77,
+   "han": 15.93,
+   "xiao": 18.29,
+   "pasde": 19.89,
+   "naissance": 22.29,
+   "classe": 27.13,
+   "maitre": 29.97
   }
  },
  "b10": {
-  "duration": 19.37,
+  "duration": 20.33,
   "cues": {
-   "maxime": 7.13,
-   "wen": 10.75,
-   "origine": 15.97,
-   "homme": 17.11
+   "maxime": 7.48,
+   "wen": 11.29,
+   "origine": 16.76,
+   "homme": 17.96
   }
  },
  "_ligne": {
   "clips": {
    "b01": {
     "debut": 0.6,
-    "duree": 16.17
+    "duree": 16.97
    },
    "b02": {
-    "debut": 17.37,
-    "duree": 11.64
+    "debut": 18.47,
+    "duree": 12.21
    },
    "b03": {
-    "debut": 29.71,
-    "duree": 37.17
+    "debut": 31.68,
+    "duree": 39.01
    },
    "b04": {
-    "debut": 72.58,
-    "duree": 28.6
+    "debut": 76.69,
+    "duree": 30.02
    },
    "b05": {
-    "debut": 101.68,
-    "duree": 14.51
+    "debut": 107.51,
+    "duree": 15.24
    },
    "b06": {
-    "debut": 120.29,
-    "duree": 24.53
+    "debut": 127.15,
+    "duree": 25.74
    },
    "b07": {
-    "debut": 145.32,
-    "duree": 29.23,
+    "debut": 153.69,
+    "duree": 30.68,
     "pause": {
-     "coupe": 14.78,
+     "coupe": 15.52,
      "duree": 1.7
     }
    },
    "b08": {
-    "debut": 181.55,
-    "duree": 30.08
+    "debut": 193.27,
+    "duree": 31.56
    },
    "b09": {
-    "debut": 213.33,
-    "duree": 29.1
+    "debut": 226.83,
+    "duree": 30.56
    },
    "b10": {
-    "debut": 243.13,
-    "duree": 19.37
+    "debut": 258.39,
+    "duree": 20.33
    }
   },
   "rouleaux": [
    {
-    "debut": 67.28,
+    "debut": 71.39,
     "duree": 5
    },
    {
-    "debut": 116.49,
+    "debut": 123.35,
     "duree": 3.5
    },
    {
-    "debut": 176.75,
-    "duree": 4.5
+    "debut": 186.87,
+    "duree": 6
    }
   ],
   "pauses": [
    [
-    160.1,
+    169.21,
     1.7
    ]
   ],
-  "fin": 262.8,
-  "total": 266.0
+  "fin": 279.22,
+  "total": 282.42
  }
 }
