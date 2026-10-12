@@ -553,7 +553,7 @@ const Song: React.FC = () => {
   );
 };
 
-// ════════════════ 9–10. Aujourd'hui : 11 traits, bandeau des écritures, 教室 / 教师 ; chute ; passerelle 文
+// ════════════════ 9–10. Aujourd'hui : 11 traits, bandeau des écritures, 教室 / 教育 ; chute ; passerelle 文
 const FORMS: [string, string, string][] = [['real:jiao_jiaguwen', '甲骨文', 'Shang'], ['real:jiao_jinwen', '金文', 'Zhou'], ['real:jiao_zhanguo', '楚簡', 'Chu'], ['real:jiao_xiaozhuan', '小篆', 'Qin'], ['real:jiao_lishu', '隸書', 'Han'], ['kai:jiao_kai', '楷書', "aujourd'hui"]];
 const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) => {
   const y = 380, x0 = 480, dx = 228, sz = 220;
@@ -605,7 +605,7 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 
 const Today: React.FC = () => {
   const t = useT();
-  const A9 = A('b09'), tr = at('b09', 'traits'), yao = at('b09', 'yao'), nait = at('b09', 'naissance'), cl = at('b09', 'classe'), mt = at('b09', 'maitre');
+  const A9 = A('b09'), tr = at('b09', 'traits'), yao = at('b09', 'yao'), nait = at('b09', 'naissance'), cl = at('b09', 'classe'), mt = at('b09', 'education');
   const A10 = A('b10'), max = at('b10', 'maxime'), wen = at('b10', 'wen'), ori = at('b10', 'origine'), hom = at('b10', 'homme');
   return (
     <AbsoluteFill>
@@ -640,7 +640,7 @@ const Today: React.FC = () => {
       <Caption text="pas de piété filiale : des baguettes, un enfant, une main qui réveille" a={win(t, at('b09', 'pasde') - 0.1, nait - 0.2, 0.4)} y={1010} size={42} />
       <div style={{ position: 'absolute', width: '100%', top: 840, display: 'flex', justifyContent: 'center', gap: 160, fontFamily: 'ShuimoKai', fontSize: 72, color: inkCss }}>
         <span style={{ opacity: win(t, cl - 0.2, A10 - 0.3) }}>教室<div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, textAlign: 'center' }}>la salle de classe</div></span>
-        <span style={{ opacity: win(t, mt - 0.4, A10 - 0.3) }}>教师<div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, textAlign: 'center' }}>le maître</div></span>
+        <span style={{ opacity: win(t, mt - 0.4, A10 - 0.3) }}>教育<div style={{ fontFamily: 'ShuimoLatin', fontSize: 38, textAlign: 'center' }}>l'éducation</div></span>
       </div>
       {/* fiche : sceau, pinyin, nombre de traits */}
       <div style={{ position: 'absolute', left: 1080, top: 300, opacity: win(t, A10 + 0.2, wen - 0.3, 0.6) }}>
