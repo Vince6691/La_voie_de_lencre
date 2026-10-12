@@ -9,6 +9,7 @@ from episode import charger, ligne_de_temps
 
 cfg = charger(sys.argv[1])
 D = cfg['voix']
+TEMPO = cfg.get('tempo', 1)  # voix accélérée par voix_prep.py : les temps Scribe (prise d'origine) sont divisés d'autant
 seg = json.load(open(f'{D}/segments.json'))
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 norm = lambda w: re.sub(r"[^\w']", '', w.lower())
@@ -28,11 +29,22 @@ for clip, cles in cfg['reperes_cles'].items():
         kt = [norm(k) for k in expr.split()]
         for i in range(k0, len(toks)):
             if i + len(kt) <= len(toks) and all(toks[i + j].startswith(k) for j, k in enumerate(kt)):
-                res[nom] = round(max(0, mots[i]['start'] - off), 2); k0 = i + 1; break
+                res[nom] = round(max(0, mots[i]['start'] - off) / TEMPO, 2); k0 = i + 1; break
         else:
             raise SystemExit(f'{clip} : « {expr} » introuvable dans la transcription')
     out[clip] = {'duration': seg[clip]['duration'], 'cues': res}
 out['_ligne'] = ligne_de_temps(cfg, {c: v['duration'] for c, v in out.items()}, {c: v['cues'] for c, v in out.items()})
+# bruitages : [son, bloc, repère (ou null = début du bloc), décalage s, volume] → temps absolus (pause comprise) ;
+# bloc « R1 », « R2 »… = rouleau n, repère « impact » = arrivée sur le sceau (0,8 de sa durée, TimeScroll IMPACT)
+def _abs(clip, cue):
+    if clip[0] == 'R':
+        r = out['_ligne']['rouleaux'][int(clip[1:]) - 1]
+        return r['debut'] + (0.8 * r['duree'] if cue == 'impact' else 0)
+    c = out['_ligne']['clips'][clip]
+    if cue is None: return c['debut']
+    v = out[clip]['cues'][cue]
+    return c['debut'] + v + (c['pause']['duree'] if c.get('pause') and v > c['pause']['coupe'] else 0)
+out['_ligne']['bruitages'] = [[n, round(_abs(b, r) + d, 3), vol] for n, b, r, d, vol in cfg.get('bruitages', [])]
 os.makedirs(os.path.dirname(cfg['reperes']), exist_ok=True)
 json.dump(out, open(cfg['reperes'], 'w', encoding='utf-8'), indent=1, ensure_ascii=False)
 L = out['_ligne']

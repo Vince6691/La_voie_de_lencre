@@ -1,0 +1,701 @@
+{
+ "voix": "voix",
+ "reperes": "voix/reperes.json",
+ "musique": "audio/musique.wav",
+ "debut": 0.6,
+ "sequence": [
+  {
+   "clip": "b01",
+   "apres": 0.9
+  },
+  {
+   "clip": "b02",
+   "apres": 1.0
+  },
+  {
+   "clip": "b03",
+   "apres": 0.7
+  },
+  {
+   "rouleau": 5,
+   "apres": 0.3
+  },
+  {
+   "clip": "b04",
+   "apres": 0.8
+  },
+  {
+   "clip": "b05",
+   "apres": 0.6
+  },
+  {
+   "rouleau": 3.5,
+   "apres": 0.3
+  },
+  {
+   "clip": "b06",
+   "apres": 0.8
+  },
+  {
+   "clip": "b07",
+   "pause": {
+    "repere": "reponse",
+    "decalage": -0.12,
+    "duree": 1.7
+   },
+   "apres": 0.8
+  },
+  {
+   "rouleau": 6,
+   "apres": 0.4
+  },
+  {
+   "clip": "b08",
+   "apres": 2.0
+  },
+  {
+   "clip": "b09",
+   "apres": 1.0
+  },
+  {
+   "clip": "b10",
+   "apres": 0.5
+  }
+ ],
+ "queue": 3.2,
+ "reperes_cles": {
+  "b01": {
+   "xiao": "À gauche",
+   "baton": "un bâton",
+   "mentait": "mentait"
+  },
+  "b02": {
+   "assemblages": "des assemblages",
+   "dessin": "tout premier",
+   "os": "gravé sur"
+  },
+  "b03": {
+   "ateliers": "ateliers",
+   "maitre": "un maître",
+   "eleve": "Un élève",
+   "signe": "Sur ces mêmes",
+   "yao": "deux croix",
+   "xue": "les mêmes que",
+   "enfant": "un enfant, la",
+   "baton": "un bâton",
+   "main": "tenu par une",
+   "doigts": "trois doigts"
+  },
+  "b04": {
+   "royaumes": "royaumes rivaux",
+   "lu": "petit royaume",
+   "confucius": "Confucius",
+   "abricotier": "abricotier",
+   "regle": "Enseigner à tous",
+   "disciples": "Ses disciples",
+   "routes": "quatorze ans"
+  },
+  "b05": {
+   "baguettes": "deux baguettes",
+   "frapper": "frapper"
+  },
+  "b06": {
+   "lettre": "la réponse",
+   "tape": "petite tape",
+   "exemple": "ce que fait",
+   "gauche": "Et à gauche",
+   "baguettes": "des baguettes posées"
+  },
+  "b07": {
+   "geste": "Ce qui s'est",
+   "tasse": "tasse les baguettes",
+   "glisse": "le dessin glisse",
+   "reponse": "Sur les os comme",
+   "jamais": "le /ɕjâʊ/ n",
+   "vrai": "Le vrai",
+   "vieillard": "un vieillard",
+   "ressemblance": "Une ressemblance"
+  },
+  "b08": {
+   "academies": "Partout naissent",
+   "zhuxi": "En mille",
+   "grotte": "la Grotte",
+   "refus": "Mais il refuse",
+   "baton": "Le bâton n'a"
+  },
+  "b09": {
+   "traits": "onze traits",
+   "reprenons": "Reprenons",
+   "formes": "trois dessins",
+   "yao": "Les baguettes",
+   "enfant": "L'enfant",
+   "main": "Et la main",
+   "han": "Sous les",
+   "xiao": "prend l'air",
+   "pasde": "mais ce n'est",
+   "naissance": "Ainsi naît",
+   "classe": "la salle de classe",
+   "education": "l'éducation"
+  },
+  "b10": {
+   "maxime": "Enseigner, c'est",
+   "wen": "Et ce que",
+   "origine": "À l'origine",
+   "homme": "un homme"
+  }
+ },
+ "glyphes": {
+  "reels": {
+   "jiao_jiaguwen": {
+    "img": "glyphes/jiao_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲1251",
+    "defaut": "hand",
+    "polys": [
+     [
+      "yao",
+      [
+       [
+        105,
+        15
+       ],
+       [
+        208,
+        15
+       ],
+       [
+        208,
+        196
+       ],
+       [
+        105,
+        196
+       ]
+      ]
+     ],
+     [
+      "child",
+      [
+       [
+        105,
+        196
+       ],
+       [
+        214,
+        196
+       ],
+       [
+        214,
+        395
+       ],
+       [
+        105,
+        395
+       ]
+      ]
+     ],
+     [
+      "stick",
+      [
+       [
+        205,
+        110
+       ],
+       [
+        246,
+        110
+       ],
+       [
+        246,
+        222
+       ],
+       [
+        205,
+        222
+       ]
+      ]
+     ]
+    ],
+    "fusion": 0.12
+   },
+   "jiao_jinwen": {
+    "img": "glyphes/jiao_xiaoxue/02.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "散氏盤",
+    "defaut": "hand",
+    "polys": [
+     [
+      "yao",
+      [
+       [
+        25,
+        35
+       ],
+       [
+        212,
+        35
+       ],
+       [
+        212,
+        350
+       ],
+       [
+        25,
+        350
+       ]
+      ]
+     ]
+    ]
+   },
+   "jiao_zhanguo": {
+    "img": "glyphes/jiao_xiaoxue/05.png",
+    "label": "戰國文字",
+    "era": "Royaumes combattants",
+    "piece": "包山 2.99",
+    "defaut": "hand",
+    "polys": [
+     [
+      "yao",
+      [
+       [
+        35,
+        25
+       ],
+       [
+        236,
+        25
+       ],
+       [
+        236,
+        186
+       ],
+       [
+        35,
+        186
+       ]
+      ]
+     ],
+     [
+      "child",
+      [
+       [
+        35,
+        186
+       ],
+       [
+        240,
+        186
+       ],
+       [
+        240,
+        380
+       ],
+       [
+        35,
+        380
+       ]
+      ]
+     ]
+    ]
+   },
+   "jiao_xiaozhuan": {
+    "img": "glyphes/jiao_xiaoxue/13.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·教部",
+    "defaut": "hand",
+    "polys": [
+     [
+      "yao",
+      [
+       [
+        75,
+        15
+       ],
+       [
+        206,
+        15
+       ],
+       [
+        206,
+        206
+       ],
+       [
+        75,
+        206
+       ]
+      ]
+     ],
+     [
+      "child",
+      [
+       [
+        75,
+        206
+       ],
+       [
+        206,
+        206
+       ],
+       [
+        206,
+        395
+       ],
+       [
+        75,
+        395
+       ]
+      ]
+     ]
+    ]
+   },
+   "jiao_lishu": {
+    "img": "glyphes/jiao_xiaoxue/17.png",
+    "label": "隸書",
+    "era": "Han",
+    "piece": "孔宙碑",
+    "defaut": "hand",
+    "polys": [
+     [
+      "yao",
+      [
+       [
+        15,
+        55
+       ],
+       [
+        172,
+        55
+       ],
+       [
+        172,
+        206
+       ],
+       [
+        15,
+        206
+       ]
+      ]
+     ],
+     [
+      "child",
+      [
+       [
+        15,
+        206
+       ],
+       [
+        172,
+        206
+       ],
+       [
+        172,
+        345
+       ],
+       [
+        15,
+        345
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_jinwen": {
+    "img": "glyphes/wen_xiaoxue/08.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "文方鼎",
+    "defaut": "body",
+    "polys": [
+     [
+      "heart",
+      [
+       [
+        165,
+        95
+       ],
+       [
+        225,
+        95
+       ],
+       [
+        225,
+        155
+       ],
+       [
+        165,
+        155
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  "traits": {
+   "jiao_kai": {
+    "src": "glyphes/traits/jiao.json",
+    "comp": [
+     "yao",
+     "yao",
+     "yao",
+     "yao",
+     "child",
+     "child",
+     "child",
+     "hand",
+     "hand",
+     "hand",
+     "hand"
+    ]
+   },
+   "xiao_kai": {
+    "src": "glyphes/traits/xiao.json",
+    "comp": [
+     "old",
+     "old",
+     "old",
+     "old",
+     "child",
+     "child",
+     "child"
+    ]
+   },
+   "wen_kai": {
+    "src": "glyphes/traits/wen.json",
+    "comp": [
+     "body",
+     "body",
+     "body",
+     "body"
+    ]
+   }
+  }
+ },
+ "portraits": {
+  "confucius": {
+   "img": "images/confucius_baimiao_1.jpg",
+   "largeur": 2752,
+   "zones": [
+    [
+     "tête",
+     0.12,
+     [
+      0.235,
+      0.14,
+      0.335,
+      0.4
+     ]
+    ],
+    [
+     "maître",
+     0.28,
+     [
+      0.17,
+      0.36,
+      0.47,
+      0.74
+     ]
+    ],
+    [
+     "élèves",
+     0.3,
+     [
+      0.08,
+      0.46,
+      0.8,
+      1.0
+     ]
+    ],
+    [
+     "arbre",
+     0.2,
+     [
+      0.0,
+      0.0,
+      0.53,
+      0.62
+     ]
+    ],
+    [
+     "reste",
+     0.1,
+     null
+    ]
+   ],
+   "seuil": 190,
+   "epaissir": 2
+  }
+ },
+ "bruitages": [
+  [
+   "pinceau",
+   "b01",
+   null,
+   -0.3,
+   0.45
+  ],
+  [
+   "pinceau",
+   "b01",
+   null,
+   0.8,
+   0.4
+  ],
+  [
+   "sceau",
+   "b02",
+   "dessin",
+   0.4,
+   0.55
+  ],
+  [
+   "gravure",
+   "b03",
+   "maitre",
+   0.3,
+   0.4
+  ],
+  [
+   "gravure",
+   "b03",
+   "eleve",
+   -3.0,
+   0.35
+  ],
+  [
+   "sceau",
+   "b03",
+   "signe",
+   0,
+   0.55
+  ],
+  [
+   "pinceau",
+   "b04",
+   "confucius",
+   -0.6,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b04",
+   "regle",
+   -1.6,
+   0.4
+  ],
+  [
+   "sceau",
+   "b04",
+   "regle",
+   -0.6,
+   0.45
+  ],
+  [
+   "sceau",
+   "b05",
+   "frapper",
+   0,
+   0.6
+  ],
+  [
+   "pinceau",
+   "b06",
+   "lettre",
+   -0.2,
+   0.4
+  ],
+  [
+   "sceau",
+   "b06",
+   "tape",
+   -0.4,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b07",
+   "tasse",
+   -0.2,
+   0.45
+  ],
+  [
+   "pinceau",
+   "b07",
+   "vrai",
+   0,
+   0.4
+  ],
+  [
+   "gong",
+   "b07",
+   "ressemblance",
+   0,
+   0.5
+  ],
+  [
+   "sceau",
+   "b08",
+   "grotte",
+   0,
+   0.45
+  ],
+  [
+   "pinceau",
+   "b08",
+   "refus",
+   -0.2,
+   0.35
+  ],
+  [
+   "pinceau",
+   "b09",
+   null,
+   0.2,
+   0.4
+  ],
+  [
+   "gong",
+   "b09",
+   "naissance",
+   0,
+   0.5
+  ],
+  [
+   "gong",
+   "b10",
+   "maxime",
+   -0.1,
+   0.45
+  ],
+  [
+   "pinceau",
+   "b10",
+   "wen",
+   0.2,
+   0.4
+  ],
+  [
+   "sceau",
+   "R1",
+   "impact",
+   0,
+   0.7
+  ],
+  [
+   "sceau",
+   "R2",
+   "impact",
+   0,
+   0.7
+  ],
+  [
+   "sceau",
+   "R3",
+   "impact",
+   0,
+   0.7
+  ]
+ ]
+}

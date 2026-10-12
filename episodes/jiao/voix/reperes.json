@@ -1,0 +1,303 @@
+{
+ "b01": {
+  "duration": 16.91,
+  "cues": {
+   "xiao": 2.72,
+   "baton": 10.52,
+   "mentait": 16.6
+  }
+ },
+ "b02": {
+  "duration": 12.21,
+  "cues": {
+   "assemblages": 2.11,
+   "dessin": 7.71,
+   "os": 9.67
+  }
+ },
+ "b03": {
+  "duration": 39.01,
+  "cues": {
+   "ateliers": 1.93,
+   "maitre": 12.33,
+   "eleve": 19.85,
+   "signe": 21.05,
+   "yao": 24.41,
+   "xue": 27.69,
+   "enfant": 31.13,
+   "baton": 35.33,
+   "main": 36.13,
+   "doigts": 37.45
+  }
+ },
+ "b04": {
+  "duration": 30.02,
+  "cues": {
+   "royaumes": 3.42,
+   "lu": 5.02,
+   "confucius": 9.95,
+   "abricotier": 12.78,
+   "regle": 18.14,
+   "disciples": 21.02,
+   "routes": 27.18
+  }
+ },
+ "b05": {
+  "duration": 15.24,
+  "cues": {
+   "baguettes": 7.81,
+   "frapper": 14.89
+  }
+ },
+ "b06": {
+  "duration": 25.74,
+  "cues": {
+   "lettre": 1.17,
+   "tape": 7.97,
+   "exemple": 13.38,
+   "gauche": 19.22,
+   "baguettes": 24.05
+  }
+ },
+ "b07": {
+  "duration": 31.42,
+  "cues": {
+   "geste": 2.29,
+   "tasse": 7.49,
+   "glisse": 12.37,
+   "reponse": 15.97,
+   "jamais": 17.93,
+   "vrai": 19.97,
+   "vieillard": 24.05,
+   "ressemblance": 29.41
+  }
+ },
+ "b08": {
+  "duration": 31.56,
+  "cues": {
+   "academies": 5.17,
+   "zhuxi": 8.37,
+   "grotte": 14.21,
+   "refus": 19.17,
+   "baton": 28.05
+  }
+ },
+ "b09": {
+  "duration": 30.71,
+  "cues": {
+   "traits": 2.13,
+   "reprenons": 5.14,
+   "formes": 7.89,
+   "yao": 9.09,
+   "enfant": 11.97,
+   "main": 13.89,
+   "han": 15.97,
+   "xiao": 18.53,
+   "pasde": 20.21,
+   "naissance": 22.61,
+   "classe": 27.29,
+   "education": 30.01
+  }
+ },
+ "b10": {
+  "duration": 20.33,
+  "cues": {
+   "maxime": 7.48,
+   "wen": 11.29,
+   "origine": 16.76,
+   "homme": 17.96
+  }
+ },
+ "_ligne": {
+  "clips": {
+   "b01": {
+    "debut": 0.6,
+    "duree": 16.91
+   },
+   "b02": {
+    "debut": 18.41,
+    "duree": 12.21
+   },
+   "b03": {
+    "debut": 31.62,
+    "duree": 39.01
+   },
+   "b04": {
+    "debut": 76.63,
+    "duree": 30.02
+   },
+   "b05": {
+    "debut": 107.45,
+    "duree": 15.24
+   },
+   "b06": {
+    "debut": 127.09,
+    "duree": 25.74
+   },
+   "b07": {
+    "debut": 153.63,
+    "duree": 31.42,
+    "pause": {
+     "coupe": 15.85,
+     "duree": 1.7
+    }
+   },
+   "b08": {
+    "debut": 193.95,
+    "duree": 31.56
+   },
+   "b09": {
+    "debut": 227.51,
+    "duree": 30.71
+   },
+   "b10": {
+    "debut": 259.22,
+    "duree": 20.33
+   }
+  },
+  "rouleaux": [
+   {
+    "debut": 71.33,
+    "duree": 5
+   },
+   {
+    "debut": 123.29,
+    "duree": 3.5
+   },
+   {
+    "debut": 187.55,
+    "duree": 6
+   }
+  ],
+  "pauses": [
+   [
+    169.48,
+    1.7
+   ]
+  ],
+  "fin": 280.05,
+  "total": 283.25,
+  "bruitages": [
+   [
+    "pinceau",
+    0.3,
+    0.45
+   ],
+   [
+    "pinceau",
+    1.4,
+    0.4
+   ],
+   [
+    "sceau",
+    26.52,
+    0.55
+   ],
+   [
+    "gravure",
+    44.25,
+    0.4
+   ],
+   [
+    "gravure",
+    48.47,
+    0.35
+   ],
+   [
+    "sceau",
+    52.67,
+    0.55
+   ],
+   [
+    "pinceau",
+    85.98,
+    0.4
+   ],
+   [
+    "pinceau",
+    93.17,
+    0.4
+   ],
+   [
+    "sceau",
+    94.17,
+    0.45
+   ],
+   [
+    "sceau",
+    122.34,
+    0.6
+   ],
+   [
+    "pinceau",
+    128.06,
+    0.4
+   ],
+   [
+    "sceau",
+    134.66,
+    0.4
+   ],
+   [
+    "pinceau",
+    160.92,
+    0.45
+   ],
+   [
+    "pinceau",
+    175.3,
+    0.4
+   ],
+   [
+    "gong",
+    184.74,
+    0.5
+   ],
+   [
+    "sceau",
+    208.16,
+    0.45
+   ],
+   [
+    "pinceau",
+    212.92,
+    0.35
+   ],
+   [
+    "pinceau",
+    227.71,
+    0.4
+   ],
+   [
+    "gong",
+    250.12,
+    0.5
+   ],
+   [
+    "gong",
+    266.6,
+    0.45
+   ],
+   [
+    "pinceau",
+    270.71,
+    0.4
+   ],
+   [
+    "sceau",
+    75.33,
+    0.7
+   ],
+   [
+    "sceau",
+    126.09,
+    0.7
+   ],
+   [
+    "sceau",
+    192.35,
+    0.7
+   ]
+  ]
+ }
+}

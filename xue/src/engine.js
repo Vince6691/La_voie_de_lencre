@@ -547,13 +547,15 @@
   // ───────── portrait au trait (白描) peint trait par trait (window.PORTRAIT, tools/build_portrait.py)
   // o : x, y (centre), height, progress [0, 1], color, alpha, glow, tip
   // chaque trait du squelette avance le long de sa polyligne et dévoile l'encre vectorisée sous lui
-  let portraitData = null;
+  let portraitCache = {};
   const portraitOff = document.createElement('canvas');
   E.drawPortrait = function (ctx, o) {
-    const P = window.PORTRAIT;
+    // o.key : portrait d'épisode (window.PORTRAITS[key], outils/video_shuimo/portrait.py) ; sinon Xu Shen
+    const P = o.key ? (window.PORTRAITS || {})[o.key] : window.PORTRAIT;
     if (!P || (o.alpha ?? 1) <= 0) return;
-    if (!portraitData) {
-      portraitData = {
+    const ck = o.key || '';
+    if (!portraitCache[ck]) {
+      portraitCache[ck] = {
         ink: new Path2D(P.ink),
         strokes: P.strokes.map((s) => {
           const pts = []; for (let i = 3; i < s.length; i += 2) pts.push([s[i], s[i + 1]]);
@@ -562,6 +564,7 @@
         }),
       };
     }
+    const portraitData = portraitCache[ck];
     const k = o.height / P.h, w = Math.ceil(P.w * k), h = Math.ceil(P.h * k);
     if (portraitOff.width !== w || portraitOff.height !== h) { portraitOff.width = w; portraitOff.height = h; }
     const c = portraitOff.getContext('2d');
@@ -894,6 +897,10 @@
       E.text(ctx, '黃河  Fleuve Jaune', p1[0] + 16, p1[1], { font: 'Kai', size: 30, color: '#6e4410', align: 'left', alpha: a, glow: 8, glowColor: 'rgba(240,220,180,0.9)' });
       E.text(ctx, '長江  Yangzi', p2[0], p2[1] + 30, { font: 'Kai', size: 30, color: '#1f4d66', alpha: a, glow: 8, glowColor: 'rgba(240,220,180,0.9)' });
     }
+    if (o.deco !== false) mapDeco(ctx, P);
+  }
+  // habillage fixe à l'écran (rose des vents, cadre, sources) : séparé pour que E.mapLayer puisse mettre le fond en cache
+  function mapDeco(ctx, P) {
     // rose des vents
     const deco = P ? '#5b4f44' : '#e8d3a6';
     ctx.save(); ctx.translate(W - 150, H - 170); ctx.globalAlpha = 0.75;
@@ -910,6 +917,28 @@
     E.text(ctx, 'Sources : Natural Earth ; historical-basemaps', W - 60, H - 58, { size: 20, weight: 500, align: 'right', color: P ? '#6b5d50' : '#d8c7a0', alpha: 0.55 });
   }
 
+  E.mapDeco = (ctx, o = {}) => mapDeco(ctx, !!o.paper);
+  // Couche de carte mise en cache. La projection étant linéaire (E.proj), toute vue v est une homothétie d'une vue de
+  // base vb : on dessine une seule fois vb (à la résolution du zoom maximal kmax) dans un canvas hors écran, puis on
+  // l'affiche transformé à chaque image. draw(c, vb) dessine la couche (E.drawMap avec deco: false, E.region…).
+  // vb doit contenir toutes les vues de l'animation (prendre la vue la plus large, k un peu plus petit).
+  const layers = {};
+  E.mapLayer = function (ctx, v, vb, kmax, key, draw, alpha = 1) {
+    if (alpha <= 0) return;
+    const f = Math.min(3, Math.max(1, kmax / vb.k));
+    let L = layers[key];
+    if (!L) {
+      const c = document.createElement('canvas'); c.width = Math.round(W * f); c.height = Math.round(H * f);
+      const cx = c.getContext('2d'); cx.scale(f, f); draw(cx, vb);
+      L = layers[key] = c;
+    }
+    const s = v.k / vb.k;
+    ctx.save(); ctx.globalAlpha *= alpha;
+    ctx.translate(W / 2 + (vb.lon - v.lon) * v.k, H / 2 - (vb.lat - v.lat) * v.k * 1.18);
+    ctx.scale(s, s); ctx.translate(-W / 2, -H / 2);
+    ctx.drawImage(L, 0, 0, W, H);
+    ctx.restore();
+  };
   E.drawMap = function (ctx, t, v, o = {}) {
     if (window.GEODATA) return drawMapGeo(ctx, t, v, o);
     // mer
