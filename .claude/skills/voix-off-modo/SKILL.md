@@ -45,7 +45,7 @@ citation finale.
 - Chaque composante a son **sens dit à l'oral** ; le caractère final a son **pinyin avec tons** dans le script
   (jiā, dào, xìn) et sa traduction.
 - Citation chinoise lue : toujours traduite juste après.
-- Personnages nommés une fois, sobrement ; dynasties en décor (« sous les Tang ») ; dates rondes (« près de 2000
+- Personnages nommés une fois, sobrement ; dynasties en décor, nommées « la dynastie Tang », « la dynastie Zhou » (jamais « les Tang », « chez les Zhou ») ; dates rondes (« près de 2000
   ans »).
 - Pas d'appel à l'abonnement, pas de « dans cette vidéo », pas de méta-commentaire.
 - Écrire pour l'oreille : pas de parenthèses, pas de chiffres romains, nombres en lettres si la voix de synthèse
@@ -67,6 +67,8 @@ posée au début. Durée libre : **3 à 5 min** si le voyage le justifie.
    queue musicale à la fin.
 6. **Annoncer chaque saut d'époque** en une phrase-repère (« Mille ans plus tard, à Chang'an… ») : c'est le moment
    du rouleau du temps à l'image (skill `rouleau-du-temps`).
+6 bis. **La forme à chaque étape** : chaque époque dit son support et décrit la forme du signe en traits et ce qui
+   change ; la synthèse en fait la **rétrospective à voix haute** (« sur l'os…, sur le bronze…, sur le bambou… »).
 7. **Le caractère aujourd'hui** (10–15 s avant la maxime) : où on le voit, dans quels mots, comment le reconnaître.
 8. **Passerelle** après la maxime vers une autre vidéo (« Ce toit, on le retrouve dans un autre caractère… »).
 À tester : un « vous » ponctuel (« Regardez », « Devinez ») ; une phrase-signature de série.
