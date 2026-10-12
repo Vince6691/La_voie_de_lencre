@@ -349,8 +349,8 @@ const Bambou: React.FC = () => {
             const latte = win(tt, bam - 0.3, R2 + 0.2, 0.6);
             if (latte <= 0) return;
             ctx.save(); ctx.globalAlpha = latte;
-            const g = ctx.createLinearGradient(820, 0, 1100, 0); g.addColorStop(0, '#c9a868'); g.addColorStop(0.5, '#dcc084'); g.addColorStop(1, '#bf9c5c');
-            ctx.fillStyle = g; E.roundRect(ctx, 830, 90, 260, 900, 18); ctx.fill();
+            const g = ctx.createLinearGradient(700, 0, 1220, 0); g.addColorStop(0, '#c9a868'); g.addColorStop(0.5, '#dcc084'); g.addColorStop(1, '#bf9c5c');
+            ctx.fillStyle = g; E.roundRect(ctx, 700, 90, 520, 900, 22); ctx.fill();
             ctx.restore();
             const o = { x: 960, y: 540, size: 520 };
             const nu = seg(tt, disp - 0.2, disp + 0.4) * (1 - seg(tt, sort - 0.3, sort + 0.1));
