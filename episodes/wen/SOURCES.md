@@ -25,3 +25,10 @@
   (Shirakawa).
 - **Légende** : fantômes qui pleurent, Cangjie aux quatre yeux, os de dragon en pharmacie ; Taibo tatoué (récit
   traditionnel rapporté par Sima Qian, « très sérieusement »).
+
+## Ajouts v2
+- 逸周書·謚法解 : 經緯天地曰文 (nom posthume « Wen »).
+- 周易·賁卦·彖傳 : 觀乎天文，以察時變；觀乎人文，以化成天下 — origine de 文化 (人文化成).
+- Roi Wen emprisonné à Youli 羑里, ordonne les 64 hexagrammes : tradition (Shiji 周本紀 : 其囚羑里，蓋益易之八卦為六十四卦), présentée comme légende.
+- 文化 = traduction japonaise de « culture / Kultur » (ère Meiji), reprise en chinois : à vérifier.
+- 美 : Shuowen 美，甘也。从羊从大。羊在六畜主給膳也。 Formes oraculaires : homme 大 coiffé (plumes ou cornes) — lecture moderne.
