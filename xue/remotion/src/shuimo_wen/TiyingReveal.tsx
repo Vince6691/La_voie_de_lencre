@@ -6,11 +6,11 @@
 // (Effondrement, sur l'image fixe cadrée comme la fin du mouvement de caméra : images/tiying_fin.jpg, tiying_eclats.json).
 // Temps provisoires : dans le montage, ils viendront des repères de la voix (tiying, wen).
 import React, { useEffect, useState } from 'react';
-import { AbsoluteFill, continueRender, delayRender, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, continueRender, delayRender, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { MorphEncre } from '../morph/MorphEncre';
 import { Effondrement } from './Effondrement';
 
-export const TIYING_SECONDS = 12.8;
+export const TIYING_SECONDS = 13;
 const OUT = 9.4; // début de l'effondrement
 const LETTRE: [number, number] = [0.268, 0.47];
 const VISAGE: [number, number] = [0.173, 0.27];
@@ -76,6 +76,8 @@ export const TiyingReveal: React.FC = () => {
         </AbsoluteFill>
       )}
       <Sequence from={Math.round(OUT * fps)} durationInFrames={Math.round((TIYING_SECONDS - OUT) * fps)}>
+        {/* craquements de l'enduit puis chute des éclats (ElevenLabs text-to-sound, variante 4 coupée à 2,4 s, −20 LUFS) */}
+        <Audio src={staticFile('episodes/wen/audio/sfx_effondrement.wav')} volume={0.6} />
         <Effondrement src="episodes/wen/images/tiying_fin.jpg" eclats="episodes/wen/images/tiying_eclats.json" coeur={[0.24, 0.45]} />
       </Sequence>
       <AbsoluteFill style={{ opacity: textes }}>
