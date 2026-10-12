@@ -11,7 +11,10 @@ import { MorphEncre } from '../morph/MorphEncre';
 import { Effondrement } from './Effondrement';
 
 export const TIYING_SECONDS = 13;
-const OUT = 9.4; // début de l'effondrement
+// temps (s, depuis le début de la scène) : colonne 緹縈, colonne 漢文帝, « L'empereur 文 » (vermillon), effondrement ;
+// dans WenV1 ils viennent des repères de la voix
+export type TiyingTimes = { tiying: number; empereur: number; wen: number; out: number };
+const ESSAI: TiyingTimes = { tiying: 3.0, empereur: 5.4, wen: 7.3, out: 9.4 };
 const LETTRE: [number, number] = [0.268, 0.47];
 const VISAGE: [number, number] = [0.173, 0.27];
 const S_FIN = 1.1;
@@ -56,17 +59,19 @@ const Colonne: React.FC<{ zh: string; t: number; at: number; x: number; y: numbe
   </div>
 );
 
-export const TiyingReveal: React.FC = () => {
+export const TiyingReveal: React.FC<{ times?: TiyingTimes; son?: boolean }> = ({ times = ESSAI, son = true }) => {
   useFonts();
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
   // caméra : poussée sur la lettre, puis glissement vers le visage de l'empereur
-  const s = 1 + (S_FIN - 1) * ease(t / 8.5);
-  const g = ease((t - 2.5) / 5.5);
+  const { out: OUT } = times;
+  const total = useVideoConfig().durationInFrames / fps;
+  const s = 1 + (S_FIN - 1) * ease(t / (OUT - 0.9));
+  const g = ease((t - 2.5) / (OUT - 3.9));
   const ox = LETTRE[0] + (VISAGE[0] - LETTRE[0]) * g, oy = LETTRE[1] + (VISAGE[1] - LETTRE[1]) * g;
-  const wenOn = clamp((t - 7.3) / 0.25); // « L'empereur 文 » : vermillon + punch
-  const bump = wenOn * clamp(1 - (t - 7.55) / 0.6);
+  const wenOn = clamp((t - times.wen) / 0.25); // « L'empereur 文 » : vermillon + punch
+  const bump = wenOn * clamp(1 - (t - times.wen - 0.25) / 0.6);
   const textes = 1 - clamp((t - OUT + 0.4) / 0.6);
   return (
     <AbsoluteFill style={{ background: '#f3eee4' }}>
@@ -75,14 +80,15 @@ export const TiyingReveal: React.FC = () => {
           <MorphEncre name="tiying" base="episodes/wen/images" dir="to3d" focus={LETTRE} end={1.08} push={0} />
         </AbsoluteFill>
       )}
-      <Sequence from={Math.round(OUT * fps)} durationInFrames={Math.round((TIYING_SECONDS - OUT) * fps)}>
-        {/* craquements de l'enduit puis chute des éclats (ElevenLabs text-to-sound, variante 1, −20 LUFS) */}
-        <Audio src={staticFile('episodes/wen/audio/sfx_effondrement.wav')} volume={0.6} />
+      <Sequence from={Math.round(OUT * fps)} durationInFrames={Math.max(1, Math.round((total - OUT) * fps))}>
+        {/* craquements de l'enduit puis chute des éclats (ElevenLabs text-to-sound, variante 1, −20 LUFS) ; dans WenV1 le
+            son vient de la liste des bruitages (son={false}) */}
+        {son && <Audio src={staticFile('episodes/wen/audio/sfx_effondrement.wav')} volume={0.6} />}
         <Effondrement src="episodes/wen/images/tiying_fin.jpg" eclats="episodes/wen/images/tiying_eclats.json" coeur={[0.24, 0.45]} />
       </Sequence>
       <AbsoluteFill style={{ opacity: textes }}>
-        <Colonne zh="緹縈" t={t} at={3.0} x={1835} y={150} size={120} legende="Tiying" />
-        <Colonne zh="漢文帝" t={t} at={5.4} x={1665} y={150} size={120} rouge={1} on={wenOn} bump={bump} legende="l'empereur Wen" />
+        <Colonne zh="緹縈" t={t} at={times.tiying} x={1835} y={150} size={120} legende="Tiying" />
+        <Colonne zh="漢文帝" t={t} at={times.empereur} x={1665} y={150} size={120} rouge={1} on={wenOn} bump={bump} legende="l'empereur Wen" />
       </AbsoluteFill>
     </AbsoluteFill>
   );
