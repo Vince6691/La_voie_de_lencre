@@ -87,11 +87,12 @@ Sous la dynastie Han, une jeune fille de quinze ans, Tiying, écrit à l'empereu
 demande à devenir esclave à sa place. L'empereur, ému, abolit les châtiments du corps… et avec eux, le tatouage du
 visage. ⏸ Son nom ? L'empereur Wen. L'empereur 文.
 > plan : paysage d'hiver ; forme `22` tracée autour d'un axe (le torse vide, aucun vermillon) ; `23` puis `25` en fondu
-> net, compteur de traits jusqu'à 4. Puis **image Nano Banana « Tiying »** (style classique à choisir parmi les trois
-> essais d'`A_FOURNIR.md`), **révélée** à la manière d'`encre-3d` : la couleur naît du point focal (la lettre de
-> bambou que Tiying tend), l'encre se retire vers les bords ; caméra en poussée lente de la lettre vers le visage de
-> l'empereur ; 緹縈 puis 漢文帝 calligraphiés dans le tiers vide (étiquettes ≥ 66 px) ; sur « L'empereur 文 », le
-> caractère 文 s'allume en vermillon dans 漢文帝 (punch). Sortie au pinceau.
+> net, compteur de traits jusqu'à 4. Puis **image « Tiying » retenue : fresque de tombe corrigée**
+> (`images/tiying_fresque_2.jpg`), révélée par `MorphEncre` (sens `to3d`, paire `tiying`, champ centré sur la lettre) :
+> lavis sur le papier, la couleur naît de la lettre de bambou et gagne toute la fresque ; caméra en poussée sur la
+> lettre puis glissement vers le visage de l'empereur ; 緹縈 puis 漢文帝 calligraphiés dans le vide de droite ; sur
+> « L'empereur 文 », le 文 passe au vermillon (punch) ; sortie au pinceau. Essai validable :
+> composition `WenTiying` (`xue/remotion/src/shuimo_wen/TiyingReveal.tsx`), aperçu `apercus/tiying_revelation_720.mp4`.
 
 ## 6. Le retournement — 3:15
 Chassé du signe, le tatouage s'installe ailleurs : plus tard, on lui ajoute un fil de soie. 紋 : le motif, le

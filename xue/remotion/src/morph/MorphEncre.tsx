@@ -8,7 +8,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AbsoluteFill, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 
-export type MorphProps = { name: string; dir: 'to3d' | 'toInk' | 'fade'; focus: [number, number]; end: number };
+// base : dossier des images dans public/ (morph/ par défaut ; épisodes : episodes/<pinyin>/images) ; push : travelling avant
+export type MorphProps = { name: string; dir: 'to3d' | 'toInk' | 'fade'; focus: [number, number]; end: number; base?: string; push?: number };
 
 const smooth = (a: number, b: number, v: number) => { const u = Math.min(1, Math.max(0, (v - a) / (b - a))); return u * u * (3 - 2 * u); };
 const easeInOut = (u: number) => { const v = Math.min(1, Math.max(0, u)); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
@@ -22,11 +23,11 @@ const pixels = (img: HTMLImageElement, w: number, h: number) => {
   return x.getImageData(0, 0, w, h).data;
 };
 
-function useMorphData(name: string, fade: boolean) {
+function useMorphData(name: string, fade: boolean, base: string) {
   const [data, setData] = useState<Data | null>(null);
   const [handle] = useState(() => delayRender(`images ${name}`));
   useEffect(() => {
-    Promise.all([`morph/${name}_3d.jpg`, `morph/${name}_encre.jpg`, fade ? `morph/${name}_couleur.png` : `morph/${name}_champ.png`, 'shuimo/paper.jpg'].map((f) => load(staticFile(f)))).then(([d3, enc, ch, paper]) => {
+    Promise.all([`${base}/${name}_3d.jpg`, `${base}/${name}_encre.jpg`, fade ? `${base}/${name}_couleur.png` : `${base}/${name}_champ.png`, 'shuimo/paper.jpg'].map((f) => load(staticFile(f)))).then(([d3, enc, ch, paper]) => {
       const w = d3.naturalWidth, h = d3.naturalHeight;
       const col = pixels(d3, w, h), e = pixels(enc, w, h), p = pixels(paper, w, h), field = pixels(ch, w, h);
       const ink = new Uint8ClampedArray(w * h * 4), washed = new Uint8ClampedArray(w * h * 4);
@@ -41,15 +42,15 @@ function useMorphData(name: string, fade: boolean) {
       setData({ w, h, ink, washed, col, field });
       continueRender(handle);
     });
-  }, [name, fade, handle]);
+  }, [name, fade, base, handle]);
   return data;
 }
 
-export const MorphEncre: React.FC<MorphProps> = ({ name, dir, focus, end }) => {
+export const MorphEncre: React.FC<MorphProps> = ({ name, dir, focus, end, base = 'morph', push = 0.07 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
-  const data = useMorphData(name, dir === 'fade');
+  const data = useMorphData(name, dir === 'fade', base);
   const ref = useRef<HTMLCanvasElement>(null);
   // seuil : to3d 0 → end (la couleur s'ouvre), toInk 1,15 → end (l'encre se referme autour du sujet)
   const u = easeInOut((t - 1.0) / 4.8);
@@ -87,7 +88,7 @@ export const MorphEncre: React.FC<MorphProps> = ({ name, dir, focus, end }) => {
     }
     ctx.putImageData(out, 0, 0);
   }, [data, r, u, dir]);
-  const s = 1 + 0.07 * easeInOut(t / 8);
+  const s = 1 + push * easeInOut(t / 8);
   return (
     <AbsoluteFill style={{ background: '#f8f5ee', overflow: 'hidden' }}>
       <canvas ref={ref} width={data?.w ?? 1} height={data?.h ?? 1}

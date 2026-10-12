@@ -13,6 +13,8 @@ PAIRS = {
     # point focal (fraction de largeur, de hauteur), étirement vertical de l'ellipse
     'paysage': {'focus': (0.64, 0.36), 'tall': 1.0},
     'vieil_homme': {'focus': (0.67, 0.52), 'tall': 2.1},
+    # épisodes : paire rangée dans le dossier d'images de l'épisode (dir)
+    'tiying': {'focus': (0.268, 0.47), 'tall': 1.0, 'dir': '../episodes/wen/images'},
 }
 
 
@@ -23,7 +25,8 @@ def fractal(h, w, seed):
 
 
 for name, p in PAIRS.items():
-    ink = np.asarray(Image.open(f'assets/morph/{name}_encre.jpg').convert('L')).astype(np.float32) / 255
+    D = p.get('dir', 'assets/morph')
+    ink = np.asarray(Image.open(f'{D}/{name}_encre.jpg').convert('L')).astype(np.float32) / 255
     h, w = ink.shape
     yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
     fx, fy = p['focus']
@@ -31,7 +34,7 @@ for name, p in PAIRS.items():
     d /= d.max()
     f = d + 0.045 * fractal(h, w, 7) + 0.04 * ndimage.gaussian_filter(1 - ink, 3)
     f = (f - f.min()) / (f.max() - f.min())
-    Image.fromarray((f * 255).round().astype(np.uint8)).save(f'assets/morph/{name}_champ.png')
+    Image.fromarray((f * 255).round().astype(np.uint8)).save(f'{D}/{name}_champ.png')
     print(name, 'champ', w, '×', h)
 
 
