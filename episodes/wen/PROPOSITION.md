@@ -3,13 +3,13 @@
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : comment un tatouage est-il devenu le mot « culture » ?
 - **Étapes** : dynastie Shang (os) · Taibo et la dynastie Zhou (bronze) · Royaumes combattants (bambou, Livre des
-  mutations) · dynastie Qin puis Han (sceau, scribes, Xu Shen) · dynastie Song (soldats tatoués, Di Qing) ·
-  aujourd'hui (文化). Pas de Confucius (déjà dans le 教).
+  mutations) · dynastie Qin puis Han (sceau, scribes, Tiying et l'empereur Wen) · dynastie Song (soldats tatoués, Di Qing) ·
+  aujourd'hui (文化). Pas de Confucius ni de Xu Shen (déjà dans le 學 et le 教) : à la place, Tiying et l'empereur Wen.
 - **Ton** : clins d'œil (chutes sèches, petits gags visuels), dosage à valider sur la voix off.
 - **Forme** : à chaque époque, le support et la forme du signe, et ce qui change ; rétrospective des formes à la
   synthèse : scène récapitulative par composante, comme le 學 et le 教 ; « la dynastie … ».
 - **Clips 3D** : 2 (A Taibo chez le tatoueur ; B les soldats tatoués et Di Qing) — prompts dans `A_FOURNIR.md`.
-- **Cartes / 白描** : non demandés → proposés ici : carte de la fuite de Taibo ; portrait de Xu Shen réutilisé.
+- **Carte** : la fuite de Taibo. **Image classique** (au lieu du 白描) : Tiying et l'empereur Wen, Nano Banana, révélée ; style choisi après essais (fresque de tombe Han, gongbi sur soie, estampage de pierre Han).
 - **Durée** : ≤ 5 min. **Passerelle** : 美.
 - **Histoire validée (v3)** ; v4 = mêmes blocs, outils de la skill et formes réelles du 小學堂.
 
@@ -81,19 +81,21 @@ du corps… et se pose juste en dessous.
 
 ## 5. La dynastie Qin, puis Han — le sceau et le pinceau — 2:30
 221 avant notre ère : la dynastie Qin impose une seule écriture, le petit sceau. Le corps s'allonge, parfaitement
-symétrique, les jambes se croisent… et le torse est vide. ⏸ Mais les scribes, eux, écrivent vite. Sur leurs lattes,
-puis sous la dynastie Han, la tête devient un point, les bras un trait, les jambes deux obliques qui se croisent.
-Quatre traits. Le 文 d'aujourd'hui est né. ⏸
-Vers l'an 100, Xu Shen l'explique dans son dictionnaire : « des traits qui se croisent ». Il n'a jamais vu d'os
-gravé. Personne ne lui a parlé du tatouage.
+symétrique, les jambes se croisent… et le torse est vide. ⏸ Mais les scribes, eux, écrivent vite : la tête devient
+un point, les bras un trait, les jambes deux obliques qui se croisent. Quatre traits. Le 文 d'aujourd'hui est né. ⏸
+Sous la dynastie Han, une jeune fille de quinze ans, Tiying, écrit à l'empereur : son père va être mutilé, elle
+demande à devenir esclave à sa place. L'empereur, ému, abolit les châtiments du corps… et avec eux, le tatouage du
+visage. ⏸ Son nom ? L'empereur Wen. L'empereur 文.
 > plan : paysage d'hiver ; forme `22` tracée autour d'un axe (le torse vide, aucun vermillon) ; `23` puis `25` en fondu
-> net, compteur de traits jusqu'à 4 ; **portrait de Xu Shen réutilisé** (`xue/assets/portrait/xushen_a.jpg`,
-> `E.drawPortrait`, 3 s, « portrait imaginé ») ; latte 文，錯畫也 traduite. Gag : un point d'interrogation d'encre
-> au-dessus de sa tête.
+> net, compteur de traits jusqu'à 4. Puis **image Nano Banana « Tiying »** (style classique à choisir parmi les trois
+> essais d'`A_FOURNIR.md`), **révélée** à la manière d'`encre-3d` : la couleur naît du point focal (la lettre de
+> bambou que Tiying tend), l'encre se retire vers les bords ; caméra en poussée lente de la lettre vers le visage de
+> l'empereur ; 緹縈 puis 漢文帝 calligraphiés dans le tiers vide (étiquettes ≥ 66 px) ; sur « L'empereur 文 », le
+> caractère 文 s'allume en vermillon dans 漢文帝 (punch). Sortie au pinceau.
 
 ## 6. Le retournement — 3:15
 Chassé du signe, le tatouage s'installe ailleurs : plus tard, on lui ajoute un fil de soie. 紋 : le motif, le
-tatouage. ⏸ Et sous la dynastie Song, il redevient… de l'écriture. Pour reconnaître les déserteurs, on tatoue les
+tatouage. ⏸ Mais sous la dynastie Song, il revient… et cette fois, c'est de l'écriture. Pour reconnaître les déserteurs, on tatoue les
 soldats au visage, à l'aiguille et à l'encre : le nom de leur armée, en caractères. ⏸ L'un d'eux, Di Qing, devient
 chef des armées. L'empereur lui offre un remède pour effacer les caractères. Il refuse : « Je les garde. » ⏸⏸
 > plan : la marque vermillon revient, glisse à côté du signe (`coup-de-pinceau`), un fil malachite s'enroule : 紋
@@ -107,7 +109,7 @@ chef des armées. L'empereur lui offre un remède pour effacer les caractères. 
 ## 7. Aujourd'hui et scène récapitulative — 3:45
 Aujourd'hui, 文 s'écrit en quatre traits, en Chine comme au Japon. Reprenons. Dans toutes ses formes, il garde un seul
 dessin : un homme, debout, de face. La tête, en haut. Les bras, grands ouverts. Les jambes, qui se croisent. ⏸ Et sur
-la poitrine, la marque : un V sur l'os, un cœur sur le bronze… puis plus rien. Xu Shen n'a vu que des traits croisés. ⏸
+la poitrine, la marque : un V sur l'os, un cœur sur le bronze… puis plus rien. ⏸
 Ainsi naît wén : le motif, l'écriture, la culture. On le lit dans 中文, le chinois, et dans 文化, la culture : un mot
 que les Japonais ont tiré du Livre des mutations, au dix-neuvième siècle.
 > plan : **scène récapitulative obligatoire** (`drawBand` de `JiaoV1`, même construction que le 學 et le 教) :
@@ -118,22 +120,20 @@ que les Japonais ont tiré du Livre des mutations, au dix-neuvième siècle.
 > elle clignote trois fois **dans toutes les formes à la fois**, dans son pigment, le reste du bandeau au gris, son
 > ruban s'épaissit. Sur « la marque » : V, cœur et cœur sorti clignotent en vermillon dans `00`, `14`, `21` ; sur
 > « plus rien », un halo pointillé vide s'allume sur la poitrine de `22`, `25` et 文.
-> **Accident d'écriture** (repère `xushen`) : seule la forme `22` reste nette et grossit, les jambes croisées en ocre,
-> 錯畫 « traits croisés » au-dessus, barré.
 > **Fin** : toutes les couleurs reviennent ensemble sur « Ainsi naît » (repère `naissance`) ; puis 中文 et 文化
 > calligraphiés.
 
 ## 8. Chute et passerelle — 4:10
 Avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau. ⏸
-Un autre homme, debout, de face, s'est paré lui aussi… mais sur la tête. Des plumes ? Ou, selon Xu Shen, un gros
-mouton. Bon à manger.
+Un autre homme, debout, de face, s'est paré lui aussi… mais sur la tête. Des plumes ? Ou, selon le plus vieux
+dictionnaire chinois, un gros mouton. Bon à manger.
 > plan : `fiche-caractere` 文 (sceau, pinyin, 4 traits) ; 美 ancien esquissé (forme 小學堂 à récupérer avec
 > `xiaoxue.py 美`), la coiffe en gomme-gutte, puis un mouton dodu se dessine à sa place ; coupé net → écran de fin.
 
 ---
 
 ## Chiffres
-≈ 613 mots → ≈ 4 min 55 à 125 mots/min + 14,5 s de rouleaux → **≈ 5 min 10** (léger dépassement, comme le 教).
+≈ 622 mots → ≈ 5 min à 125 mots/min + 14,5 s de rouleaux → **≈ 5 min 10** (léger dépassement, comme le 教).
 
 ## Outils, étape par étape
 1. **Glyphes (fait)** : `xiaoxue.py 文` → `glyphes/wen_xiaoxue/` (26 formes, planche `glyphes/planche_xiaoxue.png`) ;
@@ -142,8 +142,8 @@ mouton. Bon à manger.
 2. **Voix** (`VOIX.md`) : 文 isolé de l'accroche en IPA `/wə̌n/` (faire écouter) ; 文, 紋, 宋 partagés avec le japonais
    → 2 prises ; balises discrètes (`[curious]` question d'ouverture, `[warmly]` maxime) ; `voix_prep.py`.
 3. **Repères** : Scribe → `voix/mots/` → `reperes.py` ; repères-clés dans l'ordre de la voix (`tatouage`, `croix`,
-   `coeur`, `taibo`, `roi`, `bambou`, `vide`, `quatre`, `soie`, `caracteres`, `garde`,
-   `formes`, `tete`, `bras`, `jambes`, `marque`, `xushen`, `naissance`, `bunka`, `mouton`).
+   `coeur`, `taibo`, `roi`, `bambou`, `vide`, `quatre`, `soie`, `caracteres`, `tiying`, `wen`, `garde`,
+   `formes`, `tete`, `bras`, `jambes`, `marque`, `naissance`, `bunka`, `mouton`).
 4. **Musique et bruitages** : `musique.py` ; sfx pinceau, sceau, gravure, gong ≤ 3 (sources du 教), aiguille
    (nouveau) ; liste `bruitages` d'`episode.json` ; écoute sans vidéo avec `bande_son.py`.
 5. **Composition** `xue/remotion/src/shuimo_wen/WenV1.tsx` copiée de `JiaoV1` (caméra `Cam`, cartes en cache,
@@ -160,6 +160,7 @@ mouton. Bon à manger.
 - Taibo : Shiji, 吳太伯世家 ; roi Wen = neveu de Taibo.
 - 彖傳 du 賁 : 觀乎天文…以化成天下 (« un commentaire », Royaumes combattants).
 - Forme Chu `21` : variante avec 心 dessous (lue 文 par 小學堂) — garder « parfois » dans la voix.
-- Shuowen : 文，錯畫也。象交文 (confirmé par 小學堂) ; 紋 absent du Shuowen.
+- Tiying 緹縈 et l'abolition des châtiments corporels (dont 黥, le tatouage du visage) par l'empereur Wen des Han, 167 av. J.-C. : Shiji, 孝文本紀 et 扁鵲倉公列傳.
+- 紋 absent du Shuowen.
 - Soldats Song et Di Qing (nom d'unité à trouver) ; 文化 via le japonais (Meiji).
 - 美 : Shuowen 甘也，从羊从大.

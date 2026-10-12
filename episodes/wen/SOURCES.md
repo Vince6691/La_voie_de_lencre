@@ -41,3 +41,9 @@
 - Di Qing 狄青 : Song shi, 帝嘗敕青傅藥除字… 臣願留以勸軍中 (« effacer les caractères »). Nom de son unité : à
   chercher pour les caractères posés au montage (sinon un nom d'unité Song attesté).
 - 八字軍 de Wang Yan 王彥 (v. 1126) : 赤心報國，誓殺金賊 sur le visage (en réserve).
+
+## Tiying et l'empereur Wen (bloc 5) — à vérifier
+- Shiji 史記·孝文本紀 (13e année de l'empereur Wen, 167 av. J.-C.) et 扁鵲倉公列傳 : 緹縈, fille du médecin 淳于意
+  condamné à un châtiment corporel, écrit : 妾願入身為官婢，以贖父刑罪 ; l'empereur abolit les châtiments corporels
+  (除肉刑). Le tatouage du visage (黥) est remplacé par le rasage et le collier de bois aux travaux forcés.
+- « Quinze ans » : âge traditionnel (récits postérieurs) → à vérifier, sinon « une jeune fille ».

@@ -5,8 +5,36 @@ Déposer les fichiers tels quels (n'importe quel nom) : je les renomme et les ra
 ## 1. Glyphes anciens — FAIT
 26 formes de 文 (小學堂, CC0) → `glyphes/wen_xiaoxue/`, choix dans `glyphes/SOURCE.md`. Rien à fournir.
 
-## 2. Portrait — rien à fournir
-Xu Shen réutilisé (`xue/assets/portrait/xushen_a.jpg`). Pas d'autre 白描.
+## 2. Image classique « Tiying et l'empereur Wen » (bloc 5) — 3 essais, on choisit ensuite
+Nano Banana, 16:9, ≥ 1376 × 768. Même scène dans trois styles ; personnages dans les deux tiers gauches, **tiers droit
+vide** (緹縈 et 漢文帝 y sont calligraphiés au montage). Aucun texte dans l'image. L'image est révélée au montage
+(la couleur naît de la lettre de bambou) : garder la lettre bien visible.
+
+**Scène commune (à coller après le style choisi) :**
+> Inside a timber hall with red lacquered columns and a low dais, a middle-aged ruler in a black robe with red
+> borders and a flat rectangular crown with short strings of beads hanging front and back sits on a reed mat,
+> leaning forward, moved, unrolling a bundle of bamboo slips tied with two cords. At the open doorway below the
+> steps, a girl of fifteen kneels on stone, in a plain undyed hemp cross-collar robe, hair in two simple looped
+> buns, both hands still raised as if she had just handed over the letter. Outside, a grey-bearded man in a plain
+> robe wears a heavy wooden neck collar, flanked by two guards in red-brown tunics holding long halberds. All figures
+> in the left two thirds of the frame; the right third is empty background. No text, no calligraphy, no seal, no
+> signature, no frame, no border.
+
+**Essai A — fresque de tombe :**
+> Painted in the manner of a two-thousand-year-old tomb wall mural: mineral pigments only — red ochre, carbon black,
+> malachite green, a little azurite — laid in flat areas on cracked white lime plaster; flowing black brush outlines
+> of varying thickness; figures with long sweeping sleeves, mostly in profile, no linear perspective, sparse
+> background; visible plaster cracks, faded and flaking edges.
+
+**Essai B — gongbi sur soie :**
+> Fine gongbi painting on aged golden-brown silk: hair-thin, even ink outlines, delicate layered mineral colors
+> (cinnabar, malachite, azurite, white lead), meticulous textile patterns on the robes, soft silk weave texture,
+> gentle darkening toward the edges, calm balanced composition.
+
+**Essai C — estampage de relief en pierre :**
+> An ink rubbing taken from a carved stone relief: figures and architecture as flat pale grey-white raised
+> silhouettes on a dense black ink ground, details incised as fine lines, stone grain and uneven ink density,
+> composition arranged in a single horizontal register with a carved border line at top and bottom.
 
 ## 3. Clips 3D Seedance (16:9, sans texte ni sous-titres)
 Image de départ Nano Banana conseillée (style Pixar, mêmes réglages que les clips du 學 et du 教).
@@ -78,5 +106,5 @@ référence du visage (Nano Banana) passée en @Image1 aux deux générations.
   sur la joue au montage.
 
 ## Ce que je fais sans rien fournir
-Carte de la fuite de Taibo, paysages shuimo, rouleaux du temps, estampages (os, bronze), lattes de bambou, tracés
+Carte de la fuite de Taibo, paysages shuimo, révélation de l'image Tiying, rouleaux du temps, estampages (os, bronze), lattes de bambou, tracés
 文 / 紋 / 美, scène récapitulative, voix ElevenLabs, musique, bruitages, montage et aperçus 720p.
