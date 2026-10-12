@@ -2,16 +2,16 @@
 // L'image arrive en lavis sur le papier, puis la couleur naît de la lettre de bambou que tend Tiying et gagne toute la
 // fresque (MorphEncre, sens to3d, champ centré sur la lettre : tools/build_morph.py, paire « tiying ») ; la caméra
 // pousse doucement sur la lettre puis glisse vers le visage de l'empereur ; 緹縈 puis 漢文帝 se calligraphient dans le
-// vide de droite, le 文 de 漢文帝 s'allume en vermillon (punch) ; sortie par trois coups de pinceau (VideoReveal sur un
-// plan fixe cadré comme la fin du mouvement de caméra : episodes/wen/clips/05_tiying_image.mp4).
+// vide de droite, le 文 de 漢文帝 s'allume en vermillon (punch) ; sortie : la fresque se fend et tombe en éclats d'enduit
+// (Effondrement, sur l'image fixe cadrée comme la fin du mouvement de caméra : images/tiying_fin.jpg, tiying_eclats.json).
 // Temps provisoires : dans le montage, ils viendront des repères de la voix (tiying, wen).
 import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, continueRender, delayRender, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { MorphEncre } from '../morph/MorphEncre';
-import { VideoReveal } from '../video_encre/VideoReveal';
+import { Effondrement } from './Effondrement';
 
-export const TIYING_SECONDS = 12;
-const OUT = 9.4; // début de la sortie au pinceau
+export const TIYING_SECONDS = 12.8;
+const OUT = 9.4; // début de l'effondrement
 const LETTRE: [number, number] = [0.268, 0.47];
 const VISAGE: [number, number] = [0.173, 0.27];
 const S_FIN = 1.1;
@@ -67,7 +67,7 @@ export const TiyingReveal: React.FC = () => {
         </AbsoluteFill>
       )}
       <Sequence from={Math.round(OUT * fps)} durationInFrames={Math.round((TIYING_SECONDS - OUT) * fps)}>
-        <VideoReveal src="episodes/wen/clips/05_tiying_image.mp4" mode="pinceau" outMode="pinceau" inDur={0.001} outDur={2.4} zoom={1} />
+        <Effondrement src="episodes/wen/images/tiying_fin.jpg" eclats="episodes/wen/images/tiying_eclats.json" coeur={[0.24, 0.45]} />
       </Sequence>
       <AbsoluteFill style={{ opacity: textes }}>
         <Colonne zh="緹縈" t={t} at={3.0} x={1840} y={150} size={110} legende="Tiying" />
