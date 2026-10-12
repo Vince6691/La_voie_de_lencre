@@ -10,10 +10,6 @@
   },
   {
    "clip": "b02",
-   "apres": 1.0
-  },
-  {
-   "clip": "b03",
    "apres": 0.7
   },
   {
@@ -21,33 +17,850 @@
    "apres": 0.3
   },
   {
-   "clip": "b04",
+   "clip": "b03",
    "apres": 0.8
   },
   {
+   "clip": "b04",
+   "apres": 0.6
+  },
+  {
+   "rouleau": 3.5,
+   "apres": 0.3
+  },
+  {
    "clip": "b05",
-   "pause": {
-    "repere": "reponse",
-    "decalage": -0.12,
-    "duree": 1.7
-   },
-   "apres": 1.0
+   "apres": 3.6
   },
   {
    "clip": "b06",
+   "apres": 1.8
+  },
+  {
+   "rouleau": 6,
+   "apres": 0.4
+  },
+  {
+   "clip": "b07",
+   "apres": 1.0
+  },
+  {
+   "clip": "b08",
    "apres": 0.5
   }
  ],
  "queue": 3.2,
  "reperes_cles": {
   "b01": {
-   "mains": "deux mains"
+   "homme": "c'est un homme",
+   "tatouage": "un tatouage",
+   "comment": "Comment un"
+  },
+  "b02": {
+   "os": "Sur les os",
+   "bras": "deux bras",
+   "marque": "une marque",
+   "croix": "Une croix",
+   "shirakawa": "Selon le savant",
+   "morts": "des morts",
+   "rois": "honorer ses rois",
+   "honneur": "Le tatouage est",
+   "excuse": "une excellente"
   },
   "b03": {
-   "signe": "C'est là"
+   "duc": "le vieux duc",
+   "probleme": "Problème",
+   "fuite": "s'enfuit",
+   "tatouer": "se fait tatouer",
+   "carriere": "Carrière terminée",
+   "neveu": "Son neveu",
+   "roi": "On l'appellera",
+   "bronze": "Quand la dynastie",
+   "coeur": "un vrai cœur",
+   "grand": "Le tatouage n'a"
+  },
+  "b04": {
+   "royaumes": "Royaumes combattants",
+   "mutations": "Livre des mutations",
+   "ciel": "pour suivre",
+   "hommes": "pour transformer",
+   "etoiles": "les étoiles",
+   "rites": "les rites",
+   "peau": "Le motif quitte",
+   "bambou": "lattes de bambou",
+   "disparait": "souvent, la marque",
+   "sort": "Parfois, le cœur"
   },
   "b05": {
-   "reponse": "Les mains n'ont pas"
+   "sceau": "le petit sceau",
+   "vide": "le torse est vide",
+   "scribes": "Mais les scribes",
+   "quatre": "Quatre traits",
+   "ne": "est né",
+   "han": "Sous la dynastie",
+   "tiying": "une jeune fille",
+   "abolit": "abolit",
+   "visage": "tatouage du visage",
+   "nom": "Son nom",
+   "wen": "L'empereur Wen"
+  },
+  "b06": {
+   "soie": "un fil de soie",
+   "motif": "le motif",
+   "song": "Mais sous",
+   "ecriture": "c'est de l'écriture",
+   "deserteurs": "Pour reconnaître",
+   "caracteres": "en caractères",
+   "diqing": "L'un d'eux",
+   "remede": "un remède",
+   "garde": "Je les garde"
+  },
+  "b07": {
+   "traits": "quatre traits",
+   "reprenons": "Reprenons",
+   "formes": "un seul dessin",
+   "tete": "La tête",
+   "bras": "Les bras",
+   "jambes": "Les jambes",
+   "marque": "la marque",
+   "os": "un V",
+   "bronze": "un cœur",
+   "rien": "puis plus rien",
+   "naissance": "Ainsi naît",
+   "chinois": "le chinois",
+   "bunka": "un mot que"
+  },
+  "b08": {
+   "peau": "sur la peau",
+   "autre": "Un autre homme",
+   "tete": "sur la tête",
+   "plumes": "Des plumes",
+   "mouton": "un gros mouton",
+   "manger": "Bon à manger"
+  }
+ },
+ "bruitages": [
+  [
+   "pinceau",
+   "b01",
+   null,
+   -0.3,
+   0.45
+  ],
+  [
+   "sceau",
+   "b02",
+   "os",
+   0.2,
+   0.55
+  ],
+  [
+   "gravure",
+   "b02",
+   "os",
+   0.6,
+   0.4
+  ],
+  [
+   "sceau",
+   "R1",
+   "impact",
+   0,
+   0.7
+  ],
+  [
+   "sceau",
+   "b03",
+   "bronze",
+   0.8,
+   0.5
+  ],
+  [
+   "pinceau",
+   "b04",
+   "bambou",
+   0.2,
+   0.4
+  ],
+  [
+   "sceau",
+   "R2",
+   "impact",
+   0,
+   0.7
+  ],
+  [
+   "pinceau",
+   "b05",
+   "sceau",
+   0,
+   0.4
+  ],
+  [
+   "effondrement",
+   "b05",
+   "wen",
+   2.6,
+   0.6
+  ],
+  [
+   "pinceau",
+   "b06",
+   "soie",
+   -0.2,
+   0.4
+  ],
+  [
+   "gong",
+   "b06",
+   "garde",
+   0.4,
+   0.45
+  ],
+  [
+   "sceau",
+   "R3",
+   "impact",
+   0,
+   0.7
+  ],
+  [
+   "pinceau",
+   "b07",
+   null,
+   0.2,
+   0.4
+  ],
+  [
+   "gong",
+   "b07",
+   "naissance",
+   0,
+   0.5
+  ],
+  [
+   "gong",
+   "b08",
+   "peau",
+   -0.6,
+   0.45
+  ]
+ ],
+ "glyphes": {
+  "reels": {
+   "wen_jiaguwen": {
+    "img": "glyphes/wen_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲3940",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "marque",
+      [
+       [
+        168,
+        140
+       ],
+       [
+        228,
+        140
+       ],
+       [
+        228,
+        205
+       ],
+       [
+        168,
+        205
+       ]
+      ]
+     ],
+     [
+      "tete",
+      [
+       [
+        170,
+        20
+       ],
+       [
+        230,
+        20
+       ],
+       [
+        230,
+        118
+       ],
+       [
+        170,
+        118
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        110,
+        118
+       ],
+       [
+        290,
+        118
+       ],
+       [
+        290,
+        215
+       ],
+       [
+        110,
+        215
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_shang_croix": {
+    "img": "glyphes/wen_xiaoxue/01.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "乙6821反",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "marque",
+      [
+       [
+        170,
+        105
+       ],
+       [
+        230,
+        105
+       ],
+       [
+        230,
+        195
+       ],
+       [
+        170,
+        195
+       ]
+      ]
+     ],
+     [
+      "tete",
+      [
+       [
+        175,
+        20
+       ],
+       [
+        225,
+        20
+       ],
+       [
+        225,
+        92
+       ],
+       [
+        175,
+        92
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        110,
+        92
+       ],
+       [
+        290,
+        92
+       ],
+       [
+        290,
+        215
+       ],
+       [
+        110,
+        215
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_shang_noeud": {
+    "img": "glyphes/wen_xiaoxue/03.png",
+    "label": "金文",
+    "era": "Shang",
+    "piece": "小子啟尊",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "marque",
+      [
+       [
+        175,
+        115
+       ],
+       [
+        225,
+        115
+       ],
+       [
+        225,
+        160
+       ],
+       [
+        175,
+        160
+       ]
+      ]
+     ],
+     [
+      "tete",
+      [
+       [
+        175,
+        20
+       ],
+       [
+        225,
+        20
+       ],
+       [
+        225,
+        105
+       ],
+       [
+        175,
+        105
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        115,
+        100
+       ],
+       [
+        290,
+        100
+       ],
+       [
+        290,
+        200
+       ],
+       [
+        115,
+        200
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_zhou": {
+    "img": "glyphes/wen_xiaoxue/14.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "師害簋",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "marque",
+      [
+       [
+        140,
+        120
+       ],
+       [
+        255,
+        120
+       ],
+       [
+        255,
+        245
+       ],
+       [
+        140,
+        245
+       ]
+      ]
+     ],
+     [
+      "tete",
+      [
+       [
+        170,
+        20
+       ],
+       [
+        230,
+        20
+       ],
+       [
+        230,
+        100
+       ],
+       [
+        170,
+        100
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        110,
+        95
+       ],
+       [
+        290,
+        95
+       ],
+       [
+        290,
+        282
+       ],
+       [
+        110,
+        282
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_chu": {
+    "img": "glyphes/wen_xiaoxue/21.png",
+    "label": "楚簡",
+    "era": "Chu",
+    "piece": "上博·孔子詩論 1",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "marque",
+      [
+       [
+        245,
+        55
+       ],
+       [
+        378,
+        55
+       ],
+       [
+        378,
+        215
+       ],
+       [
+        245,
+        215
+       ]
+      ]
+     ],
+     [
+      "tete",
+      [
+       [
+        135,
+        105
+       ],
+       [
+        205,
+        105
+       ],
+       [
+        205,
+        160
+       ],
+       [
+        135,
+        160
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        25,
+        150
+       ],
+       [
+        380,
+        150
+       ],
+       [
+        380,
+        248
+       ],
+       [
+        25,
+        248
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_chu_nu": {
+    "img": "glyphes/wen_xiaoxue/20.png",
+    "label": "楚簡",
+    "era": "Chu",
+    "piece": "包山 2.42",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "tete",
+      [
+       [
+        115,
+        35
+       ],
+       [
+        182,
+        35
+       ],
+       [
+        182,
+        112
+       ],
+       [
+        115,
+        112
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        25,
+        100
+       ],
+       [
+        350,
+        100
+       ],
+       [
+        350,
+        215
+       ],
+       [
+        25,
+        215
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_xiaozhuan": {
+    "img": "glyphes/wen_xiaoxue/22.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·文部",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "tete",
+      [
+       [
+        180,
+        25
+       ],
+       [
+        220,
+        25
+       ],
+       [
+        220,
+        92
+       ],
+       [
+        180,
+        92
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        90,
+        85
+       ],
+       [
+        310,
+        85
+       ],
+       [
+        310,
+        140
+       ],
+       [
+        90,
+        140
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_qin": {
+    "img": "glyphes/wen_xiaoxue/23.png",
+    "label": "秦簡",
+    "era": "Qin",
+    "piece": "睡虎地",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "tete",
+      [
+       [
+        145,
+        55
+       ],
+       [
+        205,
+        55
+       ],
+       [
+        205,
+        150
+       ],
+       [
+        145,
+        150
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        25,
+        120
+       ],
+       [
+        315,
+        120
+       ],
+       [
+        315,
+        205
+       ],
+       [
+        25,
+        205
+       ]
+      ]
+     ]
+    ]
+   },
+   "wen_lishu": {
+    "img": "glyphes/wen_xiaoxue/25.png",
+    "label": "隸書",
+    "era": "Han",
+    "piece": "熹平石經",
+    "defaut": "jambes",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "tete",
+      [
+       [
+        145,
+        65
+       ],
+       [
+        190,
+        65
+       ],
+       [
+        190,
+        112
+       ],
+       [
+        145,
+        112
+       ]
+      ]
+     ],
+     [
+      "bras",
+      [
+       [
+        35,
+        105
+       ],
+       [
+        325,
+        105
+       ],
+       [
+        325,
+        142
+       ],
+       [
+        35,
+        142
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  "traits": {
+   "wen_regulier": {
+    "src": "glyphes/traits/wen.json",
+    "comp": [
+     "tete",
+     "bras",
+     "jambes",
+     "jambes"
+    ]
+   },
+   "wen_fil": {
+    "src": "glyphes/traits/wenfil.json",
+    "comp": [
+     "soie",
+     "soie",
+     "soie",
+     "soie",
+     "soie",
+     "soie",
+     "tete",
+     "bras",
+     "jambes",
+     "jambes"
+    ]
+   },
+   "wen_mei": {
+    "src": "glyphes/traits/mei.json",
+    "comp": [
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "homme",
+     "homme",
+     "homme"
+    ]
+   }
   }
  }
 }

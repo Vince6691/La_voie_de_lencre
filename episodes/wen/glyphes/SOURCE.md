@@ -12,7 +12,7 @@ Traits de la forme moderne : `traits/wen.json` (Make Me a Hanzi, 4 traits, repri
 | Shang, variantes (bloc 2) | `01`, `02`, `03` | 乙6821反 · 後1.19.7 · 小子啟尊 | croix · sans marque · marque en nœud (bronze Shang tardif) |
 | Zhou (bloc 3, bandeau) | `14` | 師害簋, Zhou occidentaux tardifs | grand cœur dans le torse |
 | Zhou, variante | `08` | 文方鼎, Zhou occidentaux anciens | petite marque |
-| Royaumes combattants (bloc 4, bandeau) | `21` | 上博(1)·孔子詩論 1, Chu | 心 posé sous le corps |
+| Royaumes combattants (bloc 4, bandeau) | `21` | 上博(1)·孔子詩論 1, Chu | 心 posé à côté du corps (en haut à droite) |
 | Royaumes combattants, variante | `20` | 包山 2.42, Chu | sans marque, déjà proche du 文 moderne |
 | Petit sceau (bloc 5, bandeau) | `22` | 說文·文部 | torse vide, jambes croisées |
 | Scribes Qin (bloc 5) | `23` | 睡虎地 編4 | 4 traits presque modernes |

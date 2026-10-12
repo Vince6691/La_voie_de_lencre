@@ -27,7 +27,7 @@ Pigments constants : l'homme en azurite (tête, bras, jambes) · la marque en ve
 |---|---|---|---|---|
 | Dynastie Shang | os | homme de face, V sur la poitrine | `00` (甲3940) ; variantes `01` (croix), `02` (sans marque) | — |
 | Dynastie Zhou | bronze | corps en losange, **grand cœur** | `14` (師害簋) ; `08` (文方鼎) petite marque | la marque grandit |
-| Royaumes combattants | bambou (Chu) | le cœur **sort du corps**, posé dessous ; ou plus de marque | `21` (上博·孔子詩論) ; `20` (包山) | la marque quitte la poitrine |
+| Royaumes combattants | bambou (Chu) | le cœur **sort du corps**, posé à côté ; ou plus de marque | `21` (上博·孔子詩論) ; `20` (包山) | la marque quitte la poitrine |
 | Dynastie Qin | petit sceau | corps symétrique, jambes croisées, torse vide | `22` (說文) | plus de marque |
 | Scribes Qin → dynastie Han | écriture des scribes | tête, bras, deux obliques croisées | `23` (睡虎地) → `25` (熹平石經) | 4 traits |
 | Aujourd'hui | régulière | 文, 4 traits | `glyphes/traits/wen.json` (Make Me a Hanzi) | — |
@@ -72,10 +72,10 @@ Quelques siècles plus tard, la Chine se déchire en Royaumes combattants. Un co
 alors : « Observez les 文 du ciel pour suivre les saisons. Observez les 文 des hommes pour transformer le monde. » ⏸
 Les 文 du ciel : les étoiles, les nuages. Les 文 des hommes : les rites, les textes, les manières. Le motif quitte la
 peau. ⏸ Et sur les lattes de bambou, le signe suit le mouvement : souvent, la marque disparaît. Parfois, le cœur sort
-du corps… et se pose juste en dessous.
+du corps… et se pose à côté.
 > plan : nuit en lavis (`fond-shuimo`, ambiance nuit, lune), les étoiles se relient en motifs ; citation
 > 觀乎天文…觀乎人文，以化成天下 en lattes de bambou, traduite (légende ≥ 38 px) ; gros plan caméra sur une latte :
-> forme `21`, le cœur vermillon glisse hors du torse et se pose dessous ; puis forme `20` (sans marque).
+> forme `21`, le cœur vermillon glisse hors du torse et se pose à côté ; puis forme `20` (sans marque).
 
 `[ROULEAU 2 — Royaumes combattants → Qin, 3,5 s, rapide, sens inverse, impact sec]`
 
@@ -160,7 +160,7 @@ dictionnaire chinois, un gros mouton. Bon à manger.
 - Marque funéraire = hypothèse de Shirakawa ; rois Shang nommés 文 (文武丁 / 文丁).
 - Taibo : Shiji, 吳太伯世家 ; roi Wen = neveu de Taibo.
 - 彖傳 du 賁 : 觀乎天文…以化成天下 (« un commentaire », Royaumes combattants).
-- Forme Chu `21` : variante avec 心 dessous (lue 文 par 小學堂) — garder « parfois » dans la voix.
+- Forme Chu `21` : variante avec 心 à côté du corps (lue 文 par 小學堂) — garder « parfois » dans la voix.
 - Tiying 緹縈 et l'abolition des châtiments corporels (dont 黥, le tatouage du visage) par l'empereur Wen des Han, 167 av. J.-C. : Shiji, 孝文本紀 et 扁鵲倉公列傳.
 - 紋 absent du Shuowen.
 - Soldats Song et Di Qing (nom d'unité à trouver) ; 文化 via le japonais (Meiji).

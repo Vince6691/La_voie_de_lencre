@@ -76,7 +76,7 @@ export const TiyingReveal: React.FC = () => {
         </AbsoluteFill>
       )}
       <Sequence from={Math.round(OUT * fps)} durationInFrames={Math.round((TIYING_SECONDS - OUT) * fps)}>
-        {/* craquements de l'enduit puis chute des éclats (ElevenLabs text-to-sound, variante 4 coupée à 2,4 s, −20 LUFS) */}
+        {/* craquements de l'enduit puis chute des éclats (ElevenLabs text-to-sound, variante 1, −20 LUFS) */}
         <Audio src={staticFile('episodes/wen/audio/sfx_effondrement.wav')} volume={0.6} />
         <Effondrement src="episodes/wen/images/tiying_fin.jpg" eclats="episodes/wen/images/tiying_eclats.json" coeur={[0.24, 0.45]} />
       </Sequence>
