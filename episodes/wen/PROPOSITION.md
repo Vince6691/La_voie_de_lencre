@@ -110,7 +110,7 @@ mouton. Bon à manger.
 ---
 
 ## Chiffres
-≈ 700 mots → **≈ 5 min 50** à 125 mots/min + 14,5 s de rouleaux. Encore trop long d'environ 45 s. Coupes possibles :
+≈ 735 mots → **≈ 6 min** à 125 mots/min + 14,5 s de rouleaux. Trop long d'environ 1 min. Coupes possibles :
 - resserrer Zhuangzi (bloc 5) en 3 phrases, à la fin du bloc 4 (−25 s) ;
 - garder les fantômes de Cangjie à l'image seulement (−10 s) ;
 - supprimer « le roi en prison » (−5 s).
