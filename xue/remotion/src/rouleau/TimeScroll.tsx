@@ -48,20 +48,20 @@ const tagOf = (c: TimeScrollConfig) => c.tag ?? { x: 156, y: 136, size: 92 };
 export const tsU = (c: TimeScrollConfig, t: number) => (t - c.at) / dur(c);
 
 // déroulé (u de 0 à 1) : 0–0,12 la caméra recule, la frise se trace ; 0,12–0,72 accélération franche puis freinage
-// (96 % du trajet) ; 0,72–0,80 ralenti d'approche ; 0,80 impact ; 0,86–1 le sceau s'envole, retour au plan normal.
+// (98 % du trajet) ; 0,72–0,80 ralenti d'approche ; 0,80 impact ; 0,86–1 le sceau s'envole, retour au plan normal.
 export const IMPACT = 0.8;
-// vitesse continue : l'accélération arrive à 0,72 avec la vitesse du ralenti (SLOW), qui s'éteint en douceur
-// jusqu'à l'impact (avant : arrêt complet à 0,72 puis redémarrage brusque — ralenti saccadé)
-const SLOW = 1; // = 2 × 0,04 / 0,08 : la vitesse décroît linéairement jusqu'à l'impact
+// vitesse continue (vitesse de croisière d'origine) : l'accélération amène le curseur à 98 % du trajet en gardant
+// la vitesse du ralenti (SLOW), qui décroît ensuite linéairement jusqu'à l'impact — avant : arrêt complet à 0,72 puis
+// redémarrage brusque (ralenti saccadé)
+const NEAR = 0.98, SLOW = (2 * (1 - NEAR)) / (IMPACT - 0.72);
 export function travelM(u: number) {
   if (u <= 0.12) return 0;
   if (u < 0.72) {
     // vitesse (en e) : P·(2e)⁴ qui monte, puis ve + (P − ve)·(2 − 2e)⁴ qui redescend vers ve = vitesse du ralenti
-    const e = (u - 0.12) / 0.6, ve = SLOW * 0.6, P = 5 * (0.96 - 0.4 * ve);
+    const e = (u - 0.12) / 0.6, ve = SLOW * 0.6, P = 5 * (NEAR - 0.4 * ve);
     return e < 0.5 ? (P * (2 * e) ** 5) / 10 : P / 10 + ve * (e - 0.5) + ((P - ve) * (1 - (2 - 2 * e) ** 5)) / 10;
   }
-  if (u < IMPACT) { const v = (u - 0.72) / (IMPACT - 0.72), m0 = (SLOW * (IMPACT - 0.72)) / 0.04; // Hermite 0,96 → 1
-    return 0.96 + 0.04 * ((v ** 3 - 2 * v ** 2 + v) * m0 + (-2 * v ** 3 + 3 * v ** 2)); }
+  if (u < IMPACT) { const v = (u - 0.72) / (IMPACT - 0.72); return NEAR + (1 - NEAR) * (2 * v - v * v); } // vitesse SLOW → 0, linéaire
   return 1;
 }
 
