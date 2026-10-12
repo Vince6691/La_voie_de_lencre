@@ -21,6 +21,13 @@ for k, c in L['clips'].items():
 for n, t, vol in L.get('bruitages', []):
     i = len(ins) // 2; ins += ['-i', os.path.join(base, 'audio', f'sfx_{n}.wav')]
     parts.append(f'[{i}:a]volume={vol},adelay={int(t * 1000)}:all=1[v{i}]')
+# son des rouleaux (TimeScrollStage : souffle, glissando, impact, calé sur 5 s ; gong quand le sceau se pose)
+RS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'xue', 'remotion', 'public', 'rouleau')
+for r in L['rouleaux']:
+    i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'rouleau.wav')]
+    parts.append(f'[{i}:a]atempo={5 / r["duree"]:.4f},volume=0.6,adelay={int(r["debut"] * 1000)}:all=1[v{i}]')
+    i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'gong.wav')]
+    parts.append(f'[{i}:a]volume=0.22,adelay={int((r["debut"] + 0.97 * r["duree"]) * 1000)}:all=1[v{i}]')
 m = len(ins) // 2; ins += ['-i', cfg['musique']]
 labels = ''.join(f'[v{j}]' for j in range(m))
 graph = ';'.join(parts) + f';[{m}:a]volume=0.55[m];{labels}[m]amix=inputs={m + 1}:normalize=0:duration=longest,loudnorm=I=-14:TP=-1.5[o]'

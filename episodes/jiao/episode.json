@@ -111,7 +111,7 @@
    "tasse": "tasse les baguettes",
    "glisse": "le dessin glisse",
    "reponse": "Sur les os comme",
-   "jamais": "le 孝 n",
+   "jamais": "le /ɕjâʊ/ n",
    "vrai": "Le vrai",
    "vieillard": "un vieillard",
    "ressemblance": "Une ressemblance"
@@ -675,6 +675,27 @@
    "wen",
    0.2,
    0.4
+  ],
+  [
+   "sceau",
+   "R1",
+   "impact",
+   0,
+   0.7
+  ],
+  [
+   "sceau",
+   "R2",
+   "impact",
+   0,
+   0.7
+  ],
+  [
+   "sceau",
+   "R3",
+   "impact",
+   0,
+   0.7
   ]
  ]
 }

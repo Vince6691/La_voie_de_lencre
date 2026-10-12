@@ -238,7 +238,7 @@ const ShangLu: React.FC = () => {
   const A3 = A('b03'), mait = at('b03', 'maitre'), elev = at('b03', 'eleve'), sig = at('b03', 'signe'), yao = at('b03', 'yao'), enf = at('b03', 'enfant'), bat = at('b03', 'baton');
   return (
     <AbsoluteFill>
-      <Cam keys={[[A3, 960, 540, 1.02], [mait, 900, 430, 1.3, 1.6], [elev - 3.0, 1010, 600, 1.3, 2.6], [sig - 0.3, 960, 540, 1.02, 1.0], [yao, 960, 430, 1.12, 0.8], [at('b03', 'xue'), 820, 480, 1.08, 0.8], [enf, 960, 620, 1.12, 0.8], [bat - 0.5, 960, 540, 1, 0.6]]}
+      <Cam keys={[[A3, 960, 540, 1.02], [mait, 940, 530, 1.06, 1.6], [elev - 3.0, 990, 545, 1.08, 2.6], [sig - 0.3, 960, 540, 1.02, 1.0], [yao, 960, 430, 1.12, 0.8], [at('b03', 'xue'), 820, 480, 1.08, 0.8], [enf, 960, 620, 1.12, 0.8], [bat - 0.5, 960, 540, 1, 0.6]]}
         punch={[sig + 0.2]} calm={[[bat - 0.5, R1 + TR1.duration! + 0.4]]}>
       <TimeScrollStage cfg={TR1} under={<Landscape seed={14} from={A3 - 2} to={A3 + 14} move="pan" mood="aube" />}
         fromLandscape={{ seed: 5, since: mait - 1 }} toLandscape={{ seed: 9, until: A('b05') + 1 }}>
@@ -247,7 +247,10 @@ const ShangLu: React.FC = () => {
           const bone = win(tt, mait - 0.6, sig + 0.6, 0.8);
           if (bone > 0) {
             ctx.save(); ctx.globalAlpha = bone;
-            ctx.fillStyle = 'rgba(40,34,30,0.86)'; E.roundRect(ctx, 720, 140, 480, 820, 160); ctx.fill();
+            ctx.fillStyle = 'rgba(40,34,30,0.86)'; E.roundRect(ctx, 720, 150, 480, 790, 160); ctx.fill();
+            // qui écrit quoi : le maître (colonne nette), l'élève (copie tremblée)
+            E.text(ctx, 'le maître', 880, 112, { font: 'Cormorant', size: 44, weight: 700, color: '#3b322b', alpha: seg(tt, mait + 0.2, mait + 0.8), glow: 10, glowColor: 'rgba(246,241,231,1)' });
+            E.text(ctx, "l'élève", 1040, 112, { font: 'Cormorant', size: 44, weight: 700, color: rgb(P.hand), alpha: seg(tt, elev - 3.0, elev - 2.4), glow: 10, glowColor: 'rgba(246,241,231,1)' });
             const n = GANZHI.length;
             for (let i = 0; i < n; i++) {
               const m = seg(tt, mait + 0.3 + i * 0.12, mait + 0.5 + i * 0.12);
@@ -291,7 +294,7 @@ const ShangLu: React.FC = () => {
       <ClipShot src="atelier" from={at('b03', 'ateliers') - 0.6} len={mait - at('b03', 'ateliers') + 0.4} entry="nuages" />
       <EraTag zh="商" name="SHANG" dates="Anyang · XIIIe–XIe s. av. J.-C." a={win(t, A3 + 0.3, R1 + 0.4, 0.8)} />
       <EraTag zh="魯" name="LU" dates="Printemps et Automnes · v. 500 av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
-      <Caption text="os d'exercice : la colonne du maître, la copie de l'élève" a={win(t, mait + 1.2, sig)} />
+      <Caption text="os d'exercice : une liste de jours, recopiée par un élève" a={win(t, mait + 1.2, sig)} />
       <Label x={1260} y={300} zh="卜" text="le bâton" color={P.stick} a={win(t, at('b03', 'baton') + 0.3, R1 - 0.3, 0.6)} />
       <Label x={1260} y={760} zh="又" text="la main" color={P.hand} a={win(t, at('b03', 'main') + 0.3, R1 - 0.3, 0.6)} />
       <Caption text="trois doigts vers le haut, qui serrent le bâton" a={win(t, at('b03', 'doigts') + 0.2, R1 - 0.3, 0.5)} y={960} size={42} />
@@ -413,8 +416,7 @@ const XuShen: React.FC = () => {
   const out = A('b07');
   return (
     <AbsoluteFill>
-      <Cam keys={[[A6 - 0.4, 960, 540, 1.02], [let_, 560, 560, 1.2, 2.6], [tape - 1.2, 1300, 560, 1.15, 1.4], [ex, 1300, 620, 1.2, 1.0], [g, 1260, 520, 1.3, 1.0], [out - 1.2, 960, 540, 1.02, 0.9]]}
-        punch={[bag]}>
+      <Cam keys={[[A6 - 0.4, 960, 540, 1.02], [let_, 820, 560, 1.06, 3.0], [tape - 1.2, 1060, 560, 1.06, 2.0], [g, 1100, 540, 1.1, 1.6], [out - 1.4, 960, 540, 1.02, 1.2]]}>
       <Paper />
       <Landscape seed={3} from={A6 - 1} to={out + 1} move="still" mood="brume" faint={0.5} />
       <Draw draw={(ctx, tt, E) => {

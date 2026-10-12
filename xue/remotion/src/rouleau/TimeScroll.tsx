@@ -50,10 +50,18 @@ export const tsU = (c: TimeScrollConfig, t: number) => (t - c.at) / dur(c);
 // déroulé (u de 0 à 1) : 0–0,12 la caméra recule, la frise se trace ; 0,12–0,72 accélération franche puis freinage
 // (96 % du trajet) ; 0,72–0,80 ralenti d'approche ; 0,80 impact ; 0,86–1 le sceau s'envole, retour au plan normal.
 export const IMPACT = 0.8;
+// vitesse continue : l'accélération arrive à 0,72 avec la vitesse du ralenti (SLOW), qui s'éteint en douceur
+// jusqu'à l'impact (avant : arrêt complet à 0,72 puis redémarrage brusque — ralenti saccadé)
+const SLOW = 1; // = 2 × 0,04 / 0,08 : la vitesse décroît linéairement jusqu'à l'impact
 export function travelM(u: number) {
   if (u <= 0.12) return 0;
-  if (u < 0.72) { const e = (u - 0.12) / 0.6; return 0.96 * (e < 0.5 ? 16 * e ** 5 : 1 - (-2 * e + 2) ** 5 / 2); }
-  if (u < IMPACT) return 0.96 + 0.04 * (1 - (1 - (u - 0.72) / (IMPACT - 0.72)) ** 3);
+  if (u < 0.72) {
+    // vitesse (en e) : P·(2e)⁴ qui monte, puis ve + (P − ve)·(2 − 2e)⁴ qui redescend vers ve = vitesse du ralenti
+    const e = (u - 0.12) / 0.6, ve = SLOW * 0.6, P = 5 * (0.96 - 0.4 * ve);
+    return e < 0.5 ? (P * (2 * e) ** 5) / 10 : P / 10 + ve * (e - 0.5) + ((P - ve) * (1 - (2 - 2 * e) ** 5)) / 10;
+  }
+  if (u < IMPACT) { const v = (u - 0.72) / (IMPACT - 0.72), m0 = (SLOW * (IMPACT - 0.72)) / 0.04; // Hermite 0,96 → 1
+    return 0.96 + 0.04 * ((v ** 3 - 2 * v ** 2 + v) * m0 + (-2 * v ** 3 + 3 * v ** 2)); }
   return 1;
 }
 
@@ -89,7 +97,7 @@ const useT = () => useCurrentFrame() / useVideoConfig().fps;
 function camera(u: number) {
   if (u <= 0 || u >= 1) return 1;
   const back = u < 0.12 ? ease(u / 0.12) : 1 - ease((u - 0.72) / 0.28);
-  const punch = u > IMPACT ? 0.03 * Math.exp(-(u - IMPACT) / 0.025) : 0;
+  const punch = 0.03 * smooth(IMPACT - 0.004, IMPACT + 0.016, u) * (u > IMPACT + 0.016 ? Math.exp(-(u - IMPACT - 0.016) / 0.04) : 1); // montée en 3 images
   return (1 - 0.2 * back) * (1 + punch);
 }
 
@@ -173,7 +181,7 @@ const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c
   if (u <= 0 || u >= 1.02) return null;
   const g = geom(c), eras = erasOf(c);
   const out = 1 - smooth(0.87, 0.95, u), line = smooth(0, 0.12, u);
-  const flash = Math.exp(-(((u - IMPACT) / 0.03) ** 2)) * (u > IMPACT - 0.005 ? 1 : 0);
+  const flash = smooth(IMPACT - 0.004, IMPACT + 0.016, u) * (u > IMPACT + 0.016 ? Math.exp(-(((u - IMPACT - 0.016) / 0.035) ** 2)) : 1);
   const x0 = sealX(c, 0) - 100, x1 = sealX(c, eras.length - 1) + 100;
   const cur = cursorPose(c, t);
   return (

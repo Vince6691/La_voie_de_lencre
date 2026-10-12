@@ -34,8 +34,12 @@ for clip, cles in cfg['reperes_cles'].items():
             raise SystemExit(f'{clip} : « {expr} » introuvable dans la transcription')
     out[clip] = {'duration': seg[clip]['duration'], 'cues': res}
 out['_ligne'] = ligne_de_temps(cfg, {c: v['duration'] for c, v in out.items()}, {c: v['cues'] for c, v in out.items()})
-# bruitages : [son, bloc, repère (ou null = début du bloc), décalage s, volume] → temps absolus (pause comprise)
+# bruitages : [son, bloc, repère (ou null = début du bloc), décalage s, volume] → temps absolus (pause comprise) ;
+# bloc « R1 », « R2 »… = rouleau n, repère « impact » = arrivée sur le sceau (0,8 de sa durée, TimeScroll IMPACT)
 def _abs(clip, cue):
+    if clip[0] == 'R':
+        r = out['_ligne']['rouleaux'][int(clip[1:]) - 1]
+        return r['debut'] + (0.8 * r['duree'] if cue == 'impact' else 0)
     c = out['_ligne']['clips'][clip]
     if cue is None: return c['debut']
     v = out[clip]['cues'][cue]
