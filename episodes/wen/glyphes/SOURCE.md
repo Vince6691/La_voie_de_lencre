@@ -19,3 +19,13 @@ Traits de la forme moderne : `traits/wen.json` (Make Me a Hanzi, 4 traits, repri
 | Han (bloc 5, bandeau) | `25` | 熹平石經, Han orientaux | écriture des clercs |
 
 À récupérer : 紋 (bloc 6) et 美 (passerelle) avec `xiaoxue.py`.
+
+## Écriture des clercs pour 緹縈 / 漢文帝 (bloc 5, calligraphie sur la fresque) — 小學堂, CC0
+Formes de la dynastie Han occidentale (époque de l'empereur Wen), recadrées au plus près (proportions réelles) → `images/lishu_<pinyin>.png` :
+| Caractère | Fichier | Forme 小學堂 | Pièce |
+|---|---|---|---|
+| 緹 | `lishu_ti.png` | 05 | 流沙簡·屯戍 14.7, Han occidentaux |
+| 縈 | `lishu_ying.png` | 06 | 一號墓竹簡 50, Han occidentaux |
+| 漢 | `lishu_han.png` | 06 | 居延簡甲 359B, Han occidentaux |
+| 文 | `lishu_wen.png` | 24 (`wen_xiaoxue/`) | 居延簡甲 676, Han occidentaux |
+| 帝 | `lishu_di.png` | 15 | 居延簡甲 676, Han occidentaux (même latte que 文) |

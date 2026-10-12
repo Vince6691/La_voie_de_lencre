@@ -30,19 +30,28 @@ const useFonts = () => {
   }, [h]);
 };
 
-// colonne verticale calligraphiée : chaque caractère se dévoile de haut en bas, comme tracé
+// colonne verticale en écriture des clercs : glyphes réels de la dynastie Han occidentale (小學堂, images/lishu_*.png,
+// voir glyphes/SOURCE.md), teintés par masque ; chaque caractère se dévoile de haut en bas, comme tracé
+// h : hauteur relative de la forme ; k : agrandissement (le 文 des lattes est très plat et fin)
+const LISHU: Record<string, { f: string; h: number; k?: number }> = {
+  緹: { f: 'ti', h: 0.64 }, 縈: { f: 'ying', h: 1.25 }, 漢: { f: 'han', h: 1 }, 文: { f: 'wen', h: 0.42, k: 1.3 }, 帝: { f: 'di', h: 0.71 },
+};
 const Colonne: React.FC<{ zh: string; t: number; at: number; x: number; y: number; size: number; rouge?: number; on?: number; bump?: number; legende: string }> = ({ zh, t, at, x, y, size, rouge = -1, on = 0, bump = 0, legende }) => (
-  <div style={{ position: 'absolute', left: x - size / 2, top: y, width: size, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  <div style={{ position: 'absolute', left: x - size / 2, top: y, width: size, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: size * 0.14 }}>
     {[...zh].map((c, i) => {
       const u = clamp((t - at - i * 0.45) / 0.55);
       const r = i === rouge ? on : 0, b = i === rouge ? bump : 0;
+      const url = `url(${staticFile(`episodes/wen/images/lishu_${LISHU[c].f}.png`)})`;
       return (
-        <div key={i} style={{ fontFamily: 'ShuimoKai', fontSize: size, lineHeight: 1.05, color: r > 0.5 ? VERMILLON : ENCRE,
-          clipPath: `inset(0 0 ${(1 - u) * 100}% 0)`, transform: `scale(${1 + 0.12 * b})`,
-          textShadow: '0 0 14px rgba(246,241,231,0.9)' }}>{c}</div>
+        <div key={i} style={{ width: size * (LISHU[c].k ?? 1), height: size * LISHU[c].h * (LISHU[c].k ?? 1), clipPath: `inset(0 0 ${(1 - u) * 100}% 0)`, transform: `scale(${1 + 0.12 * b})`,
+          filter: 'drop-shadow(0 0 7px rgba(246,241,231,0.95))' }}>
+          <div style={{ width: '100%', height: '100%', background: r > 0.5 ? VERMILLON : ENCRE,
+            WebkitMaskImage: url, maskImage: url, WebkitMaskSize: 'contain', maskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat', maskRepeat: 'no-repeat', WebkitMaskPosition: 'center', maskPosition: 'center' }} />
+        </div>
       );
     })}
-    <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 40, lineHeight: 1.1, color: '#4a3f36', marginTop: 10, width: 230, textAlign: 'center',
+    <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 40, lineHeight: 1.1, color: '#4a3f36', marginTop: 4, width: 230, textAlign: 'center',
       opacity: clamp((t - at - zh.length * 0.45 - 0.2) / 0.5), textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{legende}</div>
   </div>
 );
@@ -70,8 +79,8 @@ export const TiyingReveal: React.FC = () => {
         <Effondrement src="episodes/wen/images/tiying_fin.jpg" eclats="episodes/wen/images/tiying_eclats.json" coeur={[0.24, 0.45]} />
       </Sequence>
       <AbsoluteFill style={{ opacity: textes }}>
-        <Colonne zh="緹縈" t={t} at={3.0} x={1840} y={150} size={110} legende="Tiying" />
-        <Colonne zh="漢文帝" t={t} at={5.4} x={1700} y={150} size={110} rouge={1} on={wenOn} bump={bump} legende="l'empereur Wen" />
+        <Colonne zh="緹縈" t={t} at={3.0} x={1835} y={150} size={120} legende="Tiying" />
+        <Colonne zh="漢文帝" t={t} at={5.4} x={1665} y={150} size={120} rouge={1} on={wenOn} bump={bump} legende="l'empereur Wen" />
       </AbsoluteFill>
     </AbsoluteFill>
   );
