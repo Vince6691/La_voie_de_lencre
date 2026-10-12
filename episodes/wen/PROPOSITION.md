@@ -1,4 +1,4 @@
-# 文 (wén) — proposition tout shuimo, voix off v2 (≈ 4 min 55) — v4
+# 文 (wén) — proposition tout shuimo, voix off v2 (≈ 5 min 10) — v4
 
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : comment un tatouage est-il devenu le mot « culture » ?
@@ -7,7 +7,7 @@
   aujourd'hui (文化). Pas de Confucius (déjà dans le 教).
 - **Ton** : clins d'œil (chutes sèches, petits gags visuels), dosage à valider sur la voix off.
 - **Forme** : à chaque époque, le support et la forme du signe, et ce qui change ; rétrospective des formes à la
-  synthèse ; « la dynastie … ».
+  synthèse : scène récapitulative par composante, comme le 學 et le 教 ; « la dynastie … ».
 - **Clips 3D** : 2 (A Taibo chez le tatoueur ; B les soldats tatoués et Di Qing) — prompts dans `A_FOURNIR.md`.
 - **Cartes / 白描** : non demandés → proposés ici : carte de la fuite de Taibo ; portrait de Xu Shen réutilisé.
 - **Durée** : ≤ 5 min. **Passerelle** : 美.
@@ -19,7 +19,7 @@ signe : elle grandit sur le bronze, sort du corps sur le bambou, disparaît au s
 **Maxime :** avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau.
 
 **Fil visuel :** la marque sur la poitrine, en **vermillon** — c'est elle que l'œil suit d'époque en époque.
-Pigments constants : l'homme à l'encre · la marque en vermillon · le fil de soie de 紋 en malachite.
+Pigments constants : l'homme en azurite (tête, bras, jambes) · la marque en vermillon · le fil de soie de 紋 en malachite.
 `⏸` = pause (1–2 s) ; `⏸⏸` = silence long (un seul) ; `[ROULEAU]` = voix muette.
 
 ## Formes retenues (小學堂, `glyphes/wen_xiaoxue/`, détail dans `glyphes/SOURCE.md`)
@@ -104,16 +104,24 @@ chef des armées. L'empereur lui offre un remède pour effacer les caractères. 
 
 `[ROULEAU 3 — Song → aujourd'hui, 6 s ; arrivée sur un paysage contemporain]`
 
-## 7. Rétrospective et aujourd'hui — 3:45
-Alors le pinceau reprend tout depuis le début. Sur l'os, un homme marqué sur la poitrine. Sur le bronze, un grand
-cœur. Sur le bambou, le cœur sort du corps. Avec la dynastie Qin, plus rien ; avec la dynastie Han, quatre traits. ⏸
-Ainsi naît wén : le motif, l'écriture, la culture. Au dix-neuvième siècle, les Japonais reprennent la vieille phrase
-du Livre des mutations pour traduire « culture » : 文化. La Chine le leur emprunte aussitôt. ⏸
-> plan : **scène récapitulative** (`drawBand` de `JiaoV1`) : bandeau horizontal `00` → `14` → `21` → `22` → `25` →
-> 文, étiquettes écriture + époque sous chaque forme, deux rubans (homme encre, marque vermillon). Sur chaque mot
-> d'époque (repères Scribe `os`, `bronze`, `bambou2`, `qin`, `han`), la forme concernée grossit et la marque clignote
-> trois fois en vermillon dans **toutes** les formes où elle existe, le reste au gris ; sur « plus rien », la case du
-> sceau reste nette, torse vide. Sur « Ainsi naît », toutes les couleurs reviennent ; 文化 calligraphié.
+## 7. Aujourd'hui et scène récapitulative — 3:45
+Aujourd'hui, 文 s'écrit en quatre traits, en Chine comme au Japon. Reprenons. Dans toutes ses formes, il garde un seul
+dessin : un homme, debout, de face. La tête, en haut. Les bras, grands ouverts. Les jambes, qui se croisent. ⏸ Et sur
+la poitrine, la marque : un V sur l'os, un cœur sur le bronze… puis plus rien. Xu Shen n'a vu que des traits croisés. ⏸
+Ainsi naît wén : le motif, l'écriture, la culture. On le lit dans 中文, le chinois, et dans 文化, la culture : un mot
+que les Japonais ont tiré du Livre des mutations, au dix-neuvième siècle.
+> plan : **scène récapitulative obligatoire** (`drawBand` de `JiaoV1`, même construction que le 學 et le 教) :
+> bandeau **horizontal** de toutes les formes réelles `00` (os) → `14` (bronze) → `21` (bambou) → `22` (petit sceau)
+> → `25` (clercs) → 文 (régulière), étiquette écriture + époque sous chaque forme, et un **ruban par composante**
+> sous le bandeau : l'homme en azurite (sous-parties tête, bras, jambes), la marque en vermillon.
+> **Clignotement** sur le mot de chaque composante (repères Scribe `formes`, `tete`, `bras`, `jambes`, `marque`) :
+> elle clignote trois fois **dans toutes les formes à la fois**, dans son pigment, le reste du bandeau au gris, son
+> ruban s'épaissit. Sur « la marque » : V, cœur et cœur sorti clignotent en vermillon dans `00`, `14`, `21` ; sur
+> « plus rien », un halo pointillé vide s'allume sur la poitrine de `22`, `25` et 文.
+> **Accident d'écriture** (repère `xushen`) : seule la forme `22` reste nette et grossit, les jambes croisées en ocre,
+> 錯畫 « traits croisés » au-dessus, barré.
+> **Fin** : toutes les couleurs reviennent ensemble sur « Ainsi naît » (repère `naissance`) ; puis 中文 et 文化
+> calligraphiés.
 
 ## 8. Chute et passerelle — 4:10
 Avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau. ⏸
@@ -125,7 +133,7 @@ mouton. Bon à manger.
 ---
 
 ## Chiffres
-≈ 585 mots → ≈ 4 min 40 à 125 mots/min + 14,5 s de rouleaux → **≈ 4 min 55**.
+≈ 613 mots → ≈ 4 min 55 à 125 mots/min + 14,5 s de rouleaux → **≈ 5 min 10** (léger dépassement, comme le 教).
 
 ## Outils, étape par étape
 1. **Glyphes (fait)** : `xiaoxue.py 文` → `glyphes/wen_xiaoxue/` (26 formes, planche `glyphes/planche_xiaoxue.png`) ;
@@ -134,8 +142,8 @@ mouton. Bon à manger.
 2. **Voix** (`VOIX.md`) : 文 isolé de l'accroche en IPA `/wə̌n/` (faire écouter) ; 文, 紋, 宋 partagés avec le japonais
    → 2 prises ; balises discrètes (`[curious]` question d'ouverture, `[warmly]` maxime) ; `voix_prep.py`.
 3. **Repères** : Scribe → `voix/mots/` → `reperes.py` ; repères-clés dans l'ordre de la voix (`tatouage`, `croix`,
-   `coeur`, `taibo`, `roi`, `bambou`, `vide`, `quatre`, `soie`, `caracteres`, `garde`, `os`, `bronze`, `bambou2`,
-   `qin`, `han`, `naissance`, `bunka`, `mouton`).
+   `coeur`, `taibo`, `roi`, `bambou`, `vide`, `quatre`, `soie`, `caracteres`, `garde`,
+   `formes`, `tete`, `bras`, `jambes`, `marque`, `xushen`, `naissance`, `bunka`, `mouton`).
 4. **Musique et bruitages** : `musique.py` ; sfx pinceau, sceau, gravure, gong ≤ 3 (sources du 教), aiguille
    (nouveau) ; liste `bruitages` d'`episode.json` ; écoute sans vidéo avec `bande_son.py`.
 5. **Composition** `xue/remotion/src/shuimo_wen/WenV1.tsx` copiée de `JiaoV1` (caméra `Cam`, cartes en cache,
