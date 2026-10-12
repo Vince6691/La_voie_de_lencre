@@ -37,11 +37,37 @@ Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temp
 - **Téléphone** : aperçus 720p compressés et images fixes ; jamais de rendu 1080p complet sans demande. Un rendu
   720p de 4 min prend ≈ 50 min : n'en lancer qu'après vérification par images fixes.
 
+## Étape 0 — Questions de cadrage (obligatoire, AVANT toute rédaction)
+Après une recherche rapide, **ne rien écrire** avant d'avoir posé ces questions (outil de questions, 2–4 options,
+recommandation en premier) :
+1. **Angle / question d'ouverture** (2–3 angles issus de la recherche).
+2. **Durée** visée (4–5 min par défaut ; l'utilisateur préfère plus court que trop long).
+3. **Ton** (sobre / clins d'œil / plus appuyé) et **anecdotes** à garder parmi celles trouvées.
+4. **Passerelle** de fin (3–4 caractères proposés).
+Vérifier aussi dans les épisodes précédents (`episodes/*/PROPOSITION.md`, `voix-off/TRANSCRIPTIONS.md`) qu'un
+personnage ou une anecdote n'a pas déjà servi (ex. Confucius, déjà utilisé).
+
 ## Étape 1 — Recherche et proposition
 Recherche étymologique (Shuowen, 小學堂, zdic ; fait / hypothèse / légende). Puis **PROPOSITION.md** : question
 d'ouverture, réponse, maxime, voyage en 7–9 blocs avec `> plan :` sous chaque bloc, rouleaux entre les grands sauts,
 durée cible 4–5 min, titres, points à vérifier. **Attendre la validation du texte** (l'utilisateur coupe souvent :
 appliquer, recalculer la durée).
+
+Règles du texte (corrections de l'utilisateur sur le 文) :
+- **La forme d'abord** : chaque bloc d'époque dit sur quel support on est et **décrit la forme du signe en traits et
+  ce qui a changé** depuis l'époque précédente. Les anecdotes s'ajoutent à la forme, elles ne la remplacent jamais
+  (une anecdote par époque au plus). En tête de PROPOSITION.md, un **tableau des formes** : époque · support · forme
+  · ce qui change.
+- **Rétrospective finale dite par la voix** : « Alors le pinceau reprend tout depuis le début : sur l'os…, sur le
+  bronze…, sur le bambou…, avec la dynastie Qin…, avec la dynastie Han… » → « Ainsi naît + pinyin » ; à l'image,
+  le bandeau des écritures s'allume forme par forme sur ces mots.
+- **Nommer les époques ainsi** : « la dynastie Shang », « la dynastie Zhou », « la dynastie Qin », « la dynastie
+  Han », « les Royaumes combattants » (jamais « les Shang », « chez les Zhou »).
+- **Compter les mots avant de présenter** (`wc -w` du texte dit, hors `> plan :`) et annoncer la durée réelle
+  (mots / 125 × 60 s + rouleaux) ; au-delà de 5 min, couper avant de proposer.
+- **Clips Seedance** : prévoir où ils vont dans le plan ; ne jamais compter sur Seedance pour écrire des caractères
+  lisibles (marques, inscriptions, enseignes) : les laisser flous ou vierges dans le clip et poser les vrais
+  caractères par-dessus au montage (Remotion).
 
 ## Étape 2 — Voix (ElevenLabs)
 - Voix **« Chinese narration »** (`KpnSJfGwFIPSRbO89Nsr`), modèle `eleven_v4`, un clip par bloc, un flow par vidéo.

@@ -1,4 +1,4 @@
-# 文 (wén) — proposition tout shuimo, voix off v2 (≈ 4 min 40) — v3
+# 文 (wén) — proposition tout shuimo, voix off v2 (≈ 4 min 50) — v3
 
 Skill `voix-off-modo`, mouture v2. Ton de la chaîne avec **clins d'œil** (dosage à valider sur la voix off).
 Validé : angle « tatouage → culture » ; pas de Confucius ; passerelle 美.
@@ -43,7 +43,7 @@ d'ailleurs pour honorer ses rois défunts. ⏸ Le tatouage est un honneur. Il va
 `[ROULEAU 1 — Shang → Zhou, 5 s, classique : la forme oraculaire en curseur, sa croix vermillon brille]`
 
 ## 3. Dynastie Zhou — le bronze — 0:55
-Plus à l'ouest, chez les Zhou, le vieux duc veut laisser le pouvoir à son plus jeune fils. Problème : l'aîné, Taibo,
+Plus à l'ouest, dans le clan qui fondera la dynastie Zhou, le vieux duc veut laisser le pouvoir à son plus jeune fils. Problème : l'aîné, Taibo,
 est l'héritier. ⏸ Alors Taibo s'enfuit vers le sud… et se fait tatouer. Un prince tatoué ne peut pas régner.
 Carrière terminée, mission accomplie. ⏸ Son neveu, lui, régnera. On l'appellera le roi Wen. Le roi 文.
 Quand la dynastie Zhou s'installe, le signe est coulé dans le bronze. Le corps s'épaissit, et la marque devient un
@@ -76,10 +76,15 @@ gravé. Personne ne lui a parlé du tatouage.
 
 ## 6. Le retournement — 3:15
 Chassé du signe, le tatouage s'installe ailleurs : plus tard, on lui ajoute un fil de soie. 紋 : le motif, le
-tatouage. ⏸ Sous la dynastie Song, les soldats sont marqués au visage. L'un d'eux, Di Qing, devient chef des armées.
-L'empereur lui offre un remède pour effacer l'encre. Il refuse : « Je la garde. » ⏸⏸
-> plan : la marque vermillon revient, glisse à côté du signe, un fil malachite s'enroule : 紋 ; clip 3D court — Di
-> Qing, visage marqué, repousse le pot d'onguent (nuages → révélation, sortie au pinceau). Silence long.
+tatouage. ⏸ Et sous la dynastie Song, il redevient… de l'écriture. Pour reconnaître les déserteurs, on tatoue les
+soldats au visage, à l'aiguille et à l'encre : le nom de leur armée, en caractères. ⏸ L'un d'eux, Di Qing, devient
+chef des armées. L'empereur lui offre un remède pour effacer les caractères. Il refuse : « Je les garde. » ⏸⏸
+> plan : la marque vermillon revient, glisse à côté du signe, un fil malachite s'enroule : 紋. **Clip Seedance
+> « Soldats » (12 s, prompt ci-dessous)**, entrée à travers le caractère 紋 (`VideoReveal mode="glyphe"`, puisqu'il est
+> à l'écran juste avant) : la recrue tatouée à la joue, puis raccord sur le même visage vingt ans plus tard, Di Qing
+> en armure qui repousse le pot d'onguent. Au montage, les **vrais caractères** (nom d'unité, à choisir) sont posés à
+> l'encre sur la joue, sur le mot « en caractères », et restent sur le visage du général. Sortie au pinceau, puis
+> silence long.
 
 `[ROULEAU 3 — Song → aujourd'hui, 6 s ; arrivée sur un paysage contemporain]`
 
@@ -101,8 +106,45 @@ mouton. Bon à manger.
 
 ---
 
+## Clip Seedance « Soldats » (bloc 6)
+Format B, 12 s, 16:9. Les marques restent floues dans le clip : les caractères lisibles sont ajoutés au montage.
+
+```
+[Style global]: 3D cinematic cartoon, Pixar-quality rendering, warm low-key lighting, muted earth tones with deep
+ink blacks. Maintain consistent 3D cartoon style across all cuts, no photorealistic drift. Duration: 12s, 16:9.
+
+[00:00-00:05] Shot 1: The Mark (The Setup)
+Barracks courtyard at dusk: rammed-earth wall, wooden rack of spears, an oil lamp on a low wooden table beside a
+small dish of black ink and a bundle of fine steel needles.
+A young recruit, about 18, lean face, hair in a simple topknot wrapped in dark cloth, plain hemp tunic under a
+padded short jacket, sits stiffly on a wooden stool. A gruff older clerk in a dark cross-collar robe pricks the
+recruit's left cheek with the needle bundle, then brushes black ink over it.
+The recruit winces, eyes watering, trying hard to look brave. Small dark marks appear on his cheek, soft and
+out of focus.
+Camera: medium close-up, slow dolly-in toward the cheek, normal lens.
+Audio: soft tapping of needles, a sharp intake of breath, a distant drum.
+Director's note: the marks must stay blurry and illegible, no readable characters; text is added in post.
+
+[00:05-00:06] lens switch: match cut on the same cheek, twenty years later.
+
+[00:06-00:12] Shot 2: The Refusal (The Punchline)
+The same face, weathered, short beard, the same dark marks still on his left cheek. He wears lacquered iron
+lamellar armor laced with dark red cords, standing in a timber hall with red lacquered columns. A court attendant
+in pale silk robes bows and offers a small celadon pot of ointment on a black lacquer tray.
+He glances at the pot, smiles slightly, gently pushes the tray back with two fingers, then touches his marked
+cheek with quiet pride.
+Camera: medium shot, locked, eye level; slow push-in on his face for the final 2 seconds.
+Audio: quiet hall ambience, a ceramic clink as the tray slides back.
+Director's note: dry comic beat, a calm proud refusal, not anger. Hold the final expression 1.5s.
+
+Constraints: no text overlays, no readable characters anywhere, no extra people beyond those described,
+no deformed hands, no snap zooms, no neon.
+```
+Variante si le raccord vieillissement rate : deux clips séparés (recrue 6 s, général 6 s) avec une image de
+référence du visage (Nano Banana) passée en @Image1 aux deux générations.
+
 ## Chiffres
-≈ 550 mots → ≈ 4 min 25 à 125 mots/min + 14,5 s de rouleaux → **≈ 4 min 40**.
+≈ 575 mots → ≈ 4 min 35 à 125 mots/min + 14,5 s de rouleaux → **≈ 4 min 50**.
 
 ## Retiré par rapport à la v2 (en réserve)
 Zhuangzi et le marchand de chapeaux · les fantômes de Cangjie · le roi Wen en prison · la pièce d'un wén · la

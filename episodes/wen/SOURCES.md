@@ -32,3 +32,12 @@
 - Roi Wen emprisonné à Youli 羑里, ordonne les 64 hexagrammes : tradition (Shiji 周本紀 : 其囚羑里，蓋益易之八卦為六十四卦), présentée comme légende.
 - 文化 = traduction japonaise de « culture / Kultur » (ère Meiji), reprise en chinois : à vérifier.
 - 美 : Shuowen 美，甘也。从羊从大。羊在六畜主給膳也。 Formes oraculaires : homme 大 coiffé (plumes ou cornes) — lecture moderne.
+
+## Soldats tatoués (bloc 6, clip Seedance) — à vérifier
+- Usage : tatouage au visage (涅面 / 刺字) du nom de l'unité (軍號), à l'aiguille et à l'encre, pour identifier les
+  déserteurs ; parfois sur le bras ou le dos de la main. Mêmes marques pour les condamnés (刺配, « marque dorée » 金印
+  de Lin Chong et Song Jiang dans 水滸傳).
+- Origine attribuée à Zhu Wen 朱溫 (vers 900, Cinq Dynasties) : soldats marqués du nom de leur armée (Zizhi tongjian).
+- Di Qing 狄青 : Song shi, 帝嘗敕青傅藥除字… 臣願留以勸軍中 (« effacer les caractères »). Nom de son unité : à
+  chercher pour les caractères posés au montage (sinon un nom d'unité Song attesté).
+- 八字軍 de Wang Yan 王彥 (v. 1126) : 赤心報國，誓殺金賊 sur le visage (en réserve).
