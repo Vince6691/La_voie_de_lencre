@@ -44,11 +44,11 @@ const ERAS: Era[] = [
   { zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '楚', date: '−300' }, { zh: '秦', date: '−221' },
   { zh: '漢', date: '−167' }, { zh: '今', date: '2026' },
 ];
-const [R1, R3] = L.rouleaux.map((r) => r.debut);
+const [R1, , R3] = L.rouleaux.map((r) => r.debut); // le 2e rouleau (楚 → 秦) est joué pendant une pause de b04
 const P4 = pauseAt('b04'), P4D = L.clips.b04.pause!.duree;
 const TR1: TimeScrollConfig = { at: R1, duration: L.rouleaux[0].duree, eras: ERAS, from: 0, to: 1, years: [-1200, -1046] };
 const TR2: TimeScrollConfig = { at: P4, duration: P4D, eras: ERAS, from: 2, to: 3, years: [-300, -221] };
-const TR3: TimeScrollConfig = { at: R3, duration: L.rouleaux[1].duree, eras: ERAS, from: 4, to: 5, years: [-20, 2026] };
+const TR3: TimeScrollConfig = { at: R3, duration: L.rouleaux[2].duree, eras: ERAS, from: 4, to: 5, years: [-20, 2026] };
 const R1E = R1 + TR1.duration!, P4E = P4 + P4D, R3E = R3 + TR3.duration!;
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -570,7 +570,7 @@ const Zhou: React.FC = () => {
           const wa = win(tt, roi - 0.2, A('b04') + 0.2, 0.5);
           if (wa <= 0) return;
           const split = ease(seg(tt, fils - 0.2, fils + 0.8)), wu = seg(tt, fils + 0.2, fils + 1.0);
-          const rouge = seg(tt, roi + 1.0, roi + 1.6), wang = 1 - seg(tt, duo - 0.3, duo + 0.2);
+          const rouge = seg(tt, at('b03', 'caractere') - 0.1, at('b03', 'caractere') + 0.5), wang = 1 - seg(tt, duo - 0.3, duo + 0.2);
           const xw = 960 - 330 * split, xu = 960 + 330;
           E.text(ctx, '文', xw, 470, { font: 'Kai', size: 330, color: rgb(mixc(INK, VER, rouge)), alpha: wa, glow: 20 * rouge, glowColor: rgb(VER, 0.5) });
           E.text(ctx, '王', xw, 790, { font: 'Kai', size: 200, color: inkCss, alpha: wa * wang });
@@ -608,7 +608,7 @@ const Zhou: React.FC = () => {
       <Caption text="bronze Zhou (師害簋) : un vrai cœur sur la poitrine" a={win(t, coeur + 0.3, orne - 0.2, 0.5)} y={980} size={44} />
       <Caption text="os (Shang) → bronze (Zhou) : la marque devient un ornement" a={win(t, orne + 0.4, sens - 0.2, 0.5)} y={980} size={44} />
       <Caption text="deuxième sens : l'ornement, le raffinement" a={win(t, sens + 0.2, roi - 0.3, 0.5)} y={980} size={50} />
-      <Caption text="文王 · le roi Wen, « l'orné »" a={win(t, roi + 0.4, fils - 0.2, 0.5)} y={980} size={48} />
+      <Caption text="文王 · le roi Wen, comme notre caractère : « l'orné »" a={win(t, roi + 0.4, fils - 0.2, 0.5)} y={980} size={48} />
       <Caption text="武王 · le roi Wu, son fils, renverse la dynastie Shang (v. 1046 av. J.-C.)" a={win(t, fils + 1.0, duo - 0.3, 0.5)} y={980} size={42} />
       <EraTag zh="周" name="DYNASTIE ZHOU" dates="XIe siècle av. J.-C." a={seg(t, A3 - 0.6, A3 + 0.2) * (1 - seg(t, A('b04') - 0.6, A('b04')))} />
     </AbsoluteFill>
@@ -690,10 +690,11 @@ const Qin: React.FC = () => {
           if (qn > 0) E.drawRealGlyph(ctx, 'wen_qin', { ...o, opacity: qn, color: manCol(seg(tt, scr + 1.6, scr + 2.4), 0) });
           const ls = win(tt, q4, ne + 0.1, 0.3);
           if (ls > 0) E.drawRealGlyph(ctx, 'wen_lishu', { ...o, opacity: ls, color: manCol(1, 0) });
-          const kai = seg(tt, ne - 0.1, ne + 1.2) * (1 - seg(tt, A5 - 0.6, A5));
-          if (kai > 0) {
-            ctx.save(); ctx.globalAlpha = Math.min(1, kai * 3);
-            E.drawStrokes(ctx, 'wen_regulier', { ...o, size: 560, progress: 4 * kai, brush: false, color: () => inkCss });
+          // le 文 d'aujourd'hui se trace en entier, puis s'efface (sans se « détracer ») avant la fresque
+          const kp = seg(tt, ne - 0.3, ne + 0.7), ka = Math.min(1, kp * 3) * (1 - seg(tt, A5 - 0.35, A5 + 0.1));
+          if (ka > 0) {
+            ctx.save(); ctx.globalAlpha = ka;
+            E.drawStrokes(ctx, 'wen_regulier', { ...o, size: 560, progress: 4 * kp, brush: false, color: () => inkCss });
             ctx.restore();
           }
         }} />
@@ -813,8 +814,8 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 
 const Today: React.FC = () => {
   const t = useT();
-  const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'chinois'), cul = at('b06', 'culture'), blg = at('b06', 'blague');
-  const bl = seg(t, blg + 1.0, blg + 1.6);
+  const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'chinois'), mil = at('b06', 'milieu'), blg = at('b06', 'blague');
+  const ml = seg(t, mil - 0.2, mil + 0.4), bl = seg(t, blg + 0.4, blg + 1.0);
   const A7 = A('b07'), autre = at('b07', 'autre'), homme = at('b07', 'homme');
   return (
     <AbsoluteFill>
@@ -845,16 +846,17 @@ const Today: React.FC = () => {
       </Cam>
       <Caption text="un seul dessin, dans toutes les formes : un homme de face" a={win(t, fo, at('b06', 'tete') - 0.1, 0.4)} y={1010} size={40} />
       <Caption text="wén · la marque, l'ornement, l'écriture, la culture" a={win(t, nait + 0.6, chi - 0.2, 0.4)} y={880} size={50} />
-      {/* 中文 / 文化, puis la blague : le 文 de chaque mot s'allume en vermillon, « la culture des tatoués du Milieu » */}
-      <div style={{ position: 'absolute', width: '100%', top: 800 - 40 * bl, display: 'flex', justifyContent: 'center', gap: 180, fontFamily: 'ShuimoKai', fontSize: 80 + 16 * bl, color: inkCss }}>
-        {([['中文', 'le chinois', chi], ['文化', 'la culture', cul]] as [string, string, number][]).map(([w, fr, t0]) => (
-          <span key={w} style={{ opacity: win(t, t0 - 0.6, A7 - 0.3) }}>
-            {[...w].map((ch, k) => <span key={k} style={{ color: ch === '文' ? rgb(mixc(INK, VER, bl)) : inkCss, textShadow: ch === '文' && bl > 0 ? `0 0 ${18 * bl}px ${rgb(VER, 0.5)}` : 'none' }}>{ch}</span>)}
-            <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, textAlign: 'center' }}>{fr}</div>
+      {/* 中文 seul, puis la blague : 中 « le milieu », 文 en vermillon → « la culture des tatoués du Milieu » */}
+      <div style={{ position: 'absolute', width: '100%', top: 790 - 30 * ml, display: 'flex', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 84 + 26 * ml, color: inkCss, opacity: win(t, chi - 0.6, A7 - 0.3) }}>
+        {[['中', 'le milieu', ml, AZ], ['文', 'les tatoués', bl, VER]].map(([ch, lab, k, col]) => (
+          <span key={ch as string} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 10px' }}>
+            <span style={{ color: rgb(mixc(INK, col as number[], k as number)), textShadow: (k as number) > 0 ? `0 0 ${18 * (k as number)}px ${rgb(col as number[], 0.45)}` : 'none' }}>{ch}</span>
+            <span style={{ fontFamily: 'ShuimoLatin', fontSize: 36, color: rgb(col as number[]), opacity: k as number, marginTop: 4 }}>{lab}</span>
           </span>
         ))}
       </div>
-      <Caption text="au pied de la lettre : « la culture des tatoués du Milieu »" a={win(t, blg + 1.2, A7 - 0.3, 0.4)} y={985} size={48} />
+      <Caption text="中文 · le chinois" a={win(t, chi - 0.2, mil - 0.2, 0.3) * (1 - ml)} y={985} size={46} />
+      <Caption text="« la culture des tatoués du Milieu »" a={win(t, blg + 1.0, A7 - 0.3, 0.4)} y={985} size={52} />
       {/* fiche : pinyin, nombre de traits */}
       <div style={{ position: 'absolute', left: 300, top: 300, opacity: win(t, A7 - 0.2, autre - 0.2, 0.6) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 300, color: inkCss, lineHeight: 1 }}>文</div>

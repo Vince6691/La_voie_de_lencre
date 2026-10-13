@@ -39,10 +39,13 @@ def ligne_de_temps(cfg, durees, reperes=None):
                 coupe = reperes[c][p['repere']] + p.get('decalage', 0)
                 clips[c]['pause'] = {'coupe': round(coupe, 3), 'duree': p['duree']}
                 pauses.append([round(clips[c]['debut'] + coupe, 3), p['duree']])
+                if p.get('rouleau'):  # rouleau du temps joué pendant la pause (mêmes sons et même creux musical)
+                    rouleaux.append({'debut': round(clips[c]['debut'] + coupe, 3), 'duree': p['duree']})
                 t += p['duree']
         else:
             rouleaux.append({'debut': round(t, 3), 'duree': el['rouleau']})
             t += el['rouleau']
         t += el.get('apres', 0)
     fin = round(t, 3)
+    rouleaux.sort(key=lambda r: r['debut'])
     return {'clips': clips, 'rouleaux': rouleaux, 'pauses': pauses, 'fin': fin, 'total': round(fin + cfg.get('queue', 0), 3)}

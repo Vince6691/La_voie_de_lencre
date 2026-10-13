@@ -44,6 +44,7 @@ for r in L['rouleaux']:
     a, b = r['debut'], r['debut'] + r['duree']
     env *= 1 - 0.85 * np.clip(np.minimum((t - a + 0.6) / 0.6, (b + 0.8 - t) / 0.8), 0, 1)
 for a, d in L['pauses']:
+    if any(abs(r['debut'] - a) < 0.01 for r in L['rouleaux']): continue  # pause déjà creusée comme rouleau
     env *= 1 - 0.7 * np.clip(np.minimum((t - a) / 0.3, (a + d + 0.2 - t) / 0.5), 0, 1)
 env[t >= END] = 0
 bed *= env

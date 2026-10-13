@@ -7,7 +7,7 @@ Lit la section « glyphes » de episode.json :
                      "defaut": "hand", "polys": [[composante, [[x, y]…]]…]}},
     "traits": {clé: {"src": "glyphes/traits/教.json", "comp": ["yao", "yao", …]}}
   }
-- reels : (option « fusion » : seuil de partage d'un trait continu, 0,25 par défaut) formes historiques (小學堂, CC0) découpées par composante (polygones dans la boîte 400, le premier qui
+- reels : (options « fusion », « graines », « interieur » : voir reel()) (option « fusion » : seuil de partage d'un trait continu, 0,25 par défaut) formes historiques (小學堂, CC0) découpées par composante (polygones dans la boîte 400, le premier qui
   contient le pixel l'emporte ; un trait continu reste entier sauf partage réel), vectorisées (potrace) ;
   même format que xue/tools/build_real_glyphs.py → window.REALGLYPHS[clé] (E.drawRealGlyph).
 - traits : ordre et forme des traits (Make Me a Hanzi / hanzi-writer-data, Arphic Public License),
@@ -54,15 +54,27 @@ def reel(base, g):
         m = Image.new('L', (N, N), 0)
         ImageDraw.Draw(m).polygon([(x * N / 400, y * N / 400) for x, y in poly], fill=255)
         owner[(np.array(m) > 0) & (owner == '')] = c
+    # « interieur » : {composante: [r, repli]} — ne garder à la composante que l'encre à plus de r (boîte 400) du bord de la
+    # silhouette remplie (ex. la marque dans le torse : les traits du contour du corps vont au repli)
+    if g.get('interieur'):
+        dist = ndimage.distance_transform_edt(ndimage.binary_fill_holes(ink)) * 400 / N
+        for c, (r, repli) in g['interieur'].items():
+            owner[(owner == c) & (dist < r)] = repli
     owner[owner == ''] = g['defaut']
     lab, n = ndimage.label(ink, structure=np.ones((3, 3)))
+    # « graines » : {composante: [[x, y]…]} — le tracé (composante connexe) qui contient le point lui appartient en entier
+    for c, pts in g.get('graines', {}).items():
+        ys, xs = np.nonzero(ink)
+        for x, y in pts:
+            j = np.argmin((xs - x * N / 400) ** 2 + (ys - y * N / 400) ** 2)
+            owner[lab == lab[ys[j], xs[j]]] = c
     for i in range(1, n + 1):
         blob = lab == i
         names, counts = np.unique(owner[blob], return_counts=True)
         if len(names) > 1 and counts.max() / counts.sum() > 1 - g.get('fusion', MERGE):
             owner[blob] = names[counts.argmax()]
     paths, centers = [], {}
-    for c in dict.fromkeys([g['defaut']] + [c for c, _ in g.get('polys', [])]):
+    for c in dict.fromkeys([g['defaut']] + [c for c, _ in g.get('polys', [])] + list(g.get('graines', {}))):
         mask = ink & (owner == c)
         if mask.sum() < 50: continue
         ys, xs = np.nonzero(mask)
