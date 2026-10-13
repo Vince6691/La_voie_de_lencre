@@ -262,17 +262,32 @@ const mosaic = (E: any) => {
   MOSAIC = { cells, focus };
   return MOSAIC;
 };
+// papier xuan (fibres, tuile 1024 px = 512 px du monde de la mosaïque) ; calque hors écran pour le flou de profondeur
+const useImage = (src: string) => {
+  const [h] = useState(() => delayRender('image ' + src));
+  const [img, setImg] = useState<HTMLImageElement | null>(null);
+  useEffect(() => { const i = new Image(); i.onload = () => { setImg(i); continueRender(h); }; i.onerror = () => continueRender(h); i.src = staticFile(src); }, [h, src]);
+  return img;
+};
+let BG: HTMLCanvasElement | null = null;
+const bgLayer = () => { if (!BG) { BG = document.createElement('canvas'); BG.width = 1920; BG.height = 1080; } return BG; };
+// poussière en suspension dans la lumière (premier plan, parallaxe)
+const MOTES = Array.from({ length: 46 }, (_, i) => ({ x: hash(i + 50), y: hash(i + 150), r: 1.5 + 4 * hash(i + 250), a: 0.25 + 0.4 * hash(i + 350), v: 0.4 + hash(i + 450) }));
+
 const Mosaic: React.FC = () => {
   const t = useT();
   const A1 = A('b01'), zw = at('b01', 'zhongwen'), wh = at('b01', 'wenhua'), fw = at('b01', 'fawen'), pt = at('b01', 'pourtant');
   const P1 = pauseAt('b01'); // silence dans la voix : le 文 complet tient l'écran
   const C0 = pt + 0.9;
+  const fib = useImage('episodes/wen/images/xuan_fibres.png');
   if (t > C0 + 0.05) return null;
   return (
     <AbsoluteFill>
       <Paper />
       <Draw draw={(ctx, tt, E) => {
         const M = mosaic(E), F = M.focus.map((k) => M.cells[k]);
+        const bg = bgLayer(), bctx = bg.getContext('2d')!;
+        bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.clearRect(0, 0, 1920, 1080);
         // caméra (dans le canvas, pour un texte net) : très gros plans sur 中文 → 文化 → 法文, grand recul en légère
         // rotation, puis lente poussée pendant le temps d'arrêt
         const lg = Math.log, fx = (c: Cell) => c.x + 0.51 * MC.fs; // le 文 du mot repéré
@@ -294,8 +309,10 @@ const Mosaic: React.FC = () => {
         const [, cx, cy, sc] = cam;
         const rot = -0.05 * Math.sin(Math.PI * seg(tt, Z0, Z1));
         ctx.save();
-        ctx.translate(960, 540); ctx.rotate(rot); ctx.translate(-960, -540);
+        for (const c2 of [ctx, bctx]) { c2.translate(960, 540); c2.rotate(rot); c2.translate(-960, -540); }
         const X = (x: number) => (x - cx) * sc + 960, Y = (y: number) => (y - cy) * sc + 540;
+        // flou de profondeur : en gros plan, seuls les mots repérés sont nets ; le flou disparaît au recul
+        const dof = clamp((sc - 1.6) / 4) * 5.5;
         // condensation : les mots se fondent dans un 文 à l'encre (taille de la mosaïque), qui rétrécit
         const cond = seg(tt, pt + 0.05, pt + 0.6), shrink = ease(seg(tt, pt + 0.4, C0));
         const fs = MC.fs * sc, kb = clamp((sc - 1) / 2);
@@ -303,7 +320,7 @@ const Mosaic: React.FC = () => {
         const W0 = fw + 0.8, W1 = P1 - 0.05;
         const hold = seg(tt, P1, P1 + 0.6), sweepX = 380 + 1160 * ease(seg(tt, P1 + 0.15, P1 + 1.2));
         const fc = [zw, wh, fw];
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; bctx.textAlign = 'center'; bctx.textBaseline = 'middle';
         if (cond < 1) M.cells.forEach((c, i) => {
           const sx = X(c.x), sy = Y(c.y);
           if (sx < -fs * 3 || sx > 1920 + fs * 3 || sy < -fs * 2 || sy > 1080 + fs * 2) return;
@@ -325,19 +342,60 @@ const Mosaic: React.FC = () => {
             ctx.setLineDash([per * tr, per]); ctx.lineCap = 'round';
             E.roundRect(ctx, sx - bw / 2, sy - bh / 2, bw, bh, fs * 0.2); ctx.stroke(); ctx.restore();
           }
-          ctx.font = `${fs * pop}px ShuimoKai`;
+          const g2 = isF < 0 && dof > 0.3 ? bctx : ctx; // calque flou ou net
+          g2.font = `${fs * pop}px ShuimoKai`;
           const al = (1 - cond) * (base + (1 - base) * col);
           const first = isF === 0 ? 1 : 0; // le tout premier plan : le 文 de 中文 est déjà vermillon
           [...c.w].forEach((ch, k) => {
             const on = ch === '文' ? Math.max(col, first) : col;
-            ctx.globalAlpha = first && ch === '文' ? 1 - cond : al;
-            ctx.fillStyle = rgb(mixc([170, 161, 150], ch === '文' ? VER : INK, on));
-            if (ch === '文' && flash > 0) { ctx.shadowColor = rgb(VER, 0.85); ctx.shadowBlur = 14 * flash * Math.max(1, sc * 0.6); }
-            ctx.fillText(ch, sx + (k - 0.5) * fs * 1.02 * (1 - 0.6 * cond), sy);
-            ctx.shadowBlur = 0;
+            g2.globalAlpha = (first && ch === '文' ? 1 - cond : al) * (on > 0 ? 0.93 : 1);
+            const cc = mixc([170, 161, 150], ch === '文' ? VER : INK, on);
+            g2.fillStyle = rgb(cc);
+            // encre bue par le papier : un léger halo de la même couleur autour du trait ; éclat vermillon de la vague
+            if (on > 0) { g2.shadowColor = rgb(cc, 0.45 * on); g2.shadowBlur = Math.max(1, 0.07 * fs); }
+            if (ch === '文' && flash > 0) { g2.shadowColor = rgb(VER, 0.85); g2.shadowBlur = 14 * flash * Math.max(1, sc * 0.6); }
+            g2.fillText(ch, sx + (k - 0.5) * fs * 1.02 * (1 - 0.6 * cond), sy);
+            g2.shadowBlur = 0;
           });
         });
         if (cond > 0) E.text(ctx, '文', 960, 540 - 20 * shrink, { font: 'Kai', size: MC.size + (600 - MC.size) * shrink, color: inkCss, alpha: cond });
+        ctx.restore();
+        // calque flou (mots de second plan) posé sous la scène nette
+        if (dof > 0.3) {
+          ctx.save(); ctx.globalCompositeOperation = 'destination-over'; ctx.filter = `blur(${dof}px)`;
+          ctx.drawImage(bg, 0, 0); ctx.restore();
+        }
+        // fibres du papier xuan, à l'échelle de la caméra (multiply : elles passent aussi sur l'encre)
+        if (fib) {
+          const pat = ctx.createPattern(fib, 'repeat')!;
+          pat.setTransform(new DOMMatrix().translate(960, 540).rotate(rot * 180 / Math.PI).translate(-960, -540).translate(960 - cx * sc, 540 - cy * sc).scale(sc * 0.5));
+          ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.85; ctx.fillStyle = pat; ctx.fillRect(0, 0, 1920, 1080); ctx.restore();
+        }
+        // lumière rasante chaude depuis le haut à gauche, ombre douce en bas à droite ; elle monte sur le 文 pendant l'arrêt
+        ctx.save();
+        const lgr = ctx.createLinearGradient(0, 0, 1920, 1080);
+        lgr.addColorStop(0, 'rgba(255,226,176,0.22)'); lgr.addColorStop(0.55, 'rgba(255,226,176,0)');
+        ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = lgr; ctx.fillRect(0, 0, 1920, 1080);
+        const hg = ctx.createRadialGradient(960, 500, 60, 960, 520, 620);
+        hg.addColorStop(0, `rgba(255,214,150,${0.2 * hold * (1 - cond)})`); hg.addColorStop(1, 'rgba(255,214,150,0)');
+        ctx.fillStyle = hg; ctx.fillRect(0, 0, 1920, 1080);
+        ctx.globalCompositeOperation = 'multiply';
+        const sh = ctx.createLinearGradient(1920, 1080, 700, 300);
+        sh.addColorStop(0, 'rgba(150,120,90,0.35)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = sh; ctx.fillRect(0, 0, 1920, 1080);
+        ctx.restore();
+        // poussière dans la lumière : premier plan, défile plus vite que la caméra, flotte lentement
+        ctx.save(); ctx.globalCompositeOperation = 'screen';
+        MOTES.forEach((m) => {
+          const W = 2300, H = 1400;
+          const x = (((m.x * W - (cx - 960) * 0.35 * Math.min(sc, 6) + tt * 14 * m.v) % W) + W) % W - 190;
+          const y = (((m.y * H - (cy - 540) * 0.35 * Math.min(sc, 6) - tt * 9 * m.v) % H) + H) % H - 160;
+          const light = 0.45 + 0.55 * clamp(1 - (x + y) / 2400); // plus visible dans la lumière
+          const r = m.r * (1 + 0.4 * Math.min(1, sc / 8));
+          const gg = ctx.createRadialGradient(x, y, 0, x, y, r * 2.2);
+          gg.addColorStop(0, `rgba(255,240,215,${m.a * light * (1 - cond)})`); gg.addColorStop(1, 'rgba(255,240,215,0)');
+          ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, y, r * 2.2, 0, 7); ctx.fill();
+        });
         ctx.restore();
         // vignettage doux : le regard reste au centre
         const g = ctx.createRadialGradient(960, 540, 420, 960, 540, 1150);
