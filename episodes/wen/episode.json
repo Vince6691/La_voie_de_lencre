@@ -54,7 +54,10 @@
  "queue": 3.2,
  "reperes_cles": {
   "b01": {
+   "pourtant": "Pourtant",
    "homme": "c'est un homme",
+   "debout": "debout",
+   "face": "de face",
    "tatouage": "un tatouage",
    "comment": "Comment un"
   },
@@ -154,6 +157,48 @@
    null,
    -0.3,
    0.45
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   -0.12,
+   0.25
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   0.33,
+   0.31
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   0.78,
+   0.37
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   1.23,
+   0.43
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   1.68,
+   0.49
+  ],
+  [
+   "gong",
+   "b01",
+   "tatouage",
+   0.35,
+   0.35
   ],
   [
    "sceau",
