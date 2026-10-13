@@ -6,6 +6,11 @@
  "sequence": [
   {
    "clip": "b01",
+   "pause": {
+    "repere": "pourtant",
+    "decalage": -0.08,
+    "duree": 1.3
+   },
    "apres": 0.9
   },
   {
@@ -173,18 +178,25 @@
    0.3
   ],
   [
-   "gong",
-   "b01",
-   "pourtant",
-   0.2,
-   0.25
-  ],
-  [
    "tapotement",
    "b01",
    "fawen",
    0.95,
    0.7
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   -1.33,
+   0.45
+  ],
+  [
+   "gong",
+   "b01",
+   "pourtant",
+   -1.3,
+   0.22
   ],
   [
    "sceau",

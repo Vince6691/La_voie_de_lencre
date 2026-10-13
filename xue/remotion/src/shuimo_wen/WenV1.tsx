@@ -265,6 +265,7 @@ const mosaic = (E: any) => {
 const Mosaic: React.FC = () => {
   const t = useT();
   const A1 = A('b01'), zw = at('b01', 'zhongwen'), wh = at('b01', 'wenhua'), fw = at('b01', 'fawen'), pt = at('b01', 'pourtant');
+  const P1 = pauseAt('b01'); // silence dans la voix : le 文 complet tient l'écran
   const C0 = pt + 0.9;
   if (t > C0 + 0.05) return null;
   return (
@@ -272,66 +273,76 @@ const Mosaic: React.FC = () => {
       <Paper />
       <Draw draw={(ctx, tt, E) => {
         const M = mosaic(E), F = M.focus.map((k) => M.cells[k]);
-        // caméra (dans le canvas, pour un texte net) : très gros plans sur 中文 → 文化 → 法文, puis grand recul sur le 文
+        // caméra (dans le canvas, pour un texte net) : très gros plans sur 中文 → 文化 → 法文, grand recul en légère
+        // rotation, puis lente poussée pendant le temps d'arrêt
         const lg = Math.log, fx = (c: Cell) => c.x + 0.51 * MC.fs; // le 文 du mot repéré
         type Key = [number, number, number, number];
+        const Z0 = fw + 0.75, Z1 = P1 + 0.1;
         const keys: Key[] = [[A1 - 0.6, fx(F[0]) + 6, F[0].y + 2, 16], [zw - 0.25, F[0].x + 8, F[0].y, 9], [zw + 0.5, F[0].x, F[0].y, 8.2],
           [wh - 0.4, F[0].x, F[0].y, 8], [wh - 0.05, F[1].x, F[1].y, 8.6], [fw - 0.4, F[1].x, F[1].y, 8.2], [fw - 0.05, F[2].x, F[2].y, 8.6],
-          [fw + 0.75, F[2].x, F[2].y, 8.2], [pt + 0.15, 960, 540, 1]];
+          [Z0, F[2].x, F[2].y, 8.2], [Z1, 960, 540, 1], [pt + 0.3, 960, 530, 1.06]];
         let cam = keys[0];
         for (let k = 1; k < keys.length; k++) {
           const [k0, k1] = [keys[k - 1], keys[k]];
           if (tt >= k1[0]) { cam = k1; continue; }
           if (tt > k0[0]) {
-            const u = ease((tt - k0[0]) / (k1[0] - k0[0]));
+            const u = k === keys.length - 1 ? (tt - k0[0]) / (k1[0] - k0[0]) : ease((tt - k0[0]) / (k1[0] - k0[0]));
             cam = [tt, k0[1] + (k1[1] - k0[1]) * u, k0[2] + (k1[2] - k0[2]) * u, Math.exp(lg(k0[3]) + (lg(k1[3]) - lg(k0[3])) * u)];
           }
           break;
         }
         const [, cx, cy, sc] = cam;
+        const rot = -0.05 * Math.sin(Math.PI * seg(tt, Z0, Z1));
+        ctx.save();
+        ctx.translate(960, 540); ctx.rotate(rot); ctx.translate(-960, -540);
         const X = (x: number) => (x - cx) * sc + 960, Y = (y: number) => (y - cy) * sc + 540;
-        // condensation : les mots s'effacent, un 文 à l'encre (taille de la mosaïque) apparaît puis rétrécit
-        const cond = seg(tt, pt + 0.1, pt + 0.6), shrink = ease(seg(tt, pt + 0.4, C0));
+        // condensation : les mots se fondent dans un 文 à l'encre (taille de la mosaïque), qui rétrécit
+        const cond = seg(tt, pt + 0.05, pt + 0.6), shrink = ease(seg(tt, pt + 0.4, C0));
         const fs = MC.fs * sc, kb = clamp((sc - 1) / 2);
-        // vague de couleur pendant le recul : chaque mot du 文 passe à l'encre et au vermillon (tapotement)
-        const W0 = fw + 0.8, W1 = pt + 0.05;
-        const fc = M.focus.map((k) => [zw, wh, fw][M.focus.indexOf(k)]);
-        ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        // vague de couleur pendant le recul (tapotement) ; pendant l'arrêt, un reflet balaie le caractère
+        const W0 = fw + 0.8, W1 = P1 - 0.05;
+        const hold = seg(tt, P1, P1 + 0.6), sweepX = 380 + 1160 * ease(seg(tt, P1 + 0.15, P1 + 1.2));
+        const fc = [zw, wh, fw];
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         if (cond < 1) M.cells.forEach((c, i) => {
           const sx = X(c.x), sy = Y(c.y);
-          if (sx < -fs * 2 || sx > 1920 + fs * 2 || sy < -fs || sy > 1080 + fs) return;
+          if (sx < -fs * 3 || sx > 1920 + fs * 3 || sy < -fs * 2 || sy > 1080 + fs * 2) return;
           const isF = M.focus.indexOf(i);
           const tc = isF >= 0 ? fc[isF] - 0.05 : c.on ? W0 + (W1 - W0) * (0.75 * Math.hypot(c.x - F[2].x, c.y - F[2].y) / 1100 + 0.25 * c.h) : 1e9;
           const col = seg(tt, tc, tc + 0.12);
-          const pop = 1 + 0.35 * win(tt, tc, tc + 0.3, 0.12);
-          const base = 0.16 + 0.34 * kb; // mots pâles du fond
+          const pop = (1 + 0.35 * win(tt, tc, tc + 0.3, 0.12)) * (1 - 0.6 * cond);
+          const flash = win(tt, tc, tc + 0.45, 0.1) + (c.on ? 0.8 * hold * Math.max(0, 1 - Math.abs(c.x - sweepX) / 90) : 0);
+          const base = (0.16 + 0.34 * kb) * (1 - 0.55 * hold); // mots pâles du fond, qui s'effacent pendant l'arrêt
           if (col > 0 && kb < 1) { // lavis d'encre sous les mots du caractère : le 文 se lit de loin
-            ctx.save(); ctx.globalAlpha = 0.16 * (1 - kb) * col * (1 - cond); ctx.fillStyle = inkCss;
+            ctx.save(); ctx.globalAlpha = (0.14 + 0.06 * hold) * (1 - kb) * col * (1 - cond); ctx.fillStyle = inkCss;
             ctx.fillRect(sx - MC.cw * sc / 2, sy - MC.ch * sc / 2, MC.cw * sc + 0.5, MC.ch * sc + 0.5); ctx.restore();
           }
+          // cadre vermillon qui se trace autour du mot repéré
           const hi = isF >= 0 ? win(tt, fc[isF] - 0.05, [wh, fw, fw + 1.4][isF] - 0.1, 0.2) : 0;
           if (hi > 0) {
+            const bw = fs * 2.5, bh = fs * 1.56, per = 2 * (bw + bh), tr = seg(tt, fc[isF] - 0.05, fc[isF] + 0.35);
             ctx.save(); ctx.globalAlpha = hi; ctx.strokeStyle = rgb(VER); ctx.lineWidth = 0.12 * fs; ctx.shadowColor = rgb(VER, 0.6); ctx.shadowBlur = 0.4 * fs;
-            E.roundRect(ctx, sx - fs * 1.25, sy - fs * 0.78, fs * 2.5, fs * 1.56, fs * 0.2); ctx.stroke(); ctx.restore();
+            ctx.setLineDash([per * tr, per]); ctx.lineCap = 'round';
+            E.roundRect(ctx, sx - bw / 2, sy - bh / 2, bw, bh, fs * 0.2); ctx.stroke(); ctx.restore();
           }
           ctx.font = `${fs * pop}px ShuimoKai`;
-          ctx.globalAlpha = (1 - cond) * (base + (1 - base) * col);
-          // le tout premier plan : le 文 de 中文 est déjà vermillon
-          const first = isF === 0 ? 1 : 0;
+          const al = (1 - cond) * (base + (1 - base) * col);
+          const first = isF === 0 ? 1 : 0; // le tout premier plan : le 文 de 中文 est déjà vermillon
           [...c.w].forEach((ch, k) => {
             const on = ch === '文' ? Math.max(col, first) : col;
+            ctx.globalAlpha = first && ch === '文' ? 1 - cond : al;
             ctx.fillStyle = rgb(mixc([170, 161, 150], ch === '文' ? VER : INK, on));
-            if (first && ch === '文') ctx.globalAlpha = 1 - cond;
-            ctx.fillText(ch, sx + (k - 0.5) * fs * 1.02, sy);
-            ctx.globalAlpha = (1 - cond) * (base + (1 - base) * col);
+            if (ch === '文' && flash > 0) { ctx.shadowColor = rgb(VER, 0.85); ctx.shadowBlur = 14 * flash * Math.max(1, sc * 0.6); }
+            ctx.fillText(ch, sx + (k - 0.5) * fs * 1.02 * (1 - 0.6 * cond), sy);
+            ctx.shadowBlur = 0;
           });
         });
+        if (cond > 0) E.text(ctx, '文', 960, 540 - 20 * shrink, { font: 'Kai', size: MC.size + (600 - MC.size) * shrink, color: inkCss, alpha: cond });
         ctx.restore();
-        if (cond > 0) {
-          ctx.save(); ctx.globalAlpha = cond;
-          E.text(ctx, '文', 960, 540 - 20 * shrink, { font: 'Kai', size: MC.size + (600 - MC.size) * shrink, color: inkCss, alpha: cond });
-          ctx.restore();
-        }
+        // vignettage doux : le regard reste au centre
+        const g = ctx.createRadialGradient(960, 540, 420, 960, 540, 1150);
+        g.addColorStop(0, 'rgba(70,50,30,0)'); g.addColorStop(1, `rgba(70,50,30,${0.2 * (1 - cond)})`);
+        ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1080);
       }} />
       <Caption text="文 · wén" a={win(t, A1 + 0.2, zw - 0.2, 0.3)} y={880} size={64} />
       {([['中文 · le chinois', zw, wh - 0.3], ['文化 · la culture', wh, fw - 0.3], ['法文 · le français', fw, fw + 1.5]] as [string, number, number][]).map(([txt, a0, a1]) => (
