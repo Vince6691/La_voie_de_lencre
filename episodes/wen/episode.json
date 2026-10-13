@@ -173,25 +173,18 @@
    0.3
   ],
   [
-   "pinceau",
-   "b01",
-   "wenhua",
-   0,
-   0.3
-  ],
-  [
-   "pinceau",
-   "b01",
-   "fawen",
-   0,
-   0.3
-  ],
-  [
    "gong",
    "b01",
    "pourtant",
    0.2,
    0.25
+  ],
+  [
+   "tapotement",
+   "b01",
+   "fawen",
+   0.95,
+   0.7
   ],
   [
    "sceau",

@@ -272,12 +272,12 @@ const Mosaic: React.FC = () => {
       <Paper />
       <Draw draw={(ctx, tt, E) => {
         const M = mosaic(E), F = M.focus.map((k) => M.cells[k]);
-        // caméra (dans le canvas, pour un texte net) : survol dense → 中文 → 文化 → 法文 → grand recul sur le 文
-        const lg = Math.log;
+        // caméra (dans le canvas, pour un texte net) : très gros plans sur 中文 → 文化 → 法文, puis grand recul sur le 文
+        const lg = Math.log, fx = (c: Cell) => c.x + 0.51 * MC.fs; // le 文 du mot repéré
         type Key = [number, number, number, number];
-        const keys: Key[] = [[A1 - 0.6, F[0].x - 120, F[0].y + 40, 3.4], [zw - 0.35, F[0].x - 40, F[0].y, 2.6], [zw - 0.1, F[0].x, F[0].y, 5.2],
-          [wh - 0.4, F[0].x, F[0].y, 5.4], [wh - 0.05, F[1].x, F[1].y, 5.2], [fw - 0.4, F[1].x, F[1].y, 5.4], [fw - 0.05, F[2].x, F[2].y, 5.2],
-          [fw + 0.9, F[2].x, F[2].y, 5.6], [pt + 0.15, 960, 540, 1]];
+        const keys: Key[] = [[A1 - 0.6, fx(F[0]) + 6, F[0].y + 2, 16], [zw - 0.25, F[0].x + 8, F[0].y, 9], [zw + 0.5, F[0].x, F[0].y, 8.2],
+          [wh - 0.4, F[0].x, F[0].y, 8], [wh - 0.05, F[1].x, F[1].y, 8.6], [fw - 0.4, F[1].x, F[1].y, 8.2], [fw - 0.05, F[2].x, F[2].y, 8.6],
+          [fw + 0.75, F[2].x, F[2].y, 8.2], [pt + 0.15, 960, 540, 1]];
         let cam = keys[0];
         for (let k = 1; k < keys.length; k++) {
           const [k0, k1] = [keys[k - 1], keys[k]];
@@ -292,29 +292,38 @@ const Mosaic: React.FC = () => {
         const X = (x: number) => (x - cx) * sc + 960, Y = (y: number) => (y - cy) * sc + 540;
         // condensation : les mots s'effacent, un 文 à l'encre (taille de la mosaïque) apparaît puis rétrécit
         const cond = seg(tt, pt + 0.1, pt + 0.6), shrink = ease(seg(tt, pt + 0.4, C0));
-        const fs = MC.fs * sc, kb = clamp((sc - 1) / 1.6);
+        const fs = MC.fs * sc, kb = clamp((sc - 1) / 2);
+        // vague de couleur pendant le recul : chaque mot du 文 passe à l'encre et au vermillon (tapotement)
+        const W0 = fw + 0.8, W1 = pt + 0.05;
+        const fc = M.focus.map((k) => [zw, wh, fw][M.focus.indexOf(k)]);
         ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.font = `${fs}px ShuimoKai`;
         if (cond < 1) M.cells.forEach((c, i) => {
           const sx = X(c.x), sy = Y(c.y);
           if (sx < -fs * 2 || sx > 1920 + fs * 2 || sy < -fs || sy > 1080 + fs) return;
           const isF = M.focus.indexOf(i);
-          const app = isF >= 0 ? 1 : seg(tt, A1 - 0.4 + c.h * 3.0, A1 - 0.15 + c.h * 3.0);
-          if (app <= 0) return;
-          const al = app * (1 - cond) * (c.on ? 1 : 0.12 + 0.3 * kb);
-          if (c.on && kb < 1) { // lavis d'encre sous les mots du caractère : le 文 se lit de loin
-            ctx.save(); ctx.globalAlpha = 0.16 * (1 - kb) * app * (1 - cond); ctx.fillStyle = inkCss;
+          const tc = isF >= 0 ? fc[isF] - 0.05 : c.on ? W0 + (W1 - W0) * (0.75 * Math.hypot(c.x - F[2].x, c.y - F[2].y) / 1100 + 0.25 * c.h) : 1e9;
+          const col = seg(tt, tc, tc + 0.12);
+          const pop = 1 + 0.35 * win(tt, tc, tc + 0.3, 0.12);
+          const base = 0.16 + 0.34 * kb; // mots pâles du fond
+          if (col > 0 && kb < 1) { // lavis d'encre sous les mots du caractère : le 文 se lit de loin
+            ctx.save(); ctx.globalAlpha = 0.16 * (1 - kb) * col * (1 - cond); ctx.fillStyle = inkCss;
             ctx.fillRect(sx - MC.cw * sc / 2, sy - MC.ch * sc / 2, MC.cw * sc + 0.5, MC.ch * sc + 0.5); ctx.restore();
           }
-          const hi = isF >= 0 ? win(tt, [zw, wh, fw][isF] - 0.15, [wh, fw, fw + 1.6][isF] - 0.1, 0.25) : 0;
+          const hi = isF >= 0 ? win(tt, fc[isF] - 0.05, [wh, fw, fw + 1.4][isF] - 0.1, 0.2) : 0;
           if (hi > 0) {
-            ctx.save(); ctx.globalAlpha = hi; ctx.strokeStyle = rgb(VER); ctx.lineWidth = 2.2 * sc / 2; ctx.shadowColor = rgb(VER, 0.6); ctx.shadowBlur = 8 * sc;
-            E.roundRect(ctx, sx - fs * 1.25, sy - fs * 0.75, fs * 2.5, fs * 1.5, fs * 0.2); ctx.stroke(); ctx.restore();
+            ctx.save(); ctx.globalAlpha = hi; ctx.strokeStyle = rgb(VER); ctx.lineWidth = 0.12 * fs; ctx.shadowColor = rgb(VER, 0.6); ctx.shadowBlur = 0.4 * fs;
+            E.roundRect(ctx, sx - fs * 1.25, sy - fs * 0.78, fs * 2.5, fs * 1.56, fs * 0.2); ctx.stroke(); ctx.restore();
           }
-          ctx.globalAlpha = al;
+          ctx.font = `${fs * pop}px ShuimoKai`;
+          ctx.globalAlpha = (1 - cond) * (base + (1 - base) * col);
+          // le tout premier plan : le 文 de 中文 est déjà vermillon
+          const first = isF === 0 ? 1 : 0;
           [...c.w].forEach((ch, k) => {
-            ctx.fillStyle = ch === '文' ? rgb(VER, c.on ? 1 : 0.6) : c.on ? inkCss : 'rgb(150,140,128)';
+            const on = ch === '文' ? Math.max(col, first) : col;
+            ctx.fillStyle = rgb(mixc([170, 161, 150], ch === '文' ? VER : INK, on));
+            if (first && ch === '文') ctx.globalAlpha = 1 - cond;
             ctx.fillText(ch, sx + (k - 0.5) * fs * 1.02, sy);
+            ctx.globalAlpha = (1 - cond) * (base + (1 - base) * col);
           });
         });
         ctx.restore();
@@ -324,6 +333,7 @@ const Mosaic: React.FC = () => {
           ctx.restore();
         }
       }} />
+      <Caption text="文 · wén" a={win(t, A1 + 0.2, zw - 0.2, 0.3)} y={880} size={64} />
       {([['中文 · le chinois', zw, wh - 0.3], ['文化 · la culture', wh, fw - 0.3], ['法文 · le français', fw, fw + 1.5]] as [string, number, number][]).map(([txt, a0, a1]) => (
         <div key={txt} style={{ position: 'absolute', width: '100%', top: 880, display: 'flex', justifyContent: 'center', opacity: win(t, a0 + 0.1, a1, 0.3) }}>
           <div style={{ background: 'rgba(246,241,231,0.94)', borderRadius: 14, padding: '10px 34px', boxShadow: '0 0 30px rgba(246,241,231,0.95)', fontFamily: 'ShuimoLatin, ShuimoKai', fontWeight: 600, fontSize: 60, color: '#3b322b' }}>{txt}</div>

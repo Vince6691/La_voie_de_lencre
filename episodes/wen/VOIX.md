@@ -5,7 +5,7 @@ enchaînée « /wə̌n/ : … » (modèle du 教). Noms chinois en caractères, 
 choix à l'oreille. Nombres en lettres. « Quinze ans » retiré (âge non vérifié) : « une jeune fille ».
 **v6** (13/10) : quatre sens, quatre époques (la marque, l'ornement, l'écriture, la culture) ; bloc Song retiré, blocs
 renumérotés b01 à b07 ; 美 n'est pas prononcé (« ce caractère-là »).
-**v7** (13/10) : nouvelle accroche b01 (mosaïque 中文 / 文化 / 法文, boucle ouverte sur le prince) ; prises v6 de b01 dans `voix/prises/v6/`.
+**v7** (13/10) : nouvelle accroche b01 (mosaïque 中文 / 文化 / 法文, boucle ouverte sur le prince) ; prises v6 de b01 dans `voix/prises/v6/`. Le /wə̌n/ de tête sonne comme un soupir : coupé (b01.mp3 = prise 1 à partir de 0,55 s), la phrase commence à « Chaque jour ».
 
 b01: [curious] /wə̌n/ : chaque jour, plus d'un milliard de personnes l'écrivent. Dans 中文, le chinois. Dans 文化, la culture. Et même dans 法文… le français. Pourtant, regardez-le bien : c'est un homme, debout, de face. Et il y a trois mille ans, il portait sur la poitrine… un tatouage. Un prince s'en servira même pour ne jamais devenir roi. Comment un tatouage est-il devenu la culture ?
 b02: Vers mille deux cents avant notre ère, sous la dynastie 商, le signe est gravé sur les os : deux bras ouverts, deux jambes écartées… et sur le torse, une marque. Une croix, un V, parfois un cœur. Un tatouage. Et ce n'est pas une punition : la dynastie 商 donne ce nom à ses rois défunts, comme le roi 文丁. Voilà le premier sens de 文 : la marque sur la peau.
