@@ -813,7 +813,8 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 
 const Today: React.FC = () => {
   const t = useT();
-  const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'chinois'), cul = at('b06', 'culture');
+  const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'chinois'), cul = at('b06', 'culture'), blg = at('b06', 'blague');
+  const bl = seg(t, blg + 1.0, blg + 1.6);
   const A7 = A('b07'), autre = at('b07', 'autre'), homme = at('b07', 'homme');
   return (
     <AbsoluteFill>
@@ -844,10 +845,16 @@ const Today: React.FC = () => {
       </Cam>
       <Caption text="un seul dessin, dans toutes les formes : un homme de face" a={win(t, fo, at('b06', 'tete') - 0.1, 0.4)} y={1010} size={40} />
       <Caption text="wén · la marque, l'ornement, l'écriture, la culture" a={win(t, nait + 0.6, chi - 0.2, 0.4)} y={880} size={50} />
-      <div style={{ position: 'absolute', width: '100%', top: 820, display: 'flex', justifyContent: 'center', gap: 180, fontFamily: 'ShuimoKai', fontSize: 80, color: inkCss }}>
-        <span style={{ opacity: win(t, chi - 0.6, A7 - 0.3) }}>中文<div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, textAlign: 'center' }}>le chinois</div></span>
-        <span style={{ opacity: win(t, cul - 0.6, A7 - 0.3) }}>文化<div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, textAlign: 'center' }}>la culture</div></span>
+      {/* 中文 / 文化, puis la blague : le 文 de chaque mot s'allume en vermillon, « la culture des tatoués du Milieu » */}
+      <div style={{ position: 'absolute', width: '100%', top: 800 - 40 * bl, display: 'flex', justifyContent: 'center', gap: 180, fontFamily: 'ShuimoKai', fontSize: 80 + 16 * bl, color: inkCss }}>
+        {([['中文', 'le chinois', chi], ['文化', 'la culture', cul]] as [string, string, number][]).map(([w, fr, t0]) => (
+          <span key={w} style={{ opacity: win(t, t0 - 0.6, A7 - 0.3) }}>
+            {[...w].map((ch, k) => <span key={k} style={{ color: ch === '文' ? rgb(mixc(INK, VER, bl)) : inkCss, textShadow: ch === '文' && bl > 0 ? `0 0 ${18 * bl}px ${rgb(VER, 0.5)}` : 'none' }}>{ch}</span>)}
+            <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, textAlign: 'center' }}>{fr}</div>
+          </span>
+        ))}
       </div>
+      <Caption text="au pied de la lettre : « la culture des tatoués du Milieu »" a={win(t, blg + 1.2, A7 - 0.3, 0.4)} y={985} size={48} />
       {/* fiche : pinyin, nombre de traits */}
       <div style={{ position: 'absolute', left: 300, top: 300, opacity: win(t, A7 - 0.2, autre - 0.2, 0.6) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 300, color: inkCss, lineHeight: 1 }}>文</div>
