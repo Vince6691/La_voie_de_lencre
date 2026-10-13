@@ -230,33 +230,131 @@ const Senses: React.FC = () => {
   );
 };
 
-// ════════════════ 1. Accroche — la cascade du temps : 文 moderne tracé, puis il remonte 3 000 ans en accéléré
-// (clercs, sceau, Chu, bronze, os ; un coup de sceau et un compteur d'années à chaque forme), s'arrête sur l'homme de
-// l'os (tête, bras, jambes en azurite) ; sur « un tatouage », la caméra fonce sur la poitrine et la marque s'embrase.
+// ════════════════ 1. Accroche — (a) la mosaïque : des milliers de mots modernes qui contiennent 文 (中文, 文化, 法文…,
+// chaque 文 en vermillon) ; la caméra s'arrête sur 中文, 文化, 法文, puis recule : de loin, les mots dessinent le 文
+// moderne. (b) Sur « Pourtant », la mosaïque se condense en un 文 à l'encre, qui remonte 3 000 ans en accéléré (clercs,
+// sceau, Chu, bronze, os ; coup de sceau et compteur d'années à chaque forme) jusqu'à l'homme de l'os (tête, bras,
+// jambes en azurite) ; sur « un tatouage », la caméra fonce sur la poitrine et la marque s'embrase. (c) « Un prince… ne
+// jamais devenir roi » : 王 apparaît à côté et se fend d'un trait vermillon.
+const MOTS = ['中文', '文化', '文字', '文学', '天文', '英文', '法文', '日文', '文明', '文件', '论文', '文章', '作文', '文具', '人文', '课文',
+  '散文', '文艺', '文物', '语文', '原文', '公文', '文本', '文科', '德文', '韩文', '文雅', '文凭'];
+type Cell = { x: number; y: number; w: string; on: boolean; h: number };
+const MC = { cw: 50, ch: 28, fs: 20, size: 880 };
+let MOSAIC: { cells: Cell[]; focus: number[] } | null = null;
+const hash = (i: number) => { const v = Math.sin(i * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+const mosaic = (E: any) => {
+  if (MOSAIC) return MOSAIC;
+  const c = document.createElement('canvas'); c.width = 1920; c.height = 1080;
+  const g = c.getContext('2d')!;
+  E.text(g, '文', 960, 540, { font: 'Kai', size: MC.size, color: '#000' });
+  const px = g.getImageData(0, 0, 1920, 1080).data;
+  const a = (x: number, y: number) => (x < 0 || y < 0 || x >= 1920 || y >= 1080 ? 0 : px[(Math.round(y) * 1920 + Math.round(x)) * 4 + 3]);
+  const cells: Cell[] = [];
+  let i = 0;
+  for (let y = MC.ch / 2 - 14; y < 1080 + 14; y += MC.ch) for (let x = MC.cw / 2 - 10; x < 1920 + 10; x += MC.cw) {
+    const on = [[0, 0], [-22, 0], [22, 0], [0, -12], [0, 12], [-14, -10], [14, 10], [-14, 10], [14, -10]].some(([dx, dy]) => a(x + dx, y + dy) > 110);
+    cells.push({ x, y, w: MOTS[Math.floor(hash(i) * MOTS.length)], on, h: hash(i + 999) }); i++;
+  }
+  // trois mots repérés dans le 文 (dans le trait horizontal, puis la jambe gauche, puis la droite)
+  const near = (tx: number, ty: number) => cells.reduce((bi, cc, j) => (cc.on && Math.hypot(cc.x - tx, cc.y - ty) < Math.hypot(cells[bi].x - tx, cells[bi].y - ty) ? j : bi), cells.findIndex((cc) => cc.on));
+  const focus = [near(860, 330), near(1000, 560), near(1180, 760)];
+  ['中文', '文化', '法文'].forEach((w, k) => (cells[focus[k]].w = w));
+  MOSAIC = { cells, focus };
+  return MOSAIC;
+};
+const Mosaic: React.FC = () => {
+  const t = useT();
+  const A1 = A('b01'), zw = at('b01', 'zhongwen'), wh = at('b01', 'wenhua'), fw = at('b01', 'fawen'), pt = at('b01', 'pourtant');
+  const C0 = pt + 0.9;
+  if (t > C0 + 0.05) return null;
+  return (
+    <AbsoluteFill>
+      <Paper />
+      <Draw draw={(ctx, tt, E) => {
+        const M = mosaic(E), F = M.focus.map((k) => M.cells[k]);
+        // caméra (dans le canvas, pour un texte net) : survol dense → 中文 → 文化 → 法文 → grand recul sur le 文
+        const lg = Math.log;
+        type Key = [number, number, number, number];
+        const keys: Key[] = [[A1 - 0.6, F[0].x - 120, F[0].y + 40, 3.4], [zw - 0.35, F[0].x - 40, F[0].y, 2.6], [zw - 0.1, F[0].x, F[0].y, 5.2],
+          [wh - 0.4, F[0].x, F[0].y, 5.4], [wh - 0.05, F[1].x, F[1].y, 5.2], [fw - 0.4, F[1].x, F[1].y, 5.4], [fw - 0.05, F[2].x, F[2].y, 5.2],
+          [fw + 0.9, F[2].x, F[2].y, 5.6], [pt + 0.15, 960, 540, 1]];
+        let cam = keys[0];
+        for (let k = 1; k < keys.length; k++) {
+          const [k0, k1] = [keys[k - 1], keys[k]];
+          if (tt >= k1[0]) { cam = k1; continue; }
+          if (tt > k0[0]) {
+            const u = ease((tt - k0[0]) / (k1[0] - k0[0]));
+            cam = [tt, k0[1] + (k1[1] - k0[1]) * u, k0[2] + (k1[2] - k0[2]) * u, Math.exp(lg(k0[3]) + (lg(k1[3]) - lg(k0[3])) * u)];
+          }
+          break;
+        }
+        const [, cx, cy, sc] = cam;
+        const X = (x: number) => (x - cx) * sc + 960, Y = (y: number) => (y - cy) * sc + 540;
+        // condensation : les mots s'effacent, un 文 à l'encre (taille de la mosaïque) apparaît puis rétrécit
+        const cond = seg(tt, pt + 0.1, pt + 0.6), shrink = ease(seg(tt, pt + 0.4, C0));
+        const fs = MC.fs * sc, kb = clamp((sc - 1) / 1.6);
+        ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = `${fs}px ShuimoKai`;
+        if (cond < 1) M.cells.forEach((c, i) => {
+          const sx = X(c.x), sy = Y(c.y);
+          if (sx < -fs * 2 || sx > 1920 + fs * 2 || sy < -fs || sy > 1080 + fs) return;
+          const isF = M.focus.indexOf(i);
+          const app = isF >= 0 ? 1 : seg(tt, A1 - 0.4 + c.h * 3.0, A1 - 0.15 + c.h * 3.0);
+          if (app <= 0) return;
+          const al = app * (1 - cond) * (c.on ? 1 : 0.12 + 0.3 * kb);
+          if (c.on && kb < 1) { // lavis d'encre sous les mots du caractère : le 文 se lit de loin
+            ctx.save(); ctx.globalAlpha = 0.16 * (1 - kb) * app * (1 - cond); ctx.fillStyle = inkCss;
+            ctx.fillRect(sx - MC.cw * sc / 2, sy - MC.ch * sc / 2, MC.cw * sc + 0.5, MC.ch * sc + 0.5); ctx.restore();
+          }
+          const hi = isF >= 0 ? win(tt, [zw, wh, fw][isF] - 0.15, [wh, fw, fw + 1.6][isF] - 0.1, 0.25) : 0;
+          if (hi > 0) {
+            ctx.save(); ctx.globalAlpha = hi; ctx.strokeStyle = rgb(VER); ctx.lineWidth = 2.2 * sc / 2; ctx.shadowColor = rgb(VER, 0.6); ctx.shadowBlur = 8 * sc;
+            E.roundRect(ctx, sx - fs * 1.25, sy - fs * 0.75, fs * 2.5, fs * 1.5, fs * 0.2); ctx.stroke(); ctx.restore();
+          }
+          ctx.globalAlpha = al;
+          [...c.w].forEach((ch, k) => {
+            ctx.fillStyle = ch === '文' ? rgb(VER, c.on ? 1 : 0.6) : c.on ? inkCss : 'rgb(150,140,128)';
+            ctx.fillText(ch, sx + (k - 0.5) * fs * 1.02, sy);
+          });
+        });
+        ctx.restore();
+        if (cond > 0) {
+          ctx.save(); ctx.globalAlpha = cond;
+          E.text(ctx, '文', 960, 540 - 20 * shrink, { font: 'Kai', size: MC.size + (600 - MC.size) * shrink, color: inkCss, alpha: cond });
+          ctx.restore();
+        }
+      }} />
+      {([['中文 · le chinois', zw, wh - 0.3], ['文化 · la culture', wh, fw - 0.3], ['法文 · le français', fw, fw + 1.5]] as [string, number, number][]).map(([txt, a0, a1]) => (
+        <div key={txt} style={{ position: 'absolute', width: '100%', top: 880, display: 'flex', justifyContent: 'center', opacity: win(t, a0 + 0.1, a1, 0.3) }}>
+          <div style={{ background: 'rgba(246,241,231,0.94)', borderRadius: 14, padding: '10px 34px', boxShadow: '0 0 30px rgba(246,241,231,0.95)', fontFamily: 'ShuimoLatin, ShuimoKai', fontWeight: 600, fontSize: 60, color: '#3b322b' }}>{txt}</div>
+        </div>
+      ))}
+    </AbsoluteFill>
+  );
+};
+
 const CASC: [string, string, string, string][] = [
   ['wen_lishu', '隸書', 'clercs Han', '175'], ['wen_xiaozhuan', '小篆', 'sceau Qin', '−221'], ['wen_chu', '楚簡', 'bambou Chu', '−300'],
   ['wen_zhou', '金文', 'bronze Zhou', '−850'], ['wen_jiaguwen', '甲骨文', 'os Shang', '−1200'],
 ];
 const Opening: React.FC = () => {
   const t = useT();
-  const A1 = A('b01'), pt = at('b01', 'pourtant'), hom = at('b01', 'homme'), deb = at('b01', 'debout'), tat = at('b01', 'tatouage'), com = at('b01', 'comment');
-  const C0 = pt - 0.12, ST = 0.45, CE = C0 + 5 * ST; // cascade : 5 formes, une toutes les 0,45 s
-  const idx = t < C0 ? -1 : Math.min(4, Math.floor((t - C0) / ST));
+  const pt = at('b01', 'pourtant'), hom = at('b01', 'homme'), deb = at('b01', 'debout'), tat = at('b01', 'tatouage'), pr = at('b01', 'prince'), jam = at('b01', 'jamais'), com = at('b01', 'comment');
+  const C0 = pt + 0.9, ST = 0.4, CE = C0 + 5 * ST; // cascade : 5 formes, une toutes les 0,4 s
+  if (t < C0) return null;
+  const idx = Math.min(4, Math.floor((t - C0) / ST));
   const o = { x: 960, y: 520, size: 640 };
+  const h0 = Math.max(hom, CE); // l'homme s'allume quand la cascade est arrivée
   return (
     <AbsoluteFill>
-      <Cam keys={[[0, 960, 540, 1], [C0, 960, 530, 1.06, 0.3], [CE, 960, 520, 1.12, 1.0], [tat - 0.35, 960, 450, 1.55, 0.45], [com + 0.4, 960, 540, 1.02, 1.6]]}
-        punch={[0, 1, 2, 3, 4].map((i) => C0 + i * ST)}>
+      <Cam keys={[[C0, 960, 530, 1.02], [CE, 960, 520, 1.12, 1.0], [tat - 0.35, 960, 450, 1.55, 0.45], [pr - 0.2, 1180, 540, 1.05, 0.9], [com + 0.3, 960, 540, 1.02, 1.2]]}
+        punch={[0, 1, 2, 3, 4].map((i) => C0 + i * ST).concat([jam + 0.35])}>
         <Paper />
         <Draw draw={(ctx, tt, E) => {
           // le papier vieillit pendant la remontée du temps, puis redevient clair
           const age = seg(tt, C0, CE) * (1 - seg(tt, com, com + 1.5));
           if (age > 0) { ctx.save(); ctx.fillStyle = `rgba(140,104,60,${0.16 * age})`; ctx.fillRect(0, 0, 1920, 1080); ctx.restore(); }
-          const i = tt < C0 ? -1 : Math.min(4, Math.floor((tt - C0) / ST));
-          if (i < 0) {
-            E.drawStrokes(ctx, 'wen_regulier', { ...o, x: 960, y: 520, size: 600, progress: 4 * seg(tt, A1 - 0.2, A1 + 1.6), brush: false, color: () => inkCss });
-            return;
-          }
+          const i = Math.min(4, Math.floor((tt - C0) / ST));
           const u = i < 4 ? (tt - C0 - i * ST) / ST : Math.min(1, (tt - C0 - 4 * ST) / ST);
           const pop = 1 + 0.1 * (1 - ease(Math.min(1, u * 3)));
           // écho de la forme précédente qui s'éloigne
@@ -267,38 +365,58 @@ const Opening: React.FC = () => {
             else E.drawRealGlyph(ctx, CASC[prev][0], { ...o, size: 640 * (1 + 0.3 * eu), opacity: 0.4 * (1 - eu), color: () => inkCss });
             ctx.restore();
           }
-          if (i < 4) { E.drawRealGlyph(ctx, CASC[i][0], { ...o, size: 640 * pop, color: () => inkCss }); return; }
-          // l'homme de l'os : tête, bras, jambes s'allument en azurite ; la marque s'embrase sur « un tatouage »
-          const lit: Record<string, number> = { tete: seg(tt, hom, hom + 0.4), bras: seg(tt, hom + 0.5, hom + 0.9), jambes: seg(tt, deb, deb + 0.4) };
-          const man = 1 - seg(tt, tat - 0.6, tat);
-          const mark = seg(tt, tat + 0.25, tat + 0.6) * (1 - 0.5 * seg(tt, com + 1.5, B('b01')));
-          const beat = mark * (0.6 + 0.4 * Math.cos((tt - tat - 0.25) * 2 * Math.PI * 1.1));
-          E.drawRealGlyph(ctx, 'wen_jiaguwen', { ...o, size: 640 * pop, alpha: (c: string) => (c === 'marque' ? 1 - mark : 1),
-            color: (c: string) => rgb(mixc(INK, AZ, (lit[c] ?? 0) * man)) });
-          if (mark > 0) E.drawRealGlyph(ctx, 'wen_jiaguwen', { ...o, size: 640 * pop, alpha: (c: string) => (c === 'marque' ? mark : 0),
-            color: () => rgb(VER), glow: 14 + 22 * beat, glowColor: rgb(VER, 0.75) });
-          // étincelles de braise autour de la marque
-          const v = clamp((tt - tat - 0.25) / 1.1);
-          if (v > 0 && v < 1) {
-            const [mx, my] = E.realCenter('wen_jiaguwen', 'marque', o);
-            ctx.save();
-            for (let k = 0; k < 28; k++) {
-              const ang = k * 2.39996, sp = 0.45 + 0.55 * Math.abs(Math.sin(k * 12.9898)), r = (30 + 230 * sp) * ease(v);
-              ctx.globalAlpha = (1 - v) * 0.9; ctx.fillStyle = k % 3 ? rgb(VER) : 'rgb(240,150,60)';
-              ctx.beginPath(); ctx.arc(mx + Math.cos(ang) * r, my + Math.sin(ang) * r - 40 * v * v, 2 + 4 * (1 - v), 0, 7); ctx.fill();
+          if (i < 4) { E.drawRealGlyph(ctx, CASC[i][0], { ...o, size: 640 * pop, color: () => inkCss }); }
+          else {
+            // l'homme de l'os : tête, bras, jambes en azurite ; la marque s'embrase sur « un tatouage »
+            const lit: Record<string, number> = { tete: seg(tt, h0, h0 + 0.4), bras: seg(tt, h0 + 0.4, h0 + 0.8), jambes: seg(tt, Math.max(deb, h0 + 0.8), Math.max(deb, h0 + 0.8) + 0.4) };
+            const man = 1 - seg(tt, tat - 0.6, tat);
+            const mark = seg(tt, tat + 0.25, tat + 0.6) * (1 - 0.5 * seg(tt, com + 1.5, B('b01')));
+            const beat = mark * (0.6 + 0.4 * Math.cos((tt - tat - 0.25) * 2 * Math.PI * 1.1));
+            E.drawRealGlyph(ctx, 'wen_jiaguwen', { ...o, size: 640 * pop, alpha: (c: string) => (c === 'marque' ? 1 - mark : 1), color: (c: string) => rgb(mixc(INK, AZ, (lit[c] ?? 0) * man)) });
+            if (mark > 0) E.drawRealGlyph(ctx, 'wen_jiaguwen', { ...o, size: 640 * pop, alpha: (c: string) => (c === 'marque' ? mark : 0), color: () => rgb(VER), glow: 14 + 22 * beat, glowColor: rgb(VER, 0.75) });
+            // étincelles de braise autour de la marque
+            const v = clamp((tt - tat - 0.25) / 1.1);
+            if (v > 0 && v < 1) {
+              const [mx, my] = E.realCenter('wen_jiaguwen', 'marque', o);
+              ctx.save();
+              for (let k = 0; k < 28; k++) {
+                const ang = k * 2.39996, sp = 0.45 + 0.55 * Math.abs(Math.sin(k * 12.9898)), r = (30 + 230 * sp) * ease(v);
+                ctx.globalAlpha = (1 - v) * 0.9; ctx.fillStyle = k % 3 ? rgb(VER) : 'rgb(240,150,60)';
+                ctx.beginPath(); ctx.arc(mx + Math.cos(ang) * r, my + Math.sin(ang) * r - 40 * v * v, 2 + 4 * (1 - v), 0, 7); ctx.fill();
+              }
+              ctx.restore();
             }
-            ctx.restore();
+          }
+          // « un prince… pour ne jamais devenir roi » : 王 (le roi) apparaît, puis se fend d'un trait vermillon
+          const kw = win(tt, pr - 0.1, com + 0.6, 0.4);
+          if (kw > 0) {
+            const cut = seg(tt, jam + 0.25, jam + 0.45), sep = ease(seg(tt, jam + 0.45, jam + 1.3));
+            const kx = 1500, ky = 500;
+            for (const side of [0, 1]) {
+              ctx.save(); ctx.beginPath();
+              if (side === 0) { ctx.moveTo(kx - 200, ky - 200); ctx.lineTo(kx + 200, ky - 200); ctx.lineTo(kx - 200, ky + 200); }
+              else { ctx.moveTo(kx + 200, ky - 200); ctx.lineTo(kx + 200, ky + 200); ctx.lineTo(kx - 200, ky + 200); }
+              ctx.closePath(); ctx.clip();
+              const d = (side ? 1 : -1) * 40 * sep;
+              E.text(ctx, '王', kx + d, ky + d + (side ? 60 : 0) * sep * sep, { font: 'Kai', size: 300, color: inkCss, alpha: kw * (1 - 0.6 * sep) });
+              ctx.restore();
+            }
+            if (cut > 0) {
+              ctx.save(); ctx.globalAlpha = kw * (1 - 0.7 * sep); ctx.strokeStyle = rgb(VER); ctx.lineWidth = 12; ctx.lineCap = 'round';
+              ctx.shadowColor = rgb(VER, 0.6); ctx.shadowBlur = 16;
+              ctx.beginPath(); ctx.moveTo(kx + 190, ky - 190); ctx.lineTo(kx + 190 - 380 * cut, ky - 190 + 380 * cut); ctx.stroke(); ctx.restore();
+            }
           }
         }} />
       </Cam>
       {/* compteur d'années et nom de l'écriture, à chaque forme */}
-      <div style={{ position: 'absolute', width: '100%', top: 860, textAlign: 'center', opacity: win(t, C0, hom + 0.2, 0.15) }}>
-        <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 92, color: rgb(VER), lineHeight: 1 }}>{idx >= 0 ? CASC[idx][3] : '2026'}</div>
-        <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontWeight: 600, fontSize: 40, color: '#4a3f36' }}>{idx >= 0 ? `${CASC[idx][1]} · ${CASC[idx][2]}` : '楷書'}</div>
+      <div style={{ position: 'absolute', width: '100%', top: 860, textAlign: 'center', opacity: win(t, C0, h0 + 0.3, 0.15) }}>
+        <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 92, color: rgb(VER), lineHeight: 1 }}>{CASC[idx][3]}</div>
+        <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontWeight: 600, fontSize: 40, color: '#4a3f36' }}>{`${CASC[idx][1]} · ${CASC[idx][2]}`}</div>
       </div>
-      <Caption text="文 · wén · l'écriture, la culture" a={win(t, A1 + 1.6, C0 - 0.05, 0.3)} y={880} size={52} />
-      <Caption text="un homme, debout, de face" a={win(t, hom + 0.3, tat - 0.2, 0.4)} y={900} size={50} />
-      <Caption text="et sur la poitrine… une marque" a={win(t, tat + 0.4, B('b01') + 0.4, 0.4)} y={985} size={50} />
+      <Caption text="un homme, debout, de face" a={win(t, h0 + 0.3, tat - 0.2, 0.4)} y={900} size={50} />
+      <Caption text="et sur la poitrine… une marque" a={win(t, tat + 0.4, pr - 0.2, 0.4)} y={985} size={50} />
+      <Caption text="王 · roi" a={win(t, pr + 0.4, com + 0.4, 0.4)} y={985} size={50} />
     </AbsoluteFill>
   );
 };
@@ -699,7 +817,7 @@ export const WenV1: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: '#f3eee4' }}>
       {ready && <>
-        <Win from={0} to={A('b02') - 0.01}><Opening /></Win>
+        <Win from={0} to={A('b02') - 0.01}><Mosaic /><Opening /></Win>
         <Win from={A('b02') - 0.01} to={R1E + 0.05}><Shang /></Win>
         <Win from={R1E + 0.05} to={A('b04') - 0.5}><Zhou /></Win>
         <Win from={A('b04') - 0.5} to={P4E + 0.05}><Bambou /></Win>

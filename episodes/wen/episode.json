@@ -54,11 +54,18 @@
  "queue": 3.2,
  "reperes_cles": {
   "b01": {
+   "milliard": "milliard",
+   "zhongwen": "中文",
+   "wenhua": "文化",
+   "fawen": "法文",
    "pourtant": "Pourtant",
    "homme": "c'est un homme",
    "debout": "debout",
    "face": "de face",
    "tatouage": "un tatouage",
+   "prince": "Un prince",
+   "jamais": "jamais",
+   "roi": "roi",
    "comment": "Comment un"
   },
   "b02": {
@@ -156,41 +163,69 @@
    "b01",
    null,
    -0.3,
-   0.45
+   0.35
   ],
   [
-   "sceau",
+   "pinceau",
+   "b01",
+   "zhongwen",
+   0,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b01",
+   "wenhua",
+   0,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b01",
+   "fawen",
+   0,
+   0.3
+  ],
+  [
+   "gong",
    "b01",
    "pourtant",
-   -0.12,
+   0.2,
    0.25
   ],
   [
    "sceau",
    "b01",
    "pourtant",
-   0.33,
+   0.9,
+   0.25
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   1.3,
    0.31
   ],
   [
    "sceau",
    "b01",
    "pourtant",
-   0.78,
+   1.7,
    0.37
   ],
   [
    "sceau",
    "b01",
    "pourtant",
-   1.23,
+   2.1,
    0.43
   ],
   [
    "sceau",
    "b01",
    "pourtant",
-   1.68,
+   2.5,
    0.49
   ],
   [
@@ -199,6 +234,13 @@
    "tatouage",
    0.35,
    0.35
+  ],
+  [
+   "sceau",
+   "b01",
+   "jamais",
+   0.3,
+   0.55
   ],
   [
    "sceau",
