@@ -64,7 +64,7 @@ Director's note: dry comic beat — the happiest man ever to lose a throne. Hold
 Constraints: no text overlays, no readable characters, no extra main characters, no deformed hands, no snap zooms.
 ```
 
-### Clip B — Soldats tatoués et Di Qing (bloc 6, 12 s)
+### Clip B — Soldats tatoués et Di Qing — PLUS NÉCESSAIRE (bloc Song retiré en v6)
 Format B, 12 s, 16:9. Les marques restent floues dans le clip : les caractères lisibles sont ajoutés au montage.
 
 ```

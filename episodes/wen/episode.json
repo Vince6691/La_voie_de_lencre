@@ -22,30 +22,32 @@
   },
   {
    "clip": "b04",
+   "pause": {
+    "repere": "qin",
+    "decalage": -0.15,
+    "duree": 3.5
+   },
    "apres": 0.6
   },
   {
-   "rouleau": 3.5,
-   "apres": 0.3
-  },
-  {
    "clip": "b05",
-   "apres": 3.6
-  },
-  {
-   "clip": "b06",
-   "apres": 1.8
-  },
-  {
-   "rouleau": 6,
-   "apres": 0.4
-  },
-  {
-   "clip": "b07",
+   "pause": {
+    "repere": "simple",
+    "decalage": -0.2,
+    "duree": 3.4
+   },
    "apres": 1.0
   },
   {
-   "clip": "b08",
+   "rouleau": 5,
+   "apres": 0.4
+  },
+  {
+   "clip": "b06",
+   "apres": 1.0
+  },
+  {
+   "clip": "b07",
    "apres": 0.5
   }
  ],
@@ -57,66 +59,70 @@
    "comment": "Comment un"
   },
   "b02": {
-   "os": "Sur les os",
+   "os": "gravé sur",
    "bras": "deux bras",
    "marque": "une marque",
    "croix": "Une croix",
-   "shirakawa": "Selon le savant",
-   "morts": "des morts",
-   "rois": "honorer ses rois",
-   "honneur": "Le tatouage est",
-   "excuse": "une excellente"
+   "tatouage": "Un tatouage",
+   "punition": "une punition",
+   "rois": "ses rois",
+   "wending": "comme le",
+   "sens": "Voilà le",
+   "peau": "sur la peau"
   },
   "b03": {
-   "duc": "le vieux duc",
-   "probleme": "Problème",
-   "fuite": "s'enfuit",
-   "tatouer": "se fait tatouer",
-   "carriere": "Carrière terminée",
-   "neveu": "Son neveu",
-   "roi": "On l'appellera",
-   "bronze": "Quand la dynastie",
-   "coeur": "un vrai cœur",
-   "grand": "Le tatouage n'a"
+   "clan": "Dans le clan",
+   "taibo": "l'aîné",
+   "tatouer": "se fait",
+   "regner": "pour ne",
+   "prince": "un prince",
+   "carriere": "Carrière",
+   "bronze": "Sur les bronzes",
+   "coeur": "un vrai",
+   "orne": "On ne",
+   "sens": "Deuxième sens",
+   "roi": "Un roi",
+   "fils": "Son fils",
+   "wu": "le guerrier",
+   "duo": "文 et",
+   "raff": "le raffinement",
+   "force": "la force"
   },
   "b04": {
-   "royaumes": "Royaumes combattants",
-   "mutations": "Livre des mutations",
-   "ciel": "pour suivre",
-   "hommes": "pour transformer",
-   "etoiles": "les étoiles",
-   "rites": "les rites",
-   "peau": "Le motif quitte",
-   "bambou": "lattes de bambou",
-   "disparait": "souvent, la marque",
-   "sort": "Parfois, le cœur"
+   "motifs": "quels motifs",
+   "ecriture": "Ceux de",
+   "bambou": "sur le bambou",
+   "sens": "Troisième sens",
+   "quitte": "la marque quitte",
+   "chu": "Dans le royaume",
+   "sort": "sort même",
+   "cote": "à côté",
+   "qin": "Puis la dynastie",
+   "sceau": "le petit sceau",
+   "symetrique": "parfaitement",
+   "vide": "le torse vide",
+   "scribes": "Mais les scribes",
+   "tete": "la tête devient",
+   "quatre": "Quatre traits",
+   "ne": "est né"
   },
   "b05": {
-   "sceau": "le petit sceau",
-   "vide": "le torse est vide",
-   "scribes": "Mais les scribes",
-   "quatre": "Quatre traits",
-   "ne": "est né",
    "han": "Sous la dynastie",
    "tiying": "une jeune fille",
+   "pere": "sauver son",
+   "coupe": "Ce qu'on",
    "abolit": "abolit",
-   "visage": "tatouage du visage",
+   "visage": "du visage",
    "nom": "Son nom",
-   "wen": "L'empereur Wen"
+   "wen": "L'empereur",
+   "simple": "Une simple",
+   "mot": "mot que",
+   "transformer": "c'est transformer",
+   "hommes": "transformer les",
+   "armes": "par les armes",
+   "sens": "Quatrième sens"
   },
   "b06": {
-   "soie": "un fil de soie",
-   "motif": "le motif",
-   "song": "Mais sous",
-   "ecriture": "c'est de l'écriture",
-   "deserteurs": "Pour reconnaître",
-   "caracteres": "en caractères",
-   "diqing": "L'un d'eux",
-   "remede": "un remède",
-   "garde": "Je les garde"
-  },
-  "b07": {
-   "traits": "quatre traits",
    "reprenons": "Reprenons",
    "formes": "un seul dessin",
    "tete": "La tête",
@@ -126,17 +132,19 @@
    "os": "un V",
    "bronze": "un cœur",
    "rien": "puis plus rien",
+   "sens": "La marque",
+   "orn": "l'ornement",
+   "ecr": "l'écriture",
+   "cul": "la culture",
    "naissance": "Ainsi naît",
    "chinois": "le chinois",
-   "bunka": "un mot que"
+   "culture": "la culture"
   },
-  "b08": {
+  "b07": {
    "peau": "sur la peau",
-   "autre": "Un autre homme",
-   "tete": "sur la tête",
-   "plumes": "Des plumes",
-   "mouton": "un gros mouton",
-   "manger": "Bon à manger"
+   "autre": "Et dans",
+   "homme": "un homme",
+   "bientot": "Nous le"
   }
  },
  "bruitages": [
@@ -184,14 +192,14 @@
   ],
   [
    "sceau",
-   "R2",
-   "impact",
-   0,
+   "b04",
+   "qin",
+   -0.85,
    0.7
   ],
   [
    "pinceau",
-   "b05",
+   "b04",
    "sceau",
    0,
    0.4
@@ -199,48 +207,41 @@
   [
    "effondrement",
    "b05",
-   "wen",
-   2.6,
+   "simple",
+   -3.3,
    0.6
   ],
   [
-   "pinceau",
-   "b06",
-   "soie",
-   -0.2,
-   0.4
-  ],
-  [
    "gong",
-   "b06",
-   "garde",
-   0.4,
+   "b05",
+   "sens",
+   0,
    0.45
   ],
   [
    "sceau",
-   "R3",
+   "R2",
    "impact",
    0,
    0.7
   ],
   [
    "pinceau",
-   "b07",
+   "b06",
    null,
    0.2,
    0.4
   ],
   [
    "gong",
-   "b07",
+   "b06",
    "naissance",
    0,
    0.5
   ],
   [
    "gong",
-   "b08",
+   "b07",
    "peau",
    -0.6,
    0.45
