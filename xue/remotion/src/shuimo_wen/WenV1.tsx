@@ -546,20 +546,6 @@ const Shang: React.FC = () => {
             // l'os oraculaire (photo), puis le signe passe à l'encre sur le papier
             const plate = win(tt, os - 0.6, R1 + 0.2, 0.7) * (1 - seg(tt, pun, pun + 1.2));
             if (bone && plate > 0) coverImg(ctx, bone, plate, 1.0 + 0.04 * seg(tt, os - 0.6, pun));
-            // divination : un point brûlant dans un creux, la fissure 卜 court
-            const cr = seg(tt, os - 0.3, os + 0.5);
-            if (plate > 0 && cr > 0) {
-              const hx = 842, hy = 858, ember = win(tt, os - 0.4, os + 0.6, 0.2);
-              ctx.save(); ctx.globalAlpha = plate;
-              const eg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 46);
-              eg.addColorStop(0, `rgba(255,190,90,${0.9 * ember})`); eg.addColorStop(1, 'rgba(255,120,40,0)');
-              ctx.fillStyle = eg; ctx.beginPath(); ctx.arc(hx, hy, 46, 0, 7); ctx.fill();
-              ctx.strokeStyle = 'rgba(45,26,12,0.9)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.shadowColor = 'rgba(255,150,60,0.7)'; ctx.shadowBlur = 10 * ember;
-              const v = Math.min(1, cr * 1.6), b = clamp((cr - 0.55) / 0.45);
-              ctx.beginPath(); ctx.moveTo(hx, hy - 10); ctx.lineTo(hx + 6, hy - 10 - 190 * v); ctx.stroke();
-              if (b > 0) { ctx.beginPath(); ctx.moveTo(hx + 3, hy - 100); ctx.lineTo(hx + 3 + 95 * b, hy - 100 - 26 * b); ctx.stroke(); }
-              ctx.restore();
-            }
             const reveal = seg(tt, os + 0.3, os + 1.5);
             if (reveal <= 0 || tt > R1E + 0.1) return;
             const dry = seg(tt, pun - 0.4, pun + 0.8); // le signe passe du blanc (estampage) à l'encre
@@ -600,6 +586,7 @@ const Zhou: React.FC = () => {
     roi = at('b03', 'roi'), fils = at('b03', 'fils'), duo = at('b03', 'duo'), raff = at('b03', 'raff'), force = at('b03', 'force');
   const mapTo = reg - 0.3;
   const { fps } = useVideoConfig();
+  const bronzeImg = useImage('episodes/wen/images/bronze.jpg');
   const GZ0 = br - 0.4, GZ1 = coeur - 0.3; // le gui tourne, puis on passe à l'inscription intérieure
   return (
     <AbsoluteFill>
@@ -613,7 +600,14 @@ const Zhou: React.FC = () => {
           const bz = win(tt, GZ1 - 0.4, roi - 0.1, 0.6);
           if (bz > 0) {
             const side = seg(tt, orne - 0.2, orne + 0.8), gx = 960 + 260 * side;
-            bronzePlate(ctx, E, bz, gx, 520, 560, 760, seg(tt, GZ1, GZ1 + 2.2));
+            // fond intérieur du gui (photo) plein cadre ; à « l'ornement », il se resserre en plaque à droite
+            if (bronzeImg) {
+              const L = (a: number, b: number) => a + (b - a) * side;
+              const rx = L(0, gx - 280), ry = L(0, 140), rw = L(1920, 560), rh = L(1080, 760);
+              ctx.save(); E.roundRect(ctx, rx, ry, rw, rh, L(0, 46)); ctx.clip();
+              coverImg(ctx, bronzeImg, bz, 1.0 + 0.05 * seg(tt, GZ1, roi), 0.5, 0.5);
+              ctx.restore();
+            } else bronzePlate(ctx, E, bz, gx, 520, 560, 760, seg(tt, GZ1, GZ1 + 2.2));
             const mark = seg(tt, coeur, coeur + 0.6), gop = bz * seg(tt, GZ1 - 0.2, GZ1 + 0.8);
             // inscription fondue en relief : ombre portée en bas à droite, éclat en haut à gauche, puis le trait doré
             E.drawRealGlyph(ctx, 'wen_zhou', { x: gx + 4, y: 524, size: 660, opacity: gop * 0.7, color: () => 'rgb(96,58,22)' });
