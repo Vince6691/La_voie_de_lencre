@@ -1,4 +1,16 @@
 # 美 — textes envoyés au synthétiseur (ElevenLabs « Chinese narration », eleven_v4)
-Noms chinois en caractères (traditionnels si le simplifié existe aussi en japonais), nombres en lettres.
+Balises eleven_v4 discrètes aux changements de ton ([curious] sur le doute, [warmly] au récapitulatif et à la maxime) ;
+jamais [softly]/[whispers]. Noms chinois en caractères, formes simplifiées propres au chinois quand elles existent
+(许慎, 汉, 楚). Caractères isolés en IPA : 美 → /měɪ/, 大 → /tâ/, 文 → /wə̌n/ (le caractère seul est mal lu).
+Pièges japonais (美, 宋, 周, 老子, 完美 existent en japonais) → **2 prises** pour b01, b05, b06, b08 ; b01 aussi pour
+le /měɪ/ du tout début (à écouter). Nombres en lettres.
 
-b01: 
+b01: /měɪ/, le mot pour dire « beau » en chinois. Et regardez sa tête : c'est le caractère du mouton. Vers l'an cent, sous la dynastie des 汉, 许慎 écrit le premier grand dictionnaire de Chine. Pour ce caractère, il est formel : un mouton en haut, et le mot « grand » en bas. Un gros mouton, c'est bon… donc c'est beau. Mille ans plus tard, sous la dynastie des 宋, un lettré grave même cette maxime dans le marbre : 羊大則美. Mouton grand, donc beau. C'est entendu, depuis deux mille ans : en Chine, la beauté… c'est un gros mouton.
+b02: [curious] Euh… vraiment ?
+b03: Remontons à l'origine…
+b04: Il y a plus de trois mille ans, sur les os de divination de la dynastie des 商, le signe est un homme, debout, de face : /tâ/, le même que dans /wə̌n/. Sur sa tête, une haute coiffe : quatre branches, dressées vers le ciel. Or, sur ces mêmes os, le mouton a sa tête à lui : un museau en pointe, deux cornes qui retombent. Ici, rien de tel. C'est un homme paré. Un danseur, sans doute, coiffé de plumes. Ces os dormiront sous terre jusqu'en mille huit cent quatre-vingt-dix-neuf. 许慎 n'en a jamais vu un seul.
+b05: Puis viennent les 周 : le signe est coulé dans le bronze. L'homme s'épaissit. La coiffe se resserre, ses branches se courbent… et l'on commence à y voir des cornes.
+b06: Quelques siècles plus tard, la Chine se déchire en Royaumes combattants. Au sud, le royaume de 楚. En mille neuf cent quatre-vingt-treize, à 郭店, on ouvre la tombe d'un maître de 楚. Sur des lattes de bambou, le plus ancien 老子 connu. Et ce vers : « Quand tout le monde sait ce qui est beau… voilà la laideur. » Le vieux maître se méfiait de la beauté.
+b07: Sous le règne du premier empereur, on impose une seule écriture : le petit sceau. Les scribes mettent de l'ordre : la coiffe devient bien symétrique… deux cornes, trois traits. C'est exactement le même caractère que le mouton. Trois siècles plus tard, 许慎 ouvre son dictionnaire. Voilà ce qu'il a sous les yeux : un mouton, posé sur un homme. Comment ne pas conclure : « savoureux » ? Son erreur était presque inévitable. Le mouton, c'est l'écriture qui l'a dessiné.
+b08: [warmly] Reprenons. Dans toutes ses formes, il garde deux dessins. L'homme, debout, de face. Et sur sa tête, la coiffe : des plumes sur l'os, des branches courbes sur le bronze. Au petit sceau, elle prend la forme d'un mouton… et le mouton reste. Ainsi naît /měɪ/ : le beau. On le lit dans 美丽, la beauté, et dans 完美, la perfection.
+b09: [warmly] Le mouton, c'est le scribe qui l'a vu. Le danseur, lui, ne portait que des plumes. Mais la parure ne dure pas. Un jour, les plumes tombent… et sur la tête, il ne reste que des cheveux blancs.

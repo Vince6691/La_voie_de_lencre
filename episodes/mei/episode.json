@@ -6,18 +6,18 @@
  "sequence": [
   {
    "clip": "b01",
-   "apres": 0.9
+   "apres": 0.8
   },
   {
    "clip": "b02",
-   "apres": 1.0
+   "apres": 4.0
   },
   {
    "clip": "b03",
-   "apres": 0.7
+   "apres": 0.3
   },
   {
-   "rouleau": 5,
+   "rouleau": 6,
    "apres": 0.3
   },
   {
@@ -26,28 +26,115 @@
   },
   {
    "clip": "b05",
-   "pause": {
-    "repere": "reponse",
-    "decalage": -0.12,
-    "duree": 1.7
-   },
-   "apres": 1.0
+   "apres": 0.4
+  },
+  {
+   "rouleau": 3.5,
+   "apres": 0.3
   },
   {
    "clip": "b06",
-   "apres": 0.5
+   "pause": {
+    "repere": "maitre",
+    "decalage": -0.12,
+    "duree": 4.0
+   },
+   "apres": 0.8
+  },
+  {
+   "clip": "b07",
+   "apres": 1.0
+  },
+  {
+   "clip": "b08",
+   "apres": 1.2
+  },
+  {
+   "clip": "b09",
+   "apres": 0.3
   }
  ],
  "queue": 3.2,
  "reperes_cles": {
   "b01": {
-   "mains": "deux mains"
+   "beau": "le mot pour",
+   "mouton": "c'est le caractère",
+   "dico": "premier grand",
+   "haut": "un mouton en",
+   "grand": "et le mot",
+   "bon": "Un gros mouton",
+   "donc": "donc c'est",
+   "song": "Mille ans",
+   "marbre": "dans le marbre",
+   "maxime": "Mouton grand",
+   "entendu": "C'est entendu",
+   "gros": "c'est un gros"
   },
-  "b03": {
-   "signe": "C'est là"
+  "b04": {
+   "os": "os de divination",
+   "homme": "un homme, debout",
+   "dawen": "le même que",
+   "coiffe": "une haute coiffe",
+   "branches": "quatre branches",
+   "mouton": "le mouton a",
+   "museau": "un museau",
+   "rien": "Ici, rien",
+   "pare": "homme paré",
+   "danseur": "Un danseur",
+   "plumes": "coiffé de plumes",
+   "terre": "Ces os dormiront",
+   "jamais": "n'en a jamais"
   },
   "b05": {
-   "reponse": "Les mains n'ont pas"
+   "bronze": "coulé dans",
+   "epaissit": "L'homme s'épaissit",
+   "coiffe": "La coiffe se",
+   "cornes": "des cornes"
+  },
+  "b06": {
+   "royaumes": "Royaumes combattants",
+   "chu": "Au sud",
+   "guodian": "En mille",
+   "tombe": "on ouvre",
+   "lattes": "Sur des lattes",
+   "vers": "Et ce vers",
+   "beau": "Quand tout",
+   "laideur": "voilà la laideur",
+   "maitre": "Le vieux maître"
+  },
+  "b07": {
+   "empereur": "premier empereur",
+   "sceau": "le petit sceau",
+   "ordre": "Les scribes",
+   "symetrique": "bien symétrique",
+   "cornes": "deux cornes",
+   "mouton": "C'est exactement",
+   "xushen": "Trois siècles",
+   "yeux": "sous les yeux",
+   "savoureux": "savoureux",
+   "erreur": "Son erreur",
+   "ecriture": "Le mouton, c'est"
+  },
+  "b08": {
+   "reprenons": "Reprenons",
+   "formes": "deux dessins",
+   "homme": "L'homme, debout",
+   "coiffe": "Et sur sa",
+   "plumes": "des plumes sur",
+   "bronze": "des branches courbes",
+   "sceau": "Au petit sceau",
+   "reste": "et le mouton reste",
+   "naissance": "Ainsi naît",
+   "meili": "la beauté",
+   "wanmei": "la perfection"
+  },
+  "b09": {
+   "maxime": "Le mouton, c'est",
+   "danseur": "Le danseur",
+   "parure": "Mais la parure",
+   "tombent": "les plumes tombent",
+   "blancs": "cheveux blancs"
   }
- }
+ },
+ "bruitages": []
 }
