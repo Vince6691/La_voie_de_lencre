@@ -5,7 +5,7 @@
 // corps) → rouleau 2 (pause dans la voix) → la dynastie Qin (petit sceau, torse vide) et les scribes (4 traits) →
 // 4 · la culture (la dynastie Han : fresque de Tiying révélée, effondrement ; 文化 = transformer par le 文 plutôt que
 // par les armes) → rouleau 3 → scène récapitulative (tête, bras, jambes, marque dans toutes les formes ; les quatre
-// sens) → maxime et passerelle 美 (seul l'homme s'allume, le sens n'est pas dévoilé). Cartouches des quatre sens en
+// sens) → maxime et passerelle 语 par 语文 (seule la bouche 口 s'allume, le sens n'est pas dévoilé). Cartouches des quatre sens en
 // haut à droite. Ligne de temps lue dans les repères (episodes/wen/voix/reperes.json, « _ligne »), jamais recalculée
 // ici. Pigments : l'homme en azurite, la marque en vermillon, 化 en malachite.
 // En attente : clip Seedance A (Taibo) — clip d'exemple en place.
@@ -869,11 +869,11 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 const Today: React.FC = () => {
   const t = useT();
   const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'ecritures'), jg = at('b06', 'jiagu'), jw = at('b06', 'jinwen'), wz = at('b06', 'wenzi');
-  const A7 = A('b07'), autre = at('b07', 'autre'), homme = at('b07', 'homme');
+  const A7 = A('b07'), cote = at('b07', 'cote'), yw = at('b07', 'yuwen'), autre = at('b07', 'autre'), dit = at('b07', 'dit');
   return (
     <AbsoluteFill>
-      <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [A6 + 0.2, 960, 500, 1.12, 2.0], [fo - 0.9, 960, 540, 1.02, 0.9], [nait + 0.4, 960, 500, 1.1, 1.2], [A7 - 0.5, 960, 540, 1.02, 1.0], [autre, 960, 480, 1.12, 1.2], [homme - 0.2, 960, 600, 1.25, 0.8]]}
-        punch={[at('b06', 'tete'), at('b06', 'bras'), at('b06', 'jambes'), at('b06', 'marque'), nait, homme + 0.3]}>
+      <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [A6 + 0.2, 960, 500, 1.12, 2.0], [fo - 0.9, 960, 540, 1.02, 0.9], [nait + 0.4, 960, 500, 1.1, 1.2], [A7 - 0.5, 960, 540, 1.02, 1.0], [cote, 960, 520, 1.0, 1.0], [autre, 780, 520, 1.15, 1.2], [dit - 0.2, 750, 580, 1.3, 0.8]]}
+        punch={[at('b06', 'tete'), at('b06', 'bras'), at('b06', 'jambes'), at('b06', 'marque'), nait, dit + 0.3]}>
         <Paper />
         <Landscape seed={30} from={A6 - 1.5} to={END + 0.5} move="pan" mood="aube" faint={0.6} />
         <Draw draw={(ctx, tt, E) => {
@@ -886,13 +886,18 @@ const Today: React.FC = () => {
             E.drawStrokes(ctx, 'wen_regulier', { x: 960, y: 480, size: 520, progress: 4 * seg(tt, A6 + 0.2, fo - 1.0), brush: false, color: (c: string) => (tt > nait ? rgb(mixc(INK, P[c], win(tt, nait, chi, 0.5))) : inkCss) });
             ctx.restore();
           }
-          // passerelle : 美 se trace à l'encre ; seul l'homme (en bas) s'allume en azurite, le haut reste dans l'ombre
-          const m = seg(tt, autre - 0.3, autre + 0.9);
-          if (m > 0) {
-            const h = seg(tt, homme - 0.1, homme + 0.6);
-            ctx.save(); ctx.globalAlpha = m;
-            E.drawStrokes(ctx, 'wen_mei', { x: 960, y: 520, size: 560, progress: 9 * seg(tt, autre - 0.3, autre + 2.0), brush: false,
-              color: (c: string) => rgb(c === 'homme' ? mixc(INK, AZ, h) : mixc(INK, GREY, 0.55 * h)), glow: 26 * h, glowColor: rgb(AZ, 0.6) });
+          // passerelle vers 语 : « 语文 » (le cours de chinois) — le 文 vermillon à droite, 语 se trace à l'encre à sa
+          // gauche ; sur « un autre caractère » le 文 s'efface vers le gris ; sur « ce qu'on dit », seule la bouche (口)
+          // s'allume en vermillon (le sens n'est pas dévoilé)
+          const yv = seg(tt, cote - 0.3, cote + 0.5);
+          if (yv > 0) {
+            const dim = seg(tt, autre, autre + 0.8), b = seg(tt, dit - 0.1, dit + 0.6);
+            ctx.save(); ctx.globalAlpha = yv * (1 - 0.6 * dim);
+            E.drawStrokes(ctx, 'wen_regulier', { x: 1190, y: 520, size: 440, progress: 4, brush: false, color: () => rgb(mixc(VER, GREY, dim)) });
+            ctx.restore();
+            ctx.save(); ctx.globalAlpha = yv;
+            E.drawStrokes(ctx, 'wen_yu', { x: 730, y: 520, size: 440, progress: 9 * seg(tt, yw - 0.2, yw + 1.8), brush: false,
+              color: (c: string) => rgb(c === 'bouche' ? mixc(INK, VER, b) : mixc(INK, GREY, 0.45 * b)), glow: 24 * b, glowColor: rgb(VER, 0.6) });
             ctx.restore();
           }
         }} />
@@ -910,13 +915,14 @@ const Today: React.FC = () => {
         ))}
       </div>
       {/* fiche : pinyin, nombre de traits */}
-      <div style={{ position: 'absolute', width: '100%', top: 190, textAlign: 'center', opacity: win(t, A7 - 0.3, autre - 0.2, 0.5) }}>
+      <div style={{ position: 'absolute', width: '100%', top: 190, textAlign: 'center', opacity: win(t, A7 - 0.3, cote - 0.1, 0.5) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 340, color: inkCss, lineHeight: 1 }}>文</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 96, fontWeight: 600, color: inkCss }}>wén</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: rgb(VER) }}>4 traits</div>
       </div>
-      <Caption text="Avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau." a={win(t, A7 + 0.1, autre - 0.3, 0.6)} y={900} size={46} />
-      <Caption text="lui aussi : un homme, debout, de face" a={win(t, homme + 0.3, END + 0.1, 0.4)} y={920} size={48} />
+      <Caption text="Avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau." a={win(t, A7 + 0.1, cote - 0.2, 0.6)} y={900} size={46} />
+      <Caption text="语文 · yǔwén · le cours de chinois" a={win(t, yw + 0.3, autre - 0.1, 0.4)} y={880} size={50} />
+      <Caption text="ce qu'on dit, avant même de l'écrire" a={win(t, dit + 0.3, END + 0.1, 0.4)} y={900} size={48} />
     </AbsoluteFill>
   );
 };
@@ -925,7 +931,7 @@ const EndCard: React.FC = () => (
   <AbsoluteFill style={{ background: '#1d1915', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24 }}>
     <div style={{ width: 120, height: 120, background: rgb(VER, 0.95), borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 52, color: '#f6eee0', writingMode: 'vertical-rl' }}>墨道</div>
     <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, letterSpacing: 8, color: '#efe6d6' }}>LA VOIE DE L'ENCRE</div>
-    <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 34, color: '#b9ab98' }}>prochain caractère : 美</div>
+    <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 34, color: '#b9ab98' }}>prochain caractère : 语</div>
   </AbsoluteFill>
 );
 

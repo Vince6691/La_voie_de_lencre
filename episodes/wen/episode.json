@@ -163,8 +163,12 @@
   },
   "b07": {
    "peau": "sur la peau",
-   "autre": "Et dans",
-   "homme": "un homme",
+   "cote": "Et à côté",
+   "yuwen": "dans Yǔwén",
+   "ecoliers": "tous les écoliers",
+   "autre": "un autre",
+   "dit": "qu'on dit",
+   "ecrire": "de l'écrire",
    "bientot": "Nous le"
   }
  },
@@ -925,6 +929,20 @@
      "homme",
      "homme",
      "homme"
+    ]
+   },
+   "wen_yu": {
+    "src": "glyphes/traits/yu.json",
+    "comp": [
+     "parole",
+     "parole",
+     "moi",
+     "moi",
+     "moi",
+     "moi",
+     "bouche",
+     "bouche",
+     "bouche"
     ]
    }
   }
