@@ -703,6 +703,8 @@ const Qin: React.FC = () => {
       <Caption text="lattes des scribes Qin (睡虎地) → écriture des clercs Han (熹平石經)" a={win(t, scr + 0.4, q4 - 0.1, 0.5)} y={960} size={40} />
       <div style={{ position: 'absolute', right: 180, top: 380, fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 120, color: rgb(VER), opacity: win(t, q4 - 0.2, ne, 0.3) }}>{Math.max(1, Math.min(4, 1 + Math.floor((t - q4) / 0.25)))}</div>
       <Caption text="4 traits : le 文 d'aujourd'hui" a={win(t, q4 + 0.2, A5 - 0.3, 0.4)} y={960} size={48} />
+      <EraTag zh="秦" name="DYNASTIE QIN" dates="221 av. J.-C. · le petit sceau" a={seg(t, P4E - 0.6, P4E) * (1 - seg(t, scr + 0.3, scr + 0.9))} />
+      <EraTag zh="漢" name="DYNASTIE HAN" dates="l'écriture des clercs" a={seg(t, scr + 0.6, scr + 1.2) * (1 - seg(t, A5 - 0.5, A5))} />
     </AbsoluteFill>
   );
 };
@@ -721,7 +723,7 @@ const Tiying: React.FC = () => {
 // ════════════════ 6. 文化 : une lettre plutôt que la force ; 化 = transformer → 4e sens → rouleau 3 (Han → aujourd'hui)
 const Culture: React.FC = () => {
   const t = useT();
-  const simple = at('b05', 'simple'), mot = at('b05', 'mot'), tr = at('b05', 'transformer'), hom = at('b05', 'hommes'), armes = at('b05', 'armes'), sens = at('b05', 'sens');
+  const simple = at('b05', 'simple'), mot = at('b05', 'mot'), tr = at('b05', 'transformer'), hom = at('b05', 'hommes'), armes = at('b05', 'armes'), elv = at('b05', 'elever'), app = at('b05', 'appelons'), sens = at('b05', 'sens');
   return (
     <AbsoluteFill style={{ opacity: seg(t, T_CULT, T_CULT + 0.6) }}>
       <Cam keys={[[T_CULT, 960, 540, 1.02], [mot - 0.2, 960, 500, 1.1, 1.0], [tr - 0.1, 1120, 480, 1.22, 1.0], [hom, 960, 540, 1.04, 1.0], [R3 - 0.6, 960, 540, 1, 0.6]]}
@@ -758,7 +760,9 @@ const Culture: React.FC = () => {
       <Caption text="une simple lettre… plutôt que la force" a={win(t, simple + 0.2, mot - 0.3, 0.5)} y={920} size={46} />
       <Caption text="文化 · wénhuà : un mot de la dynastie Han (劉向, 說苑, Ier s. av. J.-C.)" a={win(t, mot + 0.3, tr - 0.2, 0.5)} y={920} size={42} />
       <Caption text="化 · huà · transformer" a={win(t, tr, hom + 0.4, 0.4)} y={920} size={54} />
-      <Caption text="…plutôt que par les armes" a={win(t, armes, sens - 0.1, 0.4)} y={920} size={48} />
+      <Caption text="…plutôt que par les armes" a={win(t, armes, elv - 0.1, 0.4)} y={920} size={48} />
+      <Caption text="élever les esprits, au lieu de soumettre les corps" a={win(t, elv, app + 0.2, 0.4)} y={920} size={48} />
+      <Caption text="文化 · wénhuà · la culture" a={win(t, app + 0.5, sens - 0.1, 0.4)} y={920} size={56} />
       <Caption text="quatrième sens : la culture" a={win(t, sens + 0.2, R3 - 0.2, 0.4)} y={920} size={54} />
       <EraTag zh="漢" name="DYNASTIE HAN" dates="Ier s. av. J.-C." a={win(t, T_CULT, R3 + 0.4, 0.5)} />
       <EraTag zh="今" name="AUJOURD'HUI" dates="2026" a={tagIn(TR3, t) * (1 - seg(t, R3E + 1.5, R3E + 2.2))} />
@@ -818,7 +822,7 @@ const Today: React.FC = () => {
   const A7 = A('b07'), autre = at('b07', 'autre'), homme = at('b07', 'homme');
   return (
     <AbsoluteFill>
-      <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [A6 + 0.2, 960, 500, 1.12, 2.0], [fo - 0.9, 960, 540, 1.02, 0.9], [nait + 0.4, 960, 500, 1.1, 1.2], [A7 - 0.5, 960, 540, 1.02, 1.0], [autre, 1050, 480, 1.12, 1.2], [homme - 0.2, 1050, 600, 1.25, 0.8]]}
+      <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [A6 + 0.2, 960, 500, 1.12, 2.0], [fo - 0.9, 960, 540, 1.02, 0.9], [nait + 0.4, 960, 500, 1.1, 1.2], [A7 - 0.5, 960, 540, 1.02, 1.0], [autre, 960, 480, 1.12, 1.2], [homme - 0.2, 960, 600, 1.25, 0.8]]}
         punch={[at('b06', 'tete'), at('b06', 'bras'), at('b06', 'jambes'), at('b06', 'marque'), nait, homme + 0.3]}>
         <Paper />
         <Landscape seed={30} from={A6 - 1.5} to={END + 0.5} move="pan" mood="aube" faint={0.6} />
@@ -826,7 +830,7 @@ const Today: React.FC = () => {
           const syn = win(tt, fo - 0.8, nait + 0.8, 0.6);
           if (syn > 0) drawBand(ctx, E, tt, syn);
           // 文 en 4 traits (avant et après le bandeau)
-          const main = (1 - syn) * (1 - seg(tt, A7 + 0.6, A7 + 1.2));
+          const main = (1 - syn) * (1 - seg(tt, A7 - 0.5, A7 - 0.05)); // relayé par la fiche, centrée
           if (main > 0) {
             ctx.save(); ctx.globalAlpha = main;
             E.drawStrokes(ctx, 'wen_regulier', { x: 960, y: 480, size: 520, progress: 4 * seg(tt, A6 + 0.2, fo - 1.0), brush: false, color: (c: string) => (tt > nait ? rgb(mixc(INK, P[c], win(tt, nait, chi, 0.5))) : inkCss) });
@@ -837,7 +841,7 @@ const Today: React.FC = () => {
           if (m > 0) {
             const h = seg(tt, homme - 0.1, homme + 0.6);
             ctx.save(); ctx.globalAlpha = m;
-            E.drawStrokes(ctx, 'wen_mei', { x: 1050, y: 520, size: 560, progress: 9 * seg(tt, autre - 0.3, autre + 2.0), brush: false,
+            E.drawStrokes(ctx, 'wen_mei', { x: 960, y: 520, size: 560, progress: 9 * seg(tt, autre - 0.3, autre + 2.0), brush: false,
               color: (c: string) => rgb(c === 'homme' ? mixc(INK, AZ, h) : mixc(INK, GREY, 0.55 * h)), glow: 26 * h, glowColor: rgb(AZ, 0.6) });
             ctx.restore();
           }
@@ -855,8 +859,8 @@ const Today: React.FC = () => {
         ))}
       </div>
       {/* fiche : pinyin, nombre de traits */}
-      <div style={{ position: 'absolute', left: 300, top: 300, opacity: win(t, A7 - 0.2, autre - 0.2, 0.6) }}>
-        <div style={{ fontFamily: 'ShuimoKai', fontSize: 300, color: inkCss, lineHeight: 1 }}>文</div>
+      <div style={{ position: 'absolute', width: '100%', top: 190, textAlign: 'center', opacity: win(t, A7 - 0.3, autre - 0.2, 0.5) }}>
+        <div style={{ fontFamily: 'ShuimoKai', fontSize: 340, color: inkCss, lineHeight: 1 }}>文</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 96, fontWeight: 600, color: inkCss }}>wén</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: rgb(VER) }}>4 traits</div>
       </div>
