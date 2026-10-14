@@ -1,16 +1,18 @@
-# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 5 min) — v3
+# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 5 min) — v4
 
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : mouton ou parure ? — v3 : **faux départ**. L'accroche affirme, sûre d'elle, la thèse du mouton (Xu Shen,
-  dynastie Han ; Xu Xuan et le dicton des étudiants, dynastie Song) ; une **cassure** (céramique qui se brise) ; « Mais…
-  en est-on vraiment sûr ? » ; puis retour à l'origine et voyage dans l'ordre jusqu'à la partie finale classique.
+  dynastie Han ; Xu Xuan et la stèle 羊大則美, dynastie Song) ; « Euh… vraiment ? » ; **cassure du marbre** ;
+  « Remontons à l'origine… » ; puis retour à l'origine et voyage dans l'ordre jusqu'à la partie finale classique.
 - **Étapes** : dynastie Shang (os) · dynastie Zhou (bronze) · Royaumes combattants (bambou de Chu, Laozi de Guodian) ·
   dynastie Qin puis Han (petit sceau, retour sur Xu Shen). La dynastie Song est dans l'accroche. Les Qiang ne sont plus
   cités (leur signe ressemble trop à 美, l'argument se retournerait).
 - **Carte** : le royaume de Chu et la tombe de Guodian.
 - **Portrait** : **portrait-calligramme de Laozi**, gardé et développé (≈ 12 s).
 - **Clips 3D** : 2 (A le danseur paré ; B Laozi et le scribe sur bambou).
-- **Durée** : ≈ 5 min ou un peu moins. **Passerelle** : 舞 proposé, à valider.
+- **v4** : accroche, doute, Shang, Qin et récapitulatif réécrits par l'utilisateur ; passerelle encore ouverte (il
+  cherche un caractère au lien même léger, dont la forme a beaucoup changé).
+- **Durée** : ≈ 5 min ou un peu moins. **Passerelle** : à choisir (voir plus bas).
 
 **Question du début :** la beauté chinoise est-elle vraiment un gros mouton ?
 **Réponse :** non. Sur l'os, 美 est un homme debout, paré d'une haute coiffe, sans doute de plumes. Le mouton est né au
@@ -36,37 +38,37 @@ Comparaisons : 羊 oraculaire (`羊/00`, museau en V, cornes qui retombent) et �
 ---
 
 ## 1. Accroche affirmative — 0:00
-Měi. Beau. ⏸ Et regardez sa tête : un mouton. ⏸ Vers l'an cent, sous la dynastie Han, Xu Shen écrit le premier grand
-dictionnaire de Chine. Pour ce caractère, il est formel : un mouton, et « grand ». Car le mouton est la bête qu'on sert
-à table. Un gros mouton, c'est bon… donc c'est beau. ⏸ Mille ans plus tard, sous la dynastie Song, un lettré le grave
-dans le marbre : 羊大則美. Mouton grand, donc beau. À la cour, le mouton est la viande des empereurs. Les étudiants ont
-même un dicton : « Sais ton Su Dongpo par cœur, tu mangeras du mouton. Sinon… de la soupe aux légumes. » ⏸ C'est
-entendu, depuis deux mille ans : en Chine, la beauté… c'est un gros mouton.
+Měi, le mot pour dire « beau » en chinois. ⏸ Et regardez sa tête : c'est le caractère du mouton. ⏸ Vers l'an cent,
+sous la dynastie Han, Xu Shen écrit le premier grand dictionnaire de Chine. Pour ce caractère, il est formel : un
+mouton en haut, et le mot « grand » en bas. Un gros mouton, c'est bon… donc c'est beau. ⏸ Mille ans plus tard, sous la
+dynastie Song, un lettré grave même cette maxime dans le marbre : 羊大則美. Mouton grand, donc beau. C'est entendu,
+depuis deux mille ans : en Chine, la beauté… c'est un gros mouton.
 > plan : papier nu ; 美 moderne tracé trait par trait (`drawStrokes`, `brush: false`, bruitage pinceau) ; sur « un
 > mouton », 羊 en gomme-gutte (punch +3,5 %) ; sur « Xu Shen », silhouette de lettré au pinceau et citation
-> 美，甘也。从羊从大 en colonne (légende ≥ 38 px) ; sur « un gros mouton », un mouton dodu se dessine sur le 羊 (rappel de
-> la fin du 文) ; paysage Song (neige, pavillon) ; 羊大則美 calligraphié, sceau rouge posé avec assurance ; banquet en
-> lavis (ou image Nano Banana : bol de céladon, mouton rôti) ; 蘇文熟，喫羊肉 / 蘇文生，喫菜羹 en deux colonnes, la seconde
-> pâlit (gag) ; sur « c'est un gros mouton », tout l'écran se rassemble : mouton dodu, 羊大則美 et 美, musique au plus
-> plein. Le ton de la voix est triomphal ; la caméra monte en poussée sur le mouton.
+> 美，甘也。从羊从大 en colonne (légende ≥ 38 px) ; sur « mouton en haut » 羊 s'allume, sur « grand en bas » 大 s'allume ;
+> sur « un gros mouton », un mouton dodu se dessine sur le 羊 (rappel de la fin du 文) ; paysage Song (neige,
+> pavillon) ; sur « dans le marbre », une **stèle de marbre** se dresse, 羊大則美 s'y grave en creux (bruitage ciseau
+> sur pierre), sceau rouge posé avec assurance ; sur « c'est un gros mouton », tout l'écran se rassemble : stèle,
+> mouton dodu et 美, musique au plus plein. Ton de la voix triomphal ; caméra en poussée sur la stèle.
 
-`[CASSURE — ≈ 2,5 s]` sur le dernier mot, l'image se fige ; une **craquelure de porcelaine** part du mouton et court
-sur tout l'écran (réseau de fêlures fines, comme un céladon *ge*), puis l'image **se brise** : les éclats tombent et
-découvrent le papier nu. Bruitage : céramique qui se brise (ElevenLabs sfx `sfx_ceramique.wav`, nouveau), la musique se
-coupe net. Silence long (⏸⏸, ≈ 1,5 s) sur papier nu, un seul éclat qui finit de tourner au sol.
+## 2. Le doute — 0:35
+Euh… vraiment ?
+> plan : tout se fige ; musique coupée net sur « mouton » ; silence ≈ 1 s ; « Euh… vraiment ? » sur l'image figée.
 
-## 2. Le doute — 0:45
-[curious] Mais… en est-on vraiment sûr ? ⏸ Xu Shen, lui, n'a jamais vu la forme la plus ancienne de ce caractère.
-Remontons à l'origine.
-> plan : papier nu, le 美 moderne réapparaît seul, petit, au centre, sans couleur ; un point d'interrogation en lavis
-> se forme à côté puis se dissout.
+`[CASSURE DU MARBRE — ≈ 2,5 s]` juste après « vraiment ? » : une fêlure part du 羊 gravé sur la stèle, se ramifie sur
+toute la pierre (et sur l'écran), puis la stèle **éclate** : les blocs de marbre tombent et découvrent le papier nu.
+Bruitage : marbre qui se fend puis s'effondre (ElevenLabs sfx `sfx_marbre.wav`, nouveau). Silence (⏸⏸, ≈ 1,5 s) sur
+papier nu, un dernier éclat qui roule et s'arrête.
+
+Remontons à l'origine…
+> plan : le 美 moderne réapparaît seul, petit, au centre, sans couleur.
 
 `[ROULEAU 1 — à rebours, Song → Shang, 6 s : nouveau dans la série. Le rouleau défile en sens inverse, le compteur
 d'années recule, les sceaux d'époques défilent de droite à gauche ; 美 moderne en curseur, il se défait trait par trait
 à chaque sceau jusqu'à n'être plus qu'un point d'encre ; impact sur le sceau Shang]`
 
 ## 3. La dynastie Shang — l'os — 1:00
-Vers 1200 avant notre ère, à Anyang, capitale de la dynastie Shang. Sur les os de divination, le signe est un homme,
+Il y a plus de trois mille ans, sur les os de divination de la dynastie Shang, le signe est un homme,
 debout, de face : 大, le même que dans 文. ⏸ Sur sa tête, une haute coiffe : quatre branches, dressées vers le ciel.
 Or, sur ces mêmes os, le mouton a sa tête à lui : un museau en pointe, deux cornes qui retombent. Ici, rien de tel. ⏸
 C'est un homme paré. Un danseur, sans doute, coiffé de plumes. ⏸ Ces os dormiront sous terre jusqu'en 1899. Xu Shen
@@ -103,11 +105,12 @@ scribe qui l'a copié écrit « beau »… sans le moindre mouton.
 > sortie au pinceau. Gros plan latte : 媺 de Chu, la place du mouton vide (halo pointillé).
 
 ## 6. Qin puis Han — la naissance du mouton — 3:05
-221 avant notre ère : la dynastie Qin soumet Chu et impose une seule écriture, le petit sceau. Les scribes mettent de
-l'ordre : la coiffe devient bien symétrique… deux cornes, trois traits. ⏸ Exactement le mouton. ⏸ Trois siècles plus
+Sous le règne du premier empereur, on impose une seule écriture : le petit sceau. Les scribes mettent de l'ordre : la
+coiffe devient bien symétrique… deux cornes, trois traits. ⏸ C'est exactement le même caractère que le mouton. ⏸ Trois siècles plus
 tard, Xu Shen ouvre son dictionnaire. Voilà ce qu'il a sous les yeux : un mouton, posé sur un homme. Comment ne pas
 conclure : « savoureux » ? ⏸ Son erreur était presque inévitable. Le mouton, c'est l'écriture qui l'a dessiné.
-> plan : paysage d'hiver ; **naissance du mouton** : forme `05` tracée, sa coiffe glisse sur le 羊 du petit sceau et
+> plan : paysage d'hiver ; **naissance du mouton** : forme `05` tracée ; sur « le même caractère que le mouton », le 羊 du
+> petit sceau est posé **à côté**, puis la coiffe de `05` glisse sur lui et
 > s'y superpose presque (coiffe malachite → gomme-gutte au contact, punch, bruitage sceau) ; retour de la silhouette
 > de Xu Shen et de sa citation (même cadrage qu'à l'accroche, la boucle se referme) ; derrière lui, l'os `00` en
 > transparence, qu'il ne voit pas ; forme `08` (soie de Mawangdui) puis `11` (stèle) en fondu net.
@@ -115,37 +118,41 @@ conclure : « savoureux » ? ⏸ Son erreur était presque inévitable. Le mouto
 ## 7. Scène récapitulative — 3:45
 Reprenons. Dans toutes ses formes, il garde deux dessins. L'homme, debout, de face. Et sur sa tête, la coiffe : des
 plumes sur l'os, des branches courbes sur le bronze. ⏸ Au petit sceau, elle prend la forme d'un mouton… et le mouton
-reste. ⏸ Ainsi naît měi : le beau. On le lit dans 美麗, la beauté, dans 美食, la bonne cuisine — la langue a gardé le
-goût du mouton — et dans 美國, l'Amérique… mais là, seulement pour le son.
+reste. ⏸ Ainsi naît měi : le beau. On le lit dans 美丽, la beauté, et dans 完美, la perfection.
 > plan : **scène récapitulative obligatoire** (`drawBand` de `JiaoV1`) : bandeau horizontal `00` (os) → `03`
 > (bronze) → 媺 (bambou de Chu, si trouvé) → `05` (petit sceau) → `11` (clercs) → 美 (régulière), étiquettes écriture
 > + époque ; rubans : l'homme 大 en azurite, la coiffe en malachite. Clignotement sur les repères `formes`, `homme`,
 > `coiffe` (trois fois dans toutes les formes). **Accident** sur « petit sceau » (repère `sceau`) : `05` grossit, sa
 > coiffe en ocre, 羊 au-dessus, barré sur « le mouton reste ». **Fin** : toutes les couleurs reviennent sur « Ainsi
-> naît » (repère `naissance`) ; 美麗 / 美食 / 美國 calligraphiés (美國 avec un petit sceau 米国 en clin d'œil).
+> naît » (repère `naissance`) ; 美丽 / 完美 calligraphiés.
 
-## 8. Chute et passerelle — 4:30
+## 8. Chute et passerelle — 4:20
 Le mouton, c'est le scribe qui l'a vu. Le danseur, lui, ne portait que des plumes. ⏸
-Et notre danseur n'a pas fini : il tient encore ses plumes dans les mains. Ce caractère-là… danse.
-> plan : `fiche-caractere` 美 (sceau, pinyin, 9 traits) ; passerelle : **舞** oraculaire (homme tenant des ornements
-> dans les deux mains) esquissé, les ornements en malachite ; coupé net → écran de fin.
+(passerelle : en attente du choix du caractère suivant)
+> plan : `fiche-caractere` 美 (sceau, pinyin, 9 traits) ; passerelle esquissée ; coupé net → écran de fin.
 
 ---
 
 ## Chiffres
-≈ 600 mots → ≈ 4 min 48 à 125 mots/min + 9,5 s de rouleaux + 2,5 s de cassure + ≈ 4 s de calligramme muet
-→ **≈ 5 min 05**. Pour descendre sous 5 min : couper la phrase 美國 du récapitulatif (−8 s) ou « Le vieux maître se
-méfiait de la beauté » (−3 s).
+≈ 525 mots → ≈ 4 min 12 à 125 mots/min + 9,5 s de rouleaux + ≈ 4 s de cassure et silence + ≈ 4 s de calligramme muet
++ passerelle (≈ 10 s) → **≈ 4 min 40**.
 
 ## Bruitages (nouveaux)
-- **Céramique qui se brise** (cassure de l'accroche) : `sfx_ceramique.wav`, prompt ElevenLabs du type « a celadon
-  porcelain bowl cracking then shattering on a stone floor, close, dry, no reverb tail » ; 2 variantes, choix à l'oreille.
-- Craquelure (fêlures qui courent avant l'éclat) : « fine porcelain glaze crackling, tiny ticking cracks spreading ».
+- **Marbre qui se fend puis éclate** (cassure après « vraiment ? ») : `sfx_marbre.wav`, prompt ElevenLabs du type
+  « a marble stone tablet cracking slowly, then splitting and crumbling into heavy pieces on a stone floor, close, dry,
+  no music » ; 2 variantes, choix à l'oreille.
+- Ciseau sur la pierre (gravure de 羊大則美) : « chisel tapping and scraping into marble, three short strokes ».
 - Rouleau à rebours : le son habituel du rouleau, inversé.
 
-## Passerelle (à valider)
-- **舞 (recommandé)** : la danse ; sur l'os, un homme qui tient des ornements dans les deux mains — prolonge le danseur.
-- Autres : 大 (l'homme de face), 羊 (le vrai mouton), 微 (le jumeau de 美 : l'homme aux plumes, autre chemin).
+## Passerelle — candidats (formes 小學堂 vérifiées)
+- **舞, la danse (recommandé)** : sur l'os, un homme de face qui tient des ornements dans les deux mains — **notre
+  danseur**. Puis le signe est emprunté pour dire « ne pas avoir » (無) ; pour garder la danse, on lui ajoute **deux
+  pieds** (舛) sous le corps ; le Shuowen cite même une forme ancienne écrite avec **羽, la plume**. Évolution très
+  forte (homme aux bras chargés → amas de traits sur deux pieds). Esquisse de chute : « Et notre danseur n'a pas
+  fini : il tient encore ses plumes dans les mains. Un jour, on lui volera son nom… et il lui faudra des pieds. »
+- **善, le bien** : un mouton entre **deux paroles** (譱 : 羊 + 言 + 言), qui se sont tassées en une seule bouche ; le
+  Shuowen dit qu'il a « le même sens que 美 ». Lien direct par le mouton, évolution nette (les deux 言 fondus).
+- **皇, l'auguste** : une couronne à plumes selon certains (lecture discutée), devenue 白 + 王. Lien par la parure.
 
 ## Titres possibles
 1. Non, la beauté chinoise n'est pas un mouton
@@ -159,7 +166,8 @@ méfiait de la beauté » (−3 s).
 - Guodian (1993, tombe ≈ 300 av. J.-C.), Laozi A : graphie de « beau » (媺 ?) — **à vérifier** ; la voix dit seulement
   « sans le moindre mouton ». Si la graphie de Guodian a 羊, couper la dernière phrase du bloc 5.
 - Xu Shen (vers 100) : 美，甘也。从羊从大。羊在六畜主給膳也。 Os identifiés en 1899.
-- Xu Xuan (édition de 986) : 羊大則美. Lu You, 《老學庵筆記》 : 蘇文熟，喫羊肉；蘇文生，喫菜羹. Mouton, viande de la
-  cour des Song.
-- « Qin soumet Chu » : 223 av. J.-C. ; unification de l'écriture après 221 — tournure à garder simple.
-- 美國 (transcription d'« Amérique ») / 米国 au Japon.
+- Xu Xuan (édition de 986) : 羊大則美 — c'est un commentaire de dictionnaire ; « gravé dans le marbre » est une image
+  (pas de stèle connue) : garder « grave même cette maxime dans le marbre » comme figure, ou dire « inscrit ».
+- « Sous le règne du premier empereur » : Qin Shi Huang, unification de l'écriture après 221 av. J.-C.
+- « Plus de trois mille ans » : les os inscrits datent d'environ 1250–1050 av. J.-C. (≈ 3 100 à 3 300 ans) ;
+  « plus de 3 500 ans » serait trop.
