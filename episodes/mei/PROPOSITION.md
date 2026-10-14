@@ -1,4 +1,4 @@
-# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 5 min) — v5
+# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 5 min) — v6
 
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : mouton ou parure ? — v3 : **faux départ**. L'accroche affirme, sûre d'elle, la thèse du mouton (Xu Shen,
@@ -12,7 +12,7 @@
 - **Clips 3D** : 2 (A le danseur paré ; B Laozi et le scribe sur bambou).
 - **v4** : accroche, doute, Shang, Qin et récapitulatif réécrits par l'utilisateur ; passerelle encore ouverte (il
   cherche un caractère au lien même léger, dont la forme a beaucoup changé).
-- **Durée** : ≈ 5 min ou un peu moins. **Passerelle** : à choisir (voir plus bas).
+- **Durée** : ≈ 5 min ou un peu moins. **Passerelle** : **老** (vieux). Mini-série des adjectifs de base : 美 → 老 → (黑, 长…).
 
 **Question du début :** la beauté chinoise est-elle vraiment un gros mouton ?
 **Réponse :** non. Sur l'os, 美 est un homme debout, paré d'une haute coiffe, sans doute de plumes. Le mouton est né au
@@ -29,7 +29,6 @@ gomme-gutte (ocre barré au récapitulatif).
 |---|---|---|---|---|
 | Dynastie Shang | os | homme de face, **coiffe à quatre branches dressées** | `00` (後2.14.9) ; `01` ; `02` (deux branches) | — |
 | Dynastie Zhou | bronze | la coiffe se resserre, branches courbes | `03` (美爵, Zhou de l'Ouest) | la coiffe s'arrondit |
-| Royaumes combattants | bambou de Chu | « beau » écrit **媺**, sans mouton | à trouver (voir SOURCES) | autre graphie |
 | Qin | petit sceau | coiffe symétrique **= 羊** | `05` (說文) | **naissance du mouton** |
 | Dynastie Han | soie / stèle | 羊 sur 大, grand trait final | `08` (Mawangdui) ; `11` (曹全碑) | — |
 | Aujourd'hui | régulière | 美, 9 traits | `glyphes/traits/mei.json` (Make Me a Hanzi, à extraire) | — |
@@ -127,8 +126,12 @@ reste. ⏸ Ainsi naît měi : le beau. On le lit dans 美丽, la beauté, et dan
 
 ## 8. Chute et passerelle — 4:20
 Le mouton, c'est le scribe qui l'a vu. Le danseur, lui, ne portait que des plumes. ⏸
-(passerelle : en attente du choix du caractère suivant)
-> plan : `fiche-caractere` 美 (sceau, pinyin, 9 traits) ; passerelle esquissée ; coupé net → écran de fin.
+Mais la parure ne dure pas. Un jour, les plumes tombent… et sur la tête, il ne reste que des cheveux blancs.
+> plan : `fiche-caractere` 美 (sceau, pinyin, 9 traits) ; retour sur la forme Shang `00`, coiffe en malachite ; sur « les
+> plumes tombent », les branches de la coiffe se détachent une à une et tombent comme des feuilles (lavis vert qui
+> pâlit) ; sur « des cheveux blancs », les mèches restantes s'allongent en cheveux ébouriffés gris clair, le corps se
+> voûte, un bâton se trace au pinceau : la forme oraculaire de **老** (`老/00` du 小學堂) ; 老 calligraphié à côté, en
+> esquisse ; coupé net → écran de fin.
 
 ---
 
@@ -143,15 +146,12 @@ Le mouton, c'est le scribe qui l'a vu. Le danseur, lui, ne portait que des plume
 - Ciseau sur la pierre (gravure de 羊大則美) : « chisel tapping and scraping into marble, three short strokes ».
 - Rouleau à rebours : le son habituel du rouleau, inversé.
 
-## Passerelle — candidats (formes 小學堂 vérifiées)
-- **舞, la danse (recommandé)** : sur l'os, un homme de face qui tient des ornements dans les deux mains — **notre
-  danseur**. Puis le signe est emprunté pour dire « ne pas avoir » (無) ; pour garder la danse, on lui ajoute **deux
-  pieds** (舛) sous le corps ; le Shuowen cite même une forme ancienne écrite avec **羽, la plume**. Évolution très
-  forte (homme aux bras chargés → amas de traits sur deux pieds). Esquisse de chute : « Et notre danseur n'a pas
-  fini : il tient encore ses plumes dans les mains. Un jour, on lui volera son nom… et il lui faudra des pieds. »
-- **善, le bien** : un mouton entre **deux paroles** (譱 : 羊 + 言 + 言), qui se sont tassées en une seule bouche ; le
-  Shuowen dit qu'il a « le même sens que 美 ». Lien direct par le mouton, évolution nette (les deux 言 fondus).
-- **皇, l'auguste** : une couronne à plumes selon certains (lecture discutée), devenue 白 + 王. Lien par la parure.
+## Passerelle — 老 (choisi)
+- **老**, vieux (HSK 1 : 老师). Sur l'os : un homme debout, de longs cheveux dressés sur la tête, appuyé sur un bâton ;
+  Shuowen : 「老，考也。七十曰老。从人、毛、匕。言須髮變白也。」 Les cheveux et le corps se tassent en 耂, le bâton
+  devient 匕 : métamorphose complète. Rime visuelle avec 美 (quelque chose sur la tête d'un homme debout).
+- Mini-série des adjectifs : 美 → 老 → 黑 (l'homme marqué) → 长 (le vieillard aux cheveux longs, à opposer à 老) ;
+  好 en bonus (« 好，美也 »).
 
 ## Titres possibles
 1. Non, la beauté chinoise n'est pas un mouton
