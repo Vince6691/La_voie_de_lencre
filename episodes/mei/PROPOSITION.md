@@ -1,4 +1,4 @@
-# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 5 min) — v4
+# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 5 min) — v5
 
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : mouton ou parure ? — v3 : **faux départ**. L'accroche affirme, sûre d'elle, la thèse du mouton (Xu Shen,
@@ -91,8 +91,7 @@ courbent… ⏸ et l'on commence à y voir des cornes.
 ## 5. Les Royaumes combattants — le bambou de Chu — 2:10
 Quelques siècles plus tard, la Chine se déchire en Royaumes combattants. Au sud, le royaume de Chu. ⏸ En 1993, à
 Guodian, on ouvre la tombe d'un maître de Chu. Sur des lattes de bambou, le plus ancien Laozi connu. ⏸ Et ce vers :
-« Quand tout le monde sait ce qui est beau… voilà la laideur. » ⏸ Le vieux maître se méfiait de la beauté. ⏸ Et le
-scribe qui l'a copié écrit « beau »… sans le moindre mouton.
+« Quand tout le monde sait ce qui est beau… voilà la laideur. » ⏸ Le vieux maître se méfiait de la beauté.
 > plan : **carte** (`MapPanel`, `E.mapLayer` + `E.mapDeco`, `paper: true`) : les Royaumes combattants, Chu au sud en
 > région animée, marqueur Guodian (près de Jingmen) ; poussée caméra sur Guodian ; la carte se replie en latte.
 > **Portrait-calligramme de Laozi (≈ 12 s, nouveau)** : 1) sur « Et ce vers », les caractères 天下皆知美之為美，斯惡已
@@ -102,7 +101,7 @@ scribe qui l'a copié écrit « beau »… sans le moindre mouton.
 > de la robe, 美 reste lisible à hauteur du cœur) ; 4) un lavis gris remplit la forme depuis le haut, les yeux et la
 > barbe se précisent au pinceau fin ; mention « portrait imaginé » ; 5) sur « se méfiait de la beauté », le 美 du cœur
 > pâlit. **Clip Seedance B « Laozi et le scribe »** (≈ 10 s) entrée à travers le 美 de la latte (`mode="glyphe"`),
-> sortie au pinceau. Gros plan latte : 媺 de Chu, la place du mouton vide (halo pointillé).
+> sortie au pinceau. (Phrase sur la graphie de Chu coupée : graphie de Guodian non confirmée.)
 
 ## 6. Qin puis Han — la naissance du mouton — 3:05
 Sous le règne du premier empereur, on impose une seule écriture : le petit sceau. Les scribes mettent de l'ordre : la
@@ -120,7 +119,7 @@ Reprenons. Dans toutes ses formes, il garde deux dessins. L'homme, debout, de fa
 plumes sur l'os, des branches courbes sur le bronze. ⏸ Au petit sceau, elle prend la forme d'un mouton… et le mouton
 reste. ⏸ Ainsi naît měi : le beau. On le lit dans 美丽, la beauté, et dans 完美, la perfection.
 > plan : **scène récapitulative obligatoire** (`drawBand` de `JiaoV1`) : bandeau horizontal `00` (os) → `03`
-> (bronze) → 媺 (bambou de Chu, si trouvé) → `05` (petit sceau) → `11` (clercs) → 美 (régulière), étiquettes écriture
+> (bronze) → `05` (petit sceau) → `11` (clercs) → 美 (régulière), étiquettes écriture
 > + époque ; rubans : l'homme 大 en azurite, la coiffe en malachite. Clignotement sur les repères `formes`, `homme`,
 > `coiffe` (trois fois dans toutes les formes). **Accident** sur « petit sceau » (repère `sceau`) : `05` grossit, sa
 > coiffe en ocre, 羊 au-dessus, barré sur « le mouton reste ». **Fin** : toutes les couleurs reviennent sur « Ainsi
@@ -163,8 +162,8 @@ Le mouton, c'est le scribe qui l'a vu. Le danseur, lui, ne portait que des plume
 - Lecture « homme paré de plumes » : majoritaire, pas unanime — voix : « sans doute » ; « homme paré » = fait.
 - Comparaison faite sur les formes 小學堂 : 羊 oraculaire = museau en V + cornes recourbées vers le bas ; 美 `00`/`01` =
   quatre branches dressées.
-- Guodian (1993, tombe ≈ 300 av. J.-C.), Laozi A : graphie de « beau » (媺 ?) — **à vérifier** ; la voix dit seulement
-  « sans le moindre mouton ». Si la graphie de Guodian a 羊, couper la dernière phrase du bloc 5.
+- Guodian (1993, tombe ≈ 300 av. J.-C.), Laozi A : graphie de « beau » non confirmée → phrase coupée (v5) ; le
+  bandeau récapitulatif ne montre pas de forme de Chu.
 - Xu Shen (vers 100) : 美，甘也。从羊从大。羊在六畜主給膳也。 Os identifiés en 1899.
 - Xu Xuan (édition de 986) : 羊大則美 — c'est un commentaire de dictionnaire ; « gravé dans le marbre » est une image
   (pas de stèle connue) : garder « grave même cette maxime dans le marbre » comme figure, ou dire « inscrit ».
