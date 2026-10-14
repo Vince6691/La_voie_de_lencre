@@ -8,4 +8,4 @@ grand blanc avant le passage suivant) :
 4. b05 début : « Puis viennent les 周 : le signe est coulé dans le bronze »
 5. b06 : « Au sud, le royaume de 楚… à 郭店… le plus ancien 老子 connu »
 6. b08 fin : « Ainsi naît měi : le beau… 美丽… 完美 »
-Prises uniques : b03, b07, b09 (b02 : deux prises, « Euh… vraiment ? », 2,4 s et 1,8 s).
+b10, b11 : take2 retenue (comme les autres). Prises uniques : b03, b07, b09 (b02 : deux prises, « Euh… vraiment ? », 2,4 s et 1,8 s).

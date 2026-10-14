@@ -111,6 +111,32 @@
    "blancs": 12.1
   }
  },
+ "b10": {
+  "duration": 12.86,
+  "cues": {
+   "encore": 0.0,
+   "cle": 4.02,
+   "dico": 6.4,
+   "cherche": 8.94,
+   "rayon": 9.98,
+   "agneau": 11.7,
+   "troupeau": 12.46
+  }
+ },
+ "b11": {
+  "duration": 13.87,
+  "cues": {
+   "pinceau": 1.2,
+   "neuf": 3.72,
+   "haut": 4.76,
+   "cornes": 6.36,
+   "couches": 7.56,
+   "debout": 8.72,
+   "bas": 9.96,
+   "couche": 11.4,
+   "jambes": 13.24
+  }
+ },
  "_ligne": {
   "clips": {
    "b01": {
@@ -145,12 +171,20 @@
     "debut": 133.75,
     "duree": 29.9
    },
+   "b10": {
+    "debut": 164.25,
+    "duree": 12.86
+   },
+   "b11": {
+    "debut": 178.11,
+    "duree": 13.87
+   },
    "b08": {
-    "debut": 164.65,
+    "debut": 192.98,
     "duree": 24.28
    },
    "b09": {
-    "debut": 190.13,
+    "debut": 218.46,
     "duree": 12.55
    }
   },
@@ -170,8 +204,8 @@
     4.0
    ]
   ],
-  "fin": 202.98,
-  "total": 206.18,
+  "fin": 231.31,
+  "total": 234.51,
   "bruitages": []
  }
 }

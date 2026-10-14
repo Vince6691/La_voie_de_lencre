@@ -43,6 +43,14 @@
   },
   {
    "clip": "b07",
+   "apres": 0.6
+  },
+  {
+   "clip": "b10",
+   "apres": 1.0
+  },
+  {
+   "clip": "b11",
    "apres": 1.0
   },
   {
@@ -140,7 +148,271 @@
    "parure": "Mais la parure",
    "tombent": "les plumes tombent",
    "blancs": "cheveux blancs"
+  },
+  "b10": {
+   "encore": "Et l'erreur",
+   "cle": "la clé",
+   "dico": "dictionnaires",
+   "cherche": "on cherche",
+   "rayon": "au rayon",
+   "agneau": "l'agneau",
+   "troupeau": "troupeau"
+  },
+  "b11": {
+   "pinceau": "prenons le",
+   "neuf": "neuf traits",
+   "haut": "En haut",
+   "cornes": "deux petites",
+   "couches": "trois traits",
+   "debout": "un trait debout",
+   "bas": "En bas",
+   "couche": "un trait couché",
+   "jambes": "les deux jambes"
   }
  },
- "bruitages": []
+ "bruitages": [],
+ "glyphes": {
+  "reels": {
+   "mei_jiaguwen": {
+    "img": "glyphes/mei_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "後2.14.9",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        158
+       ],
+       [
+        0,
+        158
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_jiaguwen2": {
+    "img": "glyphes/mei_xiaoxue/02.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲686",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        150
+       ],
+       [
+        0,
+        150
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_jinwen": {
+    "img": "glyphes/mei_xiaoxue/03.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "美爵",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        212
+       ],
+       [
+        0,
+        212
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_xiaozhuan": {
+    "img": "glyphes/mei_xiaoxue/05.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·羊部",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        182
+       ],
+       [
+        0,
+        182
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_mawangdui": {
+    "img": "glyphes/mei_xiaoxue/08.png",
+    "label": "帛書",
+    "era": "Han",
+    "piece": "老子乙前 (馬王堆)",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        228
+       ],
+       [
+        0,
+        228
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_lishu": {
+    "img": "glyphes/mei_xiaoxue/11.png",
+    "label": "隸書",
+    "era": "Han",
+    "piece": "曹全碑",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        192
+       ],
+       [
+        0,
+        192
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_yang_jiaguwen": {
+    "img": "glyphes/yang_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "佚450",
+    "defaut": "mouton",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_lao_jiaguwen": {
+    "img": "glyphes/lao_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "老",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_yang_xiaozhuan": {
+    "img": "glyphes/yang_xiaoxue/09.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·羊部",
+    "defaut": "mouton",
+    "fusion": 0.0,
+    "polys": []
+   }
+  },
+  "traits": {
+   "mei_regulier": {
+    "src": "glyphes/traits/mei.json",
+    "comp": [
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "homme",
+     "homme",
+     "homme"
+    ]
+   },
+   "mei_lao": {
+    "src": "glyphes/traits/lao.json",
+    "comp": [
+     "homme",
+     "homme",
+     "homme",
+     "homme",
+     "homme",
+     "homme"
+    ]
+   }
+  }
+ }
 }
