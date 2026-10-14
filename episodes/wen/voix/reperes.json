@@ -120,16 +120,16 @@
   }
  },
  "b07": {
-  "duration": 16.07,
+  "duration": 16.59,
   "cues": {
    "peau": 4.35,
    "cote": 5.54,
    "yuwen": 6.7,
    "ecoliers": 8.84,
    "autre": 10.3,
-   "dit": 12.65,
-   "ecrire": 13.78,
-   "bientot": 14.92
+   "parole": 12.43,
+   "ecriture": 14.18,
+   "bientot": 15.44
   }
  },
  "_ligne": {
@@ -172,7 +172,7 @@
    },
    "b07": {
     "debut": 245.11,
-    "duree": 16.07
+    "duree": 16.59
    }
   },
   "rouleaux": [
@@ -203,8 +203,8 @@
     3.4
    ]
   ],
-  "fin": 261.68,
-  "total": 264.88,
+  "fin": 262.2,
+  "total": 265.4,
   "bruitages": [
    [
     "pinceau",

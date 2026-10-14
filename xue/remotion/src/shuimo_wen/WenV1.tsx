@@ -869,7 +869,7 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 const Today: React.FC = () => {
   const t = useT();
   const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'ecritures'), jg = at('b06', 'jiagu'), jw = at('b06', 'jinwen'), wz = at('b06', 'wenzi');
-  const A7 = A('b07'), cote = at('b07', 'cote'), yw = at('b07', 'yuwen'), autre = at('b07', 'autre'), dit = at('b07', 'dit');
+  const A7 = A('b07'), cote = at('b07', 'cote'), yw = at('b07', 'yuwen'), autre = at('b07', 'autre'), dit = at('b07', 'parole');
   return (
     <AbsoluteFill>
       <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [A6 + 0.2, 960, 500, 1.12, 2.0], [fo - 0.9, 960, 540, 1.02, 0.9], [nait + 0.4, 960, 500, 1.1, 1.2], [A7 - 0.5, 960, 540, 1.02, 1.0], [cote, 960, 520, 1.0, 1.0], [autre, 780, 520, 1.15, 1.2], [dit - 0.2, 750, 580, 1.3, 0.8]]}
@@ -887,7 +887,7 @@ const Today: React.FC = () => {
             ctx.restore();
           }
           // passerelle vers 语 : « 语文 » (le cours de chinois) — le 文 vermillon à droite, 语 se trace à l'encre à sa
-          // gauche ; sur « un autre caractère » le 文 s'efface vers le gris ; sur « ce qu'on dit », seule la bouche (口)
+          // gauche ; sur « un autre caractère » le 文 s'efface vers le gris ; sur « la parole », seule la bouche (口)
           // s'allume en vermillon (le sens n'est pas dévoilé)
           const yv = seg(tt, cote - 0.3, cote + 0.5);
           if (yv > 0) {
@@ -922,7 +922,7 @@ const Today: React.FC = () => {
       </div>
       <Caption text="Avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau." a={win(t, A7 + 0.1, cote - 0.2, 0.6)} y={900} size={46} />
       <Caption text="语文 · yǔwén · le cours de chinois" a={win(t, yw + 0.3, autre - 0.1, 0.4)} y={880} size={50} />
-      <Caption text="ce qu'on dit, avant même de l'écrire" a={win(t, dit + 0.3, END + 0.1, 0.4)} y={900} size={48} />
+      <Caption text="la parole, avant l'écriture" a={win(t, dit + 0.3, END + 0.1, 0.4)} y={900} size={48} />
     </AbsoluteFill>
   );
 };
