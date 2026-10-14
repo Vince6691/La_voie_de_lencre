@@ -1,25 +1,25 @@
 {
  "b01": {
-  "duration": 39.07,
+  "duration": 38.39,
   "cues": {
    "beau": 0.78,
    "mouton": 5.1,
-   "dico": 11.62,
-   "haut": 16.06,
-   "grand": 17.34,
-   "bon": 19.5,
-   "donc": 21.62,
-   "song": 23.42,
-   "marbre": 28.1,
-   "maxime": 31.18,
-   "entendu": 33.66,
-   "gros": 38.06
+   "dico": 11.38,
+   "haut": 15.82,
+   "grand": 17.1,
+   "bon": 19.26,
+   "donc": 21.3,
+   "song": 23.1,
+   "marbre": 27.78,
+   "maxime": 30.94,
+   "entendu": 33.34,
+   "gros": 37.42
   }
  },
  "b02": {
-  "duration": 1.98,
+  "duration": 1.29,
   "cues": {
-   "vraiment": 1.53
+   "vraiment": 0.89
   }
  },
  "b03": {
@@ -29,44 +29,44 @@
   }
  },
  "b04": {
-  "duration": 35.7,
+  "duration": 35.38,
   "cues": {
-   "os": 2.11,
-   "homme": 5.71,
-   "dawen": 9.07,
-   "coiffe": 11.99,
-   "branches": 13.44,
-   "mouton": 17.95,
-   "museau": 19.89,
-   "rien": 23.15,
-   "pare": 25.39,
-   "danseur": 26.59,
-   "plumes": 27.91,
-   "terre": 29.63,
-   "jamais": 34.31
+   "os": 2.12,
+   "homme": 5.64,
+   "dawen": 8.92,
+   "coiffe": 11.76,
+   "branches": 13.13,
+   "mouton": 17.68,
+   "museau": 19.64,
+   "rien": 22.92,
+   "pare": 25.08,
+   "danseur": 26.2,
+   "plumes": 27.56,
+   "terre": 29.4,
+   "jamais": 34.0
   }
  },
  "b05": {
-  "duration": 11.21,
+  "duration": 11.15,
   "cues": {
-   "bronze": 2.84,
+   "bronze": 2.88,
    "epaissit": 4.44,
-   "coiffe": 6.04,
-   "cornes": 10.6
+   "coiffe": 6.12,
+   "cornes": 10.52
   }
  },
  "b06": {
-  "duration": 23.7,
+  "duration": 24.32,
   "cues": {
    "royaumes": 2.79,
    "chu": 4.27,
-   "guodian": 6.83,
-   "tombe": 9.63,
-   "lattes": 12.19,
-   "vers": 15.95,
-   "beau": 17.37,
-   "laideur": 19.79,
-   "maitre": 21.63
+   "guodian": 6.91,
+   "tombe": 9.79,
+   "lattes": 12.35,
+   "vers": 16.27,
+   "beau": 17.69,
+   "laideur": 20.35,
+   "maitre": 22.19
   }
  },
  "b07": {
@@ -86,19 +86,19 @@
   }
  },
  "b08": {
-  "duration": 24.3,
+  "duration": 24.28,
   "cues": {
-   "reprenons": 0.13,
-   "formes": 2.97,
-   "homme": 4.05,
-   "coiffe": 6.33,
-   "plumes": 8.44,
-   "bronze": 9.73,
-   "sceau": 11.93,
-   "reste": 14.77,
-   "naissance": 16.33,
-   "meili": 20.89,
-   "wanmei": 23.53
+   "reprenons": 0.14,
+   "formes": 2.9,
+   "homme": 3.98,
+   "coiffe": 6.26,
+   "plumes": 8.32,
+   "bronze": 9.58,
+   "sceau": 11.78,
+   "reste": 14.7,
+   "naissance": 16.3,
+   "meili": 20.94,
+   "wanmei": 23.5
   }
  },
  "b09": {
@@ -115,63 +115,63 @@
   "clips": {
    "b01": {
     "debut": 0.6,
-    "duree": 39.07
+    "duree": 38.39
    },
    "b02": {
-    "debut": 40.47,
-    "duree": 1.98
+    "debut": 39.79,
+    "duree": 1.29
    },
    "b03": {
-    "debut": 46.45,
+    "debut": 45.08,
     "duree": 1.35
    },
    "b04": {
-    "debut": 54.4,
-    "duree": 35.7
+    "debut": 53.03,
+    "duree": 35.38
    },
    "b05": {
-    "debut": 90.9,
-    "duree": 11.21
+    "debut": 89.21,
+    "duree": 11.15
    },
    "b06": {
-    "debut": 106.31,
-    "duree": 23.7,
+    "debut": 104.56,
+    "duree": 24.32,
     "pause": {
-     "coupe": 21.51,
+     "coupe": 22.07,
      "duree": 4.0
     }
    },
    "b07": {
-    "debut": 134.81,
+    "debut": 133.68,
     "duree": 29.9
    },
    "b08": {
-    "debut": 165.71,
-    "duree": 24.3
+    "debut": 164.58,
+    "duree": 24.28
    },
    "b09": {
-    "debut": 191.21,
+    "debut": 190.06,
     "duree": 12.55
    }
   },
   "rouleaux": [
    {
-    "debut": 48.1,
+    "debut": 46.73,
     "duree": 6
    },
    {
-    "debut": 102.51,
+    "debut": 100.76,
     "duree": 3.5
    }
   ],
   "pauses": [
    [
-    127.82,
+    126.63,
     4.0
    ]
   ],
-  "fin": 204.06,
-  "total": 207.26,
+  "fin": 202.91,
+  "total": 206.11,
   "bruitages": []
  }
 }
