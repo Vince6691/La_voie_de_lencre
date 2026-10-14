@@ -5,6 +5,7 @@ import { XUE_V2_SECONDS, XueV2 } from './shuimo_v2/XueV2';
 import { JIAO_SECONDS, JiaoV1 } from './shuimo_jiao/JiaoV1';
 import { TIYING_SECONDS, TiyingReveal } from './shuimo_wen/TiyingReveal';
 import { WEN_SECONDS, WenV1 } from './shuimo_wen/WenV1';
+import { MEI_SECONDS, MeiV1 } from './shuimo_mei/MeiV1';
 import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
@@ -41,6 +42,7 @@ export const RemotionRoot: React.FC = () => (
   {/* rouleau du temps seul (src/rouleau) : 周 → 秦, curseur par défaut */}
   <Composition id="VideoEncreDemo" component={VideoEncreDemo} durationInFrames={VIDEO_ENCRE_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
  <Composition id="JiaoV1" component={JiaoV1} durationInFrames={Math.round(JIAO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="MeiV1" component={MeiV1} durationInFrames={Math.round(MEI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenV1" component={WenV1} durationInFrames={Math.round(WEN_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenTiying" component={TiyingReveal} durationInFrames={Math.round(TIYING_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="XueV2" component={XueV2} durationInFrames={Math.round(XUE_V2_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />

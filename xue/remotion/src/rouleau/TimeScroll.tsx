@@ -194,8 +194,10 @@ const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c
       {eras.map((e, i) => {
         const pop = smooth(0.02 + i * 0.013, 0.06 + i * 0.013, u);
         if (pop <= 0) return null;
-        const isTo = i === c.to, done = i <= c.from || (isTo && u >= IMPACT);
-        const fillK = i <= c.from ? 1 : isTo ? smooth(IMPACT, IMPACT + 0.03, u) : 0;
+        // à rebours (to < from) : les sceaux « déjà passés » sont ceux d'après le départ
+        const past = c.to < c.from ? i >= c.from : i <= c.from;
+        const isTo = i === c.to, done = past || (isTo && u >= IMPACT);
+        const fillK = past ? 1 : isTo ? smooth(IMPACT, IMPACT + 0.03, u) : 0;
         const size = 64 * (0.6 + 0.4 * pop) * (isTo ? 1 + 0.28 * flash : 1);
         const a = pop * out * (isTo && u > 0.86 ? 0 : 1) * (done || isTo ? 1 : 0.55);
         return (
