@@ -113,6 +113,21 @@ conclure : « savoureux » ? ⏸ Son erreur était presque inévitable. Le mouto
 > de Xu Shen et de sa citation (même cadrage qu'à l'accroche, la boucle se referme) ; derrière lui, l'os `00` en
 > transparence, qu'il ne voit pas ; forme `08` (soie de Mawangdui) puis `11` (stèle) en fondu net.
 
+## 6 bis. L'erreur dure encore — le dictionnaire (clip b10, ≈ 12 s)
+Et l'erreur dure encore. 许慎 a rangé ce caractère sous la clé du mouton. Aujourd'hui, dans les dictionnaires
+chinois, pour trouver « beau », on cherche… au rayon des moutons, à côté de l'agneau et du troupeau.
+> plan : un dictionnaire moderne (papier fin, onglets) s'ouvre en lavis ; index des clés, le doigt d'encre descend
+> jusqu'à 羊 ; la page 羊部 : 羊, 羔 (agneau), 群 (troupeau) en noir, 美 au milieu en gomme-gutte (punch) ; petit gag :
+> un mouton dodu apparaît en marge de la page.
+
+## 6 ter. Les 9 traits de 美 (clip b11, ≈ 15 s) — rendez-vous de la mini-série
+Avant de reprendre, prenons le pinceau. /měɪ/ s'écrit en neuf traits. En haut, six : deux petites cornes, trois traits
+couchés, un trait debout. En bas, trois : un trait couché… puis les deux jambes.
+> plan : `fiche-caractere` animée en grand au centre (Make Me a Hanzi, `traits/mei.json`, ordre des traits) ; chaque
+> trait se trace sur son mot (repères `cornes`, `couches`, `debout`, `bas`, `jambes`), numéro du trait en vermillon à
+> côté ; les six traits du haut en gomme-gutte, les trois du bas en azurite ; compteur 1 → 9 ; bruitage pinceau par
+> trait. Ce plan devient le rendez-vous de chaque épisode de la mini-série des adjectifs (美 → 老 → …).
+
 ## 7. Scène récapitulative — 3:45
 Reprenons. Dans toutes ses formes, il garde deux dessins. L'homme, debout, de face. Et sur sa tête, la coiffe : des
 plumes sur l'os, des branches courbes sur le bronze. ⏸ Au petit sceau, elle prend la forme d'un mouton… et le mouton
