@@ -18,6 +18,24 @@ Plain uniform paper background, no landscape, no ground line, no shadow, no text
 no color, no gradient.
 ```
 
+### Variante « image classique » : Laozi en maître qui enseigne → `images/laozi_reference_enseigne.png`
+Posture traditionnelle des portraits de maîtres : assis, une main levée qui explique. Même usage (calligramme).
+```
+Traditional Chinese ink wash painting in the classical style of old scroll portraits of sages, full-body portrait of a
+very old master seated cross-legged on a low woven reed mat, seen in three-quarter profile facing right, in the posture
+of a teacher explaining: his right hand raised at chest height with the index finger lifted, his left hand resting on
+his knee holding a loosely rolled bundle of bamboo slips tied with cord. Long flowing white beard reaching his chest,
+long white eyebrows falling past his eyes, high bald forehead, the remaining white hair gathered in a small topknot
+tied with a plain cloth band. He wears a long, loose hemp robe with very wide sleeves pooling around him on the mat,
+the collar crossed right over left, a simple cloth sash. A tall, slightly crooked wooden walking staff lies on the mat
+beside him. Calm, kind, attentive expression, slight smile, as if answering a question.
+Style: expressive brush strokes, dark ink outlines for the robe, mat and staff, soft grey washes in the robe folds,
+fine brush lines for the face and beard, generous empty space around the figure. One single figure, centered, clean
+and readable silhouette, nothing touching the edges.
+Plain uniform off-white xuan paper background, no landscape, no student, no table, no text, no seal, no calligraphy,
+no frame, no color.
+```
+
 ## 2. Clip A « le danseur » (bloc 3, et ombre de l'intro) → `images/danseur_depart.png`, `clips/03_danseur.mp4`
 La pose finale doit reprendre le signe de l'os : **homme de face, bras ouverts, jambes écartées, quatre longues plumes
 dressées sur la tête** — le clip entre à travers la forme `00` et sert aussi d'ombre derrière le papier dans l'intro.
