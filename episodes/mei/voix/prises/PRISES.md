@@ -1,5 +1,5 @@
 # 美 — prises de voix (flow ElevenLabs « 墨道 — 美 (měi) voix off », 3p96Cu5p48I1ilNtXfrD)
-Retenue (choix de l’utilisateur) : take2 pour b01, b02, b04, b05, b06, b08 ; take1 pour b03, b07, b09.
+Retenue (choix de l’utilisateur) : b01_v2_take2 pour b01 (traduction « Quand le mouton est grand, il est beau »), take2 pour b02, b04, b05, b06, b08 ; take1 pour b03, b07, b09.
 Comparaison : apercus/comparaison_prises.mp3 — pour chaque passage, prise 1 puis prise 2 (petit blanc entre les deux,
 grand blanc avant le passage suivant) :
 1. b01 début : « měi, le mot pour dire beau en chinois »

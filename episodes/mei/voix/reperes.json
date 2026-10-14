@@ -1,19 +1,19 @@
 {
  "b01": {
-  "duration": 38.39,
+  "duration": 38.46,
   "cues": {
    "beau": 0.78,
-   "mouton": 5.1,
-   "dico": 11.38,
-   "haut": 15.82,
-   "grand": 17.1,
-   "bon": 19.26,
-   "donc": 21.3,
-   "song": 23.1,
-   "marbre": 27.78,
-   "maxime": 30.94,
-   "entendu": 33.34,
-   "gros": 37.42
+   "mouton": 5.02,
+   "dico": 11.26,
+   "haut": 15.74,
+   "grand": 16.98,
+   "bon": 19.18,
+   "donc": 21.22,
+   "song": 23.02,
+   "marbre": 27.66,
+   "maxime": 30.7,
+   "entendu": 33.26,
+   "gros": 37.5
   }
  },
  "b02": {
@@ -115,26 +115,26 @@
   "clips": {
    "b01": {
     "debut": 0.6,
-    "duree": 38.39
+    "duree": 38.46
    },
    "b02": {
-    "debut": 39.79,
+    "debut": 39.86,
     "duree": 1.29
    },
    "b03": {
-    "debut": 45.08,
+    "debut": 45.15,
     "duree": 1.35
    },
    "b04": {
-    "debut": 53.03,
+    "debut": 53.1,
     "duree": 35.38
    },
    "b05": {
-    "debut": 89.21,
+    "debut": 89.28,
     "duree": 11.15
    },
    "b06": {
-    "debut": 104.56,
+    "debut": 104.63,
     "duree": 24.32,
     "pause": {
      "coupe": 22.07,
@@ -142,36 +142,36 @@
     }
    },
    "b07": {
-    "debut": 133.68,
+    "debut": 133.75,
     "duree": 29.9
    },
    "b08": {
-    "debut": 164.58,
+    "debut": 164.65,
     "duree": 24.28
    },
    "b09": {
-    "debut": 190.06,
+    "debut": 190.13,
     "duree": 12.55
    }
   },
   "rouleaux": [
    {
-    "debut": 46.73,
+    "debut": 46.8,
     "duree": 6
    },
    {
-    "debut": 100.76,
+    "debut": 100.83,
     "duree": 3.5
    }
   ],
   "pauses": [
    [
-    126.63,
+    126.7,
     4.0
    ]
   ],
-  "fin": 202.91,
-  "total": 206.11,
+  "fin": 202.98,
+  "total": 206.18,
   "bruitages": []
  }
 }

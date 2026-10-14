@@ -40,7 +40,7 @@ Comparaisons : 羊 oraculaire (`羊/00`, museau en V, cornes qui retombent) et �
 Měi, le mot pour dire « beau » en chinois. ⏸ Et regardez sa tête : c'est le caractère du mouton. ⏸ Vers l'an cent,
 sous la dynastie Han, Xu Shen écrit le premier grand dictionnaire de Chine. Pour ce caractère, il est formel : un
 mouton en haut, et le mot « grand » en bas. Un gros mouton, c'est bon… donc c'est beau. ⏸ Mille ans plus tard, sous la
-dynastie Song, un lettré grave même cette maxime dans le marbre : 羊大則美. Mouton grand, donc beau. C'est entendu,
+dynastie Song, un lettré grave même cette maxime dans le marbre : 羊大則美. Quand le mouton est grand, il est beau. C'est entendu,
 depuis deux mille ans : en Chine, la beauté… c'est un gros mouton.
 > plan : papier nu ; 美 moderne tracé trait par trait (`drawStrokes`, `brush: false`, bruitage pinceau) ; sur « un
 > mouton », 羊 en gomme-gutte (punch +3,5 %) ; sur « Xu Shen », silhouette de lettré au pinceau et citation
