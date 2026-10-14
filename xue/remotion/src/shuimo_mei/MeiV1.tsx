@@ -9,12 +9,12 @@
 // Pigments : l'homme 大 en azurite, la coiffe en malachite, le mouton (la lecture de Xu Shen) en gomme-gutte.
 // En attente : clip Seedance B (Laozi et le scribe), bruitages propres (marbre, ciseau).
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
-import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, cursorPose, morphK, tagIn } from '../rouleau/TimeScroll';
+import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
 import { VideoReveal } from '../video_encre/VideoReveal';
 import { loadLegacy, W } from '../legacy';
 import rep from '../data/episodes/mei.json';
@@ -340,6 +340,33 @@ const Opening: React.FC = () => {
   );
 };
 
+// ════════════════ 1 bis. Derrière le papier nu, l'ombre du danseur (clip A passé en ombre, outils/video_shuimo/ombre_clip.py)
+// apparaît après la cassure, danse sur « Remontons à l'origine… », se fige de face et devient le signe de l'os
+const SH0 = SHATTER + 1.0, SHFRZ = A('b03') + 1.4;
+const ShadowDancer: React.FC = () => {
+  const { fps } = useVideoConfig();
+  const len = SHFRZ + 0.3 - SH0;
+  return (
+    <Sequence from={Math.round(SH0 * fps)} durationInFrames={Math.round(len * fps)}>
+      <ShadowInner len={len} />
+    </Sequence>
+  );
+};
+const ShadowInner: React.FC<{ len: number }> = ({ len }) => {
+  const u = useT();
+  const a = seg(u, 0, 0.9) * (1 - seg(u, len - 0.75, len));
+  const { fps } = useVideoConfig();
+  return (
+    <AbsoluteFill style={{ opacity: a }}>
+      {/* lumière chaude derrière le papier, comme une lanterne */}
+      <AbsoluteFill style={{ background: 'radial-gradient(ellipse 34% 46% at 50% 52%, rgba(255,196,120,0.38), rgba(255,196,120,0) 100%)' }} />
+      <AbsoluteFill style={{ mixBlendMode: 'multiply', filter: 'blur(4px)', opacity: 0.72, transform: 'translate(60px, 50px) scale(0.86)' }}>
+        <OffthreadVideo src={staticFile('episodes/mei/clips/03_danseur_ombre.mp4')} startFrom={Math.round((CLIP_SRC_SECONDS - (len - 0.25)) * fps)} muted style={{ width: '100%', height: '100%' }} />
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
 // ════════════════ 2. « Remontons à l'origine… » → rouleau à rebours (Song → Shang) → la dynastie Shang
 const Shang: React.FC = () => {
   const t = useT();
@@ -353,13 +380,11 @@ const Shang: React.FC = () => {
           fromLandscape={{ seed: 22, since: A3 - 0.6, mood: 'brume' }} toLandscape={{ seed: 14, until: A('b05') + 0.5, mood: 'aube' }}>
           <Draw draw={(ctx, tt, E) => {
             // avant et pendant le rouleau : le 美 d'aujourd'hui, petit, gris, qui se défait trait par trait
+            // avant et pendant le rouleau : l'ombre du danseur se fige et devient le signe de l'os, qui remonte le temps
             if (tt < R1E) {
-              const p = cursorPose(TR1, tt), mk = morphK(TR1, tt), q = arrivePose(TR1, tt);
-              const undo = 9 * (1 - seg(tt, R1 + 0.8, R1 + 0.72 * TR1.duration!));
-              const pre = seg(tt, A3 - 0.4, A3 + 0.4);
-              if (mk < 1) { ctx.save(); ctx.globalAlpha = pre * (1 - mk);
-                E.drawStrokes(ctx, 'mei_regulier', { x: p.x, y: p.y, size: 420 * p.s, progress: undo, brush: false, color: () => rgb(mixc(INK, GREY, 0.3)) }); ctx.restore(); }
-              if (mk > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: q.x, y: q.y, size: 600 * q.s, opacity: mk * (1 - seg(tt, R1E - 0.3, R1E)), color: () => inkCss });
+              const q = arrivePose(TR1, tt);
+              const born = seg(tt, SHFRZ - 0.35, SHFRZ + 0.35);
+              if (born > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: q.x, y: q.y, size: 640 * q.s, opacity: born * (1 - seg(tt, R1E - 0.3, R1E)), color: () => inkCss });
               return;
             }
             // l'os : plastron tamponné, le signe révélé en blanc puis à l'encre ; l'homme (azurite), la coiffe (malachite)
@@ -397,7 +422,7 @@ const Shang: React.FC = () => {
         </TimeScrollStage>
       </Cam>
       <ClipShot src="danseur" from={clipIn} len={clipOut - clipIn} />
-      <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, R1 + 0.3, 0.4)} y={880} size={52} />
+      <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, R1 + 0.3, 0.4)} y={960} size={52} />
       <Label x={1300} y={760} zh="大" text="un homme, de face" color={AZ} a={win(t, hom + 0.3, dw - 0.2, 0.4)} />
       <Caption text="le même homme de face que dans 文 (épisode précédent)" a={win(t, dw, coif - 0.3, 0.4)} y={960} size={42} />
       <Label x={1330} y={300} zh="" text="une haute coiffe" color={MAL} a={win(t, coif + 0.2, mt - 0.4, 0.4)} />
@@ -834,6 +859,7 @@ export const MeiV1: React.FC = () => {
         <Win from={A('b11') - 0.3} to={A('b08') - 0.3}><Traits /></Win>
         <Win from={A('b08') - 0.3} to={END}><Finale /></Win>
         <Win from={END} to={MEI_SECONDS + 1}><EndCard /></Win>
+        <ShadowDancer />
       </>}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/mei/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
