@@ -868,7 +868,7 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 
 const Today: React.FC = () => {
   const t = useT();
-  const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'chinois'), lit = at('b06', 'litterature');
+  const A6 = A('b06'), fo = at('b06', 'formes'), nait = at('b06', 'naissance'), chi = at('b06', 'ecritures'), jg = at('b06', 'jiagu'), jw = at('b06', 'jinwen'), wz = at('b06', 'wenzi');
   const A7 = A('b07'), autre = at('b07', 'autre'), homme = at('b07', 'homme');
   return (
     <AbsoluteFill>
@@ -899,9 +899,10 @@ const Today: React.FC = () => {
       </Cam>
       <Caption text="un seul dessin, dans toutes les formes : un homme de face" a={win(t, fo, at('b06', 'tete') - 0.1, 0.4)} y={1010} size={40} />
       <Caption text="wén · la marque, l'ornement, l'écriture, la culture" a={win(t, nait + 0.6, chi - 0.2, 0.4)} y={880} size={50} />
-      {/* 中文 (le chinois) et 文学 (la littérature) : le 文 de chaque mot en vermillon */}
-      <div style={{ position: 'absolute', width: '100%', top: 800, display: 'flex', justifyContent: 'center', gap: 180, fontFamily: 'ShuimoKai', fontSize: 84, color: inkCss }}>
-        {([['中文', 'le chinois', chi], ['文学', 'la littérature', lit]] as [string, string, number][]).map(([w, fr, t0]) => (
+      {/* le nom des écritures : 甲骨文 (os), 金文 (bronzes), 文字 (caractères) — le 文 de chaque mot en vermillon */}
+      <Caption text="jusque dans le nom des écritures" a={win(t, chi - 0.2, jg - 0.3, 0.4)} y={880} size={50} />
+      <div style={{ position: 'absolute', width: '100%', top: 800, display: 'flex', justifyContent: 'center', gap: 120, fontFamily: 'ShuimoKai', fontSize: 84, color: inkCss }}>
+        {([['甲骨文', "l'écriture des os", jg], ['金文', 'celle des bronzes', jw], ['文字', 'les caractères', wz]] as [string, string, number][]).map(([w, fr, t0]) => (
           <span key={w} style={{ opacity: win(t, t0 - 0.6, A7 - 0.3) }}>
             {[...w].map((ch, k) => <span key={k} style={{ color: ch === '文' ? rgb(VER) : inkCss }}>{ch}</span>)}
             <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, textAlign: 'center' }}>{fr}</div>

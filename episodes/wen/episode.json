@@ -156,8 +156,10 @@
    "ecr": "l'écriture",
    "cul": "la culture",
    "naissance": "Ainsi naît",
-   "chinois": "le chinois",
-   "litterature": "la littérature"
+   "ecritures": "le nom des",
+   "jiagu": "甲骨文",
+   "jinwen": "金文",
+   "wenzi": "文字"
   },
   "b07": {
    "peau": "sur la peau",
