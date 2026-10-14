@@ -31,6 +31,8 @@ for (const f of fs.readdirSync(`${X}/assets/shuimo_xue`)) cp(`${X}/assets/shuimo
 fs.writeFileSync(`${here}/src/data/realglyphs.json`, fs.readFileSync(`${X}/src/realglyphs.js`, 'utf8').split('=').slice(1).join('=').trim().replace(/;$/, ''));
 // rouleau du temps (tools/build_sfx.py) : sons
 for (const f of fs.readdirSync(`${X}/assets/rouleau`)) cp(`${X}/assets/rouleau/${f}`, `${here}/public/rouleau/${f}`);
+// mosaïque de mots (skill mosaique-de-mots) : sons et tuile de fibres du papier xuan
+for (const f of fs.readdirSync(`${X}/assets/mosaique`)) cp(`${X}/assets/mosaique/${f}`, `${here}/public/mosaique/${f}`);
 // clips vidéo d'exemple (Seedance / Veo) pour les tests d'intégration encre
 for (const f of fs.readdirSync(`${X}/assets/exemples_videos`)) cp(`${X}/assets/exemples_videos/${f}`, `${here}/public/exemples_videos/${f}`);
 // version shuimo v2 : voix, repères et fond musical (outils/video_shuimo, épisode xue/shuimo_v2/episode.json)
