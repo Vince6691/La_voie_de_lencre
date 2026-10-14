@@ -10,7 +10,7 @@
 // ici. Pigments : l'homme en azurite, la marque en vermillon, 化 en malachite.
 // En attente : clip Seedance A (Taibo) — clip d'exemple en place.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
@@ -62,7 +62,7 @@ const inkCss = rgb(INK);
 // le haut de 美 laissé à l'encre (on ne dévoile pas encore ce qu'il porte)
 const AZ = PIGMENT.child, VER = PIGMENT.hand, MAL = PIGMENT.roof, GOM = PIGMENT.yao;
 const P: Record<string, number[]> = { tete: AZ, bras: AZ, jambes: AZ, homme: AZ, marque: VER, soie: MAL, coiffe: GOM };
-const GREY = [168, 160, 150], PAPERWHITE = [240, 233, 219];
+const GREY = [168, 160, 150], PAPERWHITE = [240, 233, 219], CARVE = [96, 62, 34];
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── polices et moteur Canvas
@@ -149,7 +149,7 @@ const MapPanel: React.FC<{ from: number; to: number; draw: (ctx: CanvasRendering
 
 // ── cartouches, étiquettes, textes (tailles lisibles sur téléphone)
 const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({ zh, name, dates, a }) => (
-  <div style={{ position: 'absolute', left: 110, top: 90, display: 'flex', alignItems: 'center', gap: 26, opacity: a }}>
+  <div style={{ position: 'absolute', left: 96, top: 76, display: 'flex', alignItems: 'center', gap: 26, opacity: a, background: 'rgba(246,241,231,0.86)', borderRadius: 16, padding: '12px 28px 12px 14px', boxShadow: '0 0 24px rgba(246,241,231,0.6)' }}>
     <div style={{ width: 92, height: 92, background: rgb(VER, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 64, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>{zh}</div>
     <div>
       <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss }}>{name}</div>
@@ -164,7 +164,9 @@ const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: n
   </div>
 );
 const Caption: React.FC<{ text: string; a: number; y?: number; size?: number }> = ({ text, a, y = 990, size = 38 }) => (
-  <div style={{ position: 'absolute', width: '100%', top: y, textAlign: 'center', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: size, color: '#5b4f44', opacity: a, textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</div>
+  <div style={{ position: 'absolute', width: '100%', top: y, display: 'flex', justifyContent: 'center', opacity: a }}>
+    <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: size, color: '#4a3f36', background: 'rgba(246,241,231,0.78)', borderRadius: 12, padding: '2px 22px', boxShadow: '0 0 22px rgba(246,241,231,0.7)' }}>{text}</div>
+  </div>
 );
 // glyphe réel : l'homme à l'encre (ou en azurite selon man), la marque en vermillon selon mark
 const manCol = (man: number, mark: number, dim = 0) => (c: string) => rgb(mixc(c === 'marque' ? mixc(INK, VER, mark) : mixc(INK, AZ, man), GREY, dim));
@@ -268,6 +270,35 @@ const useImage = (src: string) => {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   useEffect(() => { const i = new Image(); i.onload = () => { setImg(i); continueRender(h); }; i.onerror = () => continueRender(h); i.src = staticFile(src); }, [h, src]);
   return img;
+};
+// photo plein cadre (os, lattes de bambou) : centre (u, v) de l'image placé au centre de l'écran, échelle k × « cover »
+const coverImg = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, a: number, k = 1, u = 0.5, v = 0.5) => {
+  const s = Math.max(1920 / img.width, 1080 / img.height) * k;
+  ctx.save(); ctx.globalAlpha = a; ctx.drawImage(img, 960 - u * img.width * s, 540 - v * img.height * s, img.width * s, img.height * s); ctx.restore();
+};
+// plaque de bronze neuf (fond intérieur du gui) : dorée, plus claire au centre, reflet qui la balaie
+const bronzePlate = (ctx: CanvasRenderingContext2D, E: any, a: number, x: number, y: number, w: number, h: number, sweep: number) => {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  const g = ctx.createRadialGradient(x - w * 0.15, y - h * 0.2, 40, x, y, Math.max(w, h) * 0.75);
+  g.addColorStop(0, 'rgb(236,198,128)'); g.addColorStop(0.55, 'rgb(196,146,78)'); g.addColorStop(1, 'rgb(120,80,38)');
+  ctx.fillStyle = g; E.roundRect(ctx, x - w / 2, y - h / 2, w, h, 46); ctx.fill();
+  ctx.save(); E.roundRect(ctx, x - w / 2, y - h / 2, w, h, 46); ctx.clip();
+  const sx = x - w + 2 * w * sweep, lg = ctx.createLinearGradient(sx - 160, y - h / 2, sx + 160, y + h / 2);
+  lg.addColorStop(0, 'rgba(255,240,200,0)'); lg.addColorStop(0.5, 'rgba(255,240,200,0.35)'); lg.addColorStop(1, 'rgba(255,240,200,0)');
+  ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = lg; ctx.fillRect(x - w / 2, y - h / 2, w, h);
+  ctx.restore();
+  ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(110,70,30,0.55)'; E.roundRect(ctx, x - w / 2 + 3, y - h / 2 + 3, w - 6, h - 6, 44); ctx.stroke();
+  ctx.restore();
+};
+// le gui neuf qui tourne d'un quart de tour (clip Veo sur fond blanc : « multiply » efface le blanc sur le papier)
+const GuiClip: React.FC<{ len: number }> = ({ len }) => {
+  const t = useT();
+  return (
+    <AbsoluteFill style={{ mixBlendMode: 'multiply', opacity: seg(t, 0, 0.5) * (1 - seg(t, len - 0.6, len)) }}>
+      <OffthreadVideo src={staticFile('episodes/wen/clips/gui_rotation.mp4')} muted playbackRate={6 / len} style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${1.02 + 0.05 * t / len})` }} />
+    </AbsoluteFill>
+  );
 };
 let BG: HTMLCanvasElement | null = null;
 const bgLayer = () => { if (!BG) { BG = document.createElement('canvas'); BG.width = 1920; BG.height = 1080; } return BG; };
@@ -503,6 +534,7 @@ const Opening: React.FC = () => {
 // ════════════════ 2. La dynastie Shang : l'os, la marque (croix, V, nœud), le roi défunt 文丁 → 1er sens → rouleau 1
 const Shang: React.FC = () => {
   const t = useT();
+  const bone = useImage('episodes/wen/images/os.jpg');
   const A2 = A('b02'), os = at('b02', 'os'), bras = at('b02', 'bras'), mq = at('b02', 'marque'), cx = at('b02', 'croix'), pun = at('b02', 'punition'), rois = at('b02', 'rois'), sens = at('b02', 'sens');
   return (
     <AbsoluteFill>
@@ -511,19 +543,36 @@ const Shang: React.FC = () => {
         <TimeScrollStage cfg={TR1} under={<Landscape seed={14} from={A2 - 1.5} to={pun + 1} move="push" mood="aube" />}
           fromLandscape={{ seed: 5, since: pun - 1 }} toLandscape={{ seed: 9, until: A('b03') + 2 }}>
           <Draw draw={(ctx, tt, E) => {
-            const plate = win(tt, os - 0.4, R1 + 0.2, 0.7);
-            stamp(ctx, E, plate * (1 - seg(tt, pun, pun + 1.2)), 960, 520, 520, 760, 170);
+            // l'os oraculaire (photo), puis le signe passe à l'encre sur le papier
+            const plate = win(tt, os - 0.6, R1 + 0.2, 0.7) * (1 - seg(tt, pun, pun + 1.2));
+            if (bone && plate > 0) coverImg(ctx, bone, plate, 1.0 + 0.04 * seg(tt, os - 0.6, pun));
+            // divination : un point brûlant dans un creux, la fissure 卜 court
+            const cr = seg(tt, os - 0.3, os + 0.5);
+            if (plate > 0 && cr > 0) {
+              const hx = 842, hy = 858, ember = win(tt, os - 0.4, os + 0.6, 0.2);
+              ctx.save(); ctx.globalAlpha = plate;
+              const eg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 46);
+              eg.addColorStop(0, `rgba(255,190,90,${0.9 * ember})`); eg.addColorStop(1, 'rgba(255,120,40,0)');
+              ctx.fillStyle = eg; ctx.beginPath(); ctx.arc(hx, hy, 46, 0, 7); ctx.fill();
+              ctx.strokeStyle = 'rgba(45,26,12,0.9)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.shadowColor = 'rgba(255,150,60,0.7)'; ctx.shadowBlur = 10 * ember;
+              const v = Math.min(1, cr * 1.6), b = clamp((cr - 0.55) / 0.45);
+              ctx.beginPath(); ctx.moveTo(hx, hy - 10); ctx.lineTo(hx + 6, hy - 10 - 190 * v); ctx.stroke();
+              if (b > 0) { ctx.beginPath(); ctx.moveTo(hx + 3, hy - 100); ctx.lineTo(hx + 3 + 95 * b, hy - 100 - 26 * b); ctx.stroke(); }
+              ctx.restore();
+            }
             const reveal = seg(tt, os + 0.3, os + 1.5);
             if (reveal <= 0 || tt > R1E + 0.1) return;
             const dry = seg(tt, pun - 0.4, pun + 0.8); // le signe passe du blanc (estampage) à l'encre
             const mark = seg(tt, mq, mq + 0.6);
             const man = win(tt, bras, mq, 0.4);
-            const col = (c: string) => rgb(c === 'marque' ? mixc(mixc(PAPERWHITE, INK, dry), VER, mark) : mixc(mixc(PAPERWHITE, INK, dry), AZ, man));
+            const col = (c: string) => rgb(c === 'marque' ? mixc(mixc(CARVE, INK, dry), VER, mark) : mixc(mixc(CARVE, INK, dry), AZ, man));
             // croix, V, nœud : la marque change de forme (fondu net), puis revient au V
             const k = tt < cx ? 1 : tt < cx + 0.8 ? 0 : tt < cx + 1.7 ? 1 : tt < cx + 2.8 ? 2 : 1;
             const key = ['wen_shang_croix', 'wen_jiaguwen', 'wen_shang_noeud'][k];
             const mk = morphK(TR1, tt), p = cursorPose(TR1, tt), q = arrivePose(TR1, tt);
             const g = 22 * mark * (1 - seg(tt, pun, pun + 1)) + 30 * win(tt, sens, R1 - 0.3, 0.4);
+            // gravé en creux : un liseré clair décalé (bord éclairé de l'entaille) sous le trait
+            if (mk < 1 && dry < 1) E.drawRealGlyph(ctx, key, { x: p.x + 3, y: p.y + 3, size: 640 * p.s, reveal: () => reveal, opacity: (1 - mk) * (1 - dry) * 0.75, color: () => 'rgb(246,234,208)' });
             if (mk < 1) E.drawRealGlyph(ctx, key, { x: p.x, y: p.y, size: 640 * p.s, reveal: () => reveal, opacity: 1 - mk, color: col, glow: g, glowColor: rgb(VER, 0.6) });
             if (mk > 0) E.drawRealGlyph(ctx, 'wen_zhou', { x: q.x, y: q.y, size: 640 * q.s, opacity: mk * (1 - seg(tt, R1E - 0.3, R1E + 0.1)), color: manCol(0, 1) });
           }} />
@@ -550,20 +599,26 @@ const Zhou: React.FC = () => {
   const A3 = A('b03'), taibo = at('b03', 'taibo'), reg = at('b03', 'regner'), br = at('b03', 'bronze'), coeur = at('b03', 'coeur'), orne = at('b03', 'orne'), sens = at('b03', 'sens'),
     roi = at('b03', 'roi'), fils = at('b03', 'fils'), duo = at('b03', 'duo'), raff = at('b03', 'raff'), force = at('b03', 'force');
   const mapTo = reg - 0.3;
+  const { fps } = useVideoConfig();
+  const GZ0 = br - 0.4, GZ1 = coeur - 0.3; // le gui tourne, puis on passe à l'inscription intérieure
   return (
     <AbsoluteFill>
       <Cam keys={[[A3 - 0.3, 960, 540, 1.02], [br + 0.6, 960, 520, 1.06, 1.2], [coeur - 0.2, 960, 470, 1.25, 1.0], [orne - 0.3, 960, 540, 1.02, 1.0], [roi - 0.2, 960, 520, 1.1, 1.0], [fils - 0.2, 960, 540, 1.0, 1.0]]}
         punch={[coeur + 0.3, roi + 1.2, duo]}>
         <Paper />
         <Landscape seed={9} from={A3 - 1.5} to={A('b04') + 0.6} move="pan" mood="jour" faint={0.6} />
+        <Sequence from={Math.round(GZ0 * fps)} durationInFrames={Math.round((GZ1 - GZ0) * fps)}><GuiClip len={GZ1 - GZ0} /></Sequence>
         <Draw draw={(ctx, tt, E) => {
           // le bronze : le corps s'épaissit, la marque devient un cœur ; puis os et bronze côte à côte (l'ornement)
-          const bz = win(tt, br - 0.2, roi - 0.1, 0.6);
+          const bz = win(tt, GZ1 - 0.4, roi - 0.1, 0.6);
           if (bz > 0) {
-            const side = seg(tt, orne - 0.2, orne + 0.8);
-            stamp(ctx, E, bz, 960 + 260 * side, 520, 560, 760, 60, true);
-            const mark = seg(tt, coeur, coeur + 0.6);
-            E.drawRealGlyph(ctx, 'wen_zhou', { x: 960 + 260 * side, y: 520, size: 660, opacity: bz * seg(tt, br + 0.2, br + 1.2), color: (c: string) => rgb(c === 'marque' ? mixc([214, 200, 170], VER, mark) : [214, 200, 170]), glow: 30 * mark + 20 * win(tt, sens, roi, 0.4), glowColor: rgb(VER, 0.6) });
+            const side = seg(tt, orne - 0.2, orne + 0.8), gx = 960 + 260 * side;
+            bronzePlate(ctx, E, bz, gx, 520, 560, 760, seg(tt, GZ1, GZ1 + 2.2));
+            const mark = seg(tt, coeur, coeur + 0.6), gop = bz * seg(tt, GZ1 - 0.2, GZ1 + 0.8);
+            // inscription fondue en relief : ombre portée en bas à droite, éclat en haut à gauche, puis le trait doré
+            E.drawRealGlyph(ctx, 'wen_zhou', { x: gx + 4, y: 524, size: 660, opacity: gop * 0.7, color: () => 'rgb(96,58,22)' });
+            E.drawRealGlyph(ctx, 'wen_zhou', { x: gx - 2, y: 518, size: 660, opacity: gop * 0.8, color: () => 'rgb(255,238,196)' });
+            E.drawRealGlyph(ctx, 'wen_zhou', { x: gx, y: 520, size: 660, opacity: gop, color: (c: string) => rgb(c === 'marque' ? mixc([206, 158, 86], VER, mark) : [206, 158, 86]), glow: 30 * mark + 20 * win(tt, sens, roi, 0.4), glowColor: rgb(VER, 0.6) });
             if (side > 0) E.drawRealGlyph(ctx, 'wen_jiaguwen', { x: 960 - 520 * side, y: 520, size: 440, opacity: bz * side, color: manCol(0, 1) });
           }
           // 文王 « l'orné » (vermillon), puis 武王 « le guerrier » à côté ; enfin : le raffinement… et la force
@@ -605,7 +660,7 @@ const Zhou: React.FC = () => {
       }} />
       <ClipShot src="taibo" from={reg - 0.8} len={br - 0.3 - (reg - 0.8)} entry="nuages" inDur={2.4} />
       <Caption text="Taibo 太伯, l'aîné, s'enfuit vers le sud et se fait tatouer (Shiji, 吳太伯世家)" a={win(t, taibo + 0.2, mapTo - 0.1, 0.5)} y={980} size={38} />
-      <Caption text="bronze Zhou (師害簋) : un vrai cœur sur la poitrine" a={win(t, coeur + 0.3, orne - 0.2, 0.5)} y={980} size={44} />
+      <Caption text="inscription fondue dans un vase gui (師害簋) : un vrai cœur sur la poitrine" a={win(t, coeur + 0.3, orne - 0.2, 0.5)} y={980} size={44} />
       <Caption text="os (Shang) → bronze (Zhou) : la marque devient un ornement" a={win(t, orne + 0.4, sens - 0.2, 0.5)} y={980} size={44} />
       <Caption text="deuxième sens : l'ornement, le raffinement" a={win(t, sens + 0.2, roi - 0.3, 0.5)} y={980} size={50} />
       <Caption text="文王 · le roi Wen, comme notre caractère : « l'orné »" a={win(t, roi + 0.4, fils - 0.2, 0.5)} y={980} size={48} />
@@ -619,6 +674,7 @@ const Zhou: React.FC = () => {
 // poitrine, à Chu le cœur sort du corps → rouleau 2 (pendant la pause de la voix)
 const Bambou: React.FC = () => {
   const t = useT();
+  const slips = useImage('episodes/wen/images/bambou.jpg');
   const A4 = A('b04'), mot = at('b04', 'motifs'), ecr = at('b04', 'ecriture'), bam = at('b04', 'bambou'), sens = at('b04', 'sens'), quitte = at('b04', 'quitte'), chuT = at('b04', 'chu'), sort = at('b04', 'sort');
   return (
     <AbsoluteFill>
@@ -629,11 +685,10 @@ const Bambou: React.FC = () => {
           <Draw draw={(ctx, tt, E) => {
             const latte = win(tt, mot - 0.3, P4 + 0.2, 0.6);
             if (latte <= 0) return;
-            ctx.save(); ctx.globalAlpha = latte;
-            const g = ctx.createLinearGradient(700, 0, 1220, 0); g.addColorStop(0, '#c9a868'); g.addColorStop(0.5, '#dcc084'); g.addColorStop(1, '#bf9c5c');
-            ctx.fillStyle = g; E.roundRect(ctx, 700, 90, 520, 900, 22); ctx.fill();
-            ctx.restore();
-            const o = { x: 960, y: 540, size: 520 };
+            // les lattes (photo), cadrées sur la latte du milieu ; l'encre est « bue » par le bambou (multiply)
+            if (slips) coverImg(ctx, slips, latte, 2.05 + 0.08 * seg(tt, mot, P4), 0.505, 0.5);
+            ctx.save(); ctx.globalCompositeOperation = 'multiply';
+            const o = { x: 960, y: 540, size: 440 };
             // le 文 du bronze tracé sur la latte ; les traits qui se croisent (bras, jambes) s'allument en azurite ;
             // puis la marque quitte la poitrine
             const pre = seg(tt, mot + 0.2, mot + 1.2) * (1 - seg(tt, quitte + 1.0, quitte + 1.5));
@@ -652,6 +707,7 @@ const Bambou: React.FC = () => {
               E.drawRealGlyph(ctx, 'wen_chu', { ...o, opacity: latte * chu, color: () => rgb(VER), alpha: (c: string) => (c === 'marque' ? 1 : 0), glow: 24, glowColor: rgb(VER, 0.6) });
               ctx.restore();
             }
+            ctx.restore();
           }} />
         </TimeScrollStage>
       </Cam>
