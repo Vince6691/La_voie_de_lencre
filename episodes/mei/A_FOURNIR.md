@@ -90,3 +90,19 @@ Elegant, airy, scholarly; clean high-contrast line art suitable for vectorizing.
 Notes : rien que du trait sur blanc pur, pour que je puisse extraire les lignes et animer le dessin trait par trait (les
 caractères du vers se défont en lignes qui tracent le portrait). Plein pied, au centre : 美 « beau » reste à gauche et 惡 « laid »
 à droite. Format 16:9, au moins 1920 px de large.
+
+## Clip A v2 « la danse de la pluie » — Seedance, 8 s, à partir de l'image « Danseur v2 » → `clips/03_danseur_v2.mp4`
+Montage prévu : plus de rouleau du temps à rebours. « Remontons à l'origine… » → les nuages passent → ce clip →
+sur la pose finale, j'isole la silhouette du danseur (sur le ciel) et elle se change en 美 de l'os.
+```
+8-second shot, 16:9, 24 fps. Start from the reference image: the rain dancer stands face-on on dry cracked earth under heavy storm clouds, drummer and villagers small in the background.
+0–1 s: stillness; the drummer strikes the leather drum, dust trembles at the dancer's feet.
+1–5 s: rain dance in place, never turning his back: he stamps one bare foot then the other in time with the drum, raises both arms toward the clouds with the white oxtail tassels whipping in the wind, brings them down to his sides; the four tall pheasant feathers sway with each step.
+5–6 s: he lets the two tassels fall to the ground and opens into the final pose.
+6–8 s: frozen, perfectly frontal and symmetrical: legs planted wide apart, straight arms spread down and outward at about 45 degrees, empty open hands, head up, the four feathers standing tall, the two outer ones curving outward; only the feathers and tunic hem move slightly in the wind.
+Camera: low angle, slow push-in from full shot during the dance, then locked off from 5 s; the whole figure, feathers and feet, stays inside the frame with margin. The dancer is silhouetted against the bright grey sky: no person, pole or object overlapping his outline behind him.
+Style: 3D animated film, semi-realistic cartoon render, matte, warm amber side light, cool storm shadow. No text, no subtitles, no music, no voice; ambient sound only: drum beats, wind, distant thunder at the end.
+```
+Pourquoi : pose finale = le signe de l'os (bras ouverts vers le bas, jambes écartées, quatre plumes) ; mains vides (les queues de
+bœuf tombent) pour un contour propre ; ciel clair derrière et caméra fixe à la fin pour détourer la silhouette sur les dernières
+images ; jamais de dos (cohérence du personnage).
