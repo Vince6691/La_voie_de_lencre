@@ -15,6 +15,7 @@ import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
 import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
+import { dancerPose, drawDancer, drawDiviner, drawScreen } from '../piying/Piying';
 import { VideoReveal } from '../video_encre/VideoReveal';
 import { loadLegacy, W } from '../legacy';
 import rep from '../data/episodes/mei.json';
@@ -177,20 +178,6 @@ const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; ch
 };
 
 // plastron de tortue à l'encre (contour, plaques), chauffé en un point, puis fendu en forme de 卜
-const plastron = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number, heat: number, crack: number) => {
-  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
-  ctx.fillStyle = 'rgba(214,196,160,0.35)'; ctx.strokeStyle = inkCss; ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(0, -330); ctx.bezierCurveTo(190, -330, 230, -120, 215, 40); ctx.bezierCurveTo(205, 220, 120, 330, 0, 340); ctx.bezierCurveTo(-120, 330, -205, 220, -215, 40); ctx.bezierCurveTo(-230, -120, -190, -330, 0, -330); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.lineWidth = 2.5; ctx.strokeStyle = rgb(INK, 0.5);
-  ctx.beginPath(); ctx.moveTo(0, -330); ctx.lineTo(0, 340); for (const yy of [-180, -40, 110, 240]) { ctx.moveTo(-200, yy + 20); ctx.quadraticCurveTo(0, yy - 20, 200, yy + 20); } ctx.stroke();
-  if (heat > 0) { const g = ctx.createRadialGradient(70, -40, 0, 70, -40, 60); g.addColorStop(0, `rgba(220,70,30,${0.85 * heat})`); g.addColorStop(1, 'rgba(220,70,30,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(70, -40, 60, 0, 7); ctx.fill(); }
-  if (crack > 0) {
-    ctx.strokeStyle = inkCss; ctx.lineWidth = 4; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 6 * crack, -40 - 150 * crack); ctx.lineTo(66, -40 - 210 * crack); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 70 * crack, -40 - 50 * crack); ctx.lineTo(70 + 120 * crack, -40 - 64 * crack); ctx.stroke();
-  }
-  ctx.restore();
-};
 // vase tripode (ding) en bronze, en lavis vert-de-gris
 const ding = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number) => {
   if (a <= 0) return;
@@ -202,23 +189,6 @@ const ding = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number) =>
   ctx.strokeStyle = 'rgba(40,52,46,0.55)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-290, -120); ctx.lineTo(290, -120); ctx.stroke();
   ctx.restore();
 };
-// un mouton dodu à l'encre (laine en volutes, tête sombre, quatre pattes)
-const WOOL = (() => { const r = rng(31); return Array.from({ length: 15 }, (_, i) => { const a = (i / 15) * Math.PI * 2; return [Math.cos(a) * (0.95 + 0.1 * r()), Math.sin(a) * (0.62 + 0.08 * r()), 0.32 + 0.1 * r()]; }); })();
-const sheep = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, a: number, col = GOM, flip = false) => {
-  if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(flip ? -s : s, s);
-  ctx.strokeStyle = inkCss; ctx.lineWidth = 6 / Math.max(0.3, s) * 0.5; ctx.lineCap = 'round';
-  for (const lx of [-0.55, -0.25, 0.25, 0.55]) { ctx.beginPath(); ctx.moveTo(lx * 100, 40); ctx.lineTo(lx * 100 + 4, 105); ctx.stroke(); }
-  ctx.fillStyle = rgb(mixc(PAPERWHITE, col, 0.35));
-  for (const [wx, wy, wr] of WOOL) { ctx.beginPath(); ctx.arc(wx * 100, wy * 100, wr * 100, 0, 7); ctx.fill(); ctx.stroke(); }
-  ctx.beginPath(); ctx.ellipse(0, 0, 100, 62, 0, 0, 7); ctx.fill();
-  ctx.fillStyle = inkCss;
-  ctx.beginPath(); ctx.ellipse(118, -38, 34, 26, -0.4, 0, 7); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(98, -58, 16, 8, -1.1, 0, 7); ctx.fill();
-  ctx.fillStyle = rgb(PAPERWHITE); ctx.beginPath(); ctx.arc(128, -44, 4, 0, 7); ctx.fill();
-  ctx.restore();
-};
-
 // stèle de marbre (dynastie Song), 羊大則美 gravé en creux, caractère par caractère (carve : 0 → 4)
 const stele = (ctx: CanvasRenderingContext2D, E: any, x: number, y: number, a: number, carve: number, seal: number) => {
   if (a <= 0) return;
@@ -257,16 +227,13 @@ const FREEZE = at('b01', 'gros') + 1.0; // tout se fige sur « …un gros mouton
 const CRACK = B('b02') + 0.25, SHATTER = CRACK + 1.0, BARE = SHATTER + 1.4;
 // la scène de l'accroche, dessinée au temps tt (figé après FREEZE) — sert aussi aux éclats de la cassure
 const drawOpening = (ctx: CanvasRenderingContext2D, E: any, tt: number, part: 'tout' | 'reste' | 'stele' = 'tout') => {
-  const A1 = A('b01'), mt = at('b01', 'mouton'), dico = at('b01', 'dico'), haut = at('b01', 'haut'), grand = at('b01', 'grand'), bon = at('b01', 'bon'), song = at('b01', 'song'), marbre = at('b01', 'marbre'), maxime = at('b01', 'maxime'), ent = at('b01', 'entendu'), gros = at('b01', 'gros');
+  const A1 = A('b01'), mt = at('b01', 'mouton'), dico = at('b01', 'dico'), haut = at('b01', 'haut'), grand = at('b01', 'grand'), song = at('b01', 'song'), marbre = at('b01', 'marbre'), maxime = at('b01', 'maxime'), ent = at('b01', 'entendu'), gros = at('b01', 'gros');
   // 美 tracé ; le haut (羊) en gomme-gutte sur « le caractère du mouton », le bas (大) en azurite sur « grand »
   const coif = seg(tt, mt + 0.6, mt + 1.2), man = seg(tt, grand, grand + 0.5);
   const toLeft = seg(tt, song - 0.6, song + 0.6); // le 美 se range à gauche quand la stèle arrive
   const mx = MEI.x - 0 * toLeft, my = MEI.y, ms = MEI.size * (1 - 0.18 * toLeft);
   if (part !== 'stele') E.drawStrokes(ctx, 'mei_regulier', { x: mx, y: my, size: ms, progress: 9 * seg(tt, A1 - 0.1, A1 + 2.4), brush: false,
     color: (c: string) => rgb(c === 'coiffe' ? mixc(INK, GOM, coif) : mixc(INK, AZ, man)), glow: 22 * coif * win(tt, mt + 0.6, dico, 0.4), glowColor: rgb(GOM, 0.6) });
-  // le gros mouton dodu, sur « un gros mouton, c'est bon »
-  const sh = seg(tt, bon - 0.1, bon + 0.7);
-  if (part !== 'stele') sheep(ctx, mx + 30, my + 330 - 40 * sh, 0.85 + 0.25 * seg(tt, gros - 0.2, gros + 0.4), sh);
   // la stèle de la dynastie Song : 羊大則美 gravé, le sceau posé avec assurance
   const st = seg(tt, song + 0.2, song + 1.2);
   if (part !== 'reste') stele(ctx, E, STELE.x, STELE.y, st, 4 * seg(tt, marbre + 0.3, maxime - 0.2), seg(tt, maxime + 0.1, maxime + 0.4));
@@ -371,30 +338,21 @@ const Opening: React.FC = () => {
   );
 };
 
-// ════════════════ 1 bis. Derrière le papier nu, l'ombre du danseur (clip A passé en ombre, outils/video_shuimo/ombre_clip.py)
-// apparaît après la cassure, danse sur « Remontons à l'origine… », se fige de face et devient le signe de l'os
-const SH0 = SHATTER + 1.0, SHFRZ = A('b03') + 1.4;
+// ════════════════ 1 bis. Derrière le papier nu, une lampe s'allume : ombre chinoise (皮影) du danseur de la pluie
+// il danse sur « Remontons à l'origine… », se fige de face, bras et jambes écartés, coiffé de quatre plumes : le signe de l'os
+const SH0 = SHATTER + 0.5, SHFRZ = A('b03') + 1.4;
 const ShadowDancer: React.FC = () => {
   const { fps } = useVideoConfig();
-  const len = SHFRZ + 0.3 - SH0;
+  const len = SHFRZ + 0.6 - SH0;
   return (
     <Sequence from={Math.round(SH0 * fps)} durationInFrames={Math.round(len * fps)}>
-      <ShadowInner len={len} />
+      <Draw draw={(ctx, u) => {
+        const tt = SH0 + u, q = arrivePose(TR1, SHFRZ);
+        drawScreen(ctx, 0.92 * seg(tt, SH0, SH0 + 0.7) * (1 - seg(tt, SHFRZ, SHFRZ + 0.55)), tt, q.x, q.y);
+        const d = dancerPose(tt - SH0, SHFRZ - SH0);
+        drawDancer(ctx, { x: q.x, y: q.y, size: 640 * q.s, pose: d.pose, sway: d.sway, t: tt, alpha: seg(tt, SH0 + 0.2, SH0 + 0.8) * (1 - seg(tt, SHFRZ - 0.15, SHFRZ + 0.3)) });
+      }} />
     </Sequence>
-  );
-};
-const ShadowInner: React.FC<{ len: number }> = ({ len }) => {
-  const u = useT();
-  const a = seg(u, 0, 0.9) * (1 - seg(u, len - 0.75, len));
-  const { fps } = useVideoConfig();
-  return (
-    <AbsoluteFill style={{ opacity: a }}>
-      {/* lumière chaude derrière le papier, comme une lanterne */}
-      <AbsoluteFill style={{ background: 'radial-gradient(ellipse 34% 46% at 50% 52%, rgba(255,196,120,0.38), rgba(255,196,120,0) 100%)' }} />
-      <AbsoluteFill style={{ mixBlendMode: 'multiply', filter: 'blur(4px)', opacity: 0.72, transform: 'translate(60px, 50px) scale(0.86)' }}>
-        <OffthreadVideo src={staticFile('episodes/mei/clips/03_danseur_ombre.mp4')} startFrom={Math.round((CLIP_SRC_SECONDS - (len - 0.25)) * fps)} muted style={{ width: '100%', height: '100%' }} />
-      </AbsoluteFill>
-    </AbsoluteFill>
   );
 };
 
@@ -420,8 +378,14 @@ const Shang: React.FC = () => {
             }
             // l'os : plastron tamponné, le signe révélé en blanc puis à l'encre ; l'homme (azurite), la coiffe (malachite)
             // la divination : un plastron d'os à l'encre, chauffé (point rouge), qui se fend (fissures en 卜)
-            const shell = win(tt, A4 - 0.3, os + 0.8, 0.6);
-            if (shell > 0) plastron(ctx, 960, 540, shell, seg(tt, fis - 1.6, fis - 0.6), seg(tt, fis - 0.4, fis + 0.8));
+            // la divination en ombre chinoise : le devin grave la question, chauffe la tige au brasero, l'os se fend
+            const shell = win(tt, A4 - 0.4, os + 0.5, 0.6);
+            if (shell > 0) {
+              drawScreen(ctx, shell, tt, 1040, 470);
+              const grave = at('b04', 'grave');
+              drawDiviner(ctx, 740, 900, 1.2, { alpha: shell, t: tt, carve: seg(tt, grave - 0.1, grave + 1.6), dip: seg(tt, fis - 2.4, fis - 1.9) * (1 - seg(tt, fis - 1.3, fis - 0.9)),
+                heat: seg(tt, fis - 1.1, fis - 0.2), crack: seg(tt, fis - 0.1, fis + 0.7), read: seg(tt, fis + 0.9, fis + 1.8) });
+            }
             const rv = seg(tt, os + 0.2, os + 1.4), dry = seg(tt, hom - 0.6, hom + 0.4);
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
             const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
@@ -699,8 +663,6 @@ const Dico: React.FC = () => {
             E.text(ctx, py2, 1200, y - 20, { font: 'Cormorant', size: 44, weight: 700, align: 'left', color: '#5b4f44', alpha: pg });
             E.text(ctx, fr, 1200, y + 26, { font: 'Cormorant', size: 44, align: 'left', color: '#5b4f44', alpha: pg });
           });
-          // un mouton dodu en marge de la page
-          sheep(ctx, 1450, 880, 0.45, seg(tt, trp - 0.2, trp + 0.5), GOM, true);
         }} />
       </Cam>
       <Caption text="l'erreur dure encore : 美 est rangé sous la clé du mouton 羊" a={win(t, cle - 0.2, dico + 0.4, 0.4)} y={1000} size={44} />
