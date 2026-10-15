@@ -35,9 +35,9 @@
   {
    "clip": "b06",
    "pause": {
-    "repere": "maitre",
+    "repere": "autrement",
     "decalage": -0.12,
-    "duree": 4.0
+    "duree": 4.5
    },
    "apres": 0.8
   },
@@ -85,9 +85,13 @@
    "origine": "Remontons"
   },
   "b04": {
+   "rois": "les rois",
+   "grave": "on gravait",
+   "fissures": "dans les fissures",
    "os": "os de divination",
    "homme": "un homme, debout",
    "dawen": "le même que",
+   "corps": "Une tête",
    "coiffe": "une haute coiffe",
    "branches": "quatre branches",
    "mouton": "le mouton a",
@@ -96,34 +100,39 @@
    "pare": "homme paré",
    "danseur": "Un danseur",
    "plumes": "coiffé de plumes",
+   "pluie": "appeler la pluie",
    "terre": "Ces os dormiront",
    "jamais": "n'en a jamais"
   },
   "b05": {
-   "bronze": "coulé dans",
-   "epaissit": "L'homme s'épaissit",
-   "coiffe": "La coiffe se",
+   "bronze": "vases de bronze",
+   "inscr": "des inscriptions",
+   "epaissit": "Le trait s'épaissit",
+   "coiffe": "La coiffe perd",
    "cornes": "des cornes"
   },
   "b06": {
    "royaumes": "Royaumes combattants",
-   "chu": "Au sud",
-   "guodian": "En mille",
-   "tombe": "on ouvre",
-   "lattes": "Sur des lattes",
-   "vers": "Et ce vers",
+   "retrouve": "on a retrouvé",
+   "guodian": "dans le sud",
+   "laozi": "les plus anciens",
+   "vers": "On y lit",
    "beau": "Quand tout",
    "laideur": "voilà la laideur",
+   "autrement": "Autrement dit",
+   "decide": "dès qu'on",
+   "laid": "aussi de ce",
    "maitre": "Le vieux maître"
   },
   "b07": {
    "empereur": "premier empereur",
    "sceau": "le petit sceau",
-   "ordre": "Les scribes",
-   "symetrique": "bien symétrique",
+   "ordre": "Pour unifier",
+   "symetrique": "bien symétriques",
    "cornes": "deux cornes",
    "mouton": "C'est exactement",
    "xushen": "Trois siècles",
+   "neufmille": "neuf mille",
    "yeux": "sous les yeux",
    "savoureux": "savoureux",
    "erreur": "Son erreur",
@@ -545,6 +554,105 @@
     "era": "Qin",
     "piece": "說文·羊部",
     "defaut": "mouton",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_00": {
+    "img": "glyphes/vers/00.png",
+    "label": "天",
+    "era": "Chu",
+    "piece": "帛甲5.18 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_01": {
+    "img": "glyphes/vers/01.png",
+    "label": "下",
+    "era": "Chu",
+    "piece": "郭.老乙.9",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_02": {
+    "img": "glyphes/vers/02.png",
+    "label": "皆",
+    "era": "Chu",
+    "piece": "包2.123 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_03": {
+    "img": "glyphes/vers/03.png",
+    "label": "智",
+    "era": "Chu",
+    "piece": "包2.135 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_04": {
+    "img": "glyphes/vers/04.png",
+    "label": "美",
+    "era": "Chu",
+    "piece": "中山王壺 (Royaumes combattants)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_05": {
+    "img": "glyphes/vers/05.png",
+    "label": "之",
+    "era": "Chu",
+    "piece": "包2.12 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_06": {
+    "img": "glyphes/vers/06.png",
+    "label": "為",
+    "era": "Chu",
+    "piece": "郭.老甲.2",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_07": {
+    "img": "glyphes/vers/07.png",
+    "label": "美",
+    "era": "Chu",
+    "piece": "中山王壺",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_08": {
+    "img": "glyphes/vers/08.png",
+    "label": "也",
+    "era": "Chu",
+    "piece": "郭.語3.66",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_09": {
+    "img": "glyphes/vers/09.png",
+    "label": "惡",
+    "era": "Chu",
+    "piece": "郭.語2.25",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_10": {
+    "img": "glyphes/vers/10.png",
+    "label": "已",
+    "era": "Chu",
+    "piece": "郭.成.36 (巳 = 已)",
+    "defaut": "encre",
     "fusion": 0.0,
     "polys": []
    }

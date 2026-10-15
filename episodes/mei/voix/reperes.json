@@ -29,60 +29,69 @@
   }
  },
  "b04": {
-  "duration": 35.38,
+  "duration": 52.88,
   "cues": {
-   "os": 2.12,
-   "homme": 5.64,
-   "dawen": 8.92,
-   "coiffe": 11.76,
-   "branches": 13.13,
-   "mouton": 17.68,
-   "museau": 19.64,
-   "rien": 22.92,
-   "pare": 25.08,
-   "danseur": 26.2,
-   "plumes": 27.56,
-   "terre": 29.4,
-   "jamais": 34.0
+   "rois": 1.79,
+   "grave": 5.42,
+   "fissures": 9.67,
+   "os": 11.55,
+   "homme": 13.95,
+   "dawen": 17.39,
+   "corps": 19.15,
+   "coiffe": 23.99,
+   "branches": 25.36,
+   "mouton": 29.91,
+   "museau": 31.76,
+   "rien": 35.03,
+   "pare": 37.35,
+   "danseur": 38.51,
+   "plumes": 39.83,
+   "pluie": 43.23,
+   "terre": 46.63,
+   "jamais": 51.51
   }
  },
  "b05": {
-  "duration": 11.15,
+  "duration": 15.17,
   "cues": {
-   "bronze": 2.88,
-   "epaissit": 4.44,
-   "coiffe": 6.12,
-   "cornes": 10.52
+   "bronze": 3.79,
+   "inscr": 5.63,
+   "epaissit": 6.99,
+   "coiffe": 10.11,
+   "cornes": 14.59
   }
  },
  "b06": {
-  "duration": 24.32,
+  "duration": 27.21,
   "cues": {
-   "royaumes": 2.79,
-   "chu": 4.27,
-   "guodian": 6.91,
-   "tombe": 9.79,
-   "lattes": 12.35,
-   "vers": 16.27,
-   "beau": 17.69,
-   "laideur": 20.35,
-   "maitre": 22.19
+   "royaumes": 3.23,
+   "retrouve": 6.03,
+   "guodian": 9.43,
+   "laozi": 10.99,
+   "vers": 14.11,
+   "beau": 15.21,
+   "laideur": 17.63,
+   "autrement": 19.42,
+   "decide": 20.56,
+   "laid": 23.19,
+   "maitre": 25.07
   }
  },
  "b07": {
-  "duration": 29.9,
+  "duration": 39.19,
   "cues": {
-   "empereur": 0.8,
-   "sceau": 4.08,
-   "ordre": 5.52,
-   "symetrique": 8.32,
-   "cornes": 9.6,
-   "mouton": 11.56,
-   "xushen": 14.64,
-   "yeux": 18.84,
-   "savoureux": 23.84,
-   "erreur": 25.15,
-   "ecriture": 27.4
+   "empereur": 0.84,
+   "sceau": 4.16,
+   "ordre": 5.64,
+   "symetrique": 10.08,
+   "cornes": 12.56,
+   "mouton": 14.68,
+   "xushen": 18.2,
+   "neufmille": 23.16,
+   "yeux": 28.0,
+   "savoureux": 33.24,
+   "erreur": 34.55,
+   "ecriture": 36.68
   }
  },
  "b08": {
@@ -153,38 +162,38 @@
    },
    "b04": {
     "debut": 53.1,
-    "duree": 35.38
+    "duree": 52.88
    },
    "b05": {
-    "debut": 89.28,
-    "duree": 11.15
+    "debut": 106.78,
+    "duree": 15.17
    },
    "b06": {
-    "debut": 104.63,
-    "duree": 24.32,
+    "debut": 126.15,
+    "duree": 27.21,
     "pause": {
-     "coupe": 22.07,
-     "duree": 4.0
+     "coupe": 19.3,
+     "duree": 4.5
     }
    },
    "b07": {
-    "debut": 133.75,
-    "duree": 29.9
+    "debut": 158.66,
+    "duree": 39.19
    },
    "b10": {
-    "debut": 164.25,
+    "debut": 198.45,
     "duree": 12.86
    },
    "b11": {
-    "debut": 178.11,
+    "debut": 212.31,
     "duree": 13.87
    },
    "b08": {
-    "debut": 192.98,
+    "debut": 227.18,
     "duree": 24.28
    },
    "b09": {
-    "debut": 218.46,
+    "debut": 252.66,
     "duree": 12.55
    }
   },
@@ -194,18 +203,18 @@
     "duree": 6
    },
    {
-    "debut": 100.83,
+    "debut": 122.35,
     "duree": 3.5
    }
   ],
   "pauses": [
    [
-    126.7,
-    4.0
+    145.45,
+    4.5
    ]
   ],
-  "fin": 231.31,
-  "total": 234.51,
+  "fin": 265.51,
+  "total": 268.71,
   "bruitages": [
    [
     "pinceau",
@@ -244,82 +253,82 @@
    ],
    [
     "sceau",
-    55.42,
+    64.85,
     0.55
    ],
    [
     "gravure",
-    55.82,
+    65.25,
     0.4
    ],
    [
     "sceau",
-    70.78,
+    83.01,
     0.45
    ],
    [
     "sceau",
-    92.16,
+    110.57,
     0.5
    ],
    [
     "pinceau",
-    120.9,
+    140.26,
     0.35
    ],
    [
     "pinceau",
-    123.32,
+    142.36,
     0.3
    ],
    [
     "gong",
-    146.61,
+    174.64,
     0.4
    ],
    [
     "sceau",
-    174.23,
+    208.43,
     0.45
    ],
    [
     "pinceau",
-    184.47,
+    218.67,
     0.4
    ],
    [
     "pinceau",
-    185.67,
+    219.87,
     0.4
    ],
    [
     "pinceau",
-    186.83,
+    221.03,
     0.4
    ],
    [
     "pinceau",
-    189.51,
+    223.71,
     0.4
    ],
    [
     "pinceau",
-    191.05,
+    225.25,
     0.4
    ],
    [
     "gong",
-    204.76,
+    238.96,
     0.35
    ],
    [
     "sceau",
-    209.28,
+    243.48,
     0.45
    ],
    [
     "gong",
-    230.26,
+    264.46,
     0.35
    ]
   ]

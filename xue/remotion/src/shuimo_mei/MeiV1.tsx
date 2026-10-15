@@ -176,6 +176,32 @@ const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; ch
   return <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${960 - cx * s}px, ${540 - cy * s}px) scale(${s})` }}>{children}</AbsoluteFill>;
 };
 
+// plastron de tortue à l'encre (contour, plaques), chauffé en un point, puis fendu en forme de 卜
+const plastron = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number, heat: number, crack: number) => {
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
+  ctx.fillStyle = 'rgba(214,196,160,0.35)'; ctx.strokeStyle = inkCss; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(0, -330); ctx.bezierCurveTo(190, -330, 230, -120, 215, 40); ctx.bezierCurveTo(205, 220, 120, 330, 0, 340); ctx.bezierCurveTo(-120, 330, -205, 220, -215, 40); ctx.bezierCurveTo(-230, -120, -190, -330, 0, -330); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.lineWidth = 2.5; ctx.strokeStyle = rgb(INK, 0.5);
+  ctx.beginPath(); ctx.moveTo(0, -330); ctx.lineTo(0, 340); for (const yy of [-180, -40, 110, 240]) { ctx.moveTo(-200, yy + 20); ctx.quadraticCurveTo(0, yy - 20, 200, yy + 20); } ctx.stroke();
+  if (heat > 0) { const g = ctx.createRadialGradient(70, -40, 0, 70, -40, 60); g.addColorStop(0, `rgba(220,70,30,${0.85 * heat})`); g.addColorStop(1, 'rgba(220,70,30,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(70, -40, 60, 0, 7); ctx.fill(); }
+  if (crack > 0) {
+    ctx.strokeStyle = inkCss; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 6 * crack, -40 - 150 * crack); ctx.lineTo(66, -40 - 210 * crack); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 70 * crack, -40 - 50 * crack); ctx.lineTo(70 + 120 * crack, -40 - 64 * crack); ctx.stroke();
+  }
+  ctx.restore();
+};
+// vase tripode (ding) en bronze, en lavis vert-de-gris
+const ding = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number) => {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
+  ctx.fillStyle = 'rgba(92,120,104,0.55)'; ctx.strokeStyle = 'rgba(40,52,46,0.9)'; ctx.lineWidth = 6;
+  for (const lx of [-170, 0, 170]) { ctx.beginPath(); ctx.moveTo(lx - 18, 160); ctx.lineTo(lx - 10, 330); ctx.lineTo(lx + 10, 330); ctx.lineTo(lx + 18, 160); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  ctx.beginPath(); ctx.moveTo(-300, -170); ctx.lineTo(300, -170); ctx.bezierCurveTo(300, 120, 200, 220, 0, 220); ctx.bezierCurveTo(-200, 220, -300, 120, -300, -170); ctx.closePath(); ctx.fill(); ctx.stroke();
+  for (const sx of [-1, 1]) { ctx.beginPath(); ctx.moveTo(sx * 180, -170); ctx.lineTo(sx * 180, -270); ctx.lineTo(sx * 250, -270); ctx.lineTo(sx * 250, -170); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(40,52,46,0.55)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-290, -120); ctx.lineTo(290, -120); ctx.stroke();
+  ctx.restore();
+};
 // un mouton dodu à l'encre (laine en volutes, tête sombre, quatre pattes)
 const WOOL = (() => { const r = rng(31); return Array.from({ length: 15 }, (_, i) => { const a = (i / 15) * Math.PI * 2; return [Math.cos(a) * (0.95 + 0.1 * r()), Math.sin(a) * (0.62 + 0.08 * r()), 0.32 + 0.1 * r()]; }); })();
 const sheep = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, a: number, col = GOM, flip = false) => {
@@ -361,12 +387,12 @@ const ShadowInner: React.FC<{ len: number }> = ({ len }) => {
 // ════════════════ 2. « Remontons à l'origine… » → rouleau à rebours (Song → Shang) → la dynastie Shang
 const Shang: React.FC = () => {
   const t = useT();
-  const A3 = A('b03'), A4 = A('b04'), os = at('b04', 'os'), hom = at('b04', 'homme'), dw = at('b04', 'dawen'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
+  const A3 = A('b03'), A4 = A('b04'), fis = at('b04', 'fissures'), corps = at('b04', 'corps'), pluie = at('b04', 'pluie'), os = at('b04', 'os'), hom = at('b04', 'homme'), dw = at('b04', 'dawen'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
   const clipIn = pare - 0.4, clipOut = terre - 0.2;
   return (
     <AbsoluteFill>
       <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [R1 - 0.4, 960, 540, 1, 0.4], [os + 0.4, 960, 520, 1.06, 1.4], [coif - 0.3, 960, 330, 1.3, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [rien, 960, 520, 1.06, 1.0], [terre, 960, 560, 1.02, 1.0]]}
-        punch={[os + 1.2, coif + 0.3, rien + 0.2]} calm={[[R1 - 0.4, R1E + 0.3]]}>
+        punch={[fis + 0.2, os + 1.2, corps, coif + 0.3, rien + 0.2]} calm={[[R1 - 0.4, R1E + 0.3]]}>
         <TimeScrollStage cfg={TR1} under={<Paper />}
           fromLandscape={{ seed: 22, since: A3 - 0.6, mood: 'brume' }} toLandscape={{ seed: 14, until: A('b05') + 0.5, mood: 'aube' }}>
           <Draw draw={(ctx, tt, E) => {
@@ -379,8 +405,9 @@ const Shang: React.FC = () => {
               return;
             }
             // l'os : plastron tamponné, le signe révélé en blanc puis à l'encre ; l'homme (azurite), la coiffe (malachite)
-            const plate = win(tt, os - 0.4, clipIn + 0.6, 0.7);
-            void plate; // plus de plaque sombre : le signe se grave directement sur le papier
+            // la divination : un plastron d'os à l'encre, chauffé (point rouge), qui se fend (fissures en 卜)
+            const shell = win(tt, A4 - 0.3, os + 0.8, 0.6);
+            if (shell > 0) plastron(ctx, 960, 540, shell, seg(tt, fis - 1.6, fis - 0.6), seg(tt, fis - 0.4, fis + 0.8));
             const rv = seg(tt, os + 0.2, os + 1.4), dry = seg(tt, hom - 0.6, hom + 0.4);
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
             const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
@@ -414,11 +441,14 @@ const Shang: React.FC = () => {
       <ClipShot src="danseur" from={clipIn} len={clipOut - clipIn} />
       <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, R1 + 0.3, 0.4)} y={960} size={52} />
       <Label x={1300} y={760} zh="大" text="un homme, de face" color={AZ} a={win(t, hom + 0.3, dw - 0.2, 0.4)} />
-      <Caption text="le même homme de face que dans 文 (épisode précédent)" a={win(t, dw, coif - 0.3, 0.4)} y={960} size={42} />
+      <Caption text="la divination : on grave la question, on chauffe l'os, on lit les fissures" a={win(t, A4 + 1.6, os - 0.2, 0.5)} y={960} size={42} />
+      <Caption text="le même homme de face que dans 文 (épisode précédent)" a={win(t, dw, corps - 0.1, 0.4)} y={960} size={42} />
+      <Caption text="une tête · deux bras ouverts · deux jambes écartées" a={win(t, corps, coif - 0.3, 0.4)} y={960} size={46} />
       <Label x={1330} y={300} zh="" text="une haute coiffe" color={MAL} a={win(t, coif + 0.2, mt - 0.4, 0.4)} />
       <Caption text={t < br + 0.6 ? 'quatre branches, dressées vers le ciel' : 'parfois deux (甲686)'} a={win(t, br, mt - 0.4, 0.4)} y={960} size={46} />
       <Caption text="羊 sur l'os : un museau en pointe, deux cornes qui retombent" a={win(t, mus - 0.2, rien + 0.4, 0.4)} y={960} size={44} />
       <Caption text="un homme paré — un danseur, sans doute, coiffé de plumes" a={win(t, rien + 0.6, clipIn + 0.6, 0.4)} y={960} size={44} />
+      <Caption text="les inscriptions Shang mentionnent des danses pour appeler la pluie" a={win(t, pluie - 0.1, terre - 0.3, 0.4)} y={990} size={40} />
       <Caption text="les os de divination ne sont redécouverts qu'en 1899" a={win(t, terre + 0.2, jam + 0.2, 0.5)} y={960} size={44} />
       <Caption text="Xu Shen n'en a jamais vu un seul" a={win(t, jam - 0.2, A('b05') - 0.2, 0.4)} y={960} size={48} />
       <EraTag zh="商" name="DYNASTIE SHANG" dates="Anyang · v. 1200 av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
@@ -429,7 +459,7 @@ const Shang: React.FC = () => {
 // ════════════════ 3. La dynastie Zhou : le bronze, la coiffe se resserre et se courbe → rouleau 2
 const Zhou: React.FC = () => {
   const t = useT();
-  const A5 = A('b05'), bz = at('b05', 'bronze'), ep = at('b05', 'epaissit'), cf = at('b05', 'coiffe'), co = at('b05', 'cornes');
+  const A5 = A('b05'), ins = at('b05', 'inscr'), bz = at('b05', 'bronze'), ep = at('b05', 'epaissit'), cf = at('b05', 'coiffe'), co = at('b05', 'cornes');
   return (
     <AbsoluteFill>
       <Cam keys={[[A5 - 0.3, 960, 540, 1.02], [ep, 960, 560, 1.06, 1.0], [cf - 0.2, 960, 380, 1.25, 1.0], [R2 - 0.5, 960, 540, 1, 0.5]]} punch={[bz + 0.6, co + 0.2]} calm={[[R2 - 0.5, R2E + 0.3]]}>
@@ -440,12 +470,17 @@ const Zhou: React.FC = () => {
             if (a <= 0) return;
             const side = seg(tt, cf + 1.6, cf + 2.4) * (1 - seg(tt, co - 0.3, co));
             const c1 = seg(tt, cf, cf + 0.5), horn = seg(tt, co - 0.1, co + 0.6);
-            E.drawRealGlyph(ctx, 'mei_jinwen', { x: 960 + 240 * side, y: 540, size: 680, opacity: a * seg(tt, bz, bz + 1), color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, c1), GOM, 0.55 * horn) : mixc(INK, AZ, seg(tt, ep, ep + 0.5))), glow: 24 * c1, glowColor: rgb(horn > 0.5 ? GOM : MAL, 0.6) });
+            // le vase de bronze ; l'inscription y est coulée, puis elle sort du vase et grandit
+            const out = ease(seg(tt, ep - 0.2, ep + 1.0));
+            ding(ctx, 960, 560, a * seg(tt, bz - 0.5, bz + 0.4) * (1 - out));
+            const gy = 520 + 40 * (1 - out), gs = 300 + 380 * out;
+            E.drawRealGlyph(ctx, 'mei_jinwen', { x: 960 + 240 * side, y: gy, size: gs, reveal: () => seg(tt, ins - 0.2, ins + 1.0), opacity: a * seg(tt, ins - 0.3, ins + 0.3), color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, c1), GOM, 0.55 * horn) : mixc(INK, AZ, seg(tt, ep, ep + 0.5))), glow: 24 * c1, glowColor: rgb(horn > 0.5 ? GOM : MAL, 0.6) });
             if (side > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: 960 - 500 * side, y: 540, size: 440, opacity: a * side, color: meiCol(1, 1) });
           }} />
         </TimeScrollStage>
       </Cam>
-      <Caption text="bronze Zhou (美爵) : l'homme s'épaissit" a={win(t, bz + 0.4, cf - 0.2, 0.5)} y={980} size={46} />
+      <Caption text="un vase rituel en bronze (ding) : l'inscription est coulée avec le métal" a={win(t, bz, ep - 0.2, 0.5)} y={980} size={42} />
+      <Caption text="bronze Zhou (美爵) : le trait s'épaissit, devient plus régulier" a={win(t, ep, cf - 0.2, 0.5)} y={980} size={44} />
       <Caption text="os (Shang) → bronze (Zhou) : la coiffe se resserre, ses branches se courbent" a={win(t, cf + 1.6, co - 0.3, 0.4)} y={980} size={42} />
       <Caption text="…et l'on commence à y voir des cornes" a={win(t, co - 0.2, R2 + 0.2, 0.4)} y={980} size={48} />
       <EraTag zh="周" name="DYNASTIE ZHOU" dates="XIe siècle av. J.-C." a={seg(t, A5 - 0.6, A5 + 0.2) * (1 - seg(t, R2, R2 + 0.4))} />
@@ -458,99 +493,83 @@ const Zhou: React.FC = () => {
 const GUODIAN = [112.2, 31.05], YING = [112.2, 30.4];
 // le royaume de Chu (vers 300 av. J.-C.), contour simplifié : moyen Yangzi, de la Han au lac Dongting
 const CHU = [[108.6, 32.6], [111.2, 33.6], [114.6, 33.6], [117.2, 33.0], [119.4, 31.6], [118.6, 29.4], [115.6, 28.0], [112.4, 27.0], [109.6, 27.6], [108.0, 29.8]];
-const VERSE = '天下皆知美之為美斯惡已'.split('');
+// le vers tel qu'il est écrit à Guodian (Laozi A) : 天下皆智(知)美之為美也，惡已 — formes de Chu (glyphes/vers/SOURCE.md)
+const VERSE = '天下皆知美之為美也惡已'.split('');
 const NS = VERSE.length;
-// bande de l'image de Laozi (largeur relative) : les lattes forment la silhouette (l'image est en 16:9, plein cadre)
-const FIG = { x0: 0.355, x1: 0.62 };
+const HEART = [1920 * 0.52, 1080 * 0.4];
 let washCanvas: HTMLCanvasElement | null = null, maskCanvas: HTMLCanvasElement | null = null;
-const laoziCalligram = (ctx: CanvasRenderingContext2D, E: any, tt: number, T: { vers: number; laideur: number; p0: number; p1: number; maitre: number }) => {
+// le portrait de Laozi qui s'étend en taches de lavis depuis un point (bord irrégulier, posé en multiplication)
+const laoziWash = (ctx: CanvasRenderingContext2D, wash: number, R = 780) => {
   const img = laoziImg.img;
-  const sw = (1920 * (FIG.x1 - FIG.x0)) / NS;
-  const step = (T.laideur - T.vers) / NS;
-  const HEART = [1920 * 0.52, 1080 * 0.4];
-  // 3. le lavis : le portrait entier s'étend depuis le cœur, bord irrégulier (comme l'encre qui boit le papier)
-  const wash = seg(tt, T.p1 - 1.0, T.p1 + 1.4);
-  for (let i = 0; i < NS; i++) {
-    // 1. chaque latte tombe (légère rotation, petit rebond), puis son caractère s'écrit de haut en bas
-    const t0 = T.vers + i * step;
-    const fall = clamp((tt - t0) / 0.55);
-    if (fall <= 0) continue;
-    const bounce = fall < 1 ? 1 - Math.pow(1 - fall, 3) : 1 + 0.02 * Math.sin((tt - t0 - 0.55) * 14) * Math.exp(-(tt - t0 - 0.55) * 5);
-    const sx = 1640 - i * 104, sy = 140 - 700 * (1 - bounce), sh = 780, sr = (1 - fall) * (i % 2 ? 0.18 : -0.14);
-    // 2. pendant la pause : la latte pivote sur elle-même (comme une carte) et montre au dos sa tranche du portrait,
-    //    en glissant à sa place dans la silhouette
-    const f = seg(tt, T.p0 + 0.15 + i * 0.2, T.p0 + 1.55 + i * 0.2);
-    const fx = 1920 * FIG.x1 - (i + 1) * sw;
-    const w = 78 + (sw - 78) * f, h = sh + (1080 - sh) * f;
-    const cx = sx + 39 + (fx + sw / 2 - (sx + 39)) * ease(f), cy = sy + sh / 2 + (540 - (sy + sh / 2)) * ease(f);
-    const flip = Math.abs(Math.cos(Math.PI * f)), back = f > 0.5;
-    const alpha = (1 - seg(tt, T.p1 + 0.2, T.p1 + 1.2));
-    if (alpha <= 0) continue;
-    ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cx, cy); ctx.rotate(sr * (1 - f)); ctx.scale(Math.max(0.02, flip), 1);
-    if (!back) {
-      const g = ctx.createLinearGradient(-w / 2, 0, w / 2, 0); g.addColorStop(0, '#c4a262'); g.addColorStop(0.5, '#dcc084'); g.addColorStop(1, '#b8955a');
-      ctx.fillStyle = g; E.roundRect(ctx, -w / 2, -h / 2, w, h, 8); ctx.fill();
-      // nœuds du bambou et cordelettes
-      ctx.fillStyle = 'rgba(120,90,50,0.35)'; ctx.fillRect(-w / 2, -h / 2 + h * 0.33, w, 4); ctx.fillRect(-w / 2, -h / 2 + h * 0.7, w, 4);
-      ctx.fillStyle = 'rgba(70,52,34,0.8)'; ctx.fillRect(-w / 2, -h / 2 + 60, w, 6); ctx.fillRect(-w / 2, h / 2 - 66, w, 6);
-      // le caractère, écrit au pinceau (dévoilé de haut en bas)
-      const wr = seg(tt, t0 + 0.35, t0 + 0.35 + Math.max(0.35, step * 0.9));
-      if (wr > 0) {
-        ctx.save(); ctx.beginPath(); ctx.rect(-w / 2, -h / 2 + 80, w, 140 * wr); ctx.clip();
-        E.text(ctx, VERSE[i], 0, -h / 2 + 150, { font: 'ShuimoKai', size: 66, color: VERSE[i] === '美' ? rgb(mixc(INK, MAL, 0.85)) : '#2a231d' });
-        ctx.restore();
-      }
-    } else if (img) {
-      const ix = (fx / 1920) * img.width, iw = (sw / 1920) * img.width;
-      ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(img, ix, 0, iw, img.height, -w / 2, -h / 2, w, h); ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = `rgba(200,170,110,${0.25 * (1 - f)})`; ctx.fillRect(-w / 2, -h / 2, w, h);
-    }
-    ctx.restore();
+  if (!img || wash <= 0) return;
+  if (!washCanvas) { washCanvas = document.createElement('canvas'); washCanvas.width = 1920; washCanvas.height = 1080; }
+  if (!maskCanvas) { maskCanvas = document.createElement('canvas'); maskCanvas.width = 1920; maskCanvas.height = 1080; }
+  const mc = maskCanvas.getContext('2d')!;
+  mc.clearRect(0, 0, 1920, 1080);
+  const R0 = R * ease(wash), r = rng(12);
+  for (let k = 0; k < 26; k++) {
+    const a = r() * 6.283, d = r() * R0 * 0.55, rr = Math.max(1, R0 * (0.35 + 0.5 * r()));
+    const x = HEART[0] + Math.cos(a) * d, y = HEART[1] + Math.sin(a) * d;
+    const g = mc.createRadialGradient(x, y, 0, x, y, rr); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    mc.fillStyle = g; mc.fillRect(x - rr, y - rr, 2 * rr, 2 * rr);
   }
-  if (img && wash > 0) {
-    if (!washCanvas) { washCanvas = document.createElement('canvas'); washCanvas.width = 1920; washCanvas.height = 1080; }
-    if (!maskCanvas) { maskCanvas = document.createElement('canvas'); maskCanvas.width = 1920; maskCanvas.height = 1080; }
-    // masque : union de taches de lavis autour du cœur, qui grandissent ; puis appliqué une seule fois au portrait
-    const mc = maskCanvas.getContext('2d')!;
-    mc.clearRect(0, 0, 1920, 1080);
-    const R0 = 760 * ease(wash), r = rng(12); // le lavis reste autour de la silhouette : le paysage demeure autour
-    for (let k = 0; k < 26; k++) {
-      const a = r() * 6.283, d = r() * R0 * 0.55, rr = R0 * (0.35 + 0.5 * r());
-      const x = HEART[0] + Math.cos(a) * d, y = HEART[1] + Math.sin(a) * d;
-      const g = mc.createRadialGradient(x, y, 0, x, y, Math.max(1, rr)); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-      mc.fillStyle = g; mc.fillRect(x - rr, y - rr, 2 * rr, 2 * rr);
-    }
-    const wc = washCanvas.getContext('2d')!;
-    wc.globalCompositeOperation = 'source-over'; wc.clearRect(0, 0, 1920, 1080); wc.drawImage(img, 0, 0, 1920, 1080);
-    wc.globalCompositeOperation = 'destination-in'; wc.drawImage(maskCanvas, 0, 0);
-    wc.globalCompositeOperation = 'source-over';
-    ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(washCanvas, 0, 0); ctx.restore();
-  }
-  // le 美 à hauteur du cœur, qui pâlit sur « se méfiait de la beauté »
-  const heart = seg(tt, T.p1 - 0.2, T.p1 + 0.6) * (1 - 0.85 * seg(tt, T.maitre + 1.0, T.maitre + 2.2));
-  if (heart > 0) E.text(ctx, '美', HEART[0], HEART[1], { font: 'ShuimoKai', size: 92, color: rgb(MAL), alpha: heart, glow: 14, glowColor: rgb(MAL, 0.5) });
+  const wc = washCanvas.getContext('2d')!;
+  wc.globalCompositeOperation = 'source-over'; wc.clearRect(0, 0, 1920, 1080); wc.drawImage(img, 0, 0, 1920, 1080);
+  wc.globalCompositeOperation = 'destination-in'; wc.drawImage(maskCanvas, 0, 0);
+  wc.globalCompositeOperation = 'source-over';
+  ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(washCanvas, 0, 0); ctx.restore();
 };
+// position d'un caractère du vers : deux colonnes, lues de haut en bas et de droite à gauche
+const versePos = (i: number) => (i < 6 ? [1060, 175 + i * 142] : [860, 175 + (i - 6) * 142]);
+// cible dans la silhouette de Laozi (les caractères s'y fondent)
+const FIGPTS = (() => { const r = rng(44); return Array.from({ length: NS }, (_, i) => [900 + (r() - 0.5) * 160, 180 + (i / (NS - 1)) * 760]); })();
 const Chu: React.FC = () => {
   const t = useT();
-  const A6 = A('b06'), roy = at('b06', 'royaumes'), chu = at('b06', 'chu'), gd = at('b06', 'guodian'), tb = at('b06', 'tombe'), lat = at('b06', 'lattes'), vers = at('b06', 'vers'), beau = at('b06', 'beau'), laid = at('b06', 'laideur'), mai = at('b06', 'maitre');
+  const A6 = A('b06'), roy = at('b06', 'royaumes'), ret = at('b06', 'retrouve'), gd = at('b06', 'guodian'), lz = at('b06', 'laozi'), vers = at('b06', 'vers'), beau = at('b06', 'beau'), laid0 = at('b06', 'laideur'), aut = at('b06', 'autrement'), dec = at('b06', 'decide'), laid = at('b06', 'laid'), mai = at('b06', 'maitre');
   const pz = L.clips.b06.pause!, p0 = A6 + pz.coupe, p1 = p0 + pz.duree;
   const mapTo = vers - 0.2;
   return (
     <AbsoluteFill>
-      <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [vers, 960, 540, 1.0, 0.8], [p1 - 0.4, 1000, 460, 1.08, 2.0], [mai + 1.4, 960, 540, 1.02, 1.2]]} punch={[p1 - 0.2]}>
+      <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [vers, 960, 540, 1.04, 0.8], [p0 + 0.2, 960, 540, 1.0, 1.0], [p1 - 0.6, 980, 470, 1.08, 2.0], [aut + 0.4, 960, 540, 1.0, 1.2]]} punch={[beau + 0.4, laid0 + 0.2, p1 - 0.2, dec, laid]}>
         <Paper />
         <Landscape seed={26} from={A6 - 1.5} to={A('b07') + 0.5} move="still" mood="brume" faint={0.4} />
         <Draw draw={(ctx, tt, E) => {
           if (tt < vers - 0.6) return;
-          laoziCalligram(ctx, E, tt, { vers, laideur: laid, p0, p1, maitre: mai });
+          // 1. le vers s'écrit à l'écran, caractère par caractère, dans l'écriture de Chu ; 美 en malachite, 惡 en ocre
+          const step = (laid0 - vers) / NS;
+          const melt = seg(tt, p0 + 0.2, p1 - 0.8); // 2. pendant la pause : les caractères se fondent dans la silhouette
+          for (let i = 0; i < NS; i++) {
+            const t0 = vers + 0.2 + i * step;
+            const a = seg(tt, t0, t0 + 0.35) * (1 - seg(tt, p1 - 1.4, p1 - 0.4));
+            if (a <= 0) continue;
+            const [x0, y0] = versePos(i), [x1, y1] = FIGPTS[i];
+            const k = ease(clamp((melt - i * 0.04) / 0.6));
+            const x = x0 + (x1 - x0) * k, y = y0 + (y1 - y0) * k, sz = (VERSE[i] === '美' ? 215 : 150) * (1 - 0.55 * k);
+            const isMei = VERSE[i] === '美', isE = VERSE[i] === '惡';
+            const hl = isMei ? win(tt, beau - 0.1, p0 + 0.4, 0.3) : isE ? win(tt, laid0 - 0.1, p0 + 0.4, 0.3) : 0;
+            const col = isMei ? mixc(INK, MAL, 0.4 + 0.6 * hl) : isE ? mixc(INK, OCRE, 0.4 + 0.6 * hl) : INK;
+            E.drawRealGlyph(ctx, `mei_vers_${String(i).padStart(2, '0')}`, { x, y, size: sz, reveal: () => seg(tt, t0, t0 + Math.max(0.3, step)), opacity: a, color: () => rgb(col), glow: 20 * hl, glowColor: rgb(isMei ? MAL : OCRE, 0.6) });
+          }
+          // 3. le portrait naît de l'encre des caractères
+          laoziWash(ctx, seg(tt, p0 + 0.9, p1 + 0.4));
+          // 4. « beau » à gauche, « laid » à droite, pendant l'explication
+          const sides = win(tt, aut - 0.2, A('b07') - 0.2, 0.5);
+          if (sides > 0) {
+            const pb = win(tt, dec, laid - 0.1, 0.25), pl = seg(tt, laid, laid + 0.3);
+            const fade = 1 - 0.5 * seg(tt, mai + 0.6, mai + 1.6);
+            E.text(ctx, '美', 380, 470, { font: 'ShuimoKai', size: 200 * (1 + 0.08 * pb), color: rgb(MAL), alpha: sides * fade, glow: 24 * pb, glowColor: rgb(MAL, 0.6) });
+            E.text(ctx, 'beau', 380, 640, { font: 'Cormorant', size: 64, weight: 700, color: rgb(MAL), alpha: sides * fade });
+            E.text(ctx, '惡', 1540, 470, { font: 'ShuimoKai', size: 200 * (1 + 0.08 * pl), color: rgb(OCRE), alpha: sides * seg(tt, aut + 0.2, aut + 0.8), glow: 24 * pl, glowColor: rgb(OCRE, 0.6) });
+            E.text(ctx, 'laid', 1540, 640, { font: 'Cormorant', size: 64, weight: 700, color: rgb(OCRE), alpha: sides * seg(tt, aut + 0.2, aut + 0.8) });
+          }
         }} />
       </Cam>
       <MapPanel from={A6 - 0.4} to={mapTo} draw={(ctx, u, E, tt) => {
-        const z = ease(seg(tt, chu - 0.4, gd + 1.6)), v = { lon: 113.5 - 1.2 * z, lat: 32.6 - 1.4 * z, k: 58 + 70 * z };
+        const z = ease(seg(tt, ret - 0.4, gd + 1.6)), v = { lon: 113.5 - 1.2 * z, lat: 32.6 - 1.4 * z, k: 58 + 70 * z };
         const vb = { lon: 113.5, lat: 32.6, k: 55 };
         E.mapLayer(ctx, v, vb, 140, 'mei_chu', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
-        // le royaume de Chu, en lavis vert, qui s'étend sur « Au sud, le royaume de Chu »
-        const ra = seg(tt, chu - 0.3, chu + 0.8);
+        // le royaume de Chu, au sud, en lavis vert
+        const ra = seg(tt, roy - 0.3, roy + 0.8);
         if (ra > 0) {
           ctx.save(); ctx.globalAlpha = ra; ctx.beginPath();
           CHU.forEach((p, i) => { const q = E.proj(v, p); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.closePath();
@@ -559,25 +578,15 @@ const Chu: React.FC = () => {
           E.text(ctx, '楚', c[0], c[1], { font: 'ShuimoKai', size: 110, color: rgb(MAL), alpha: ra * 0.85 });
         }
         E.mapDeco(ctx, { paper: true });
-        E.marker(ctx, tt, v, YING, 'Ying', 'capitale de Chu', seg(tt, chu + 0.6, chu + 1.2) * (1 - seg(tt, gd - 0.3, gd)), '#348462', -1);
-        E.marker(ctx, tt, v, GUODIAN, 'Guodian 郭店', 'tombe d\'un maître de Chu (fouillée en 1993)', seg(tt, gd, gd + 0.6), '#c0392b', 1);
-        // les lattes de bambou de la tombe, en vignette sur « Sur des lattes de bambou »
-        const la = seg(tt, lat - 0.2, lat + 0.5);
-        if (la > 0) {
-          ctx.save(); ctx.globalAlpha = la;
-          for (let i = 0; i < 7; i++) {
-            const x = 1460 + i * 52, g = ctx.createLinearGradient(x, 0, x + 42, 0); g.addColorStop(0, '#c9a868'); g.addColorStop(0.5, '#dcc084'); g.addColorStop(1, '#bf9c5c');
-            ctx.fillStyle = g; E.roundRect(ctx, x, 230 + (i % 2) * 18, 42, 600, 8); ctx.fill();
-          }
-          ctx.restore();
-          E.text(ctx, '老子', 1640, 900, { font: 'ShuimoKai', size: 80, color: inkCss, alpha: la });
-        }
+        E.marker(ctx, tt, v, GUODIAN, 'Guodian 郭店', 'tombe fouillée en 1993', seg(tt, gd - 0.2, gd + 0.5), '#c0392b', 1);
+        void YING;
       }} />
-      <Caption text="les Royaumes combattants (Ve–IIIe siècle av. J.-C.)" a={win(t, roy - 0.2, chu - 0.1, 0.4)} y={980} size={42} />
-      <Caption text="Guodian 郭店 : le plus ancien Laozi connu, sur lattes de bambou (≈ 300 av. J.-C.)" a={win(t, tb, mapTo, 0.4)} y={990} size={40} />
+      <Caption text="les Royaumes combattants (Ve–IIIe siècle av. J.-C.)" a={win(t, roy - 0.2, ret - 0.1, 0.4)} y={980} size={42} />
+      <Caption text="Guodian 郭店 (1993) : les plus anciens écrits de Laozi 老子 (≈ 300 av. J.-C.)" a={win(t, lz - 0.2, mapTo, 0.4)} y={990} size={38} />
       <Caption text="« Quand tout le monde sait ce qui est beau… voilà la laideur. »" a={win(t, beau - 0.2, p0 + 0.6, 0.4)} y={990} size={46} />
-      <Caption text="天下皆知美之為美，斯惡已 · Laozi, chapitre 2" a={win(t, p0 + 0.4, p1 - 0.2, 0.5)} y={990} size={44} />
-      <Caption text="Laozi 老子 · portrait imaginé" a={win(t, p1, mai + 0.2, 0.5)} y={990} size={40} />
+      <Caption text="天下皆智(知)美之為美也，惡已 · écriture de Chu, Guodian" a={win(t, p0 + 0.4, p1 - 0.2, 0.5)} y={990} size={42} />
+      <Caption text="Laozi 老子 · portrait imaginé" a={win(t, p1 - 0.2, aut + 0.6, 0.5)} y={990} size={40} />
+      <Caption text="décider du beau, c'est décider aussi du laid" a={win(t, dec - 0.2, mai - 0.2, 0.4)} y={990} size={46} />
       <Caption text="le vieux maître se méfiait de la beauté" a={win(t, mai, A('b07') - 0.2, 0.4)} y={990} size={46} />
     </AbsoluteFill>
   );
@@ -619,10 +628,13 @@ const QinHan: React.FC = () => {
         }} />
       </Cam>
       <Caption text="221 av. J.-C. · le Premier Empereur impose le petit sceau 小篆" a={win(t, emp, ord - 0.1, 0.4)} y={960} size={44} />
-      <Caption text="la coiffe devient symétrique : deux cornes, trois traits…" a={win(t, sym - 0.2, mt - 0.2, 0.4)} y={960} size={46} />
+      <Caption text="pour unifier l'empire, chaque caractère est redessiné, bien symétrique" a={win(t, ord - 0.2, at('b07', 'cornes') - 0.2, 0.4)} y={960} size={42} />
+      <Caption text="la coiffe : deux cornes, trois traits…" a={win(t, at('b07', 'cornes') - 0.2, mt - 0.2, 0.4)} y={960} size={46} />
       <Label x={1170} y={250} zh="羊" text="le mouton (petit sceau)" color={GOM} a={win(t, mt - 0.1, mt + 2.3, 0.4)} />
       <Caption text="…exactement le même caractère que le mouton" a={win(t, mt + 0.2, xs - 0.3, 0.4)} y={960} size={48} />
-      <Caption text="Xu Shen 許慎, vers 100 : « 美，甘也。从羊从大 »" a={win(t, xs + 0.2, sav - 0.2, 0.4)} y={990} size={44} />
+      <Caption text="Xu Shen 許慎, vers 100 : le Shuowen jiezi" a={win(t, xs + 0.2, at('b07', 'neufmille') - 0.2, 0.4)} y={990} size={44} />
+      <Caption text="9 353 caractères expliqués un par un, découpés en morceaux" a={win(t, at('b07', 'neufmille') - 0.1, yeux - 0.1, 0.4)} y={990} size={44} />
+      <Caption text="« 美，甘也。从羊从大 » — savoureux : un mouton sur un homme" a={win(t, yeux, sav - 0.2, 0.4)} y={990} size={42} />
       <Caption text="« savoureux » — une erreur presque inévitable" a={win(t, sav, err + 1.4, 0.4)} y={990} size={48} />
       <Caption text="Laozi sur soie (Mawangdui, 168 av. J.-C.) puis stèle des clercs (曹全碑) : le mouton reste" a={win(t, err + 1.4, B('b07') + 0.4, 0.4)} y={990} size={38} />
       <EraTag zh="秦" name="DYNASTIE QIN" dates="221 av. J.-C. · le petit sceau" a={seg(t, A7 - 0.5, A7) * (1 - seg(t, xs - 0.5, xs))} />
