@@ -44,7 +44,7 @@ for r in L['rouleaux']:
     a, b = r['debut'], r['debut'] + r['duree']
     env *= 1 - 0.85 * np.clip(np.minimum((t - a + 0.6) / 0.6, (b + 0.8 - t) / 0.8), 0, 1)
 for pl in L.get('plages', {}).values():
-    a, b = pl['debut'], pl['debut'] + pl['duree']
+    a = pl['debut']; b = a + max(pl['duree'], pl.get('son_decalage', 0) + pl.get('son_duree', 0))
     env *= 1 - 0.65 * np.clip(np.minimum((t - a) / 0.8, (b + 1.0 - t) / 1.0), 0, 1)
 for a, d in L['pauses']:
     env *= 1 - 0.7 * np.clip(np.minimum((t - a) / 0.3, (a + d + 0.2 - t) / 0.5), 0, 1)

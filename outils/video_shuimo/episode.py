@@ -41,7 +41,7 @@ def ligne_de_temps(cfg, durees, reperes=None):
                 pauses.append([round(clips[c]['debut'] + coupe, 3), p['duree']])
                 t += p['duree']
         elif 'plage' in el:  # plage sans voix réservée à un clip (son du clip éventuel : son, son_decalage, son_volume)
-            plages[el['nom']] = {'debut': round(t, 3), 'duree': el['plage'], **{k: el[k] for k in ('son', 'son_decalage', 'son_volume') if k in el}}
+            plages[el['nom']] = {'debut': round(t, 3), 'duree': el['plage'], **{k: el[k] for k in ('son', 'son_decalage', 'son_volume', 'son_duree') if k in el}}
             t += el['plage']
         else:
             rouleaux.append({'debut': round(t, 3), 'duree': el['rouleau']})

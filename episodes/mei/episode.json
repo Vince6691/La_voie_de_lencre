@@ -17,12 +17,17 @@
    "apres": 0.3
   },
   {
-   "plage": 7.75,
+   "plage": 1.25,
    "nom": "danse",
    "apres": 0.0,
    "son": "clips/03_danseur_v2.mp4",
    "son_decalage": 0.75,
-   "son_volume": 0.7
+   "son_volume": 0.7,
+   "son_duree": 8.0
+  },
+  {
+   "clip": "b12",
+   "apres": 0.3
   },
   {
    "clip": "b04",
@@ -88,11 +93,19 @@
   "b03": {
    "origine": "Remontons"
   },
+  "b12": {
+   "debut": "Il y a",
+   "pluie": "quand la pluie",
+   "danse": "on dansait",
+   "plumes": "Coiffés de",
+   "frappaient": "frappaient",
+   "tambours": "au son"
+  },
   "b04": {
+   "pluie": "la pluie viendrait",
    "rois": "les rois",
-   "grave": "on gravait",
-   "fissures": "dans les fissures",
    "os": "os de divination",
+   "signe": "un signe qui",
    "homme": "un homme, debout",
    "dawen": "le même que",
    "corps": "Une tête",
@@ -102,9 +115,7 @@
    "museau": "un museau",
    "rien": "Ici, rien",
    "pare": "homme paré",
-   "danseur": "Un danseur",
    "plumes": "coiffé de plumes",
-   "pluie": "appeler la pluie",
    "terre": "Ces os dormiront",
    "jamais": "n'en a jamais"
   },
@@ -142,26 +153,6 @@
    "erreur": "Son erreur",
    "ecriture": "Le mouton, c'est"
   },
-  "b08": {
-   "reprenons": "Reprenons",
-   "formes": "deux dessins",
-   "homme": "L'homme, debout",
-   "coiffe": "Et sur sa",
-   "plumes": "des plumes sur",
-   "bronze": "des branches courbes",
-   "sceau": "Au petit sceau",
-   "reste": "et le mouton reste",
-   "naissance": "Ainsi naît",
-   "meili": "la beauté",
-   "wanmei": "la perfection"
-  },
-  "b09": {
-   "maxime": "Le mouton, c'est",
-   "danseur": "Le danseur",
-   "parure": "Mais la parure",
-   "tombent": "les plumes tombent",
-   "blancs": "cheveux blancs"
-  },
   "b10": {
    "encore": "Et l'erreur",
    "cle": "la clé",
@@ -181,6 +172,26 @@
    "bas": "En bas",
    "couche": "un trait couché",
    "jambes": "les deux jambes"
+  },
+  "b08": {
+   "reprenons": "Reprenons",
+   "formes": "deux dessins",
+   "homme": "L'homme, debout",
+   "coiffe": "Et sur sa",
+   "plumes": "des plumes sur",
+   "bronze": "des branches courbes",
+   "sceau": "Au petit sceau",
+   "reste": "et le mouton reste",
+   "naissance": "Ainsi naît",
+   "meili": "la beauté",
+   "wanmei": "la perfection"
+  },
+  "b09": {
+   "maxime": "Le mouton, c'est",
+   "danseur": "Le danseur",
+   "parure": "Mais la parure",
+   "tombent": "les plumes tombent",
+   "blancs": "cheveux blancs"
   }
  },
  "bruitages": [
@@ -225,13 +236,6 @@
    null,
    1.54,
    0.75
-  ],
-  [
-   "sceau",
-   "b04",
-   "os",
-   0.2,
-   0.55
   ],
   [
    "gravure",

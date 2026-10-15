@@ -28,27 +28,36 @@
    "origine": 0.0
   }
  },
- "b04": {
-  "duration": 52.88,
+ "b12": {
+  "duration": 10.14,
   "cues": {
-   "rois": 1.79,
-   "grave": 5.42,
-   "fissures": 9.67,
-   "os": 11.55,
-   "homme": 13.95,
-   "dawen": 17.39,
-   "corps": 19.15,
-   "coiffe": 23.99,
-   "branches": 25.36,
-   "mouton": 29.91,
-   "museau": 31.76,
-   "rien": 35.03,
-   "pare": 37.35,
-   "danseur": 38.51,
-   "plumes": 39.83,
-   "pluie": 43.23,
-   "terre": 46.63,
-   "jamais": 51.51
+   "debut": 0.0,
+   "pluie": 2.59,
+   "danse": 4.07,
+   "plumes": 5.87,
+   "frappaient": 8.07,
+   "tambours": 9.03
+  }
+ },
+ "b04": {
+  "duration": 43.27,
+  "cues": {
+   "pluie": 0.68,
+   "rois": 1.96,
+   "os": 4.6,
+   "signe": 7.8,
+   "homme": 10.36,
+   "dawen": 13.72,
+   "corps": 15.56,
+   "coiffe": 20.4,
+   "branches": 21.86,
+   "mouton": 26.44,
+   "museau": 28.32,
+   "rien": 31.56,
+   "pare": 33.72,
+   "plumes": 35.48,
+   "terre": 37.32,
+   "jamais": 41.88
   }
  },
  "b05": {
@@ -94,32 +103,6 @@
    "ecriture": 36.68
   }
  },
- "b08": {
-  "duration": 24.28,
-  "cues": {
-   "reprenons": 0.14,
-   "formes": 2.9,
-   "homme": 3.98,
-   "coiffe": 6.26,
-   "plumes": 8.32,
-   "bronze": 9.58,
-   "sceau": 11.78,
-   "reste": 14.7,
-   "naissance": 16.3,
-   "meili": 20.94,
-   "wanmei": 23.5
-  }
- },
- "b09": {
-  "duration": 12.55,
-  "cues": {
-   "maxime": 0.02,
-   "danseur": 2.5,
-   "parure": 5.54,
-   "tombent": 8.42,
-   "blancs": 12.1
-  }
- },
  "b10": {
   "duration": 12.86,
   "cues": {
@@ -146,6 +129,32 @@
    "jambes": 13.24
   }
  },
+ "b08": {
+  "duration": 24.28,
+  "cues": {
+   "reprenons": 0.14,
+   "formes": 2.9,
+   "homme": 3.98,
+   "coiffe": 6.26,
+   "plumes": 8.32,
+   "bronze": 9.58,
+   "sceau": 11.78,
+   "reste": 14.7,
+   "naissance": 16.3,
+   "meili": 20.94,
+   "wanmei": 23.5
+  }
+ },
+ "b09": {
+  "duration": 12.55,
+  "cues": {
+   "maxime": 0.02,
+   "danseur": 2.5,
+   "parure": 5.54,
+   "tombent": 8.42,
+   "blancs": 12.1
+  }
+ },
  "_ligne": {
   "clips": {
    "b01": {
@@ -160,16 +169,20 @@
     "debut": 45.15,
     "duree": 1.35
    },
+   "b12": {
+    "debut": 48.05,
+    "duree": 10.14
+   },
    "b04": {
-    "debut": 54.55,
-    "duree": 52.88
+    "debut": 58.49,
+    "duree": 43.27
    },
    "b05": {
-    "debut": 108.23,
+    "debut": 102.56,
     "duree": 15.17
    },
    "b06": {
-    "debut": 127.6,
+    "debut": 121.93,
     "duree": 27.21,
     "pause": {
      "coupe": 19.3,
@@ -177,49 +190,50 @@
     }
    },
    "b07": {
-    "debut": 160.11,
+    "debut": 154.44,
     "duree": 39.19
    },
    "b10": {
-    "debut": 199.9,
+    "debut": 194.23,
     "duree": 12.86
    },
    "b11": {
-    "debut": 213.76,
+    "debut": 208.09,
     "duree": 13.87
    },
    "b08": {
-    "debut": 228.63,
+    "debut": 222.96,
     "duree": 24.28
    },
    "b09": {
-    "debut": 254.11,
+    "debut": 248.44,
     "duree": 12.55
    }
   },
   "rouleaux": [
    {
-    "debut": 123.8,
+    "debut": 118.13,
     "duree": 3.5
    }
   ],
   "pauses": [
    [
-    146.9,
+    141.23,
     4.5
    ]
   ],
   "plages": {
    "danse": {
     "debut": 46.8,
-    "duree": 7.75,
+    "duree": 1.25,
     "son": "clips/03_danseur_v2.mp4",
     "son_decalage": 0.75,
-    "son_volume": 0.7
+    "son_volume": 0.7,
+    "son_duree": 8.0
    }
   },
-  "fin": 266.96,
-  "total": 270.16,
+  "fin": 261.29,
+  "total": 264.49,
   "bruitages": [
    [
     "pinceau",
@@ -252,83 +266,78 @@
     0.75
    ],
    [
-    "sceau",
-    66.3,
-    0.55
-   ],
-   [
     "gravure",
-    66.7,
+    63.69,
     0.4
    ],
    [
     "sceau",
-    84.46,
+    84.93,
     0.45
    ],
    [
     "sceau",
-    112.02,
+    106.35,
     0.5
    ],
    [
     "pinceau",
-    141.71,
+    136.04,
     0.35
    ],
    [
     "pinceau",
-    143.81,
+    138.14,
     0.3
    ],
    [
     "gong",
-    176.09,
+    170.42,
     0.4
    ],
    [
     "sceau",
-    209.88,
+    204.21,
     0.45
    ],
    [
     "pinceau",
-    220.12,
+    214.45,
     0.4
    ],
    [
     "pinceau",
-    221.32,
+    215.65,
     0.4
    ],
    [
     "pinceau",
-    222.48,
+    216.81,
     0.4
    ],
    [
     "pinceau",
-    225.16,
+    219.49,
     0.4
    ],
    [
     "pinceau",
-    226.7,
+    221.03,
     0.4
    ],
    [
     "gong",
-    240.41,
+    234.74,
     0.35
    ],
    [
     "sceau",
-    244.93,
+    239.26,
     0.45
    ],
    [
     "gong",
-    265.91,
+    260.24,
     0.35
    ]
   ]

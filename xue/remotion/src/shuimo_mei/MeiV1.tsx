@@ -20,7 +20,7 @@ import { VideoReveal } from '../video_encre/VideoReveal';
 import { loadLegacy, W } from '../legacy';
 import rep from '../data/episodes/mei.json';
 
-type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b10' | 'b11' | 'b08' | 'b09';
+type Clip = 'b01' | 'b02' | 'b03' | 'b12' | 'b04' | 'b05' | 'b06' | 'b07' | 'b10' | 'b11' | 'b08' | 'b09';
 type Rep = Record<Clip, { duration: number; cues: Record<string, number> }> & {
   _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; plages: Record<string, { debut: number; duree: number; son?: string; son_decalage?: number; son_volume?: number }>; fin: number; total: number; bruitages?: [string, number, number][] };
 };
@@ -412,6 +412,7 @@ const DanseIntro: React.FC = () => {
       <Sequence from={Math.round(PL.debut * fps)} durationInFrames={Math.round((CLIPEND + 0.2 - PL.debut) * fps)}>
         <CloudReveal src="episodes/mei/clips/03_danseur_v2.mp4" inDur={CLOUD_IN} exit={false} videoAt={CLIP0 - PL.debut} volume={PL.son_volume ?? 0.7} />
       </Sequence>
+      <Caption text="les inscriptions Shang mentionnent des danses pour appeler la pluie" a={win(useT(), at('b12', 'danse') - 0.2, CLIPEND - 0.2, 0.5)} y={990} size={40} />
       <Sequence from={Math.round((CLIPEND - 0.05) * fps)} durationInFrames={Math.round((GLYEND + 0.1 - CLIPEND) * fps)}>
         <Draw draw={(ctx, u, E) => {
           const tt = CLIPEND - 0.05 + u;
@@ -444,30 +445,24 @@ const DanseIntro: React.FC = () => {
 // ════════════════ 2. La dynastie Shang (après la danse : le signe de l'os, la divination)
 const Shang: React.FC = () => {
   const t = useT();
-  const A3 = A('b03'), A4 = A('b04'), fis = at('b04', 'fissures'), corps = at('b04', 'corps'), pluie = at('b04', 'pluie'), os = at('b04', 'os'), hom = at('b04', 'homme'), dw = at('b04', 'dawen'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
-  const clipIn = terre, shell0 = Math.max(A4 - 0.3, GLYEND + 0.5); void pare;
+  const A3 = A('b03'), A4 = A('b04'), sig = at('b04', 'signe'), corps = at('b04', 'corps'), pluie = at('b04', 'pluie'), os = at('b04', 'os'), hom = at('b04', 'homme'), dw = at('b04', 'dawen'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
+  void pare; void plumes;
   return (
     <AbsoluteFill>
       <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [GLYEND, 960, 540, 1, 0.4], [os + 0.4, 960, 520, 1.06, 1.4], [coif - 0.3, 960, 330, 1.3, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [rien, 960, 520, 1.06, 1.0], [terre, 960, 560, 1.02, 1.0]]}
-        punch={[fis + 0.2, os + 1.2, corps, coif + 0.3, rien + 0.2]} calm={[[PL.debut, GLYEND + 0.3]]}>
+        punch={[sig + 0.2, corps, coif + 0.3, rien + 0.2]} calm={[[PL.debut, GLYEND + 0.3]]}>
         <Paper />
         <Landscape seed={14} from={GLYEND - 0.6} to={A('b05') + 0.5} move="still" mood="aube" faint={0.85} />
           <Draw draw={(ctx, tt, E) => {
-            // le signe né de la danse reste un instant au centre, puis laisse la place au plastron de la divination
-            const born = tt >= GLYEND - 0.02 ? 1 - seg(tt, shell0, shell0 + 0.6) : 0;
-            if (born > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { ...G_REST, opacity: born, color: () => inkCss });
+            // le signe né de la danse reste au centre : on le décrit trait par trait (plus de plastron)
             if (tt < GLYEND) return;
-            // l'os : plastron tamponné, le signe révélé en blanc puis à l'encre ; l'homme (azurite), la coiffe (malachite)
-            // la divination : un plastron d'os à l'encre, chauffé (point rouge), qui se fend (fissures en 卜)
-            const shell = win(tt, shell0, os + 0.8, 0.6);
-            if (shell > 0) plastron(ctx, 960, 540, shell, seg(tt, fis - 1.6, fis - 0.6), seg(tt, fis - 0.4, fis + 0.8));
-            const rv = seg(tt, os + 0.2, os + 1.4), dry = seg(tt, hom - 0.6, hom + 0.4);
+            const rv = 1, dry = 1;
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
             const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
             const col = (c: string) => rgb(c === 'coiffe' ? mixc(base(c), MAL, cf) : mixc(base(c), AZ, man));
             const mainA = 1;
             const two = tt > br + 0.6 && tt < br + 2.2; // « parfois deux »
-            if (mainA > 0) E.drawRealGlyph(ctx, two ? 'mei_jiaguwen2' : 'mei_jiaguwen', { x: 960, y: 540, size: 660, reveal: () => rv, opacity: Math.min(1, mainA), color: col, glow: 26 * cf * win(tt, coif, mt, 0.5), glowColor: rgb(MAL, 0.6) });
+            if (mainA > 0) E.drawRealGlyph(ctx, two ? 'mei_jiaguwen2' : 'mei_jiaguwen', { ...G_REST, reveal: () => rv, opacity: Math.min(1, mainA), color: col, glow: 26 * cf * win(tt, coif, mt, 0.5), glowColor: rgb(MAL, 0.6) });
             // « le même que dans 文 » : le 文 de l'os, en petit, à gauche
             const wa = win(tt, dw - 0.2, coif - 0.2, 0.4);
             if (wa > 0) E.drawRealGlyph(ctx, 'wen_jiaguwen', { x: 470, y: 560, size: 300, opacity: wa, color: () => rgb(mixc(INK, AZ, 0.6)) });
@@ -492,14 +487,13 @@ const Shang: React.FC = () => {
       </Cam>
       <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, PL.debut + 0.8, 0.4)} y={960} size={52} />
       <Label x={1300} y={760} zh="大" text="un homme, de face" color={AZ} a={win(t, hom + 0.3, dw - 0.2, 0.4)} />
-      <Caption text="la divination : on grave la question, on chauffe l'os, on lit les fissures" a={win(t, Math.max(A4 + 1.6, Math.max(A4 - 0.3, GLYEND + 0.5) + 0.3), os - 0.2, 0.5)} y={960} size={42} />
+      <Caption text="pour savoir s'il pleuvrait, on interrogeait les ancêtres sur des os de divination" a={win(t, pluie - 0.2, sig - 0.2, 0.4)} y={960} size={42} />
       <Caption text="le même homme de face que dans 文 (épisode précédent)" a={win(t, dw, corps - 0.1, 0.4)} y={960} size={42} />
       <Caption text="une tête · deux bras ouverts · deux jambes écartées" a={win(t, corps, coif - 0.3, 0.4)} y={960} size={46} />
       <Label x={1330} y={300} zh="" text="une haute coiffe" color={MAL} a={win(t, coif + 0.2, mt - 0.4, 0.4)} />
       <Caption text={t < br + 0.6 ? 'quatre branches, dressées vers le ciel' : 'parfois deux (甲686)'} a={win(t, br, mt - 0.4, 0.4)} y={960} size={46} />
       <Caption text="羊 sur l'os : un museau en pointe, deux cornes qui retombent" a={win(t, mus - 0.2, rien + 0.4, 0.4)} y={960} size={44} />
-      <Caption text="un homme paré — un danseur, sans doute, coiffé de plumes" a={win(t, rien + 0.6, pluie - 0.2, 0.4)} y={960} size={44} />
-      <Caption text="les inscriptions Shang mentionnent des danses pour appeler la pluie" a={win(t, pluie - 0.1, terre - 0.3, 0.4)} y={990} size={40} />
+      <Caption text="un homme paré — un danseur, sans doute, coiffé de plumes" a={win(t, rien + 0.6, terre - 0.2, 0.4)} y={960} size={44} />
       <Caption text="les os de divination ne sont redécouverts qu'en 1899" a={win(t, terre + 0.2, jam + 0.2, 0.5)} y={960} size={44} />
       <Caption text="Xu Shen n'en a jamais vu un seul" a={win(t, jam - 0.2, A('b05') - 0.2, 0.4)} y={960} size={48} />
       <EraTag zh="商" name="DYNASTIE SHANG" dates="Anyang · v. 1200 av. J.-C." a={seg(t, CLIP0 + 1.0, CLIP0 + 1.8) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
@@ -923,7 +917,7 @@ const SFX = (L.bruitages ?? []) as [string, number, number][];
 export const MeiV1: React.FC = () => {
   const ready = useSetup();
   const { fps } = useVideoConfig();
-  const clips: Clip[] = ['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b10', 'b11', 'b08', 'b09'];
+  const clips: Clip[] = ['b01', 'b02', 'b03', 'b12', 'b04', 'b05', 'b06', 'b07', 'b10', 'b11', 'b08', 'b09'];
   const voice = (k: Clip) => {
     const c = L.clips[k];
     if (!c.pause) return <Sequence key={k} from={Math.round(c.debut * fps)}><Audio src={staticFile(`episodes/mei/voix/${k}.wav`)} /></Sequence>;
