@@ -1,4 +1,4 @@
-# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 5 min) — v6
+# 美 (měi) — proposition tout shuimo, voix off v2 (≈ 4 min 30) — v7
 
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : mouton ou parure ? — v3 : **faux départ**. L'accroche affirme, sûre d'elle, la thèse du mouton (Xu Shen,
@@ -66,52 +66,36 @@ Remontons à l'origine…
 d'années recule, les sceaux d'époques défilent de droite à gauche ; 美 moderne en curseur, il se défait trait par trait
 à chaque sceau jusqu'à n'être plus qu'un point d'encre ; impact sur le sceau Shang]`
 
-## 3. La dynastie Shang — l'os — 1:00
-Il y a plus de trois mille ans, sur les os de divination de la dynastie Shang, le signe est un homme,
-debout, de face : 大, le même que dans 文. ⏸ Sur sa tête, une haute coiffe : quatre branches, dressées vers le ciel.
-Or, sur ces mêmes os, le mouton a sa tête à lui : un museau en pointe, deux cornes qui retombent. Ici, rien de tel. ⏸
-C'est un homme paré. Un danseur, sans doute, coiffé de plumes. ⏸ Ces os dormiront sous terre jusqu'en 1899. Xu Shen
-n'en a jamais vu un seul.
-> plan : paysage `fond-shuimo` (seed Shang, aube, brume) ; `InkStage` : plastron tamponné, fissures, forme `00` révélée
-> en blanc puis à l'encre (bruitage gravure) ; 大 en azurite, la coiffe en malachite (halo) ; caméra en poussée sur la
-> coiffe ; sur « le mouton a sa tête », 羊 oraculaire (`羊/00`) estampé à côté, museau et cornes en gomme-gutte, puis
-> 羊 pâlit et s'efface ; **clip Seedance A « danseur »** (≈ 10 s) entrée à travers `00` (`VideoReveal mode="glyphe"`),
-> sortie au pinceau ; sur « 1899 », l'os s'enfonce sous une couche de terre en lavis.
+## 3. La dynastie Shang — l'os — 0:53
+Texte définitif : `VOIX.md` (b04, v7). Ajouts v7 : la divination (on grave la question, on chauffe l'os, on lit les
+fissures) et les danses pour appeler la pluie.
+> plan : paysage (aube, brume) ; **plastron de tortue** : la question gravée, la chaleur, les fissures 卜 ; forme `00`
+> née du gel de l'ombre du danseur ; 大 en azurite, coiffe en malachite ; 羊 oraculaire à côté (museau et cornes en
+> gomme-gutte), barré ; **clip A « danseur »** à travers `00`, sortie au pinceau ; sur « 1899 », lavis de terre.
+> Plus de plaques couleur os / bronze derrière les caractères (retirées en v7).
 
-## 4. La dynastie Zhou — le bronze — 1:50
-Avec la dynastie Zhou, le signe est coulé dans le bronze. L'homme s'épaissit. La coiffe se resserre, ses branches se
-courbent… ⏸ et l'on commence à y voir des cornes.
-> plan : paysage d'automne (seed Zhou) ; `InkStage` bronze : forme `03` (美爵) tamponnée (bruitage sceau) ; un instant,
-> `00` et `03` côte à côte, la coiffe malachite des deux s'allume ; sur « des cornes », les branches courbes de `03`
-> prennent une pointe de gomme-gutte (le mouton qui guette).
+## 4. La dynastie Zhou — le bronze — 1:47
+Texte définitif : `VOIX.md` (b05, v7). Ajout : les grands vases rituels où l'on coule les inscriptions.
+> plan : **vase ding** dessiné ; la forme `03` (美爵) apparaît coulée dans sa panse, puis en sort et grandit sur
+> « s'épaissit » ; `00` et `03` côte à côte ; sur « des cornes », pointe de gomme-gutte.
 
-`[ROULEAU 2 — Zhou → Royaumes combattants, 3,5 s, rapide, impact sec]`
+`[ROULEAU 2 — Zhou → Royaumes combattants, 3,5 s]`
 
-## 5. Les Royaumes combattants — le bambou de Chu — 2:10
-Quelques siècles plus tard, la Chine se déchire en Royaumes combattants. Au sud, le royaume de Chu. ⏸ En 1993, à
-Guodian, on ouvre la tombe d'un maître de Chu. Sur des lattes de bambou, le plus ancien Laozi connu. ⏸ Et ce vers :
-« Quand tout le monde sait ce qui est beau… voilà la laideur. » ⏸ Le vieux maître se méfiait de la beauté.
-> plan : **carte** (`MapPanel`, `E.mapLayer` + `E.mapDeco`, `paper: true`) : les Royaumes combattants, Chu au sud en
-> région animée, marqueur Guodian (près de Jingmen) ; poussée caméra sur Guodian ; la carte se replie en latte.
-> **Portrait-calligramme de Laozi (≈ 12 s, nouveau)** : 1) sur « Et ce vers », les caractères 天下皆知美之為美，斯惡已
-> tombent un à un, à l'encre, sur des lattes de bambou verticales (bruitage pinceau léger, un par caractère) ; 2) la
-> traduction en légende ≥ 38 px ; 3) sur la pause qui suit « la laideur », les lattes se courbent et glissent, sans
-> voix (≈ 4 s), pour s'assembler en silhouette du vieux maître (profil, longue barbe, bâton, les lattes forment les plis
-> de la robe, 美 reste lisible à hauteur du cœur) ; 4) un lavis gris remplit la forme depuis le haut, les yeux et la
-> barbe se précisent au pinceau fin ; mention « portrait imaginé » ; 5) sur « se méfiait de la beauté », le 美 du cœur
-> pâlit. **Clip Seedance B « Laozi et le scribe »** (≈ 10 s) entrée à travers le 美 de la latte (`mode="glyphe"`),
-> sortie au pinceau. (Phrase sur la graphie de Chu coupée : graphie de Guodian non confirmée.)
+## 5. Les Royaumes combattants — Guodian et Laozi — 2:06
+Texte définitif : `VOIX.md` (b06, v7, réécrit par l'utilisateur). Correction factuelle : Guodian a livré les plus
+anciens **écrits** de Laozi (pas une représentation).
+> plan : **carte** : Chu en lavis malachite, marqueur Guodian. Puis **le vers écrit à l'écran en écriture de Chu**
+> (formes réelles, `glyphes/vers/SOURCE.md`) : 天下皆智(知)美之為美也惡已, deux colonnes lues de droite à gauche,
+> 美 en malachite, 惡 en ocre. Pendant la pause (4,5 s), les caractères glissent et fondent dans la silhouette, et le
+> **portrait de Laozi** s'étend en taches de lavis depuis le cœur (mention « portrait imaginé »). Pendant
+> l'explication : **美 beau à gauche, 惡 laid à droite**, qui battent sur « décide » et « laid ».
+> Formes : 美 de Chu inconnu → 美 du 中山王壺 (Royaumes combattants, Jin) ; 已 écrit 巳 (郭.成.36).
 
-## 6. Qin puis Han — la naissance du mouton — 3:05
-Sous le règne du premier empereur, on impose une seule écriture : le petit sceau. Les scribes mettent de l'ordre : la
-coiffe devient bien symétrique… deux cornes, trois traits. ⏸ C'est exactement le même caractère que le mouton. ⏸ Trois siècles plus
-tard, Xu Shen ouvre son dictionnaire. Voilà ce qu'il a sous les yeux : un mouton, posé sur un homme. Comment ne pas
-conclure : « savoureux » ? ⏸ Son erreur était presque inévitable. Le mouton, c'est l'écriture qui l'a dessiné.
-> plan : paysage d'hiver ; **naissance du mouton** : forme `05` tracée ; sur « le même caractère que le mouton », le 羊 du
-> petit sceau est posé **à côté**, puis la coiffe de `05` glisse sur lui et
-> s'y superpose presque (coiffe malachite → gomme-gutte au contact, punch, bruitage sceau) ; retour de la silhouette
-> de Xu Shen et de sa citation (même cadrage qu'à l'accroche, la boucle se referme) ; derrière lui, l'os `00` en
-> transparence, qu'il ne voit pas ; forme `08` (soie de Mawangdui) puis `11` (stèle) en fondu net.
+## 6. Qin puis Han — la naissance du mouton — 2:38
+Texte définitif : `VOIX.md` (b07, v7). Ajouts : « pour unifier l'empire, chaque caractère est redessiné » ; Xu Shen
+explique plus de neuf mille caractères (9 353), un par un, en les découpant en morceaux.
+> plan : forme `05` tracée ; le 羊 du petit sceau à côté, la coiffe glisse dessus (malachite → gomme-gutte, sceau) ;
+> Xu Shen et sa citation 美·甘也·从羊从大 ; `08` (Mawangdui) puis `11` (stèle).
 
 ## 6 bis. L'erreur dure encore — le dictionnaire (clip b10, ≈ 12 s)
 Et l'erreur dure encore. 许慎 a rangé ce caractère sous la clé du mouton. Aujourd'hui, dans les dictionnaires
