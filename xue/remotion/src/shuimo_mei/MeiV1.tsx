@@ -256,44 +256,56 @@ const MEI = { x: 640, y: 470, size: 520 };
 const FREEZE = at('b01', 'gros') + 1.0; // tout se fige sur « …un gros mouton. »
 const CRACK = B('b02') + 0.25, SHATTER = CRACK + 1.0, BARE = SHATTER + 1.4;
 // la scène de l'accroche, dessinée au temps tt (figé après FREEZE) — sert aussi aux éclats de la cassure
-const drawOpening = (ctx: CanvasRenderingContext2D, E: any, tt: number) => {
+const drawOpening = (ctx: CanvasRenderingContext2D, E: any, tt: number, part: 'tout' | 'reste' | 'stele' = 'tout') => {
   const A1 = A('b01'), mt = at('b01', 'mouton'), dico = at('b01', 'dico'), haut = at('b01', 'haut'), grand = at('b01', 'grand'), bon = at('b01', 'bon'), song = at('b01', 'song'), marbre = at('b01', 'marbre'), maxime = at('b01', 'maxime'), ent = at('b01', 'entendu'), gros = at('b01', 'gros');
   // 美 tracé ; le haut (羊) en gomme-gutte sur « le caractère du mouton », le bas (大) en azurite sur « grand »
   const coif = seg(tt, mt + 0.6, mt + 1.2), man = seg(tt, grand, grand + 0.5);
   const toLeft = seg(tt, song - 0.6, song + 0.6); // le 美 se range à gauche quand la stèle arrive
   const mx = MEI.x - 0 * toLeft, my = MEI.y, ms = MEI.size * (1 - 0.18 * toLeft);
-  E.drawStrokes(ctx, 'mei_regulier', { x: mx, y: my, size: ms, progress: 9 * seg(tt, A1 - 0.1, A1 + 2.4), brush: false,
+  if (part !== 'stele') E.drawStrokes(ctx, 'mei_regulier', { x: mx, y: my, size: ms, progress: 9 * seg(tt, A1 - 0.1, A1 + 2.4), brush: false,
     color: (c: string) => rgb(c === 'coiffe' ? mixc(INK, GOM, coif) : mixc(INK, AZ, man)), glow: 22 * coif * win(tt, mt + 0.6, dico, 0.4), glowColor: rgb(GOM, 0.6) });
   // le gros mouton dodu, sur « un gros mouton, c'est bon »
   const sh = seg(tt, bon - 0.1, bon + 0.7);
-  sheep(ctx, mx + 30, my + 330 - 40 * sh, 0.85 + 0.25 * seg(tt, gros - 0.2, gros + 0.4), sh);
+  if (part !== 'stele') sheep(ctx, mx + 30, my + 330 - 40 * sh, 0.85 + 0.25 * seg(tt, gros - 0.2, gros + 0.4), sh);
   // la stèle de la dynastie Song : 羊大則美 gravé, le sceau posé avec assurance
   const st = seg(tt, song + 0.2, song + 1.2);
-  stele(ctx, E, STELE.x, STELE.y, st, 4 * seg(tt, marbre + 0.3, maxime - 0.2), seg(tt, maxime + 0.1, maxime + 0.4));
+  if (part !== 'reste') stele(ctx, E, STELE.x, STELE.y, st, 4 * seg(tt, marbre + 0.3, maxime - 0.2), seg(tt, maxime + 0.1, maxime + 0.4));
   void ent;
 };
-// fissures : quelques branches qui partent du 羊 gravé (en haut de la stèle) et courent sur tout l'écran
+// la silhouette de la stèle (sans le socle) : les fissures et les éclats y restent enfermés
+const STW = 300, STH = 760, STTOP = STELE.y - STH / 2;
+const stelePath = (c: CanvasRenderingContext2D) => {
+  const x = STELE.x, w = STW, top = STTOP;
+  c.beginPath(); c.moveTo(x - w / 2, STELE.y + STH / 2); c.lineTo(x - w / 2, top + 110); c.quadraticCurveTo(x - w / 2, top, x, top);
+  c.quadraticCurveTo(x + w / 2, top, x + w / 2, top + 110); c.lineTo(x + w / 2, STELE.y + STH / 2); c.closePath();
+};
+// fissures : elles partent du 羊 gravé et courent dans le marbre, avec quelques ramifications
 const CRACKS = (() => {
   const r = rng(91), out: number[][][] = [];
-  for (let b = 0; b < 9; b++) {
-    const ang = (b / 9) * Math.PI * 2 + r() * 0.5;
-    const pts = [[STELE.x, STELE.y - 210]];
-    let x = STELE.x, y = STELE.y - 210, a = ang;
-    for (let j = 0; j < 14; j++) { a += (r() - 0.5) * 0.7; const d = 70 + r() * 90; x += Math.cos(a) * d; y += Math.sin(a) * d; pts.push([x, y]); }
+  const x0 = STELE.x, y0 = STTOP + 170;
+  const grow = (x: number, y: number, a: number, n: number, depth: number) => {
+    const pts = [[x, y]];
+    for (let j = 0; j < n; j++) {
+      a += (r() - 0.5) * 0.9; const d = 22 + r() * 30; x += Math.cos(a) * d; y += Math.sin(a) * d;
+      x = Math.max(STELE.x - STW / 2 - 4, Math.min(STELE.x + STW / 2 + 4, x)); pts.push([x, y]);
+      if (depth < 2 && r() < 0.18) grow(x, y, a + (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6), Math.floor(n / 2), depth + 1);
+    }
     out.push(pts);
-  }
+  };
+  for (let b = 0; b < 6; b++) grow(x0, y0, (b / 6) * Math.PI * 2 + r() * 0.4 + (b % 2 ? 0.3 : 0), 18 + Math.floor(r() * 10), 0);
   return out;
 })();
-// éclats : grille déformée de quadrilatères, chacun tombe avec sa vitesse et sa rotation
+// éclats : grille déformée sur la stèle seulement, chaque morceau tombe avec sa vitesse et sa rotation
 const SHARDS = (() => {
-  const r = rng(5), nx = 9, ny = 6, P: number[][][] = [];
-  for (let j = 0; j <= ny; j++) { const row: number[][] = []; for (let i = 0; i <= nx; i++) row.push([(i / nx) * 1920 + (i % nx ? (r() - 0.5) * 120 : 0), (j / ny) * 1080 + (j % ny ? (r() - 0.5) * 100 : 0)]); P.push(row); }
+  const r = rng(5), nx = 4, ny = 9, P: number[][][] = [];
+  const x0 = STELE.x - STW / 2 - 10, w = STW + 20, y0 = STTOP - 10, h = STH + 70;
+  for (let j = 0; j <= ny; j++) { const row: number[][] = []; for (let i = 0; i <= nx; i++) row.push([x0 + (i / nx) * w + (i % nx ? (r() - 0.5) * 40 : 0), y0 + (j / ny) * h + (j % ny ? (r() - 0.5) * 50 : 0)]); P.push(row); }
   const out: { poly: number[][]; cx: number; cy: number; vx: number; vr: number; delay: number }[] = [];
   for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
     const poly = [P[j][i], P[j][i + 1], P[j + 1][i + 1], P[j + 1][i]];
     const cx = poly.reduce((s, p) => s + p[0], 0) / 4, cy = poly.reduce((s, p) => s + p[1], 0) / 4;
-    const d = Math.hypot(cx - STELE.x, cy - STELE.y) / 1400;
-    out.push({ poly, cx, cy, vx: (cx - STELE.x) * 0.25 + (r() - 0.5) * 80, vr: (r() - 0.5) * 1.6, delay: 0.25 * d + 0.08 * r() });
+    const d = Math.hypot(cx - STELE.x, cy - (STTOP + 170)) / 700;
+    out.push({ poly, cx, cy, vx: (cx - STELE.x) * 1.6 + (r() - 0.5) * 60, vr: (r() - 0.5) * 2.2, delay: 0.18 * d + 0.06 * r() });
   }
   return out;
 })();
@@ -315,25 +327,27 @@ const Opening: React.FC = () => {
           const tq = Math.min(tt, FREEZE);
           if (tt < CRACK) { drawOpening(ctx, E, tq); return; }
           if (!frozenCanvas) { frozenCanvas = document.createElement('canvas'); frozenCanvas.width = 1920; frozenCanvas.height = 1080; }
-          const fc = frozenCanvas.getContext('2d')!; fc.clearRect(0, 0, 1920, 1080); drawOpening(fc, E, FREEZE);
-          // les fissures courent (fines, sombres, liseré clair)
-          const cr = seg(tt, CRACK, CRACK + 0.8);
-          const drawCracks = (c: CanvasRenderingContext2D) => {
-            CRACKS.forEach((pts) => {
-              const n = Math.max(1, Math.floor(cr * (pts.length - 1)) + 1);
-              c.beginPath(); pts.slice(0, n).forEach((p, i) => (i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])));
-              c.strokeStyle = 'rgba(250,246,238,0.8)'; c.lineWidth = 6; c.stroke();
-              c.strokeStyle = 'rgba(28,24,20,0.9)'; c.lineWidth = 2.5; c.stroke();
-            });
-          };
-          if (tt < SHATTER) { ctx.drawImage(frozenCanvas, 0, 0); drawCracks(ctx); return; }
-          // les éclats tombent et découvrent le papier nu
-          drawCracks(fc);
+          const fc = frozenCanvas.getContext('2d')!; fc.clearRect(0, 0, 1920, 1080); drawOpening(fc, E, FREEZE, 'stele');
+          // les fissures courent dans le marbre (fines, sombres, liseré clair), sans jamais en sortir
+          const cr = seg(tt, CRACK, CRACK + 0.7);
+          fc.save(); stelePath(fc); fc.clip();
+          CRACKS.forEach((pts, k) => {
+            const n = Math.max(1, Math.floor(clamp(cr * 1.25 - k * 0.04) * (pts.length - 1)) + 1);
+            fc.beginPath(); pts.slice(0, n).forEach((p, i) => (i ? fc.lineTo(p[0], p[1]) : fc.moveTo(p[0], p[1])));
+            fc.strokeStyle = 'rgba(250,246,238,0.75)'; fc.lineWidth = 5; fc.stroke();
+            fc.strokeStyle = 'rgba(34,30,26,0.92)'; fc.lineWidth = 2.2; fc.stroke();
+          });
+          fc.restore();
+          // le reste (美 et le mouton) reste figé, puis s'efface quand la stèle tombe
+          const rest = 1 - seg(tt, SHATTER, SHATTER + 0.9);
+          if (rest > 0) { ctx.save(); ctx.globalAlpha = rest; drawOpening(ctx, E, FREEZE, 'reste'); ctx.restore(); }
+          if (tt < SHATTER) { const sh = (tt > CRACK && tt < CRACK + 0.25) ? 3 * Math.sin(tt * 90) : 0; ctx.drawImage(frozenCanvas, sh, 0); return; }
+          // les éclats de marbre tombent
           const u = tt - SHATTER;
           SHARDS.forEach((s) => {
             const k = Math.max(0, u - s.delay);
             if (k > 1.6) return;
-            const dy = 900 * k * k, dx = s.vx * k, rot = s.vr * k;
+            const dy = 1100 * k * k, dx = s.vx * k, rot = s.vr * k;
             ctx.save(); ctx.globalAlpha = 1 - seg(k, 0.9, 1.5);
             ctx.translate(s.cx + dx, s.cy + dy); ctx.rotate(rot); ctx.translate(-s.cx, -s.cy);
             ctx.beginPath(); s.poly.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath(); ctx.clip();
