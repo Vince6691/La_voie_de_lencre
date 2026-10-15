@@ -1,6 +1,6 @@
-// Ombres chinoises (皮影) dessinées au Canvas : écran de papier éclairé par une lampe, marionnettes en cuir teinté
-// translucide (bord sombre, panneaux colorés, motifs ajourés par où passe la lumière), articulations rivetées,
-// tiges de manipulation. Deux marionnettes : le danseur de face (coiffe de plumes) et le devin de profil.
+// Ombres chinoises dessinées au Canvas : écran de papier éclairé par une lampe, silhouettes noires aux bords doux
+// (seules quelques découpes laissent passer la lumière : barbes des plumes, franges, signes et fissures de l'os).
+// Deux ombres : le danseur de face (coiffe de plumes) et le devin de profil, à genoux devant le brasero.
 type Pt = [number, number];
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const sm = (u: number) => { const v = clamp(u); return v * v * (3 - 2 * v); };
@@ -8,7 +8,8 @@ const seg = (t: number, a: number, b: number) => sm((t - a) / (b - a));
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const lp = (a: Pt, b: Pt, k: number): Pt => [lerp(a[0], b[0], k), lerp(a[1], b[1], k)];
 
-export const EDGE = 'rgba(38,20,12,0.96)';
+export const EDGE = 'rgb(14,10,8)';
+const BLACK = 'rgb(14,10,8)';
 export const DYE = { red: 'rgba(158,44,26,0.82)', ochre: 'rgba(196,132,46,0.8)', green: 'rgba(44,104,70,0.8)', blue: 'rgba(40,74,120,0.78)', bone: 'rgba(222,196,140,0.85)', dark: 'rgba(70,34,20,0.9)' };
 
 // ── l'écran : papier chaud, lampe derrière (légère vacillation), bords plus sombres
@@ -33,17 +34,17 @@ const getLayer = () => {
   const c = layer.getContext('2d')!; c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; c.filter = 'none'; c.clearRect(0, 0, 1920, 1080);
   return c;
 };
-const flush = (ctx: CanvasRenderingContext2D, a: number, blur = 0.8) => {
+const flush = (ctx: CanvasRenderingContext2D, a: number, blur = 1.4) => {
   if (!layer || a <= 0) return;
   ctx.save();
-  ctx.globalAlpha = a * 0.22; ctx.filter = 'blur(10px)'; ctx.drawImage(layer, 10, 8); // halo d'ombre (la tige éloigne un peu le cuir)
-  ctx.globalAlpha = a; ctx.filter = `blur(${blur}px)`; ctx.drawImage(layer, 0, 0);
+  ctx.globalAlpha = a * 0.3; ctx.filter = 'blur(9px)'; ctx.drawImage(layer, 0, 0); // pénombre
+  ctx.globalAlpha = a * 0.96; ctx.filter = `blur(${blur}px)`; ctx.drawImage(layer, 0, 0);
   ctx.restore();
 };
 
 // pièce en cuir : remplissage teinté + bord sombre
 const piece = (c: CanvasRenderingContext2D, path: () => void, dye: string, lw = 3.5) => {
-  c.beginPath(); path(); c.closePath(); c.fillStyle = dye; c.fill(); c.lineJoin = 'round'; c.strokeStyle = EDGE; c.lineWidth = lw; c.stroke();
+  c.beginPath(); path(); c.closePath(); c.fillStyle = BLACK; c.fill(); void dye; c.lineJoin = 'round'; c.strokeStyle = EDGE; c.lineWidth = lw; c.stroke();
 };
 // segment de membre effilé (a → b), bouts arrondis
 const limb = (c: CanvasRenderingContext2D, a: Pt, b: Pt, w1: number, w2: number, dye: string) => {
@@ -59,12 +60,14 @@ const limb = (c: CanvasRenderingContext2D, a: Pt, b: Pt, w1: number, w2: number,
 const cut = (c: CanvasRenderingContext2D, draw: () => void) => {
   c.save(); c.globalCompositeOperation = 'destination-out'; c.fillStyle = 'rgba(0,0,0,0.9)'; c.strokeStyle = 'rgba(0,0,0,0.9)'; draw(); c.restore();
 };
-const lozenges = (c: CanvasRenderingContext2D, a: Pt, b: Pt, n: number, r: number) => cut(c, () => {
+const lozenges = (_c: CanvasRenderingContext2D, _a: Pt, _b: Pt, _n: number, _r: number) => {};
+const lozengesCut = (c: CanvasRenderingContext2D, a: Pt, b: Pt, n: number, r: number) => cut(c, () => {
   for (let i = 1; i < n; i++) { const p = lp(a, b, i / n); c.beginPath(); c.moveTo(p[0], p[1] - r); c.lineTo(p[0] + r * 0.6, p[1]); c.lineTo(p[0], p[1] + r); c.lineTo(p[0] - r * 0.6, p[1]); c.closePath(); c.fill(); }
 });
-const rivet = (c: CanvasRenderingContext2D, p: Pt, r = 4) => { c.beginPath(); c.arc(p[0], p[1], r, 0, 7); c.fillStyle = 'rgba(30,16,10,0.95)'; c.fill(); };
+const rivet = (_c: CanvasRenderingContext2D, _p: Pt, _r = 4) => {};
 // tige de manipulation : fine, sombre, un peu floue (elle est loin de l'écran)
-const rods = (ctx: CanvasRenderingContext2D, from: Pt[], a: number) => {
+const rods = (_ctx: CanvasRenderingContext2D, _from: Pt[], _a: number) => {};
+const rodsDrawn = (ctx: CanvasRenderingContext2D, from: Pt[], a: number) => {
   ctx.save(); ctx.globalAlpha = a * 0.55; ctx.filter = 'blur(2px)'; ctx.strokeStyle = 'rgb(40,24,14)'; ctx.lineWidth = 4; ctx.lineCap = 'round';
   from.forEach(([x, y], i) => { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (i - 1) * 90, 1110); ctx.stroke(); });
   ctx.restore();
@@ -144,13 +147,10 @@ export const drawDancer = (ctx: CanvasRenderingContext2D, o: { x: number; y: num
   piece(c, () => { c.moveTo(wa[0] - w(24), wa[1]); c.lineTo(wa[0] + w(24), wa[1]); c.lineTo(wa[0] + w(58), wa[1] + hem); c.lineTo(wa[0] - w(58), wa[1] + hem); }, DYE.red);
   cut(c, () => { c.lineWidth = w(3); for (let i = -4; i <= 4; i++) { const x = wa[0] + i * w(11); c.beginPath(); c.moveTo(x + i * w(1.5), wa[1] + hem * 0.35); c.lineTo(x + i * w(3.5), wa[1] + hem - w(4)); c.stroke(); } });
   piece(c, () => { c.rect(wa[0] - w(27), wa[1] - w(6), w(54), w(12)); }, DYE.green, 2.5);
-  // cou et tête (masque de face, yeux en amande ajourés)
+  // cou et tête
   limb(c, P.S, P.Hd, w(9), w(8), DYE.ochre);
   piece(c, () => { c.ellipse(P.Hd[0], P.Hd[1], w(30), w(38), 0, 0, Math.PI * 2); }, DYE.ochre);
-  cut(c, () => {
-    for (const s of [-1, 1]) { c.beginPath(); c.ellipse(P.Hd[0] + s * w(12), P.Hd[1] - w(4), w(8), w(3.2), s * 0.25, 0, 7); c.fill(); }
-    c.beginPath(); c.ellipse(P.Hd[0], P.Hd[1] + w(18), w(8), w(2.2), 0, 0, 7); c.fill();
-  });
+
   // coiffe : bandeau, puis deux paires de plumes (en haut et sur les côtés) qui ondulent avec un temps de retard
   piece(c, () => { c.rect(P.Hd[0] - w(32), P.Hd[1] - w(36), w(64), w(12)); }, DYE.red, 2.5);
   const top: Pt = [P.Hd[0] + w(2), P.Hd[1] - w(72)];
@@ -193,11 +193,7 @@ export const drawDiviner = (ctx: CanvasRenderingContext2D, x0: number, y0: numbe
     c.quadraticCurveTo(p[5][0], p[5][1], p[6][0], p[6][1]); c.quadraticCurveTo(p[7][0], p[7][1], p[8][0], p[8][1]); c.lineTo(p[9][0], p[9][1]);
   }, DYE.red);
   piece(c, () => { const a = M(-74, -250), b = M(46, -250); c.moveTo(a[0], a[1] - w(8)); c.lineTo(b[0], b[1] - w(8)); c.lineTo(b[0] + w(4), b[1] + w(8)); c.lineTo(a[0] - w(4), a[1] + w(8)); }, DYE.ochre, 2.5);
-  cut(c, () => {
-    c.lineWidth = w(3);
-    for (const [cx, cy] of [[-60, -150], [10, -110], [-40, -330], [90, -60], [-90, -70]] as Pt[]) { const p = M(cx, cy); c.beginPath(); c.arc(p[0], p[1], w(15), 0.3, 5.6); c.stroke(); c.beginPath(); c.arc(p[0] + w(4), p[1], w(7), 3.4, 8.6); c.stroke(); }
-    for (let i = 0; i < 9; i++) { const p = M(-120 + i * 30, -18); c.beginPath(); c.moveTo(p[0], p[1] - w(7)); c.lineTo(p[0] + w(5), p[1]); c.lineTo(p[0], p[1] + w(7)); c.lineTo(p[0] - w(5), p[1]); c.closePath(); c.fill(); }
-  });
+
   // bras arrière (tient le plastron)
   limb(c, M(-6, -392), M(80, -300), w(13), w(11), DYE.red); limb(c, M(80, -300), hand1, w(11), w(8), DYE.ochre); rivet(c, M(80, -300), w(4));
   // le plastron : os pâle, écailles gravées, signes incisés, point chauffé, fissures où passe la lumière
@@ -209,23 +205,23 @@ export const drawDiviner = (ctx: CanvasRenderingContext2D, x0: number, y0: numbe
     for (const yy of [-0.5, -0.05, 0.4]) { c.moveTo(plC[0] - pw * 0.88, plC[1] + ph * (yy + 0.06)); c.quadraticCurveTo(plC[0], plC[1] + ph * (yy - 0.06), plC[0] + pw * 0.88, plC[1] + ph * (yy + 0.06)); }
     c.stroke();
   });
-  // signes incisés puis fissures : traits sombres, brûlés, dans l'os
-  c.strokeStyle = EDGE; c.lineWidth = w(3);
+  // signes incisés puis fissures : la lumière passe à travers l'os
+  c.save(); c.globalCompositeOperation = 'destination-out'; c.strokeStyle = '#000'; c.lineCap = 'round'; c.lineWidth = w(3.2);
   const n = Math.floor(clamp(st.carve) * 10);
   for (let i = 0; i < n; i++) { const col = i % 2, row = Math.floor(i / 2); const px = plC[0] + (col ? -pw * 0.5 : -pw * 0.22), py = plC[1] - ph * 0.6 + row * w(24); c.beginPath(); c.moveTo(px - w(8), py); c.lineTo(px + w(8), py); c.moveTo(px, py - w(9)); c.lineTo(px, py + w(9)); c.stroke(); }
   if (st.crack > 0) {
-    c.lineWidth = w(4.2);
+    c.lineWidth = w(4.6);
     const o: Pt = [plC[0] + pw * 0.3, plC[1] + ph * 0.15];
     CRK.forEach((pl, j) => { const kk = clamp(st.crack * 1.4 - j * 0.2); if (kk <= 0) return; c.beginPath(); pl.forEach((p, i) => { const q = lp(pl[0], p, kk); const X = o[0] + q[0] * s * 1.3, Y = o[1] + q[1] * s * 1.3; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.stroke(); });
   }
-  // tête de profil : front droit, nez, œil long ajouré, barbe en franges, haut bonnet
+  c.restore();
+  // tête de profil : front droit, nez, barbe en franges, haut bonnet
   const hd = (x: number, y: number) => { const r = 0.08 * lift, dx = x - 10, dy = y + 410; return M(10 + dx * Math.cos(r) - dy * Math.sin(r), -410 + dx * Math.sin(r) + dy * Math.cos(r)); };
   limb(c, M(4, -404), hd(14, -446), w(11), w(10), DYE.ochre);
   piece(c, () => {
     const p = [hd(-30, -470), hd(-24, -522), hd(34, -522), hd(40, -500), hd(60, -476), hd(46, -468), hd(48, -456), hd(38, -446), hd(14, -438)];
     p.forEach((q, i) => (i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])));
   }, DYE.ochre);
-  cut(c, () => { const e = hd(28, -494); c.beginPath(); c.ellipse(e[0], e[1], w(11), w(3), -0.12, 0, 7); c.fill(); const m = hd(38, -460); c.beginPath(); c.ellipse(m[0], m[1], w(5), w(1.6), 0, 0, 7); c.fill(); });
   for (let i = 0; i < 6; i++) { const a = hd(18 + i * 5, -446), b = hd(26 + i * 6, -392 + i * 3); c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.strokeStyle = EDGE; c.lineWidth = w(3); c.stroke(); }
   piece(c, () => { const p = [hd(-34, -516), hd(-30, -560), hd(-6, -606), hd(22, -598), hd(30, -520)]; p.forEach((q, i) => (i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]))); }, DYE.dark);
   lozenges(c, hd(-14, -590), hd(8, -530), 3, w(6));
