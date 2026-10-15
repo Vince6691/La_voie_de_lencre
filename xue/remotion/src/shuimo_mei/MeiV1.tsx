@@ -176,15 +176,6 @@ const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; ch
   return <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${960 - cx * s}px, ${540 - cy * s}px) scale(${s})` }}>{children}</AbsoluteFill>;
 };
 
-// estampage (os ou bronze) : plaque sombre tamponnée sur le papier
-const stamp = (ctx: CanvasRenderingContext2D, E: any, a: number, x: number, y: number, w: number, h: number, r: number, bronze = false) => {
-  if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha = a;
-  ctx.fillStyle = bronze ? 'rgba(44,52,46,0.88)' : 'rgba(40,34,30,0.86)';
-  E.roundRect(ctx, x - w / 2, y - h / 2, w, h, r); ctx.fill();
-  ctx.restore();
-};
-
 // un mouton dodu à l'encre (laine en volutes, tête sombre, quatre pattes)
 const WOOL = (() => { const r = rng(31); return Array.from({ length: 15 }, (_, i) => { const a = (i / 15) * Math.PI * 2; return [Math.cos(a) * (0.95 + 0.1 * r()), Math.sin(a) * (0.62 + 0.08 * r()), 0.32 + 0.1 * r()]; }); })();
 const sheep = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, a: number, col = GOM, flip = false) => {
@@ -389,10 +380,10 @@ const Shang: React.FC = () => {
             }
             // l'os : plastron tamponné, le signe révélé en blanc puis à l'encre ; l'homme (azurite), la coiffe (malachite)
             const plate = win(tt, os - 0.4, clipIn + 0.6, 0.7);
-            stamp(ctx, E, plate, 960, 540, 560, 800, 170);
+            void plate; // plus de plaque sombre : le signe se grave directement sur le papier
             const rv = seg(tt, os + 0.2, os + 1.4), dry = seg(tt, hom - 0.6, hom + 0.4);
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
-            const base = (c: string) => mixc(PAPERWHITE, INK, dry);
+            const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
             const col = (c: string) => rgb(c === 'coiffe' ? mixc(base(c), MAL, cf) : mixc(base(c), AZ, man));
             const mainA = (1 - seg(tt, clipIn - 0.2, clipIn + 0.4)) + seg(tt, clipOut, clipOut + 0.8);
             const two = tt > br + 0.6 && tt < br + 2.2; // « parfois deux »
@@ -403,8 +394,7 @@ const Shang: React.FC = () => {
             // le vrai mouton de l'os : museau en pointe, cornes qui retombent (gomme-gutte), puis il pâlit
             const ya = win(tt, mt - 0.2, rien + 0.6, 0.5);
             if (ya > 0) {
-              stamp(ctx, E, ya, 1480, 540, 400, 520, 120);
-              E.drawRealGlyph(ctx, 'mei_yang_jiaguwen', { x: 1480, y: 540, size: 420, opacity: ya, color: () => rgb(mixc(PAPERWHITE, GOM, seg(tt, mus - 0.2, mus + 0.4))), glow: 18 * win(tt, mus, rien, 0.3), glowColor: rgb(GOM, 0.5) });
+              E.drawRealGlyph(ctx, 'mei_yang_jiaguwen', { x: 1480, y: 540, size: 420, opacity: ya, color: () => rgb(mixc(INK, GOM, seg(tt, mus - 0.2, mus + 0.4))), glow: 18 * win(tt, mus, rien, 0.3), glowColor: rgb(GOM, 0.5) });
               if (tt > rien) { // « ici, rien de tel » : un trait rouge barre la comparaison
                 const k = seg(tt, rien, rien + 0.5);
                 ctx.save(); ctx.globalAlpha = ya; ctx.strokeStyle = rgb(VER, 0.9); ctx.lineWidth = 10; ctx.lineCap = 'round';
@@ -449,9 +439,8 @@ const Zhou: React.FC = () => {
             const a = win(tt, A5 - 0.2, R2 + 0.3, 0.5);
             if (a <= 0) return;
             const side = seg(tt, cf + 1.6, cf + 2.4) * (1 - seg(tt, co - 0.3, co));
-            stamp(ctx, E, a * seg(tt, bz - 0.4, bz + 0.2), 960 + 240 * side, 540, 560, 800, 60, true);
             const c1 = seg(tt, cf, cf + 0.5), horn = seg(tt, co - 0.1, co + 0.6);
-            E.drawRealGlyph(ctx, 'mei_jinwen', { x: 960 + 240 * side, y: 540, size: 680, opacity: a * seg(tt, bz, bz + 1), color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc([214, 200, 170], MAL, c1), GOM, 0.55 * horn) : mixc([214, 200, 170], AZ, seg(tt, ep, ep + 0.5))), glow: 24 * c1, glowColor: rgb(horn > 0.5 ? GOM : MAL, 0.6) });
+            E.drawRealGlyph(ctx, 'mei_jinwen', { x: 960 + 240 * side, y: 540, size: 680, opacity: a * seg(tt, bz, bz + 1), color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, c1), GOM, 0.55 * horn) : mixc(INK, AZ, seg(tt, ep, ep + 0.5))), glow: 24 * c1, glowColor: rgb(horn > 0.5 ? GOM : MAL, 0.6) });
             if (side > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: 960 - 500 * side, y: 540, size: 440, opacity: a * side, color: meiCol(1, 1) });
           }} />
         </TimeScrollStage>
@@ -473,37 +462,73 @@ const VERSE = '天下皆知美之為美斯惡已'.split('');
 const NS = VERSE.length;
 // bande de l'image de Laozi (largeur relative) : les lattes forment la silhouette (l'image est en 16:9, plein cadre)
 const FIG = { x0: 0.355, x1: 0.62 };
+let washCanvas: HTMLCanvasElement | null = null, maskCanvas: HTMLCanvasElement | null = null;
 const laoziCalligram = (ctx: CanvasRenderingContext2D, E: any, tt: number, T: { vers: number; laideur: number; p0: number; p1: number; maitre: number }) => {
   const img = laoziImg.img;
   const sw = (1920 * (FIG.x1 - FIG.x0)) / NS;
-  const assemble = ease(seg(tt, T.p0, T.p1 - 0.6));
-  const wash = seg(tt, T.p1 - 1.2, T.p1 + 0.6);
-  // les lattes : d'abord en rangée (rouleau de bambou lu de droite à gauche), chacune reçoit son caractère
+  const step = (T.laideur - T.vers) / NS;
+  const HEART = [1920 * 0.52, 1080 * 0.4];
+  // 3. le lavis : le portrait entier s'étend depuis le cœur, bord irrégulier (comme l'encre qui boit le papier)
+  const wash = seg(tt, T.p1 - 1.0, T.p1 + 1.4);
   for (let i = 0; i < NS; i++) {
-    const appear = seg(tt, T.vers + i * ((T.laideur - T.vers) / NS), T.vers + i * ((T.laideur - T.vers) / NS) + 0.5);
-    if (appear <= 0) continue;
-    const sx = 1620 - i * 104, sy = 140, sh = 800;               // position de départ (rangée de lattes)
-    const fx = 1920 * FIG.x1 - (i + 1) * sw, fy = 0, fh = 1080;   // position finale : une tranche de la silhouette
-    const x = sx + (fx - sx) * assemble, y = sy + (fy - sy) * assemble, w = 78 + (sw - 78) * assemble, h = sh + (fh - sh) * assemble;
-    ctx.save(); ctx.globalAlpha = appear * (1 - 0.85 * wash);
-    // latte de bambou, qui se fond dans la tranche du portrait
-    const g = ctx.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, '#c9a868'); g.addColorStop(0.5, '#dcc084'); g.addColorStop(1, '#bf9c5c');
-    ctx.fillStyle = g; ctx.globalAlpha *= 1 - assemble; E.roundRect(ctx, x, y, w, h, 8 * (1 - assemble)); ctx.fill();
-    ctx.globalAlpha = appear * (1 - 0.85 * wash);
-    if (img && assemble > 0) {
-      ctx.globalAlpha *= assemble;
-      const ix = ((fx / 1920) * img.width), iw = (sw / 1920) * img.width;
-      ctx.drawImage(img, ix, 0, iw, img.height, x, y, w, h);
+    // 1. chaque latte tombe (légère rotation, petit rebond), puis son caractère s'écrit de haut en bas
+    const t0 = T.vers + i * step;
+    const fall = clamp((tt - t0) / 0.55);
+    if (fall <= 0) continue;
+    const bounce = fall < 1 ? 1 - Math.pow(1 - fall, 3) : 1 + 0.02 * Math.sin((tt - t0 - 0.55) * 14) * Math.exp(-(tt - t0 - 0.55) * 5);
+    const sx = 1640 - i * 104, sy = 140 - 700 * (1 - bounce), sh = 780, sr = (1 - fall) * (i % 2 ? 0.18 : -0.14);
+    // 2. pendant la pause : la latte pivote sur elle-même (comme une carte) et montre au dos sa tranche du portrait,
+    //    en glissant à sa place dans la silhouette
+    const f = seg(tt, T.p0 + 0.15 + i * 0.2, T.p0 + 1.55 + i * 0.2);
+    const fx = 1920 * FIG.x1 - (i + 1) * sw;
+    const w = 78 + (sw - 78) * f, h = sh + (1080 - sh) * f;
+    const cx = sx + 39 + (fx + sw / 2 - (sx + 39)) * ease(f), cy = sy + sh / 2 + (540 - (sy + sh / 2)) * ease(f);
+    const flip = Math.abs(Math.cos(Math.PI * f)), back = f > 0.5;
+    const alpha = (1 - seg(tt, T.p1 + 0.2, T.p1 + 1.2));
+    if (alpha <= 0) continue;
+    ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cx, cy); ctx.rotate(sr * (1 - f)); ctx.scale(Math.max(0.02, flip), 1);
+    if (!back) {
+      const g = ctx.createLinearGradient(-w / 2, 0, w / 2, 0); g.addColorStop(0, '#c4a262'); g.addColorStop(0.5, '#dcc084'); g.addColorStop(1, '#b8955a');
+      ctx.fillStyle = g; E.roundRect(ctx, -w / 2, -h / 2, w, h, 8); ctx.fill();
+      // nœuds du bambou et cordelettes
+      ctx.fillStyle = 'rgba(120,90,50,0.35)'; ctx.fillRect(-w / 2, -h / 2 + h * 0.33, w, 4); ctx.fillRect(-w / 2, -h / 2 + h * 0.7, w, 4);
+      ctx.fillStyle = 'rgba(70,52,34,0.8)'; ctx.fillRect(-w / 2, -h / 2 + 60, w, 6); ctx.fillRect(-w / 2, h / 2 - 66, w, 6);
+      // le caractère, écrit au pinceau (dévoilé de haut en bas)
+      const wr = seg(tt, t0 + 0.35, t0 + 0.35 + Math.max(0.35, step * 0.9));
+      if (wr > 0) {
+        ctx.save(); ctx.beginPath(); ctx.rect(-w / 2, -h / 2 + 80, w, 140 * wr); ctx.clip();
+        E.text(ctx, VERSE[i], 0, -h / 2 + 150, { font: 'ShuimoKai', size: 66, color: VERSE[i] === '美' ? rgb(mixc(INK, MAL, 0.85)) : '#2a231d' });
+        ctx.restore();
+      }
+    } else if (img) {
+      const ix = (fx / 1920) * img.width, iw = (sw / 1920) * img.width;
+      ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(img, ix, 0, iw, img.height, -w / 2, -h / 2, w, h); ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = `rgba(200,170,110,${0.25 * (1 - f)})`; ctx.fillRect(-w / 2, -h / 2, w, h);
     }
     ctx.restore();
-    const ca = appear * (1 - seg(tt, T.p0 + 0.4, T.p0 + 1.6));
-    if (ca > 0) E.text(ctx, VERSE[i], x + w / 2, y + 120 + 2 * 0, { font: 'ShuimoKai', size: 64, color: VERSE[i] === '美' ? rgb(mixc(INK, MAL, 0.8)) : '#2a231d', alpha: ca });
   }
-  // le lavis : l'image entière remplit la forme (les jointures disparaissent)
-  if (img && wash > 0) { ctx.save(); ctx.globalAlpha = wash; ctx.drawImage(img, 0, 0, 1920, 1080); ctx.restore(); }
+  if (img && wash > 0) {
+    if (!washCanvas) { washCanvas = document.createElement('canvas'); washCanvas.width = 1920; washCanvas.height = 1080; }
+    if (!maskCanvas) { maskCanvas = document.createElement('canvas'); maskCanvas.width = 1920; maskCanvas.height = 1080; }
+    // masque : union de taches de lavis autour du cœur, qui grandissent ; puis appliqué une seule fois au portrait
+    const mc = maskCanvas.getContext('2d')!;
+    mc.clearRect(0, 0, 1920, 1080);
+    const R0 = 760 * ease(wash), r = rng(12); // le lavis reste autour de la silhouette : le paysage demeure autour
+    for (let k = 0; k < 26; k++) {
+      const a = r() * 6.283, d = r() * R0 * 0.55, rr = R0 * (0.35 + 0.5 * r());
+      const x = HEART[0] + Math.cos(a) * d, y = HEART[1] + Math.sin(a) * d;
+      const g = mc.createRadialGradient(x, y, 0, x, y, Math.max(1, rr)); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      mc.fillStyle = g; mc.fillRect(x - rr, y - rr, 2 * rr, 2 * rr);
+    }
+    const wc = washCanvas.getContext('2d')!;
+    wc.globalCompositeOperation = 'source-over'; wc.clearRect(0, 0, 1920, 1080); wc.drawImage(img, 0, 0, 1920, 1080);
+    wc.globalCompositeOperation = 'destination-in'; wc.drawImage(maskCanvas, 0, 0);
+    wc.globalCompositeOperation = 'source-over';
+    ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(washCanvas, 0, 0); ctx.restore();
+  }
   // le 美 à hauteur du cœur, qui pâlit sur « se méfiait de la beauté »
-  const heart = seg(tt, T.p1 - 0.4, T.p1 + 0.4) * (1 - 0.85 * seg(tt, T.maitre + 1.0, T.maitre + 2.2));
-  if (heart > 0) E.text(ctx, '美', 1920 * 0.52, 1080 * 0.4, { font: 'ShuimoKai', size: 92, color: rgb(MAL), alpha: heart, glow: 14, glowColor: rgb(MAL, 0.5) });
+  const heart = seg(tt, T.p1 - 0.2, T.p1 + 0.6) * (1 - 0.85 * seg(tt, T.maitre + 1.0, T.maitre + 2.2));
+  if (heart > 0) E.text(ctx, '美', HEART[0], HEART[1], { font: 'ShuimoKai', size: 92, color: rgb(MAL), alpha: heart, glow: 14, glowColor: rgb(MAL, 0.5) });
 };
 const Chu: React.FC = () => {
   const t = useT();
