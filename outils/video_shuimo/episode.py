@@ -28,7 +28,7 @@ def ligne_de_temps(cfg, durees, reperes=None):
     """Temps absolus : début de chaque clip, rouleaux, pauses, fin. durees = {clip: secondes} ;
     reperes = {clip: {nom: t}} (nécessaire pour les pauses calées sur un repère)."""
     t = cfg['debut']
-    clips, rouleaux, pauses = {}, [], []
+    clips, rouleaux, pauses, plages = {}, [], [], {}
     for el in cfg['sequence']:
         if 'clip' in el:
             c = el['clip']
@@ -40,9 +40,12 @@ def ligne_de_temps(cfg, durees, reperes=None):
                 clips[c]['pause'] = {'coupe': round(coupe, 3), 'duree': p['duree']}
                 pauses.append([round(clips[c]['debut'] + coupe, 3), p['duree']])
                 t += p['duree']
+        elif 'plage' in el:  # plage sans voix réservée à un clip (son du clip éventuel : son, son_decalage, son_volume)
+            plages[el['nom']] = {'debut': round(t, 3), 'duree': el['plage'], **{k: el[k] for k in ('son', 'son_decalage', 'son_volume') if k in el}}
+            t += el['plage']
         else:
             rouleaux.append({'debut': round(t, 3), 'duree': el['rouleau']})
             t += el['rouleau']
         t += el.get('apres', 0)
     fin = round(t, 3)
-    return {'clips': clips, 'rouleaux': rouleaux, 'pauses': pauses, 'fin': fin, 'total': round(fin + cfg.get('queue', 0), 3)}
+    return {'clips': clips, 'rouleaux': rouleaux, 'pauses': pauses, 'plages': plages, 'fin': fin, 'total': round(fin + cfg.get('queue', 0), 3)}

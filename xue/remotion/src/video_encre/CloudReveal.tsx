@@ -3,7 +3,7 @@
 // cachent la scène et s'écartent à nouveau sur le décor shuimo. Pas de traitement par pixel : la vidéo est posée telle
 // quelle sous les nuages.
 import React from 'react';
-import { AbsoluteFill, Img, OffthreadVideo, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Img, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const ease = (u: number) => { const v = clamp(u); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
@@ -21,7 +21,7 @@ const CLOUDS = (() => {
   return out.sort((a, b) => a.depth - b.depth);
 })();
 
-export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: number; exit?: boolean; startFrom?: number; playbackRate?: number }> = ({ src, inDur = 3.6, outDur = 3.2, exit = true, startFrom = 0, playbackRate = 1 }) => {
+export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: number; exit?: boolean; startFrom?: number; playbackRate?: number; videoAt?: number; volume?: number }> = ({ src, inDur = 3.6, outDur = 3.2, exit = true, startFrom = 0, playbackRate = 1, videoAt, volume = 0 }) => {
   const { fps, durationInFrames } = useVideoConfig();
   const t = useCurrentFrame() / fps, total = durationInFrames / fps, oAt = exit ? total - outDur : Infinity; // exit = false : entrée seule (la sortie est confiée à un autre effet)
   const inPh = t < oAt, u = inPh ? clamp(t / inDur) : clamp((t - oAt) / outDur);
@@ -31,7 +31,10 @@ export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: numbe
   const core = Math.min(close(0.1), 1 - open(0.05)); // voile de papier au cœur, pour qu'aucun trou ne laisse voir le changement
   return (
     <AbsoluteFill>
-      {showVid && <OffthreadVideo src={staticFile(src)} muted startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+      {/* videoAt (s) : la vidéo démarre à son début à cet instant (au lieu de démarrer avec la séquence) */}
+      {videoAt !== undefined
+        ? <Sequence from={Math.round(videoAt * fps)} layout="none"><OffthreadVideo src={staticFile(src)} muted={volume === 0} volume={volume} startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></Sequence>
+        : showVid && <OffthreadVideo src={staticFile(src)} muted startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse 75% 70% at 50% 50%, rgba(246,241,231,1) 40%, rgba(246,241,231,0.85) 75%, rgba(246,241,231,0) 100%)', opacity: core }} />
       {CLOUDS.map((c, i) => {
         const k = close(c.delay) * (1 - open(c.delay));

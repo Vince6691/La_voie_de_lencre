@@ -17,8 +17,12 @@
    "apres": 0.3
   },
   {
-   "rouleau": 6,
-   "apres": 0.3
+   "plage": 7.75,
+   "nom": "danse",
+   "apres": 0.0,
+   "son": "clips/03_danseur_v2.mp4",
+   "son_decalage": 0.75,
+   "son_volume": 0.7
   },
   {
    "clip": "b04",
@@ -221,13 +225,6 @@
    null,
    1.54,
    0.75
-  ],
-  [
-   "sceau",
-   "R1",
-   "impact",
-   0,
-   0.6
   ],
   [
    "sceau",

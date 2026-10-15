@@ -44,7 +44,7 @@ let extra = '';
 if (fs.existsSync(EP)) for (const p of fs.readdirSync(EP)) {
   const e = `${EP}/${p}`;
   if (!fs.existsSync(`${e}/episode.json`)) continue;
-  for (const [dir, ok] of [['voix', (f) => f.endsWith('.wav')], ['audio', (f) => f.endsWith('.wav')], ['clips', (f) => f.endsWith('.mp4')], ['images', (f) => /\.(png|jpe?g|json)$/.test(f)]]) {
+  for (const [dir, ok] of [['voix', (f) => f.endsWith('.wav')], ['audio', (f) => f.endsWith('.wav')], ['clips', (f) => /\.(mp4|png|jpe?g)$/.test(f)], ['images', (f) => /\.(png|jpe?g|json)$/.test(f)]]) {
     if (fs.existsSync(`${e}/${dir}`)) for (const f of fs.readdirSync(`${e}/${dir}`)) if (ok(f)) cp(`${e}/${dir}/${f}`, `${here}/public/episodes/${p}/${dir}/${f}`);
   }
   if (fs.existsSync(`${e}/voix/reperes.json`)) cp(`${e}/voix/reperes.json`, `${here}/src/data/episodes/${p}.json`);

@@ -15,14 +15,14 @@ import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
 import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
-import { Rig, drawGlyphDance } from '../danse/GlyphDance';
+import { CloudReveal } from '../video_encre/CloudReveal';
 import { VideoReveal } from '../video_encre/VideoReveal';
 import { loadLegacy, W } from '../legacy';
 import rep from '../data/episodes/mei.json';
 
 type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b10' | 'b11' | 'b08' | 'b09';
 type Rep = Record<Clip, { duration: number; cues: Record<string, number> }> & {
-  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; fin: number; total: number; bruitages?: [string, number, number][] };
+  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; plages: Record<string, { debut: number; duree: number; son?: string; son_decalage?: number; son_volume?: number }>; fin: number; total: number; bruitages?: [string, number, number][] };
 };
 const R = rep as unknown as Rep;
 const L = R._ligne;
@@ -41,11 +41,10 @@ const ERAS: Era[] = [
   { zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '戰', date: '−300' }, { zh: '秦', date: '−221' },
   { zh: '漢', date: '100' }, { zh: '宋', date: '986' },
 ];
-const [R1, R2] = L.rouleaux.map((r) => r.debut);
-// rouleau 1 à rebours : de la stèle des Song jusqu'aux os des Shang ; rouleau 2 : Zhou → Royaumes combattants
-const TR1: TimeScrollConfig = { at: R1, duration: L.rouleaux[0].duree, eras: ERAS, from: 5, to: 0, years: [986, -1200] };
-const TR2: TimeScrollConfig = { at: R2, duration: L.rouleaux[1].duree, eras: ERAS, from: 1, to: 2, years: [-1046, -300] };
-const R1E = R1 + TR1.duration!, R2E = R2 + TR2.duration!;
+const R2 = L.rouleaux[0].debut;
+// rouleau : Zhou → Royaumes combattants (le retour aux Shang se fait par les nuages et le clip de la danse)
+const TR2: TimeScrollConfig = { at: R2, duration: L.rouleaux[0].duree, eras: ERAS, from: 1, to: 2, years: [-1046, -300] };
+const R2E = R2 + TR2.duration!;
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const seg = (t: number, a: number, b: number) => { const u = clamp((t - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -64,6 +63,9 @@ const useT = () => useCurrentFrame() / useVideoConfig().fps;
 // ── polices, moteur Canvas, image de Laozi
 const LAOZI = 'episodes/mei/images/laozi_reference.jpg';
 const laoziImg: { img: HTMLImageElement | null } = { img: null };
+// autres images : fin du clip (pose figée), silhouette détourée (detourer.py), tracé du baimiao (trace_baimiao.py)
+const IMGSRC = { fin: 'episodes/mei/clips/03_danseur_v2_fin.jpg', sil: 'episodes/mei/clips/03_danseur_v2_silhouette.png', trace: 'episodes/mei/images/laozi_baimiao_trace.png' };
+const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 const useSetup = () => {
   const [h] = useState(() => delayRender('polices + moteur + images'));
   const [ready, setReady] = useState(false);
@@ -74,6 +76,7 @@ const useSetup = () => {
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load(),
       imgP,
+      ...Object.entries(IMGSRC).map(([k, src]) => new Promise<void>((res) => { const im = new Image(); im.onload = () => { IMG[k as keyof typeof IMGSRC] = im; res(); }; im.onerror = () => res(); im.src = staticFile(src); })),
     ]).then(([f1, f2]) => { [f1, f2].forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
   }, [h]);
   return ready;
@@ -262,35 +265,50 @@ const stelePath = (c: CanvasRenderingContext2D) => {
   c.beginPath(); c.moveTo(x - w / 2, STELE.y + STH / 2); c.lineTo(x - w / 2, top + 110); c.quadraticCurveTo(x - w / 2, top, x, top);
   c.quadraticCurveTo(x + w / 2, top, x + w / 2, top + 110); c.lineTo(x + w / 2, STELE.y + STH / 2); c.closePath();
 };
-// fissures : elles partent du 羊 gravé et courent dans le marbre, avec quelques ramifications
-const CRACKS = (() => {
-  const r = rng(91), out: number[][][] = [];
-  const x0 = STELE.x, y0 = STTOP + 170;
-  const grow = (x: number, y: number, a: number, n: number, depth: number) => {
-    const pts = [[x, y]];
-    for (let j = 0; j < n; j++) {
-      a += (r() - 0.5) * 0.9; const d = 22 + r() * 30; x += Math.cos(a) * d; y += Math.sin(a) * d;
-      x = Math.max(STELE.x - STW / 2 - 4, Math.min(STELE.x + STW / 2 + 4, x)); pts.push([x, y]);
-      if (depth < 2 && r() < 0.18) grow(x, y, a + (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6), Math.floor(n / 2), depth + 1);
-    }
-    out.push(pts);
-  };
-  for (let b = 0; b < 6; b++) grow(x0, y0, (b / 6) * Math.PI * 2 + r() * 0.4 + (b % 2 ? 0.3 : 0), 18 + Math.floor(r() * 10), 0);
-  return out;
-})();
-// éclats : grille déformée sur la stèle seulement, chaque morceau tombe avec sa vitesse et sa rotation
-const SHARDS = (() => {
-  const r = rng(5), nx = 4, ny = 9, P: number[][][] = [];
-  const x0 = STELE.x - STW / 2 - 10, w = STW + 20, y0 = STTOP - 10, h = STH + 70;
-  for (let j = 0; j <= ny; j++) { const row: number[][] = []; for (let i = 0; i <= nx; i++) row.push([x0 + (i / nx) * w + (i % nx ? (r() - 0.5) * 40 : 0), y0 + (j / ny) * h + (j % ny ? (r() - 0.5) * 50 : 0)]); P.push(row); }
-  const out: { poly: number[][]; cx: number; cy: number; vx: number; vr: number; delay: number }[] = [];
-  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
-    const poly = [P[j][i], P[j][i + 1], P[j + 1][i + 1], P[j + 1][i]];
-    const cx = poly.reduce((s, p) => s + p[0], 0) / 4, cy = poly.reduce((s, p) => s + p[1], 0) / 4;
-    const d = Math.hypot(cx - STELE.x, cy - (STTOP + 170)) / 700;
-    out.push({ poly, cx, cy, vx: (cx - STELE.x) * 1.6 + (r() - 0.5) * 60, vr: (r() - 0.5) * 2.2, delay: 0.18 * d + 0.06 * r() });
+// la cassure : un réseau de fissures (cellules de Voronoï autour de germes serrés près du 羊 gravé) ; les mêmes
+// lignes, brisées, servent de bords aux éclats — la stèle se détache exactement le long des fissures
+type P2 = [number, number];
+const IMPACT: P2 = [STELE.x, STTOP + 170];
+const FRACT = (() => {
+  const r = rng(91), x0 = STELE.x - STW / 2 - 12, x1 = STELE.x + STW / 2 + 12, y0 = STTOP - 12, y1 = STELE.y + STH / 2 + 48;
+  const seeds: P2[] = [];
+  for (let i = 0; i < 22; i++) {
+    const rad = 40 + Math.pow(r(), 1.6) * 640, a = r() * Math.PI * 2;
+    seeds.push([Math.max(x0 + 8, Math.min(x1 - 8, IMPACT[0] + Math.cos(a) * rad * 0.55)), Math.max(y0 + 8, Math.min(y1 - 8, IMPACT[1] + Math.sin(a) * rad + rad * 0.35))]);
   }
-  return out;
+  // cellule i = rectangle découpé par les demi-plans « plus près de i que de j »
+  const clipHalf = (poly: P2[], p: P2, q: P2) => {
+    const m: P2 = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2], n: P2 = [q[0] - p[0], q[1] - p[1]];
+    const side = (v: P2) => (v[0] - m[0]) * n[0] + (v[1] - m[1]) * n[1];
+    const out: P2[] = [];
+    poly.forEach((v, i) => {
+      const w = poly[(i + 1) % poly.length], sv = side(v), sw = side(w);
+      if (sv <= 0) out.push(v);
+      if ((sv < 0 && sw > 0) || (sv > 0 && sw < 0)) { const k = sv / (sv - sw); out.push([v[0] + (w[0] - v[0]) * k, v[1] + (w[1] - v[1]) * k]); }
+    });
+    return out;
+  };
+  const cells = seeds.map((p, i) => seeds.reduce((poly, q, j) => (i === j ? poly : clipHalf(poly, p, q)), [[x0, y0], [x1, y0], [x1, y1], [x0, y1]] as P2[]));
+  // chaque bord intérieur devient une ligne brisée, la même pour les deux cellules voisines
+  const key = (p: P2) => `${Math.round(p[0])},${Math.round(p[1])}`;
+  const onBox = (p: P2, q: P2) => (Math.abs(p[0] - q[0]) < 1 && (Math.abs(p[0] - x0) < 1 || Math.abs(p[0] - x1) < 1)) || (Math.abs(p[1] - q[1]) < 1 && (Math.abs(p[1] - y0) < 1 || Math.abs(p[1] - y1) < 1));
+  const jag: Record<string, P2[]> = {}, edges: P2[][] = [];
+  const zig = (p: P2, q: P2): P2[] => {
+    const k = [key(p), key(q)].sort().join('|');
+    if (jag[k]) return key(p) < key(q) ? jag[k] : [...jag[k]].reverse();
+    const [a, b] = key(p) < key(q) ? [p, q] : [q, p], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.round(L / 18));
+    const rr = rng(Math.abs(Math.round(a[0] * 7 + a[1] * 13 + b[0] * 3 + b[1])) + 1), pts: P2[] = [a];
+    for (let i = 1; i < n; i++) { const t = i / n, o = (rr() - 0.5) * Math.min(14, L * 0.12); pts.push([a[0] + (b[0] - a[0]) * t - (b[1] - a[1]) / L * o, a[1] + (b[1] - a[1]) * t + (b[0] - a[0]) / L * o]); }
+    pts.push(b); jag[k] = pts; if (!onBox(a, b)) edges.push(pts);
+    return key(p) < key(q) ? pts : [...pts].reverse();
+  };
+  const shards = cells.filter((c) => c.length > 2).map((c) => {
+    const poly: P2[] = [];
+    c.forEach((v, i) => { const w = c[(i + 1) % c.length]; const z = onBox(v, w) ? [v, w] : zig(v, w); poly.push(...z.slice(0, -1)); });
+    const cx = c.reduce((s, p) => s + p[0], 0) / c.length, cy = c.reduce((s, p) => s + p[1], 0) / c.length, d = Math.hypot(cx - IMPACT[0], cy - IMPACT[1]);
+    return { poly, cx, cy, d, vx: (cx - IMPACT[0]) * 1.4 + (r() - 0.5) * 80, vy: -120 - 180 * Math.max(0, 1 - d / 300), vr: (r() - 0.5) * 2.4, delay: 0.25 * (d / 700) + 0.05 * r() };
+  });
+  return { edges, shards };
 })();
 let frozenCanvas: HTMLCanvasElement | null = null;
 const Opening: React.FC = () => {
@@ -314,11 +332,19 @@ const Opening: React.FC = () => {
           // les fissures courent dans le marbre (fines, sombres, liseré clair), sans jamais en sortir
           const cr = seg(tt, CRACK, CRACK + 0.7);
           fc.save(); stelePath(fc); fc.clip();
-          CRACKS.forEach((pts, k) => {
-            const n = Math.max(1, Math.floor(clamp(cr * 1.25 - k * 0.04) * (pts.length - 1)) + 1);
-            fc.beginPath(); pts.slice(0, n).forEach((p, i) => (i ? fc.lineTo(p[0], p[1]) : fc.moveTo(p[0], p[1])));
-            fc.strokeStyle = 'rgba(250,246,238,0.75)'; fc.lineWidth = 5; fc.stroke();
-            fc.strokeStyle = 'rgba(34,30,26,0.92)'; fc.lineWidth = 2.2; fc.stroke();
+          // le front de la cassure avance depuis le 羊 : on trace chaque fissure depuis son bout le plus proche
+          const R = 30 + 760 * ease(cr), dI = (p: P2) => Math.hypot(p[0] - IMPACT[0], p[1] - IMPACT[1]);
+          FRACT.edges.forEach((e) => {
+            const pts = dI(e[0]) <= dI(e[e.length - 1]) ? e : [...e].reverse();
+            if (dI(pts[0]) > R) return;
+            fc.beginPath(); fc.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i < pts.length; i++) {
+              const d0 = dI(pts[i - 1]), d1 = dI(pts[i]);
+              if (d1 <= R) { fc.lineTo(pts[i][0], pts[i][1]); continue; }
+              const k = clamp((R - d0) / Math.max(1, d1 - d0)); fc.lineTo(pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * k, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * k); break;
+            }
+            fc.strokeStyle = 'rgba(250,246,238,0.75)'; fc.lineWidth = 4.5; fc.lineJoin = 'round'; fc.stroke();
+            fc.strokeStyle = 'rgba(34,30,26,0.92)'; fc.lineWidth = 2; fc.stroke();
           });
           fc.restore();
           // le reste (美 et le mouton) reste figé, puis s'efface quand la stèle tombe
@@ -327,10 +353,10 @@ const Opening: React.FC = () => {
           if (tt < SHATTER) { const sh = (tt > CRACK && tt < CRACK + 0.25) ? 3 * Math.sin(tt * 90) : 0; ctx.drawImage(frozenCanvas, sh, 0); return; }
           // les éclats de marbre tombent
           const u = tt - SHATTER;
-          SHARDS.forEach((s) => {
+          FRACT.shards.forEach((s) => {
             const k = Math.max(0, u - s.delay);
             if (k > 1.6) return;
-            const dy = 1100 * k * k, dx = s.vx * k, rot = s.vr * k;
+            const dx = s.vx * k, dy = s.vy * k + 1300 * k * k, rot = s.vr * k;
             ctx.save(); ctx.globalAlpha = 1 - seg(k, 0.9, 1.5);
             ctx.translate(s.cx + dx, s.cy + dy); ctx.rotate(rot); ctx.translate(-s.cx, -s.cy);
             ctx.beginPath(); s.poly.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath(); ctx.clip();
@@ -354,77 +380,92 @@ const Opening: React.FC = () => {
   );
 };
 
-// ════════════════ 1 bis. Sur le papier nu, le 美 de l'os apparaît… et se met à danser : la coiffe de plumes ondule,
-// les bras se lèvent tour à tour, les pieds frappent le sol ; puis il se fige dans sa forme gravée et remonte le temps
-// squelette du glyphe mei_jiaguwen (boîte 660 : coiffe à quatre plumes, buste, bras, jambes)
-const MEI_RIG: Rig = { box: 660, bones: [
-  { name: 'torse', pivot: [348, 370], tip: [340, 95] },
-  { name: 'jambeG', pivot: [348, 375], tip: [310, 628] },
-  { name: 'jambeD', pivot: [352, 375], tip: [452, 650] },
-  { name: 'brasG', parent: 'torse', pivot: [338, 262], tip: [284, 352] },
-  { name: 'brasD', parent: 'torse', pivot: [350, 268], tip: [432, 325] },
-  { name: 'plumeHG', parent: 'torse', pivot: [338, 95], tip: [228, 25] },
-  { name: 'plumeHD', parent: 'torse', pivot: [348, 88], tip: [440, 60] },
-  { name: 'plumeBG', parent: 'torse', pivot: [332, 200], tip: [240, 200] },
-  { name: 'plumeBD', parent: 'torse', pivot: [352, 192], tip: [430, 175] },
-] };
-const SH0 = SHATTER + 0.3, SHFRZ = A('b03') + 1.4;
-// la danse de la pluie : un pas par seconde, bras levés tour à tour, la coiffe suit avec un temps de retard
-const danse = (u: number, D: number) => {
-  const ph = 2 * Math.PI * (u - 0.6) / 1.0, s = Math.sin(ph);
-  const env = seg(u, 0.5, 1.2) * (1 - seg(u, D - 0.75, D - 0.05));
-  const up = (v: number) => Math.max(0, v);
-  return {
-    torse: 0.07 * s * env, dx: 12 * s * env, dy: -16 * Math.abs(s) * env,
-    brasG: (0.3 + 0.8 * up(s)) * env, brasD: -(0.3 + 0.8 * up(-s)) * env,
-    jambeG: 0.13 * up(s) * env, jambeD: -0.13 * up(-s) * env,
-    plumeHG: 0.24 * Math.sin(ph - 0.9) * env, plumeHD: 0.24 * Math.sin(ph - 0.9) * env,
-    plumeBG: 0.2 * Math.sin(ph - 1.4) * env, plumeBD: 0.2 * Math.sin(ph - 1.4) * env,
-  };
+// ════════════════ 1 bis. « Remontons à l'origine… » : les nuages passent et s'ouvrent sur la danse de la pluie (clip de
+// 8 s) ; sur la pose figée, le décor s'efface, le danseur reste seul, devient une silhouette d'encre, puis le 美 de l'os
+const PL = L.plages.danse;
+const CLOUD_IN = 1.6, CLIP0 = PL.debut + (PL.son_decalage ?? 0.75), CLIPEND = CLIP0 + 7.92;
+const T_BG = CLIPEND + 0.1, T_INK = CLIPEND + 0.45, T_MORPH = CLIPEND + 1.1, T_MOVE = CLIPEND + 2.1, GLYEND = CLIPEND + 2.9;
+// le clip (1280×720) est posé plein cadre : silhouette, en coordonnées écran, de (552, 64) à (1383, 1042)
+// glyphe aligné sur le danseur (plumes en haut, pieds en bas), puis ramené à sa place au centre
+const G_DANCER = { x: 953, y: 553, size: 1008 }, G_REST = { x: 960, y: 540, size: 640 };
+let mcA: HTMLCanvasElement | null = null, mcB: HTMLCanvasElement | null = null, dancerCol: HTMLCanvasElement | null = null;
+const MW = 960, MH = 540; // fusion encre faite à mi-résolution
+// fusion « encre visqueuse » : la silhouette et le glyphe se mélangent flous, puis on ne garde que le cœur de l'encre
+const drawMorph = (ctx: CanvasRenderingContext2D, E: any, k: number, gx: { x: number; y: number; size: number }) => {
+  if (!mcA) { mcA = document.createElement('canvas'); mcA.width = MW; mcA.height = MH; mcB = document.createElement('canvas'); mcB.width = MW; mcB.height = MH; }
+  const a = mcA.getContext('2d', { willReadFrequently: true })!, b = mcB!.getContext('2d', { willReadFrequently: true })!;
+  a.clearRect(0, 0, MW, MH); b.clearRect(0, 0, MW, MH);
+  a.globalAlpha = 1 - k; if (IMG.sil) a.drawImage(IMG.sil, 0, 0, MW, MH);
+  a.globalAlpha = k; a.save(); a.scale(MW / 1920, MH / 1080); E.drawRealGlyph(a, 'mei_jiaguwen', { ...gx, color: () => '#000' }); a.restore(); a.globalAlpha = 1;
+  const blur = 9 * Math.sin(Math.PI * k);
+  b.filter = `blur(${blur.toFixed(2)}px)`; b.drawImage(mcA, 0, 0); b.filter = 'none';
+  const im = b.getImageData(0, 0, MW, MH), d = im.data;
+  const th = 0.42 + 0.08 * Math.sin(Math.PI * k);
+  for (let i = 3; i < d.length; i += 4) { const v = d[i] / 255, o = Math.min(1, Math.max(0, (v - th) / 0.08)); d[i - 3] = INK[0]; d[i - 2] = INK[1]; d[i - 1] = INK[2]; d[i] = o * 255; }
+  b.putImageData(im, 0, 0);
+  ctx.save(); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(mcB!, 0, 0, 1920, 1080); ctx.restore();
 };
-const ShadowDancer: React.FC = () => {
+const DanseIntro: React.FC = () => {
   const { fps } = useVideoConfig();
-  const len = SHFRZ - SH0;
   return (
-    <Sequence from={Math.round(SH0 * fps)} durationInFrames={Math.round(len * fps)}>
-      <Draw draw={(ctx, u, E) => {
-        const q = arrivePose(TR1, SHFRZ);
-        drawGlyphDance(ctx, 'mei_jiaguwen', MEI_RIG, (c) => E.drawRealGlyph(c, 'mei_jiaguwen', { x: 330, y: 330, size: 660, color: () => inkCss }),
-          { x: q.x, y: q.y + 40 * (1 - seg(u, len - 0.9, len - 0.1)), size: 640 * q.s * (1 + 0.22 * (1 - seg(u, len - 0.9, len - 0.1))), motion: danse(u, len), alpha: seg(u, 0, 0.5) });
-      }} />
-    </Sequence>
+    <>
+      <Sequence from={Math.round(PL.debut * fps)} durationInFrames={Math.round((CLIPEND + 0.2 - PL.debut) * fps)}>
+        <CloudReveal src="episodes/mei/clips/03_danseur_v2.mp4" inDur={CLOUD_IN} exit={false} videoAt={CLIP0 - PL.debut} volume={PL.son_volume ?? 0.7} />
+      </Sequence>
+      <Sequence from={Math.round((CLIPEND - 0.05) * fps)} durationInFrames={Math.round((GLYEND + 0.1 - CLIPEND) * fps)}>
+        <Draw draw={(ctx, u, E) => {
+          const tt = CLIPEND - 0.05 + u;
+          if (!IMG.fin || !IMG.sil) return;
+          // 1. le décor s'efface autour du danseur (pose figée = dernière image du clip)
+          const bg = 1 - seg(tt, T_BG, T_BG + 0.6);
+          if (bg > 0) { ctx.save(); ctx.globalAlpha = bg; ctx.drawImage(IMG.fin, 0, 0, 1920, 1080); ctx.restore(); }
+          if (!dancerCol) {
+            dancerCol = document.createElement('canvas'); dancerCol.width = 1920; dancerCol.height = 1080;
+            const c = dancerCol.getContext('2d')!; c.drawImage(IMG.fin, 0, 0, 1920, 1080); c.globalCompositeOperation = 'destination-in'; c.drawImage(IMG.sil, 0, 0, 1920, 1080);
+          }
+          // 2. le danseur, seul sur le papier, passe à l'encre
+          const ink = seg(tt, T_INK, T_INK + 0.6);
+          if (tt < T_MORPH) {
+            ctx.drawImage(dancerCol, 0, 0);
+            if (ink > 0) { ctx.save(); ctx.globalAlpha = ink; ctx.filter = 'brightness(0.18) saturate(0.2)'; ctx.drawImage(dancerCol, 0, 0); ctx.restore(); }
+            return;
+          }
+          // 3. la silhouette d'encre se fond en 美 de l'os, puis le signe reprend sa place
+          const k = seg(tt, T_MORPH, T_MOVE - 0.1);
+          if (k < 1) { drawMorph(ctx, E, k, G_DANCER); return; }
+          const m = ease(clamp((tt - T_MOVE) / (GLYEND - T_MOVE)));
+          E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: G_DANCER.x + (G_REST.x - G_DANCER.x) * m, y: G_DANCER.y + (G_REST.y - G_DANCER.y) * m, size: G_DANCER.size + (G_REST.size - G_DANCER.size) * m, color: () => inkCss });
+        }} />
+      </Sequence>
+    </>
   );
 };
 
-// ════════════════ 2. « Remontons à l'origine… » → rouleau à rebours (Song → Shang) → la dynastie Shang
+// ════════════════ 2. La dynastie Shang (après la danse : le signe de l'os, la divination)
 const Shang: React.FC = () => {
   const t = useT();
   const A3 = A('b03'), A4 = A('b04'), fis = at('b04', 'fissures'), corps = at('b04', 'corps'), pluie = at('b04', 'pluie'), os = at('b04', 'os'), hom = at('b04', 'homme'), dw = at('b04', 'dawen'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
-  const clipIn = pare - 0.4, clipOut = terre - 0.2;
+  const clipIn = terre, shell0 = Math.max(A4 - 0.3, GLYEND + 0.5); void pare;
   return (
     <AbsoluteFill>
-      <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [R1 - 0.4, 960, 540, 1, 0.4], [os + 0.4, 960, 520, 1.06, 1.4], [coif - 0.3, 960, 330, 1.3, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [rien, 960, 520, 1.06, 1.0], [terre, 960, 560, 1.02, 1.0]]}
-        punch={[fis + 0.2, os + 1.2, corps, coif + 0.3, rien + 0.2]} calm={[[R1 - 0.4, R1E + 0.3]]}>
-        <TimeScrollStage cfg={TR1} under={<Paper />}
-          fromLandscape={{ seed: 22, since: A3 - 0.6, mood: 'brume' }} toLandscape={{ seed: 14, until: A('b05') + 0.5, mood: 'aube' }}>
+      <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [GLYEND, 960, 540, 1, 0.4], [os + 0.4, 960, 520, 1.06, 1.4], [coif - 0.3, 960, 330, 1.3, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [rien, 960, 520, 1.06, 1.0], [terre, 960, 560, 1.02, 1.0]]}
+        punch={[fis + 0.2, os + 1.2, corps, coif + 0.3, rien + 0.2]} calm={[[PL.debut, GLYEND + 0.3]]}>
+        <Paper />
+        <Landscape seed={14} from={GLYEND - 0.6} to={A('b05') + 0.5} move="still" mood="aube" faint={0.85} />
           <Draw draw={(ctx, tt, E) => {
-            // avant et pendant le rouleau : le 美 d'aujourd'hui, petit, gris, qui se défait trait par trait
-            // avant et pendant le rouleau : l'ombre du danseur se fige et devient le signe de l'os, qui remonte le temps
-            if (tt < R1E) {
-              const q = arrivePose(TR1, tt);
-              const born = tt >= SHFRZ - 0.02 ? 1 : 0;
-              if (born > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: q.x, y: q.y, size: 640 * q.s, opacity: born * (1 - seg(tt, R1E - 0.3, R1E)), color: () => inkCss });
-              return;
-            }
+            // le signe né de la danse reste un instant au centre, puis laisse la place au plastron de la divination
+            const born = tt >= GLYEND - 0.02 ? 1 - seg(tt, shell0, shell0 + 0.6) : 0;
+            if (born > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { ...G_REST, opacity: born, color: () => inkCss });
+            if (tt < GLYEND) return;
             // l'os : plastron tamponné, le signe révélé en blanc puis à l'encre ; l'homme (azurite), la coiffe (malachite)
             // la divination : un plastron d'os à l'encre, chauffé (point rouge), qui se fend (fissures en 卜)
-            const shell = win(tt, A4 - 0.3, os + 0.8, 0.6);
+            const shell = win(tt, shell0, os + 0.8, 0.6);
             if (shell > 0) plastron(ctx, 960, 540, shell, seg(tt, fis - 1.6, fis - 0.6), seg(tt, fis - 0.4, fis + 0.8));
             const rv = seg(tt, os + 0.2, os + 1.4), dry = seg(tt, hom - 0.6, hom + 0.4);
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
             const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
             const col = (c: string) => rgb(c === 'coiffe' ? mixc(base(c), MAL, cf) : mixc(base(c), AZ, man));
-            const mainA = (1 - seg(tt, clipIn - 0.2, clipIn + 0.4)) + seg(tt, clipOut, clipOut + 0.8);
+            const mainA = 1;
             const two = tt > br + 0.6 && tt < br + 2.2; // « parfois deux »
             if (mainA > 0) E.drawRealGlyph(ctx, two ? 'mei_jiaguwen2' : 'mei_jiaguwen', { x: 960, y: 540, size: 660, reveal: () => rv, opacity: Math.min(1, mainA), color: col, glow: 26 * cf * win(tt, coif, mt, 0.5), glowColor: rgb(MAL, 0.6) });
             // « le même que dans 文 » : le 文 de l'os, en petit, à gauche
@@ -448,22 +489,20 @@ const Shang: React.FC = () => {
               ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1080);
             }
           }} />
-        </TimeScrollStage>
       </Cam>
-      <ClipShot src="danseur" from={clipIn} len={clipOut - clipIn} />
-      <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, R1 + 0.3, 0.4)} y={960} size={52} />
+      <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, PL.debut + 0.8, 0.4)} y={960} size={52} />
       <Label x={1300} y={760} zh="大" text="un homme, de face" color={AZ} a={win(t, hom + 0.3, dw - 0.2, 0.4)} />
-      <Caption text="la divination : on grave la question, on chauffe l'os, on lit les fissures" a={win(t, A4 + 1.6, os - 0.2, 0.5)} y={960} size={42} />
+      <Caption text="la divination : on grave la question, on chauffe l'os, on lit les fissures" a={win(t, Math.max(A4 + 1.6, Math.max(A4 - 0.3, GLYEND + 0.5) + 0.3), os - 0.2, 0.5)} y={960} size={42} />
       <Caption text="le même homme de face que dans 文 (épisode précédent)" a={win(t, dw, corps - 0.1, 0.4)} y={960} size={42} />
       <Caption text="une tête · deux bras ouverts · deux jambes écartées" a={win(t, corps, coif - 0.3, 0.4)} y={960} size={46} />
       <Label x={1330} y={300} zh="" text="une haute coiffe" color={MAL} a={win(t, coif + 0.2, mt - 0.4, 0.4)} />
       <Caption text={t < br + 0.6 ? 'quatre branches, dressées vers le ciel' : 'parfois deux (甲686)'} a={win(t, br, mt - 0.4, 0.4)} y={960} size={46} />
       <Caption text="羊 sur l'os : un museau en pointe, deux cornes qui retombent" a={win(t, mus - 0.2, rien + 0.4, 0.4)} y={960} size={44} />
-      <Caption text="un homme paré — un danseur, sans doute, coiffé de plumes" a={win(t, rien + 0.6, clipIn + 0.6, 0.4)} y={960} size={44} />
+      <Caption text="un homme paré — un danseur, sans doute, coiffé de plumes" a={win(t, rien + 0.6, pluie - 0.2, 0.4)} y={960} size={44} />
       <Caption text="les inscriptions Shang mentionnent des danses pour appeler la pluie" a={win(t, pluie - 0.1, terre - 0.3, 0.4)} y={990} size={40} />
       <Caption text="les os de divination ne sont redécouverts qu'en 1899" a={win(t, terre + 0.2, jam + 0.2, 0.5)} y={960} size={44} />
       <Caption text="Xu Shen n'en a jamais vu un seul" a={win(t, jam - 0.2, A('b05') - 0.2, 0.4)} y={960} size={48} />
-      <EraTag zh="商" name="DYNASTIE SHANG" dates="Anyang · v. 1200 av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
+      <EraTag zh="商" name="DYNASTIE SHANG" dates="Anyang · v. 1200 av. J.-C." a={seg(t, CLIP0 + 1.0, CLIP0 + 1.8) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
     </AbsoluteFill>
   );
 };
@@ -508,33 +547,35 @@ const CHU = [[108.6, 32.6], [111.2, 33.6], [114.6, 33.6], [117.2, 33.0], [119.4,
 // le vers tel qu'il est écrit à Guodian (Laozi A) : 天下皆智(知)美之為美也，惡已 — formes de Chu (glyphes/vers/SOURCE.md)
 const VERSE = '天下皆知美之為美也惡已'.split('');
 const NS = VERSE.length;
-const HEART = [1920 * 0.52, 1080 * 0.4];
-let washCanvas: HTMLCanvasElement | null = null, maskCanvas: HTMLCanvasElement | null = null;
-// le portrait de Laozi qui s'étend en taches de lavis depuis un point (bord irrégulier, posé en multiplication)
-const laoziWash = (ctx: CanvasRenderingContext2D, wash: number, R = 780) => {
-  const img = laoziImg.img;
-  if (!img || wash <= 0) return;
-  if (!washCanvas) { washCanvas = document.createElement('canvas'); washCanvas.width = 1920; washCanvas.height = 1080; }
-  if (!maskCanvas) { maskCanvas = document.createElement('canvas'); maskCanvas.width = 1920; maskCanvas.height = 1080; }
-  const mc = maskCanvas.getContext('2d')!;
-  mc.clearRect(0, 0, 1920, 1080);
-  const R0 = R * ease(wash), r = rng(12);
-  for (let k = 0; k < 26; k++) {
-    const a = r() * 6.283, d = r() * R0 * 0.55, rr = Math.max(1, R0 * (0.35 + 0.5 * r()));
-    const x = HEART[0] + Math.cos(a) * d, y = HEART[1] + Math.sin(a) * d;
-    const g = mc.createRadialGradient(x, y, 0, x, y, rr); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-    mc.fillStyle = g; mc.fillRect(x - rr, y - rr, 2 * rr, 2 * rr);
+// Laozi en baimiao 白描 : le dessin au trait se construit en 3 s, les traits poussent depuis les points où fondent les
+// caractères du vers (instant d'arrivée de chaque pixel : trace_baimiao.py, canal R ; encre : alpha)
+const BM = { w: 1376, h: 768 }, BMS = 1920 / BM.w, BMY = (1080 - BM.h * BMS) / 2;
+const BM_SEEDS: [number, number][] = [[591, 43], [662, 77], [712, 123], [586, 158], [894, 239], [542, 329], [860, 379], [549, 443], [869, 501], [565, 509], [849, 647]];
+let bmData: Uint8ClampedArray | null = null, bmCanvas: HTMLCanvasElement | null = null, bmLast = -1;
+const drawBaimiao = (ctx: CanvasRenderingContext2D, p: number, alpha = 1) => {
+  const im = IMG.trace;
+  if (!im || p <= 0 || alpha <= 0) return;
+  if (!bmCanvas) {
+    bmCanvas = document.createElement('canvas'); bmCanvas.width = BM.w; bmCanvas.height = BM.h;
+    const c = bmCanvas.getContext('2d', { willReadFrequently: true })!; c.drawImage(im, 0, 0); bmData = c.getImageData(0, 0, BM.w, BM.h).data.slice();
   }
-  const wc = washCanvas.getContext('2d')!;
-  wc.globalCompositeOperation = 'source-over'; wc.clearRect(0, 0, 1920, 1080); wc.drawImage(img, 0, 0, 1920, 1080);
-  wc.globalCompositeOperation = 'destination-in'; wc.drawImage(maskCanvas, 0, 0);
-  wc.globalCompositeOperation = 'source-over';
-  ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(washCanvas, 0, 0); ctx.restore();
+  const thr = p * 262; // un peu au-delà de 250 : à p = 1 tout est tracé
+  if (Math.abs(thr - bmLast) > 0.01) {
+    const c = bmCanvas.getContext('2d', { willReadFrequently: true })!, out = c.createImageData(BM.w, BM.h), o = out.data, d = bmData!;
+    for (let i = 0; i < d.length; i += 4) {
+      const a = d[i + 3]; if (!a) continue;
+      const head = Math.min(1, Math.max(0, (thr - d[i]) / 8)); // la pointe du trait arrive en douceur
+      if (head <= 0) continue;
+      o[i] = INK[0]; o[i + 1] = INK[1]; o[i + 2] = INK[2]; o[i + 3] = a * head;
+    }
+    c.putImageData(out, 0, 0); bmLast = thr;
+  }
+  ctx.save(); ctx.globalAlpha = alpha; ctx.drawImage(bmCanvas, 0, BMY, 1920, BM.h * BMS); ctx.restore();
 };
 // position d'un caractère du vers : deux colonnes, lues de haut en bas et de droite à gauche
 const versePos = (i: number) => (i < 6 ? [1060, 175 + i * 142] : [860, 175 + (i - 6) * 142]);
 // cible dans la silhouette de Laozi (les caractères s'y fondent)
-const FIGPTS = (() => { const r = rng(44); return Array.from({ length: NS }, (_, i) => [900 + (r() - 0.5) * 160, 180 + (i / (NS - 1)) * 760]); })();
+const FIGPTS = BM_SEEDS.map(([x, y]) => [x * BMS, BMY + y * BMS]);
 const Chu: React.FC = () => {
   const t = useT();
   const A6 = A('b06'), roy = at('b06', 'royaumes'), ret = at('b06', 'retrouve'), gd = at('b06', 'guodian'), lz = at('b06', 'laozi'), vers = at('b06', 'vers'), beau = at('b06', 'beau'), laid0 = at('b06', 'laideur'), aut = at('b06', 'autrement'), dec = at('b06', 'decide'), laid = at('b06', 'laid'), mai = at('b06', 'maitre');
@@ -562,8 +603,8 @@ const Chu: React.FC = () => {
             const col = isMei ? mixc(INK, MAL, 0.4 + 0.6 * hl) : isE ? mixc(INK, OCRE, 0.4 + 0.6 * hl) : INK;
             E.drawRealGlyph(ctx, `mei_vers_${String(i).padStart(2, '0')}`, { x, y, size: sz, reveal: () => seg(tt, t0, t0 + Math.max(0.3, step)), opacity: a, color: () => rgb(col), glow: 20 * hl, glowColor: rgb(isMei ? MAL : OCRE, 0.6) });
           }
-          // 3. le portrait naît de l'encre des caractères
-          laoziWash(ctx, seg(tt, p0 + 0.9, p1 + 0.4));
+          // 3. le portrait au trait se construit (3 s) depuis l'encre des caractères
+          drawBaimiao(ctx, clamp((tt - (p0 + 0.9)) / 3.0));
           // 4. « beau » à gauche, « laid » à droite, pendant l'explication
           const sides = win(tt, aut - 0.2, A('b07') - 0.2, 0.5);
           if (sides > 0) {
@@ -906,7 +947,7 @@ export const MeiV1: React.FC = () => {
         <Win from={A('b11') - 0.3} to={A('b08') - 0.3}><Traits /></Win>
         <Win from={A('b08') - 0.3} to={END}><Finale /></Win>
         <Win from={END} to={MEI_SECONDS + 1}><EndCard /></Win>
-        <ShadowDancer />
+        <DanseIntro />
       </>}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/mei/audio/sfx_${n}.wav`)} volume={v} /></Sequence>

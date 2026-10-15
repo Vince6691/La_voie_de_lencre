@@ -21,6 +21,10 @@ for k, c in L['clips'].items():
 for n, t, vol in L.get('bruitages', []):
     i = len(ins) // 2; ins += ['-i', os.path.join(base, 'audio', f'sfx_{n}.wav')]
     parts.append(f'[{i}:a]volume={vol},adelay={int(t * 1000)}:all=1[v{i}]')
+for pl in L.get('plages', {}).values():
+    if 'son' not in pl: continue
+    i = len(ins) // 2; ins += ['-i', os.path.join(base, pl['son'])]
+    parts.append(f'[{i}:a]volume={pl.get("son_volume", 1)},adelay={int((pl["debut"] + pl.get("son_decalage", 0)) * 1000)}:all=1[v{i}]')
 # son des rouleaux (TimeScrollStage : souffle, glissando, impact, calé sur 5 s ; gong quand le sceau se pose)
 RS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'xue', 'remotion', 'public', 'rouleau')
 for r in L['rouleaux']:
