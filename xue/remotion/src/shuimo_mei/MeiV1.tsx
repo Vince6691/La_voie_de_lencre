@@ -15,7 +15,7 @@ import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
 import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
-import { dancerPose, drawDancer, drawDiviner, drawScreen } from '../piying/Piying';
+import { Rig, drawGlyphDance } from '../danse/GlyphDance';
 import { VideoReveal } from '../video_encre/VideoReveal';
 import { loadLegacy, W } from '../legacy';
 import rep from '../data/episodes/mei.json';
@@ -189,6 +189,22 @@ const ding = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number) =>
   ctx.strokeStyle = 'rgba(40,52,46,0.55)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-290, -120); ctx.lineTo(290, -120); ctx.stroke();
   ctx.restore();
 };
+// plastron de tortue à l'encre, chauffé (point rouge), qui se fend (fissures en 卜)
+const plastron = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number, heat: number, crack: number) => {
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
+  ctx.fillStyle = 'rgba(214,196,160,0.35)'; ctx.strokeStyle = inkCss; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(0, -330); ctx.bezierCurveTo(190, -330, 230, -120, 215, 40); ctx.bezierCurveTo(205, 220, 120, 330, 0, 340); ctx.bezierCurveTo(-120, 330, -205, 220, -215, 40); ctx.bezierCurveTo(-230, -120, -190, -330, 0, -330); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.lineWidth = 2.5; ctx.strokeStyle = rgb(INK, 0.5);
+  ctx.beginPath(); ctx.moveTo(0, -330); ctx.lineTo(0, 340); for (const yy of [-180, -40, 110, 240]) { ctx.moveTo(-200, yy + 20); ctx.quadraticCurveTo(0, yy - 20, 200, yy + 20); } ctx.stroke();
+  if (heat > 0) { const g = ctx.createRadialGradient(70, -40, 0, 70, -40, 60); g.addColorStop(0, `rgba(220,70,30,${0.85 * heat})`); g.addColorStop(1, 'rgba(220,70,30,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(70, -40, 60, 0, 7); ctx.fill(); }
+  if (crack > 0) {
+    ctx.strokeStyle = inkCss; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 6 * crack, -40 - 150 * crack); ctx.lineTo(66, -40 - 210 * crack); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 70 * crack, -40 - 50 * crack); ctx.lineTo(70 + 120 * crack, -40 - 64 * crack); ctx.stroke();
+  }
+  ctx.restore();
+};
+
 // stèle de marbre (dynastie Song), 羊大則美 gravé en creux, caractère par caractère (carve : 0 → 4)
 const stele = (ctx: CanvasRenderingContext2D, E: any, x: number, y: number, a: number, carve: number, seal: number) => {
   if (a <= 0) return;
@@ -338,19 +354,43 @@ const Opening: React.FC = () => {
   );
 };
 
-// ════════════════ 1 bis. Derrière le papier nu, une lampe s'allume : ombre chinoise (皮影) du danseur de la pluie
-// il danse sur « Remontons à l'origine… », se fige de face, bras et jambes écartés, coiffé de quatre plumes : le signe de l'os
-const SH0 = SHATTER + 0.5, SHFRZ = A('b03') + 1.4;
+// ════════════════ 1 bis. Sur le papier nu, le 美 de l'os apparaît… et se met à danser : la coiffe de plumes ondule,
+// les bras se lèvent tour à tour, les pieds frappent le sol ; puis il se fige dans sa forme gravée et remonte le temps
+// squelette du glyphe mei_jiaguwen (boîte 660 : coiffe à quatre plumes, buste, bras, jambes)
+const MEI_RIG: Rig = { box: 660, bones: [
+  { name: 'torse', pivot: [348, 370], tip: [340, 95] },
+  { name: 'jambeG', pivot: [348, 375], tip: [310, 628] },
+  { name: 'jambeD', pivot: [352, 375], tip: [452, 650] },
+  { name: 'brasG', parent: 'torse', pivot: [338, 262], tip: [284, 352] },
+  { name: 'brasD', parent: 'torse', pivot: [350, 268], tip: [432, 325] },
+  { name: 'plumeHG', parent: 'torse', pivot: [338, 95], tip: [228, 25] },
+  { name: 'plumeHD', parent: 'torse', pivot: [348, 88], tip: [440, 60] },
+  { name: 'plumeBG', parent: 'torse', pivot: [332, 200], tip: [240, 200] },
+  { name: 'plumeBD', parent: 'torse', pivot: [352, 192], tip: [430, 175] },
+] };
+const SH0 = SHATTER + 0.3, SHFRZ = A('b03') + 1.4;
+// la danse de la pluie : un pas par seconde, bras levés tour à tour, la coiffe suit avec un temps de retard
+const danse = (u: number, D: number) => {
+  const ph = 2 * Math.PI * (u - 0.6) / 1.0, s = Math.sin(ph);
+  const env = seg(u, 0.5, 1.2) * (1 - seg(u, D - 0.75, D - 0.05));
+  const up = (v: number) => Math.max(0, v);
+  return {
+    torse: 0.07 * s * env, dx: 12 * s * env, dy: -16 * Math.abs(s) * env,
+    brasG: (0.3 + 0.8 * up(s)) * env, brasD: -(0.3 + 0.8 * up(-s)) * env,
+    jambeG: 0.13 * up(s) * env, jambeD: -0.13 * up(-s) * env,
+    plumeHG: 0.24 * Math.sin(ph - 0.9) * env, plumeHD: 0.24 * Math.sin(ph - 0.9) * env,
+    plumeBG: 0.2 * Math.sin(ph - 1.4) * env, plumeBD: 0.2 * Math.sin(ph - 1.4) * env,
+  };
+};
 const ShadowDancer: React.FC = () => {
   const { fps } = useVideoConfig();
-  const len = SHFRZ + 0.6 - SH0;
+  const len = SHFRZ - SH0;
   return (
     <Sequence from={Math.round(SH0 * fps)} durationInFrames={Math.round(len * fps)}>
-      <Draw draw={(ctx, u) => {
-        const tt = SH0 + u, q = arrivePose(TR1, SHFRZ);
-        drawScreen(ctx, 0.92 * seg(tt, SH0, SH0 + 0.7) * (1 - seg(tt, SHFRZ, SHFRZ + 0.55)), tt, q.x, q.y);
-        const d = dancerPose(tt - SH0, SHFRZ - SH0);
-        drawDancer(ctx, { x: q.x, y: q.y, size: 640 * q.s, pose: d.pose, sway: d.sway, t: tt, alpha: seg(tt, SH0 + 0.2, SH0 + 0.8) * (1 - seg(tt, SHFRZ - 0.15, SHFRZ + 0.3)) });
+      <Draw draw={(ctx, u, E) => {
+        const q = arrivePose(TR1, SHFRZ);
+        drawGlyphDance(ctx, 'mei_jiaguwen', MEI_RIG, (c) => E.drawRealGlyph(c, 'mei_jiaguwen', { x: 330, y: 330, size: 660, color: () => inkCss }),
+          { x: q.x, y: q.y + 40 * (1 - seg(u, len - 0.9, len - 0.1)), size: 640 * q.s * (1 + 0.22 * (1 - seg(u, len - 0.9, len - 0.1))), motion: danse(u, len), alpha: seg(u, 0, 0.5) });
       }} />
     </Sequence>
   );
@@ -372,20 +412,14 @@ const Shang: React.FC = () => {
             // avant et pendant le rouleau : l'ombre du danseur se fige et devient le signe de l'os, qui remonte le temps
             if (tt < R1E) {
               const q = arrivePose(TR1, tt);
-              const born = seg(tt, SHFRZ - 0.35, SHFRZ + 0.35);
+              const born = tt >= SHFRZ - 0.02 ? 1 : 0;
               if (born > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: q.x, y: q.y, size: 640 * q.s, opacity: born * (1 - seg(tt, R1E - 0.3, R1E)), color: () => inkCss });
               return;
             }
             // l'os : plastron tamponné, le signe révélé en blanc puis à l'encre ; l'homme (azurite), la coiffe (malachite)
             // la divination : un plastron d'os à l'encre, chauffé (point rouge), qui se fend (fissures en 卜)
-            // la divination en ombre chinoise : le devin grave la question, chauffe la tige au brasero, l'os se fend
-            const shell = win(tt, A4 - 0.4, os + 0.5, 0.6);
-            if (shell > 0) {
-              drawScreen(ctx, shell, tt, 1040, 470);
-              const grave = at('b04', 'grave');
-              drawDiviner(ctx, 740, 900, 1.2, { alpha: shell, t: tt, carve: seg(tt, grave - 0.1, grave + 1.6), dip: seg(tt, fis - 2.4, fis - 1.9) * (1 - seg(tt, fis - 1.3, fis - 0.9)),
-                heat: seg(tt, fis - 1.1, fis - 0.2), crack: seg(tt, fis - 0.1, fis + 0.7), read: seg(tt, fis + 0.9, fis + 1.8) });
-            }
+            const shell = win(tt, A4 - 0.3, os + 0.8, 0.6);
+            if (shell > 0) plastron(ctx, 960, 540, shell, seg(tt, fis - 1.6, fis - 0.6), seg(tt, fis - 0.4, fis + 0.8));
             const rv = seg(tt, os + 0.2, os + 1.4), dry = seg(tt, hom - 0.6, hom + 0.4);
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
             const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
