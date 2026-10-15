@@ -77,3 +77,16 @@ Solemn, hopeful mood. Soft depth of field, matte render, warm color grading, lay
 Notes : tunique courte à col croisé, ceinture et tablier de genoux (statuettes de jade de la tombe de Fu Hao, Anyang) ; motifs
 de « tonnerre » 雷紋 ; queues de bœuf tenues à la main (le glyphe 舞 montre un danseur avec des pompons) ; cloches 鐃 posées
 bouche en haut ; terre damée (hangtu) et toits de chaume. Pas de fer, pas de tuiles, pas de toits courbés, pas de soie brodée d'or.
+
+## Laozi en baimiao 白描 (transition vers Laozi : le vers se change en dessin au trait)
+```
+Baimiao fine-line ink drawing, pure outline only: even, unbroken black ink lines in the "gossamer thread" manner (gaogu youshi miao), no wash, no shading, no color, no gradients. Pure white paper background, nothing else on the page.
+Full-length elderly sage standing in three-quarter view facing right, centered, occupying the middle third of a 16:9 frame with wide empty space left and right.
+Long flowing white beard and eyebrows, bald crown with a small topknot tied by a plain cloth band, calm half-closed eyes, gentle smile.
+Ample shenyi robe with crossed right-over-left collar, very wide sleeves falling in long rhythmic folds, a sash knotted at the waist with long hanging ends; one hand resting on a gnarled wooden staff, the other raised at chest height, palm open, as if explaining.
+Bare simple setting: no ground line, no landscape, no seal, no text.
+Elegant, airy, scholarly; clean high-contrast line art suitable for vectorizing.
+```
+Notes : rien que du trait sur blanc pur, pour que je puisse extraire les lignes et animer le dessin trait par trait (les
+caractères du vers se défont en lignes qui tracent le portrait). Plein pied, au centre : 美 « beau » reste à gauche et 惡 « laid »
+à droite. Format 16:9, au moins 1920 px de large.
