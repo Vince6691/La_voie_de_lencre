@@ -64,3 +64,16 @@ legs apart, the four feathers standing straight up against the evening sky, like
 Style: 3D animated film, cinematic, warm firelight against cool blue dusk, shallow depth of field.
 No text, no subtitles, no music, no voice; ambient sound only: crackling fire, distant wind.
 ```
+
+## Danseur v2 — image de référence plus fidèle aux Shang (Nano Banana 2)
+```
+3D animated film, semi-realistic cartoon render, lived-in surfaces with subtle wear, warm cinematic lighting. Wide frontal shot, 16:9, figure centered.
+Lean young rain dancer standing face-on, legs planted wide apart, arms spread down and outward like an open X, a long white oxtail tassel in each hand; tall headdress of four long pheasant tail feathers rising from a bronze headband with a small jade disc at the brow, the two outer feathers curving outward.
+Knee-length hemp tunic with crossed right-over-left collar and narrow sleeves, borders woven with square thunder spirals, wide sash with a hanging knee-apron panel, bare feet on dry cracked earth.
+Behind him a raised platform of rammed earth with a thatched hall on wooden posts; a drummer at a leather drum on a wooden frame, three bronze bells mouth-up on a stand, a bronze tripod cauldron with thin incense smoke; villagers in hemp tunics watching.
+Heavy grey storm clouds gathering over a parched millet field, low warm amber sun from the side, cool blue shadow under the clouds, dust lifting at his feet.
+Solemn, hopeful mood. Soft depth of field, matte render, warm color grading, layered composition with foreground detail, no excessive ornamentation.
+```
+Notes : tunique courte à col croisé, ceinture et tablier de genoux (statuettes de jade de la tombe de Fu Hao, Anyang) ; motifs
+de « tonnerre » 雷紋 ; queues de bœuf tenues à la main (le glyphe 舞 montre un danseur avec des pompons) ; cloches 鐃 posées
+bouche en haut ; terre damée (hangtu) et toits de chaume. Pas de fer, pas de tuiles, pas de toits courbés, pas de soie brodée d'or.
