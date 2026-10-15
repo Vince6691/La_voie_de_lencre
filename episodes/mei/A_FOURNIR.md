@@ -91,18 +91,19 @@ Notes : rien que du trait sur blanc pur, pour que je puisse extraire les lignes 
 caractères du vers se défont en lignes qui tracent le portrait). Plein pied, au centre : 美 « beau » reste à gauche et 惡 « laid »
 à droite. Format 16:9, au moins 1920 px de large.
 
-## Clip A v2 « la danse de la pluie » — Seedance, 8 s, à partir de l'image « Danseur v2 » → `clips/03_danseur_v2.mp4`
+## Clip A v2 « la danse de la pluie » — Veo 3.1, 8 s, image → vidéo à partir de l'image « Danseur v2 » → `clips/03_danseur_v2.mp4`
 Montage prévu : plus de rouleau du temps à rebours. « Remontons à l'origine… » → les nuages passent → ce clip →
 sur la pose finale, j'isole la silhouette du danseur (sur le ciel) et elle se change en 美 de l'os.
 ```
-8-second shot, 16:9, 24 fps. Start from the reference image: the rain dancer stands face-on on dry cracked earth under heavy storm clouds, drummer and villagers small in the background.
-0–1 s: stillness; the drummer strikes the leather drum, dust trembles at the dancer's feet.
-1–5 s: rain dance in place, never turning his back: he stamps one bare foot then the other in time with the drum, raises both arms toward the clouds with the white oxtail tassels whipping in the wind, brings them down to his sides; the four tall pheasant feathers sway with each step.
-5–6 s: he lets the two tassels fall to the ground and opens into the final pose.
-6–8 s: frozen, perfectly frontal and symmetrical: legs planted wide apart, straight arms spread down and outward at about 45 degrees, empty open hands, head up, the four feathers standing tall, the two outer ones curving outward; only the feathers and tunic hem move slightly in the wind.
-Camera: low angle, slow push-in from full shot during the dance, then locked off from 5 s; the whole figure, feathers and feet, stays inside the frame with margin. The dancer is silhouetted against the bright grey sky: no person, pole or object overlapping his outline behind him.
-Style: 3D animated film, semi-realistic cartoon render, matte, warm amber side light, cool storm shadow. No text, no subtitles, no music, no voice; ambient sound only: drum beats, wind, distant thunder at the end.
+A low-angle cinematic shot in a 3D animated film style, semi-realistic and matte. A lean young rain dancer stands face-on on dry cracked earth under heavy grey storm clouds, a tall headdress of four pheasant feathers on a bronze headband, a knee-length hemp tunic with a knee-apron, a white oxtail tassel in each hand; far behind him, small and out of focus, a drummer at a leather drum and villagers in front of a thatched hall on a rammed-earth platform.
+At first he is still while the drummer strikes the drum and dust trembles at his feet. Then he dances the rain dance in place, always facing the camera: he stamps one bare foot, then the other, in time with the drum, raises both arms toward the clouds with the tassels whipping in the wind, and brings them back down; the feathers sway with every step.
+In the last three seconds he lets both tassels fall to the ground and freezes in a perfectly frontal, symmetrical pose: legs planted wide apart, straight arms spread down and outward at about forty-five degrees, empty open hands, head up, the four feathers standing tall, the two outer ones curving outward. He holds the pose without moving; only the feathers and the hem of his tunic stir in the wind.
+Camera: slow push-in from a full shot while he dances, then completely locked off for the final pose, his whole body from feathers to feet inside the frame with space around it. He is silhouetted against the bright grey sky, with nothing behind or overlapping his outline.
+Lighting: warm amber light from a low sun on one side, cool blue shadow under the storm clouds.
+Audio: deep steady drum beats, gusts of wind, bare feet stamping on dry earth, a distant roll of thunder as he freezes. No music, no voice, no dialogue.
+No text, no subtitles, no watermark.
 ```
 Pourquoi : pose finale = le signe de l'os (bras ouverts vers le bas, jambes écartées, quatre plumes) ; mains vides (les queues de
 bœuf tombent) pour un contour propre ; ciel clair derrière et caméra fixe à la fin pour détourer la silhouette sur les dernières
-images ; jamais de dos (cohérence du personnage).
+images ; toujours de face (cohérence du personnage). Veo : 8 s, 16:9, 720p ou 1080p ; le son de Veo peut être gardé (tambour,
+vent, tonnerre) sous la voix.
