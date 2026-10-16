@@ -16,6 +16,7 @@ import { rng } from '../shuimo/common';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
 import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
 import { CloudReveal } from '../video_encre/CloudReveal';
+import { Rig, drawGlyphDance } from '../danse/GlyphDance';
 import { VideoReveal } from '../video_encre/VideoReveal';
 import { loadLegacy, W } from '../legacy';
 import rep from '../data/episodes/mei.json';
@@ -64,7 +65,7 @@ const useT = () => useCurrentFrame() / useVideoConfig().fps;
 const LAOZI = 'episodes/mei/images/laozi_reference.jpg';
 const laoziImg: { img: HTMLImageElement | null } = { img: null };
 // autres images : fin du clip (pose figée), silhouette détourée (detourer.py), tracé du baimiao (trace_baimiao.py)
-const IMGSRC = { fin: 'episodes/mei/clips/03_danseur_v2_fin.jpg', sil: 'episodes/mei/clips/03_danseur_v2_silhouette.png', trace: 'episodes/mei/images/laozi_baimiao_trace.png' };
+const IMGSRC = { fin: 'episodes/mei/clips/03_danseur_v2_fin.jpg', sil: 'episodes/mei/clips/03_danseur_v2_silhouette.png', trace: 'episodes/mei/images/laozi_baimiao_trace.png', xushen: 'episodes/mei/images/xushen_baimiao_trace.png' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 const useSetup = () => {
   const [h] = useState(() => delayRender('polices + moteur + images'));
@@ -372,7 +373,7 @@ const Opening: React.FC = () => {
         <Caption text="« 美，甘也。从羊从大 » — savoureux : un mouton 羊 en haut, « grand » 大 en bas" a={win(tf, haut - 0.2, song - 0.3, 0.5)} y={960} size={42} />
         <Label x={980} y={720} zh="大" text="grand" color={AZ} a={win(tf, grand, song - 0.6, 0.4)} />
         <Caption text="Xu Xuan 徐鉉 (dynastie Song, 986) : 羊大則美" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} />
-        <Caption text="« Quand le mouton est grand, il est beau. »" a={win(tf, maxime + 0.2, ent - 0.1, 0.4)} y={960} size={50} />
+        <Caption text="« Quand le mouton est grand, il est beau. »" a={win(tf, maxime + 0.2, FREEZE + 0.3, 0.4)} y={960} size={50} />
         <EraTag zh="漢" name="DYNASTIE HAN" dates="vers l'an 100" a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
         <EraTag zh="宋" name="DYNASTIE SONG" dates="Xe–XIIIe siècle" a={win(tf, song, FREEZE + 0.2, 0.6)} />
       </>}
@@ -442,10 +443,36 @@ const DanseIntro: React.FC = () => {
   );
 };
 
+// squelette du glyphe mei_jiaguwen (boîte 660) : le signe peut danser (GlyphDance, déformation par os)
+const MEI_RIG: Rig = { box: 660, bones: [
+  { name: 'torse', pivot: [348, 370], tip: [340, 95] },
+  { name: 'jambeG', pivot: [348, 375], tip: [310, 628] },
+  { name: 'jambeD', pivot: [352, 375], tip: [452, 650] },
+  { name: 'brasG', parent: 'torse', pivot: [338, 262], tip: [284, 352] },
+  { name: 'brasD', parent: 'torse', pivot: [350, 268], tip: [432, 325] },
+  { name: 'plumeHG', parent: 'torse', pivot: [338, 95], tip: [228, 25] },
+  { name: 'plumeHD', parent: 'torse', pivot: [348, 88], tip: [440, 60] },
+  { name: 'plumeBG', parent: 'torse', pivot: [332, 200], tip: [240, 200] },
+  { name: 'plumeBD', parent: 'torse', pivot: [352, 192], tip: [430, 175] },
+] };
+// un pas de la danse de la pluie (un par seconde) ; amplitude nulle au début et à la fin (retour exact au glyphe)
+const danse = (u: number, D: number) => {
+  const ph = 2 * Math.PI * u / 1.0, s = Math.sin(ph);
+  const env = seg(u, 0, 0.4) * (1 - seg(u, D - 0.6, D - 0.05));
+  const up = (v: number) => Math.max(0, v);
+  return {
+    torse: 0.07 * s * env, dx: 12 * s * env, dy: -16 * Math.abs(s) * env,
+    brasG: (0.3 + 0.8 * up(s)) * env, brasD: -(0.3 + 0.8 * up(-s)) * env,
+    jambeG: 0.13 * up(s) * env, jambeD: -0.13 * up(-s) * env,
+    plumeHG: 0.24 * Math.sin(ph - 0.9) * env, plumeHD: 0.24 * Math.sin(ph - 0.9) * env,
+    plumeBG: 0.2 * Math.sin(ph - 1.4) * env, plumeBD: 0.2 * Math.sin(ph - 1.4) * env,
+  };
+};
+
 // ════════════════ 2. La dynastie Shang (après la danse : le signe de l'os, la divination)
 const Shang: React.FC = () => {
   const t = useT();
-  const A3 = A('b03'), A4 = A('b04'), sig = at('b04', 'signe'), corps = at('b04', 'corps'), pluie = at('b04', 'pluie'), os = at('b04', 'os'), hom = at('b04', 'homme'), dw = at('b04', 'dawen'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
+  const A3 = A('b03'), A4 = A('b04'), sig = at('b04', 'signe'), corps = at('b04', 'corps'), pluie = at('b04', 'pluie'), os = at('b04', 'os'), hom = at('b04', 'homme'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
   void pare; void plumes;
   return (
     <AbsoluteFill>
@@ -460,12 +487,17 @@ const Shang: React.FC = () => {
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
             const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
             const col = (c: string) => rgb(c === 'coiffe' ? mixc(base(c), MAL, cf) : mixc(base(c), AZ, man));
-            const mainA = 1;
             const two = tt > br + 0.6 && tt < br + 2.2; // « parfois deux »
+            // « un danseur coiffé de plumes » : le signe se remet à danser deux secondes
+            const dz = tt - (pare - 0.2);
+            if (dz > 0 && dz < 2.6) {
+              drawGlyphDance(ctx, 'mei_jiaguwen_couleurs', MEI_RIG, (c) => E.drawRealGlyph(c, 'mei_jiaguwen', { x: 330, y: 330, size: 660, color: col }),
+                { ...G_REST, size: G_REST.size * 660 / 660, motion: danse(dz, 2.6) });
+              return;
+            }
+            const mainA = 1;
             if (mainA > 0) E.drawRealGlyph(ctx, two ? 'mei_jiaguwen2' : 'mei_jiaguwen', { ...G_REST, reveal: () => rv, opacity: Math.min(1, mainA), color: col, glow: 26 * cf * win(tt, coif, mt, 0.5), glowColor: rgb(MAL, 0.6) });
             // « le même que dans 文 » : le 文 de l'os, en petit, à gauche
-            const wa = win(tt, dw - 0.2, coif - 0.2, 0.4);
-            if (wa > 0) E.drawRealGlyph(ctx, 'wen_jiaguwen', { x: 470, y: 560, size: 300, opacity: wa, color: () => rgb(mixc(INK, AZ, 0.6)) });
             // le vrai mouton de l'os : museau en pointe, cornes qui retombent (gomme-gutte), puis il pâlit
             const ya = win(tt, mt - 0.2, rien + 0.6, 0.5);
             if (ya > 0) {
@@ -486,9 +518,8 @@ const Shang: React.FC = () => {
           }} />
       </Cam>
       <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, PL.debut + 0.8, 0.4)} y={960} size={52} />
-      <Label x={1300} y={760} zh="大" text="un homme, de face" color={AZ} a={win(t, hom + 0.3, dw - 0.2, 0.4)} />
+      <Label x={1300} y={760} zh="大" text="un homme, de face" color={AZ} a={win(t, hom + 0.3, corps - 0.1, 0.4)} />
       <Caption text="pour savoir s'il pleuvrait, on interrogeait les ancêtres sur des os de divination" a={win(t, pluie - 0.2, sig - 0.2, 0.4)} y={960} size={42} />
-      <Caption text="le même homme de face que dans 文 (épisode précédent)" a={win(t, dw, corps - 0.1, 0.4)} y={960} size={42} />
       <Caption text="une tête · deux bras ouverts · deux jambes écartées" a={win(t, corps, coif - 0.3, 0.4)} y={960} size={46} />
       <Label x={1330} y={300} zh="" text="une haute coiffe" color={MAL} a={win(t, coif + 0.2, mt - 0.4, 0.4)} />
       <Caption text={t < br + 0.6 ? 'quatre branches, dressées vers le ciel' : 'parfois deux (甲686)'} a={win(t, br, mt - 0.4, 0.4)} y={960} size={46} />
@@ -545,26 +576,28 @@ const NS = VERSE.length;
 // caractères du vers (instant d'arrivée de chaque pixel : trace_baimiao.py, canal R ; encre : alpha)
 const BM = { w: 1376, h: 768 }, BMS = 1920 / BM.w, BMY = (1080 - BM.h * BMS) / 2;
 const BM_SEEDS: [number, number][] = [[591, 43], [662, 77], [712, 123], [586, 158], [894, 239], [542, 329], [860, 379], [549, 443], [869, 501], [565, 509], [849, 647]];
-let bmData: Uint8ClampedArray | null = null, bmCanvas: HTMLCanvasElement | null = null, bmLast = -1;
-const drawBaimiao = (ctx: CanvasRenderingContext2D, p: number, alpha = 1) => {
-  const im = IMG.trace;
+// un baimiao qui se trace : IMG[key] = PNG de trace_baimiao.py (instant d'arrivée en R, encre en alpha), image 1376×768
+const BMC: Record<string, { data: Uint8ClampedArray; cv: HTMLCanvasElement; last: number }> = {};
+const drawBaimiao = (ctx: CanvasRenderingContext2D, p: number, alpha = 1, key: 'trace' | 'xushen' = 'trace') => {
+  const im = IMG[key];
   if (!im || p <= 0 || alpha <= 0) return;
-  if (!bmCanvas) {
-    bmCanvas = document.createElement('canvas'); bmCanvas.width = BM.w; bmCanvas.height = BM.h;
-    const c = bmCanvas.getContext('2d', { willReadFrequently: true })!; c.drawImage(im, 0, 0); bmData = c.getImageData(0, 0, BM.w, BM.h).data.slice();
+  if (!BMC[key]) {
+    const cv = document.createElement('canvas'); cv.width = BM.w; cv.height = BM.h;
+    const c = cv.getContext('2d', { willReadFrequently: true })!; c.drawImage(im, 0, 0);
+    BMC[key] = { data: c.getImageData(0, 0, BM.w, BM.h).data.slice(), cv, last: -1 };
   }
-  const thr = p * 262; // un peu au-delà de 250 : à p = 1 tout est tracé
-  if (Math.abs(thr - bmLast) > 0.01) {
-    const c = bmCanvas.getContext('2d', { willReadFrequently: true })!, out = c.createImageData(BM.w, BM.h), o = out.data, d = bmData!;
+  const B = BMC[key], thr = p * 262; // un peu au-delà de 250 : à p = 1 tout est tracé
+  if (Math.abs(thr - B.last) > 0.01) {
+    const c = B.cv.getContext('2d', { willReadFrequently: true })!, out = c.createImageData(BM.w, BM.h), o = out.data, d = B.data;
     for (let i = 0; i < d.length; i += 4) {
       const a = d[i + 3]; if (!a) continue;
       const head = Math.min(1, Math.max(0, (thr - d[i]) / 8)); // la pointe du trait arrive en douceur
       if (head <= 0) continue;
       o[i] = INK[0]; o[i + 1] = INK[1]; o[i + 2] = INK[2]; o[i + 3] = a * head;
     }
-    c.putImageData(out, 0, 0); bmLast = thr;
+    c.putImageData(out, 0, 0); B.last = thr;
   }
-  ctx.save(); ctx.globalAlpha = alpha; ctx.drawImage(bmCanvas, 0, BMY, 1920, BM.h * BMS); ctx.restore();
+  ctx.save(); ctx.globalAlpha = alpha; ctx.drawImage(B.cv, 0, BMY, 1920, BM.h * BMS); ctx.restore();
 };
 // position d'un caractère du vers : deux colonnes, lues de haut en bas et de droite à gauche
 const versePos = (i: number) => (i < 6 ? [1060, 175 + i * 142] : [860, 175 + (i - 6) * 142]);
@@ -661,8 +694,10 @@ const QinHan: React.FC = () => {
             const x = 1330 + (cx - 1330) * slide, y = 420 + (cy - 420) * slide;
             E.drawRealGlyph(ctx, 'mei_yang_xiaozhuan', { x, y, size: 380 - 90 * slide, opacity: ya * (1 - 0.6 * slide), color: () => rgb(GOM), glow: 18, glowColor: rgb(GOM, 0.5) });
           }
-          // Xu Shen : sa citation en colonne ; derrière lui, l'os qu'il n'a jamais vu (en transparence)
-          const xa = win(tt, xs - 0.2, err + 0.4, 0.6);
+          // Xu Shen à sa table (baimiao repris de la vidéo du 學), qui se trace en 2,5 s, puis s'efface devant l'analyse
+          drawBaimiao(ctx, clamp((tt - (xs + 0.1)) / 2.5), 1 - seg(tt, yeux - 0.5, yeux + 0.1), 'xushen');
+          // sa citation en colonne ; derrière, l'os qu'il n'a jamais vu (en transparence)
+          const xa = win(tt, yeux - 0.3, err + 0.4, 0.6);
           if (xa > 0) {
             E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: 1450, y: 520, size: 560, opacity: xa * 0.22 * seg(tt, yeux + 1.0, yeux + 2.0), color: () => rgb(MAL) });
             E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 560, opacity: xa, color: meiCol(0.6, 1, GOM) });
@@ -679,8 +714,8 @@ const QinHan: React.FC = () => {
       <Caption text="la coiffe : deux cornes, trois traits…" a={win(t, at('b07', 'cornes') - 0.2, mt - 0.2, 0.4)} y={960} size={46} />
       <Label x={1170} y={250} zh="羊" text="le mouton (petit sceau)" color={GOM} a={win(t, mt - 0.1, mt + 2.3, 0.4)} />
       <Caption text="…exactement le même caractère que le mouton" a={win(t, mt + 0.2, xs - 0.3, 0.4)} y={960} size={48} />
-      <Caption text="Xu Shen 許慎, vers 100 : le Shuowen jiezi" a={win(t, xs + 0.2, at('b07', 'neufmille') - 0.2, 0.4)} y={990} size={44} />
-      <Caption text="9 353 caractères expliqués un par un, découpés en morceaux" a={win(t, at('b07', 'neufmille') - 0.1, yeux - 0.1, 0.4)} y={990} size={44} />
+      <Caption text="Xu Shen 許慎, vers 100 : le Shuowen jiezi" a={win(t, xs + 0.2, at('b07', 'neufmille') - 0.2, 0.4)} y={1010} size={42} />
+      <Caption text="plus de 9 000 caractères expliqués (9 353)" a={win(t, at('b07', 'neufmille') - 0.1, yeux - 0.1, 0.4)} y={1010} size={42} />
       <Caption text="« 美，甘也。从羊从大 » — savoureux : un mouton sur un homme" a={win(t, yeux, sav - 0.2, 0.4)} y={990} size={42} />
       <Caption text="« savoureux » — une erreur presque inévitable" a={win(t, sav, err + 1.4, 0.4)} y={990} size={48} />
       <Caption text="Laozi sur soie (Mawangdui, 168 av. J.-C.) puis stèle des clercs (曹全碑) : le mouton reste" a={win(t, err + 1.4, B('b07') + 0.4, 0.4)} y={990} size={38} />

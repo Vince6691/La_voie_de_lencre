@@ -74,8 +74,9 @@
  "queue": 3.2,
  "reperes_cles": {
   "b01": {
-   "beau": "le mot pour",
+   "beau": "beau",
    "mouton": "c'est le caractère",
+   "officiel": "l'explication officielle",
    "dico": "premier grand",
    "haut": "un mouton en",
    "grand": "et le mot",
@@ -84,8 +85,8 @@
    "song": "Mille ans",
    "marbre": "dans le marbre",
    "maxime": "Quand le mouton",
-   "entendu": "C'est entendu",
-   "gros": "c'est un gros"
+   "entendu": "est grand",
+   "gros": "il est beau"
   },
   "b02": {
    "vraiment": "vraiment"
@@ -107,7 +108,6 @@
    "os": "os de divination",
    "signe": "un signe qui",
    "homme": "un homme, debout",
-   "dawen": "le même que",
    "corps": "Une tête",
    "coiffe": "une haute coiffe",
    "branches": "quatre branches",
@@ -116,7 +116,7 @@
    "rien": "Ici, rien",
    "pare": "homme paré",
    "plumes": "coiffé de plumes",
-   "terre": "Ces os dormiront",
+   "terre": "Ces os ne",
    "jamais": "n'en a jamais"
   },
   "b05": {
