@@ -20,7 +20,7 @@ import { rng } from '../shuimo/common';
 import { Era, travelM } from '../rouleau/TimeScroll';
 
 export type Rouleau3DConfig = {
-  at: number; duration?: number; // 5 s par défaut (le son est calé dessus)
+  at: number; duration?: number; // 5,8 s par défaut (le son est calé dessus)
   eras: Era[]; from: number; to: number; years: [number, number];
   fromLand: { seed: number; mood: Mood }; toLand: { seed: number; mood: Mood };
   midSeeds?: number[]; // paysages traversés (2), puis 2 marges
@@ -50,13 +50,14 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const V3 = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 const vl = (a: THREE.Vector3, b: THREE.Vector3, k: number) => a.clone().lerp(b, k);
 
-const dur = (c: Rouleau3DConfig) => c.duration ?? 5;
+const LEN = 5.8; // déroulé de référence : défilement 4 s, impact à 4 s, tenue sur le sceau, plongée
+const dur = (c: Rouleau3DConfig) => c.duration ?? LEN;
 // temps de référence (déroulé de 5 s) : on étire tout si la durée change
-const tRef = (c: Rouleau3DConfig, t: number) => ((t - c.at) * 5) / dur(c);
-const IMPACT = 4.0; // = 0,8 de la durée, comme le son du rouleau 2D (impact à 0,8)
+const tRef = (c: Rouleau3DConfig, t: number) => ((t - c.at) * LEN) / dur(c);
+const IMPACT = 4.0;
 const centerAt = (s: number) => lerp(C0, C1, travelM(s / 5)); // P au centre du rouleau (x = 0)
 const yearFmt = (y: number) => (y < 0 ? `−${Math.abs(Math.round(y))}` : `${Math.round(y)}`);
-export const r3TagIn = (c: Rouleau3DConfig, t: number) => sm(seg(tRef(c, t), 5.05, 5.45));
+export const r3TagIn = (c: Rouleau3DConfig, t: number) => sm(seg(tRef(c, t), 6.05, 6.45));
 
 // ── la peinture du rouleau (une seule fois) ──
 const shotsOf = (c: Rouleau3DConfig): Shot[] => {
@@ -209,8 +210,10 @@ const KEYS: { t: number; p: THREE.Vector3; l: THREE.Vector3 }[] = [
   { t: 1.0, p: V3(0.1, 6.6, ZC + 2.2), l: V3(0.5, 0, ZC - 0.15) },
   { t: 2.2, p: T.clone().add(V3(-2.1, 1.55, 3.6)), l: T.clone() },
   { t: 3.95, p: P3, l: T.clone().add(V3(0.2, 0, 0)) },
-  { t: 4.5, p: P3.clone().lerp(P4, 0.5).add(V3(0, 1.3, 0)), l: T.clone().lerp(V3(XEND, 0, ZC), 0.6) },
-  { t: 5.0, p: P4, l: V3(XEND, 0, ZC) },
+  // tenue sur le sceau après l'impact : la caméra s'en approche à peine
+  { t: 4.8, p: P3.clone().lerp(T, 0.12), l: T.clone().add(V3(0.25, 0, 0.1)) },
+  { t: 5.3, p: P3.clone().lerp(P4, 0.5).add(V3(0, 1.3, 0)), l: T.clone().lerp(V3(XEND, 0, ZC), 0.6) },
+  { t: 5.8, p: P4, l: V3(XEND, 0, ZC) },
 ];
 const PCURVE = new THREE.CatmullRomCurve3(KEYS.map((k) => k.p), false, 'centripetal');
 const LCURVE = new THREE.CatmullRomCurve3(KEYS.map((k) => k.l), false, 'centripetal');
@@ -256,23 +259,25 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
   const sealX = (SEAL1 - c) / UNIT;
   const { p, l } = camAt(s);
   // impact : la caméra s'avance à peine vers le sceau (aucune vibration)
-  const push = Math.sin(Math.PI * seg(s, IMPACT - 0.05, IMPACT + 0.5)) * 0.06;
+  const di = s - IMPACT, push = di < 0 ? 0 : 0.07 * Math.min(1, di / 0.05) * Math.exp(-Math.max(0, di - 0.05) * 4.5);
   p.lerp(l, push);
   const dir = l.clone().sub(p).normalize(), top = sm((-dir.y - 0.82) / 0.17);
   camera.up.copy(V3(0, 1 - top, -top).normalize()); camera.position.copy(p); camera.lookAt(l);
 
   // sceau de jade : descend (accéléré), frappe, remonte
-  const down = seg(s, IMPACT - 0.6, IMPACT), up = seg(s, IMPACT + 0.12, IMPACT + 0.5);
-  const sy = 0.28 + 0.006 + 2.8 * Math.pow(1 - down, 2.2) + 4.5 * up * up;
-  const sRot = 0.5 * Math.pow(1 - down, 2) - 0.3 * up * up, sTilt = 0.12 * Math.pow(1 - down, 2) + 0.08 * up;
+  const down = seg(s, IMPACT - 0.5, IMPACT), up = seg(s, IMPACT + 0.3, IMPACT + 0.75);
+  // appui : la pierre s'écrase d'un rien à l'impact puis reprend sa forme
+  const squash = di >= 0 && di < 0.12 ? 0.035 * Math.sin((Math.PI * di) / 0.12) : 0;
+  const sy = 0.28 + 0.006 - squash * 0.28 + 2.8 * Math.pow(1 - down, 3) + 4.5 * up * up;
+  const sRot = 0.5 * Math.pow(1 - down, 3) - 0.3 * up * up, sTilt = 0.12 * Math.pow(1 - down, 2) + 0.08 * up;
   const sway = 0.35 * Math.pow(1 - down, 1.5) * Math.sin(s * 9) + (s > IMPACT ? 0.25 * Math.exp(-(s - IMPACT) * 5) * Math.sin((s - IMPACT) * 14) : 0);
   const stamped = s >= IMPACT, ink = stamped ? 1 - 0.2 * Math.exp(-(s - IMPACT) * 8) : 0;
   const glow = stamped ? Math.exp(-(s - IMPACT) * 3) : 0;
-  const sealFade = 1 - seg(s, 4.95, 5.15);
+  const sealFade = 1; // relayé par le sceau 2D (même place) dès que la caméra est arrivée
 
   // pétales : soufflés dans le sens du défilement, rafale quand le rouleau file
   const wind = -travel * 0.55 - 0.35 * s, M = new THREE.Matrix4(), Qt = new THREE.Quaternion(), E = new THREE.Euler(), S = new THREE.Vector3();
-  const pa = seg(s, 0.35, 1.2) * (1 - seg(s, 4.3, 4.8));
+  const pa = seg(s, 0.35, 1.2) * (1 - seg(s, 5.0, 5.5));
   const place = (m: THREE.InstancedMesh | null) => {
     if (!m) return;
     for (let i = 0; i < NP; i++) {
@@ -348,8 +353,8 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
         </mesh>
       )}
       {/* le sceau : pierre de Shoushan couleur miel, pommeau tourné, cordon et gland de soie rouge */}
-      {s > IMPACT - 0.65 && s < IMPACT + 0.5 && (
-        <group position={[sealX, sy, ZS]} rotation={[sTilt, sRot, 0.6 * sTilt]}>
+      {s > IMPACT - 0.55 && s < IMPACT + 0.8 && (
+        <group position={[sealX, sy, ZS]} rotation={[sTilt, sRot, 0.6 * sTilt]} scale={[1 + squash * 0.5, 1 - squash, 1 + squash * 0.5]}>
           <mesh geometry={G.box} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive="#6a3208" emissiveIntensity={0.12} /></mesh>
           <mesh geometry={G.knob} position={[0, 0.28, 0]} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive="#6a3208" emissiveIntensity={0.12} /></mesh>
           <mesh position={[0, -0.279, 0]}><boxGeometry args={[0.43, 0.004, 0.43]} /><meshStandardMaterial color="#a8241c" roughness={0.75} /></mesh>
@@ -444,26 +449,25 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
         continueRender(h);
       });
   }, [cfg, h]);
-  if (!A || s < -0.4 || s > 5.6) return null;
+  const sealUrl = useMemo(() => (A ? (A.seal.image as HTMLCanvasElement).toDataURL() : ''), [A]);
+  if (!A || s < -0.4 || s > 6.6) return null;
   const year = lerp(cfg.years[0], cfg.years[1], travelM(s / 5));
-  const ya = sm(seg(s, 0.7, 1.3)) * (1 - sm(seg(s, 4.15, 4.6)));
+  const ya = sm(seg(s, 0.7, 1.3)) * (1 - sm(seg(s, 4.85, 5.25)));
   // sceau volant : de sa place dans le plan d'arrivée (vue verticale) au cartouche
-  const fk = eio(seg(s, 5.0, 5.45)), fx = lerp(960 + SEAL.dx, 156, fk), fy = lerp(SEAL.y - TOP, 136, fk), fsz = lerp(SEAL.size, 92, fk);
+  const fk = eio(seg(s, 5.98, 6.45)), fx = lerp(960 + SEAL.dx, 156, fk), fy = lerp(SEAL.y - TOP, 136, fk), fsz = lerp(SEAL.size, 92, fk);
   return (
     <AbsoluteFill>
-      <AbsoluteFill style={{ opacity: seg(s, -0.35, -0.05) * (1 - seg(s, 4.8, 5.05)) }}>
+      <AbsoluteFill style={{ opacity: seg(s, -0.35, -0.05) * (1 - seg(s, 5.78, 5.98)) }}>
         <ThreeCanvas width={width} height={height} shadows flat gl={{ antialias: true }} camera={{ fov: 35, position: [0, H0, ZC], near: 0.05, far: 100 }}>
-          <Scene s={Math.max(0, Math.min(5, s))} A={A} />
+          <Scene s={Math.max(0, Math.min(LEN, s))} A={A} />
         </ThreeCanvas>
       </AbsoluteFill>
       <YearPlate cfg={cfg} year={year} a={ya} />
-      {s > 4.95 && s < 5.5 && (
-        <div style={{ position: 'absolute', left: fx - fsz / 2, top: fy - fsz / 2, width: fsz, height: fsz, background: 'rgba(192,57,43,0.95)', borderRadius: 10 * fk, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: fsz * 0.7, color: '#f6eee0', opacity: 1 - seg(s, 5.4, 5.5), boxShadow: `0 ${10 * Math.sin(Math.PI * fk)}px ${30 * Math.sin(Math.PI * fk)}px rgba(60,20,10,0.35)` }}>
-          {cfg.eras[cfg.to].zh}
-        </div>
+      {s >= 5.78 && s < 6.55 && (
+        <img src={sealUrl} style={{ position: 'absolute', left: fx - fsz / 2, top: fy - fsz / 2, width: fsz, height: fsz, opacity: 1 - seg(s, 6.42, 6.52), filter: `drop-shadow(0 ${10 * Math.sin(Math.PI * fk)}px ${16 * Math.sin(Math.PI * fk)}px rgba(60,20,10,0.35))` }} />
       )}
-      <Sequence from={Math.round(cfg.at * fps)} layout="none"><Audio src={staticFile('rouleau/rouleau.wav')} volume={0.6} playbackRate={5 / dur(cfg)} /></Sequence>
-      <Sequence from={Math.round((cfg.at + 0.97 * dur(cfg)) * fps)} layout="none"><Audio src={staticFile('rouleau/gong.wav')} volume={0.22} /></Sequence>
+      {/* souffle du rouleau, impact du sceau à 4 s, cloche quand le sceau s'envole (rouleau/rouleau3d.wav, calé sur 5,8 s) */}
+      <Sequence from={Math.round(cfg.at * fps)} layout="none"><Audio src={staticFile('rouleau/rouleau3d.wav')} volume={0.8} playbackRate={LEN / dur(cfg)} /></Sequence>
     </AbsoluteFill>
   );
 };

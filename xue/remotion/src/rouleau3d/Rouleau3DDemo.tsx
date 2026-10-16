@@ -5,7 +5,7 @@ import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose } from '../shuimo/layout';
 import { Rouleau3DConfig, Rouleau3DStage, r3TagIn } from './Rouleau3D';
 
-export const ROULEAU3D_DEMO_SECONDS = 7.8;
+export const ROULEAU3D_DEMO_SECONDS = 8.6;
 const CFG: Rouleau3DConfig = {
   at: 1.2, from: 1, to: 2, years: [-1046, -300],
   eras: [{ zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '戰', date: '−300' }, { zh: '秦', date: '−221' }],
@@ -33,7 +33,7 @@ export const Rouleau3DDemo: React.FC = () => {
   }, [h]);
   const { fps } = useVideoConfig();
   const t = useCurrentFrame() / fps;
-  const end = CFG.at + 5;
+  const end = CFG.at + 5.8;
   return (
     <AbsoluteFill style={{ background: '#f8f5ee' }}>
       <Sequence durationInFrames={Math.round((CFG.at + 0.2) * fps)}>
