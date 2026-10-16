@@ -481,6 +481,36 @@ const Shang: React.FC = () => {
           <Draw draw={(ctx, tt, E) => {
             // le signe né de la danse reste au centre : on le décrit trait par trait (plus de plastron)
             if (tt < GLYEND) return;
+            // « Pour savoir si la pluie viendrait… » : une averse d'encre, un lavis de nuages ; le signe glisse à gauche
+            const rain = win(tt, A4 - 0.2, sig - 0.4, 0.8);
+            if (rain > 0) {
+              const g = ctx.createLinearGradient(0, 0, 0, 520);
+              g.addColorStop(0, rgb(INK, 0.32 * rain)); g.addColorStop(1, rgb(INK, 0));
+              ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 520);
+              const r = rng(77);
+              ctx.save(); ctx.lineCap = 'round';
+              for (let i = 0; i < 140; i++) {
+                const x0 = r() * 2100 - 90, sp = 900 + r() * 500, len = 30 + r() * 50, ph = r() * 1180;
+                const y = ((ph + sp * (tt - A4)) % 1180) - 80, x = x0 - 0.18 * y;
+                ctx.strokeStyle = rgb(INK, (0.12 + 0.18 * r()) * rain); ctx.lineWidth = 1.2 + r() * 1.6;
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 0.18 * len, y + len); ctx.stroke();
+              }
+              ctx.restore();
+            }
+            // le signe : au centre, puis à gauche pendant la pluie et la comparaison, puis de retour au centre
+            const side = seg(tt, A4 + 0.3, A4 + 1.6) * (1 - seg(tt, hom - 0.1, hom + 0.8));
+            const GP = { x: G_REST.x + (640 - G_REST.x) * ease(side), y: G_REST.y, size: G_REST.size * (1 - 0.12 * ease(side)) };
+            // « un signe qui ressemble à notre danseur » : la silhouette d'encre du danseur arrive à droite,
+            // puis glisse sur le signe et s'y superpose (bras, jambes, plumes)
+            const sa = win(tt, sig - 0.7, hom + 0.3, 0.4);
+            if (sa > 0 && IMG.sil) {
+              const over = ease(seg(tt, sig + 0.2, sig + 1.1));
+              const tgt = { x: 1330 + (GP.x - 1330) * over, y: GP.y, size: GP.size * (0.95 + 0.05 * over) };
+              const sc = tgt.size / G_DANCER.size;
+              ctx.save(); ctx.globalAlpha = sa * (1 - 0.55 * over);
+              ctx.drawImage(IMG.sil, tgt.x - G_DANCER.x * sc, tgt.y - G_DANCER.y * sc, 1920 * sc, 1080 * sc);
+              ctx.restore();
+            }
             const rv = 1, dry = 1;
             const man = seg(tt, hom, hom + 0.5), cf = seg(tt, coif, coif + 0.5);
             const base = (_c: string) => mixc(mixc(PAPERWHITE, INK, 0.45), INK, dry);
@@ -494,7 +524,7 @@ const Shang: React.FC = () => {
               return;
             }
             const mainA = 1;
-            if (mainA > 0) E.drawRealGlyph(ctx, two ? 'mei_jiaguwen2' : 'mei_jiaguwen', { ...G_REST, reveal: () => rv, opacity: Math.min(1, mainA), color: col, glow: 26 * cf * win(tt, coif, mt, 0.5), glowColor: rgb(MAL, 0.6) });
+            if (mainA > 0) E.drawRealGlyph(ctx, two ? 'mei_jiaguwen2' : 'mei_jiaguwen', { ...GP, reveal: () => rv, opacity: Math.min(1, mainA), color: col, glow: 26 * cf * win(tt, coif, mt, 0.5), glowColor: rgb(MAL, 0.6) });
             // « le même que dans 文 » : le 文 de l'os, en petit, à gauche
             // le vrai mouton de l'os : museau en pointe, cornes qui retombent (gomme-gutte), puis il pâlit
             const ya = win(tt, mt - 0.2, rien + 0.6, 0.5);
