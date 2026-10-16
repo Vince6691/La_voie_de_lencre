@@ -14,6 +14,7 @@ import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile,
 import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { compose, Mood, Shot } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { Era, travelM } from '../rouleau/TimeScroll';
@@ -23,6 +24,7 @@ export type Rouleau3DConfig = {
   eras: Era[]; from: number; to: number; years: [number, number];
   fromLand: { seed: number; mood: Mood }; toLand: { seed: number; mood: Mood };
   midSeeds?: number[]; // paysages traversés (2), puis 2 marges
+  periods?: { from: number; zh: string; name: string }[]; // périodes affichées au-dessus du compteur d'années
 };
 
 // ── géométrie de la peinture, en « pixels de plan » P (un plan 2D = 1920 × 1080 P) ──
@@ -70,7 +72,7 @@ const MOODFILL: Partial<Record<Mood, (g: CanvasRenderingContext2D, w: number, h:
 const drawSealSquare = (g: CanvasRenderingContext2D, x: number, y: number, s: number, zh: string, a: number, ghost = false) => {
   g.save(); g.translate(x, y); g.globalAlpha = a;
   if (ghost) {
-    g.strokeStyle = VER; g.lineWidth = s * 0.03; g.setLineDash([s * 0.06, s * 0.05]); g.strokeRect(-s / 2, -s / 2, s, s); g.setLineDash([]);
+    g.strokeStyle = VER; g.lineWidth = s * 0.03; g.setLineDash([s * 0.06, s * 0.05]); g.strokeRect(-s * 0.45, -s * 0.45, s * 0.9, s * 0.9); g.setLineDash([]);
     g.fillStyle = 'rgba(192,57,43,0.35)'; g.font = `${s * 0.7}px ShuimoKai`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(zh, 0, s * 0.03);
   } else {
     const R0 = rng(zh.charCodeAt(0));
@@ -143,16 +145,48 @@ const rollCanvas = (paper: HTMLImageElement) => {
   g.fillStyle = 'rgba(90,70,45,0.6)'; g.fillRect(0, 0, 1024, 14); g.fillRect(0, 498, 1024, 14);
   return cv;
 };
-const woodCanvas = () => {
-  const cv = document.createElement('canvas'); cv.width = 2048; cv.height = 1024; const g = cv.getContext('2d')!;
-  g.fillStyle = '#3a1712'; g.fillRect(0, 0, 2048, 1024);
+// plateau en bois de zitan (planches, fil serré, pores) sous un vernis : couleur et relief
+const woodCanvas = (bump = false) => {
+  const cv = document.createElement('canvas'); cv.width = 2048; cv.height = 2048; const g = cv.getContext('2d')!;
   const R0 = rng(31);
-  for (let i = 0; i < 260; i++) { // veines du bois sous la laque
-    const y = R0() * 1024, a = 0.03 + R0() * 0.08, amp = 4 + R0() * 18, f = 0.002 + R0() * 0.006, ph = R0() * 6;
-    g.strokeStyle = R0() < 0.5 ? `rgba(20,6,4,${a * 2})` : `rgba(120,50,30,${a})`; g.lineWidth = 1 + R0() * 3; g.beginPath();
-    for (let x = 0; x <= 2048; x += 16) g.lineTo(x, y + amp * Math.sin(x * f + ph) + 0.5 * amp * Math.sin(x * f * 2.7 + ph));
-    g.stroke();
+  g.fillStyle = bump ? '#808080' : '#2a120e'; g.fillRect(0, 0, 2048, 2048);
+  for (let pl = 0; pl < 4; pl++) { // quatre planches, teinte un peu différente
+    const y0 = pl * 512;
+    if (!bump) { g.fillStyle = `rgba(${60 + R0() * 25},${24 + R0() * 10},${16 + R0() * 6},0.35)`; g.fillRect(0, y0, 2048, 512); }
+    for (let i = 0; i < 420; i++) {
+      const y = y0 + R0() * 512, a = 0.04 + R0() * 0.12, amp = 3 + R0() * 14, f = 0.0015 + R0() * 0.004, ph = R0() * 6;
+      g.strokeStyle = bump ? `rgba(0,0,0,${a * 1.5})` : R0() < 0.6 ? `rgba(12,4,3,${a * 1.8})` : `rgba(130,62,38,${a})`;
+      g.lineWidth = 0.6 + R0() * 2.2; g.beginPath();
+      for (let x = 0; x <= 2048; x += 12) g.lineTo(x, y + amp * Math.sin(x * f + ph) + 0.4 * amp * Math.sin(x * f * 3.1 + ph * 2));
+      g.stroke();
+    }
+    for (let i = 0; i < 900; i++) { // pores
+      g.fillStyle = bump ? 'rgba(0,0,0,0.5)' : 'rgba(8,2,2,0.45)';
+      g.fillRect(R0() * 2048, y0 + R0() * 512, 4 + R0() * 14, 1 + R0() * 1.2);
+    }
+    g.fillStyle = bump ? 'rgba(0,0,0,0.9)' : 'rgba(5,1,1,0.85)'; g.fillRect(0, y0, 2048, 3); // joint
   }
+  return cv;
+};
+const feltCanvas = () => {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 512; const g = cv.getContext('2d')!;
+  g.fillStyle = '#25262b'; g.fillRect(0, 0, 512, 512);
+  const R0 = rng(5);
+  for (let i = 0; i < 9000; i++) { const x = R0() * 512, y = R0() * 512, a = R0() * 6.3, l = 2 + R0() * 6;
+    g.strokeStyle = R0() < 0.5 ? 'rgba(70,72,82,0.35)' : 'rgba(10,10,14,0.4)'; g.lineWidth = 0.6; g.beginPath(); g.moveTo(x, y); g.lineTo(x + l * Math.cos(a), y + l * Math.sin(a)); g.stroke(); }
+  return cv;
+};
+// pierre de Shoushan couleur miel (tianhuang) : veines, nuages, fines « peaux de radis »
+const stoneCanvas = () => {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 512; const g = cv.getContext('2d')!;
+  const gr = g.createLinearGradient(0, 0, 0, 512); gr.addColorStop(0, '#e3ad5e'); gr.addColorStop(0.5, '#cf8f3e'); gr.addColorStop(1, '#b8742c');
+  g.fillStyle = gr; g.fillRect(0, 0, 512, 512);
+  const R0 = rng(8);
+  for (let i = 0; i < 60; i++) { const x = R0() * 512, y = R0() * 512, r = 20 + R0() * 80, rg = g.createRadialGradient(x, y, 0, x, y, r);
+    rg.addColorStop(0, R0() < 0.5 ? 'rgba(255,220,150,0.18)' : 'rgba(150,80,25,0.16)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
+  for (let i = 0; i < 14; i++) { g.strokeStyle = `rgba(120,55,15,${0.15 + R0() * 0.3})`; g.lineWidth = 0.6 + R0() * 1.6; g.beginPath();
+    let x = R0() * 512, y = R0() * 512; g.moveTo(x, y);
+    for (let k = 0; k < 30; k++) { x += (R0() - 0.3) * 22; y += (R0() - 0.5) * 22; g.lineTo(x, y); } g.stroke(); }
   return cv;
 };
 const petalCanvas = () => {
@@ -164,45 +198,74 @@ const petalCanvas = () => {
 };
 const tex = (cv: HTMLCanvasElement) => { const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; };
 
-// ── caméra : verticale → s'élève → rasante (suit) → remonte → plonge à la verticale sur l'arrivée ──
+// ── caméra : une seule trajectoire lisse (Catmull-Rom) parcourue à vitesse continue (interpolation monotone du
+// temps), sans arrêt aux étapes : verticale → s'élève → rasante, de trois quarts (≈ 20°) → glisse → remonte → plonge
 const H0 = 3.375 / (2 * Math.tan((17.5 * Math.PI) / 180)); // hauteur qui cadre exactement un plan (1080 P)
-const T = V3(STOP_X, 0, ZS - 0.5); // un peu au-delà du sceau : plus de peinture dans le champ
-const P0 = V3(0, H0, ZC), L0 = V3(0, 0, ZC);
-const P1 = V3(0.5, 8.2, ZC + 1.6), L1 = V3(0.6, 0, ZC);
-const P2 = T.clone().add(V3(-4.4, 1.75, 2.2)), P3 = T.clone().add(V3(-3.8, 1.5, 1.9));
+const T = V3(STOP_X, 0, ZS - 0.45); // un peu au-delà du sceau : plus de peinture dans le champ
 const XEND = (SEAL1 - SEAL.dx - C1) / UNIT; // centre du plan d'arrivée à la fin
-const P4 = V3(XEND, H0, ZC), L4 = V3(XEND, 0, ZC);
+const P3 = T.clone().add(V3(-1.55, 1.3, 3.1)), P4 = V3(XEND, H0, ZC);
+const KEYS: { t: number; p: THREE.Vector3; l: THREE.Vector3 }[] = [
+  { t: 0, p: V3(0, H0, ZC), l: V3(0, 0, ZC) },
+  { t: 1.0, p: V3(0.1, 6.6, ZC + 2.2), l: V3(0.5, 0, ZC - 0.15) },
+  { t: 2.2, p: T.clone().add(V3(-2.1, 1.55, 3.6)), l: T.clone() },
+  { t: 3.95, p: P3, l: T.clone().add(V3(0.2, 0, 0)) },
+  { t: 4.5, p: P3.clone().lerp(P4, 0.5).add(V3(0, 1.3, 0)), l: T.clone().lerp(V3(XEND, 0, ZC), 0.6) },
+  { t: 5.0, p: P4, l: V3(XEND, 0, ZC) },
+];
+const PCURVE = new THREE.CatmullRomCurve3(KEYS.map((k) => k.p), false, 'centripetal');
+const LCURVE = new THREE.CatmullRomCurve3(KEYS.map((k) => k.l), false, 'centripetal');
+// paramètre de courbe en fonction du temps : cubique monotone (Fritsch–Carlson), vitesse nulle aux deux bouts
+const TMAP = (() => {
+  const x = KEYS.map((k) => k.t), y = KEYS.map((_, i) => i / (KEYS.length - 1)), n = x.length;
+  const d = x.slice(0, -1).map((_, i) => (y[i + 1] - y[i]) / (x[i + 1] - x[i]));
+  const m = x.map((_, i) => (i === 0 || i === n - 1 ? 0 : (2 * d[i - 1] * d[i]) / (d[i - 1] + d[i])));
+  return (t: number) => {
+    if (t <= x[0]) return 0; if (t >= x[n - 1]) return 1;
+    let i = 0; while (t > x[i + 1]) i++;
+    const h = x[i + 1] - x[i], u = (t - x[i]) / h, u2 = u * u, u3 = u2 * u;
+    return (2 * u3 - 3 * u2 + 1) * y[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * y[i + 1] + (u3 - u2) * h * m[i + 1];
+  };
+})();
 function camAt(s: number) {
-  let p: THREE.Vector3, l: THREE.Vector3;
-  if (s < 0.75) { const k = eio(s / 0.75); p = vl(P0, P1, k); l = vl(L0, L1, k); }
-  else if (s < 2.1) { const k = eio((s - 0.75) / 1.35); p = vl(P1, P2, k); p.y += 0.6 * Math.sin(Math.PI * k); l = vl(L1, T, k); }
-  else if (s < 4.15) { const k = sm((s - 2.1) / 2.05); p = vl(P2, P3, k); l = T.clone(); }
-  else { const k = eio((s - 4.15) / 0.75); p = vl(P3, P4, k); p.y += 2.2 * Math.sin(Math.PI * k); l = vl(T, L4, k); }
-  // impact : secousse brève
-  const d = s - IMPACT;
-  if (d > 0 && d < 0.35) { const a = 0.045 * (1 - d / 0.35); p.x += a * Math.sin(d * 90); p.y += a * Math.sin(d * 117 + 1); }
-  return { p, l };
+  const k = TMAP(s);
+  return { p: PCURVE.getPoint(k), l: LCURVE.getPoint(k) };
 }
 
-type Assets = { scroll: THREE.CanvasTexture; seal: THREE.CanvasTexture; roll: THREE.CanvasTexture; wood: THREE.CanvasTexture; petal: THREE.CanvasTexture };
+type Assets = { scroll: THREE.CanvasTexture; seal: THREE.CanvasTexture; roll: THREE.CanvasTexture; wood: THREE.CanvasTexture; woodBump: THREE.CanvasTexture; felt: THREE.CanvasTexture; stone: THREE.CanvasTexture; petal: THREE.CanvasTexture };
 const NP = 120, ND = 240;
 const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
   const { camera, gl } = useThree();
   const petals = useRef<THREE.InstancedMesh>(null), dust = useRef<THREE.Points>(null);
   const seeds = useMemo(() => { const r = rng(11); return Array.from({ length: Math.max(NP, ND) }, () => [r(), r(), r(), r(), r(), r()]); }, []);
   const dustPos = useMemo(() => new Float32Array(ND * 3), []);
-  useMemo(() => { A.scroll.anisotropy = gl.capabilities.getMaxAnisotropy(); A.wood.anisotropy = A.scroll.anisotropy; A.wood.wrapS = A.wood.wrapT = THREE.RepeatWrapping; A.wood.repeat.set(3, 3); }, [A, gl]);
+  const G = useMemo(() => {
+    const an = gl.capabilities.getMaxAnisotropy();
+    A.scroll.anisotropy = an;
+    for (const t of [A.wood, A.woodBump]) { t.anisotropy = an; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2.5, 2.5); }
+    A.woodBump.colorSpace = THREE.NoColorSpace;
+    A.felt.wrapS = A.felt.wrapT = THREE.RepeatWrapping; A.felt.repeat.set(6, 2.5);
+    // pommeau sculpté du sceau (profil tourné) et cordon de soie
+    const knob = new THREE.LatheGeometry([[0.2, 0], [0.205, 0.015], [0.17, 0.035], [0.12, 0.06], [0.11, 0.08], [0.14, 0.12], [0.155, 0.17], [0.14, 0.22], [0.1, 0.26], [0.05, 0.285], [0.015, 0.295], [0, 0.297]].map(([r, y]) => new THREE.Vector2(r, y)), 48);
+    const cord = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.02, 0.43, 0), V3(0.12, 0.47, 0.05), V3(0.25, 0.36, 0.12), V3(0.28, 0.18, 0.15), V3(0.29, 0.02, 0.16)]), 40, 0.014, 8);
+    const box = new RoundedBoxGeometry(0.46, 0.56, 0.46, 4, 0.035);
+    return { knob, cord, box };
+  }, [A, gl]);
 
   const c = centerAt(s), travel = (c - C0) / UNIT;
   A.scroll.repeat.set((VIS * UNIT) / PW, 1); A.scroll.offset.set((c - (VIS * UNIT) / 2) / PW, 0);
   const sealX = (SEAL1 - c) / UNIT;
   const { p, l } = camAt(s);
+  // impact : la caméra s'avance à peine vers le sceau (aucune vibration)
+  const push = Math.sin(Math.PI * seg(s, IMPACT - 0.05, IMPACT + 0.5)) * 0.06;
+  p.lerp(l, push);
   const dir = l.clone().sub(p).normalize(), top = sm((-dir.y - 0.82) / 0.17);
   camera.up.copy(V3(0, 1 - top, -top).normalize()); camera.position.copy(p); camera.lookAt(l);
 
   // sceau de jade : descend (accéléré), frappe, remonte
-  const down = seg(s, IMPACT - 0.45, IMPACT), up = seg(s, IMPACT + 0.08, IMPACT + 0.5);
-  const sy = 0.28 + 0.004 + 3.6 * (1 - down * down) + 3.6 * up * up;
+  const down = seg(s, IMPACT - 0.6, IMPACT), up = seg(s, IMPACT + 0.12, IMPACT + 0.5);
+  const sy = 0.28 + 0.006 + 2.8 * Math.pow(1 - down, 2.2) + 4.5 * up * up;
+  const sRot = 0.5 * Math.pow(1 - down, 2) - 0.3 * up * up, sTilt = 0.12 * Math.pow(1 - down, 2) + 0.08 * up;
+  const sway = 0.35 * Math.pow(1 - down, 1.5) * Math.sin(s * 9) + (s > IMPACT ? 0.25 * Math.exp(-(s - IMPACT) * 5) * Math.sin((s - IMPACT) * 14) : 0);
   const stamped = s >= IMPACT, ink = stamped ? 1 - 0.2 * Math.exp(-(s - IMPACT) * 8) : 0;
   const glow = stamped ? Math.exp(-(s - IMPACT) * 3) : 0;
   const sealFade = 1 - seg(s, 4.95, 5.15);
@@ -237,16 +300,25 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
   const rot = -travel / R;
   return (
     <>
-      <color attach="background" args={['#1b120d']} />
-      <fog attach="fog" args={['#1b120d', 9, 21]} />
-      <ambientLight intensity={1.75} color="#ffffff" />
-      <directionalLight position={[-7, 6.5, 5]} intensity={2.1} color="#fff0dc" castShadow
-        shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-9} shadow-camera-right={9} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-camera-near={1} shadow-camera-far={30} />
-      <directionalLight position={[6, 3, -6]} intensity={0.2} color="#e8d8c0" />
-      {/* table laquée */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.002, 0]} receiveShadow>
+      <color attach="background" args={['#120b08']} />
+      <fog attach="fog" args={['#120b08', 8, 19]} />
+      {/* lumière : plate à la verticale (le plan 2D exact), puis lumière de studio en vue rasante : un pinceau chaud
+          sur le rouleau, la table qui s'enfonce dans l'ombre */}
+      <ambientLight intensity={lerp(0.5, 1.75, top)} color="#ffffff" />
+      <hemisphereLight args={['#fff1dc', '#2a1408', lerp(0.35, 0, top)]} />
+      <directionalLight position={[-7, 6.5, 5]} intensity={lerp(1.15, 2.1, top)} color="#ffe9cf" castShadow
+        shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-radius={6} shadow-camera-left={-9} shadow-camera-right={9} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-camera-near={1} shadow-camera-far={30} />
+      <spotLight position={[-1.5, 9, 3.5]} angle={0.62} penumbra={0.95} decay={0} intensity={lerp(2.4, 0, top)} color="#ffdcae" />
+      <directionalLight position={[6, 2.5, -7]} intensity={lerp(0.9, 0.15, top)} color="#d9c2a0" />
+      {/* plateau en zitan verni */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.004, 0]} receiveShadow>
         <planeGeometry args={[60, 34]} />
-        <meshStandardMaterial map={A.wood} roughness={0.5} metalness={0.05} />
+        <meshPhysicalMaterial map={A.wood} bumpMap={A.woodBump} bumpScale={0.6} roughness={0.55} clearcoat={1} clearcoatRoughness={0.14} />
+      </mesh>
+      {/* feutre de calligraphe sous le rouleau */}
+      <mesh position={[0, -0.002, 0]} receiveShadow>
+        <boxGeometry args={[VIS + 1.8, 0.004, 4.9]} />
+        <meshStandardMaterial map={A.felt} roughness={1} />
       </mesh>
       {/* le rouleau déroulé */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]} receiveShadow>
@@ -275,13 +347,19 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
           <meshStandardMaterial map={A.seal} transparent opacity={ink * sealFade} roughness={0.7} emissive="#ff5a3a" emissiveIntensity={0.9 * glow} emissiveMap={A.seal} />
         </mesh>
       )}
-      {/* le sceau de jade */}
-      {s > IMPACT - 0.5 && s < IMPACT + 0.55 && (
-        <group position={[sealX, sy, ZS]}>
-          <mesh castShadow><boxGeometry args={[0.48, 0.56, 0.48]} /><meshStandardMaterial color="#4f7d63" roughness={0.16} metalness={0.05} /></mesh>
-          <mesh position={[0, 0.3, 0]} castShadow><boxGeometry args={[0.36, 0.05, 0.36]} /><meshStandardMaterial color="#4f7d63" roughness={0.16} /></mesh>
-          <mesh position={[0, 0.44, 0]} castShadow><torusGeometry args={[0.11, 0.045, 12, 32]} /><meshStandardMaterial color="#5a8a6e" roughness={0.16} /></mesh>
-          <mesh position={[0, -0.282, 0]}><boxGeometry args={[0.46, 0.006, 0.46]} /><meshStandardMaterial color="#b8322a" roughness={0.6} /></mesh>
+      {/* le sceau : pierre de Shoushan couleur miel, pommeau tourné, cordon et gland de soie rouge */}
+      {s > IMPACT - 0.65 && s < IMPACT + 0.5 && (
+        <group position={[sealX, sy, ZS]} rotation={[sTilt, sRot, 0.6 * sTilt]}>
+          <mesh geometry={G.box} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive="#6a3208" emissiveIntensity={0.12} /></mesh>
+          <mesh geometry={G.knob} position={[0, 0.28, 0]} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive="#6a3208" emissiveIntensity={0.12} /></mesh>
+          <mesh position={[0, -0.279, 0]}><boxGeometry args={[0.43, 0.004, 0.43]} /><meshStandardMaterial color="#a8241c" roughness={0.75} /></mesh>
+          <group position={[0, 0.43, 0]} rotation={[0, 0, sway]}>
+            <group position={[0, -0.43, 0]}>
+              <mesh geometry={G.cord} castShadow><meshPhysicalMaterial color="#9a1714" roughness={0.55} sheen={1} sheenColor="#ff7a6a" /></mesh>
+              <mesh position={[0.29, 0.02, 0.16]}><sphereGeometry args={[0.034, 16, 12]} /><meshPhysicalMaterial color="#8c1310" roughness={0.5} sheen={1} sheenColor="#ff7a6a" /></mesh>
+              <mesh position={[0.29, -0.1, 0.16]} castShadow><cylinderGeometry args={[0.022, 0.05, 0.22, 20, 1, true]} /><meshPhysicalMaterial color="#9a1714" roughness={0.6} sheen={1} sheenColor="#ff8a7a" side={THREE.DoubleSide} /></mesh>
+            </group>
+          </group>
         </group>
       )}
       <instancedMesh ref={petals} args={[undefined, undefined, NP]} frustumCulled={false}>
@@ -293,6 +371,55 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
         <pointsMaterial size={0.02} color="#ffe2b0" transparent opacity={0.5 * pa} depthWrite={false} />
       </points>
     </>
+  );
+};
+
+// ── compteur d'années : capitales romaines (Cinzel) dorées, chiffres à chasse fixe, filets et losanges d'or,
+// période traversée au-dessus (caractères + nom), petite frise de progression ; voile sombre pour la lisibilité ──
+const GOLD = 'linear-gradient(180deg, #fff4d6 0%, #f0d595 38%, #c99a4b 72%, #a8772f 100%)';
+const goldText: React.CSSProperties = { backgroundImage: GOLD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent' };
+const Rule: React.FC<{ flip?: boolean }> = ({ flip }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexDirection: flip ? 'row-reverse' : 'row' }}>
+    <div style={{ width: 150, height: 1.5, background: `linear-gradient(${flip ? 270 : 90}deg, rgba(232,200,130,0) 0%, rgba(232,200,130,0.95) 100%)` }} />
+    <div style={{ width: 9, height: 9, transform: 'rotate(45deg)', background: '#e8c882', boxShadow: '0 0 8px rgba(240,200,120,0.7)' }} />
+  </div>
+);
+const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number }> = ({ cfg, year, a }) => {
+  if (a <= 0) return null;
+  const [y0, y1] = cfg.years, k = clamp((year - y0) / (y1 - y0));
+  const per = cfg.periods ?? [];
+  let pi = -1; per.forEach((p, i) => { if (year >= p.from) pi = i; });
+  const P = per[pi], next = per[pi + 1];
+  // fondu du nom de période autour de chaque changement
+  const pa = P ? Math.min(clamp((year - P.from) / 25), next ? clamp((next.from - year) / 25) : 1) : 0;
+  const digits = yearFmt(year).split('');
+  return (
+    <AbsoluteFill style={{ opacity: a, pointerEvents: 'none' }}>
+      <AbsoluteFill style={{ background: 'linear-gradient(180deg, rgba(14,8,5,0) 58%, rgba(14,8,5,0.42) 78%, rgba(14,8,5,0.7) 100%)' }} />
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 772, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ height: 46, display: 'flex', alignItems: 'baseline', gap: 18, opacity: pa }}>
+          {P && <span style={{ fontFamily: 'ShuimoKai', fontSize: 40, ...goldText }}>{P.zh}</span>}
+          {P && <span style={{ fontFamily: 'ShuimoCaps', fontWeight: 500, fontSize: 24, letterSpacing: '0.32em', color: 'rgba(246,236,214,0.92)' }}>{P.name}</span>}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 28, marginTop: 4 }}>
+          <Rule />
+          <div style={{ display: 'flex', filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.55))' }}>
+            {digits.map((d, i) => (
+              <span key={i} style={{ fontFamily: 'ShuimoCaps', fontWeight: 700, fontSize: 118, lineHeight: 1, width: d === '−' ? 62 : 82, textAlign: 'center', ...goldText }}>{d}</span>
+            ))}
+          </div>
+          <Rule flip />
+        </div>
+        <div style={{ fontFamily: 'ShuimoCaps', fontWeight: 500, fontSize: 22, letterSpacing: '0.42em', color: 'rgba(246,236,214,0.85)', marginTop: 8 }}>{year < 0 ? 'AV. J.-C.' : 'APR. J.-C.'}</div>
+        {/* frise de progression : départ, périodes, arrivée */}
+        <div style={{ position: 'relative', width: 560, height: 14, marginTop: 14 }}>
+          <div style={{ position: 'absolute', left: 0, right: 0, top: 6, height: 1, background: 'rgba(232,200,130,0.45)' }} />
+          <div style={{ position: 'absolute', left: 0, width: `${k * 100}%`, top: 5.5, height: 2, background: 'linear-gradient(90deg, rgba(232,200,130,0.3), #f0d595)' }} />
+          {per.map((p, i) => { const x = clamp((p.from - y0) / (y1 - y0)); return <div key={i} style={{ position: 'absolute', left: `${x * 100}%`, top: 2, width: 1.5, height: 10, background: 'rgba(232,200,130,0.8)' }} />; })}
+          <div style={{ position: 'absolute', left: `calc(${k * 100}% - 5px)`, top: 1.5, width: 11, height: 11, borderRadius: 6, background: '#fff1cc', boxShadow: '0 0 10px 3px rgba(245,205,120,0.8)' }} />
+        </div>
+      </div>
+    </AbsoluteFill>
   );
 };
 
@@ -309,16 +436,17 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
       document.fonts.ready,
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load().then((f) => document.fonts.add(f)),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load().then((f) => document.fonts.add(f)),
+      new FontFace('ShuimoCaps', `url(${staticFile('fonts/Cinzel.ttf')})`, { weight: '400 900' }).load().then((f) => document.fonts.add(f)),
     ]).then(() => Promise.all([load(staticFile('shuimo/paper.jpg')), ...files.map((f) => load(staticFile(`shuimo/elements/${f}`)))]))
       .then(([paper, ...ims]) => {
         const img: Record<string, HTMLImageElement> = {}; files.forEach((f, i) => (img[f] = ims[i]));
-        setA({ scroll: tex(paintScroll(cfg, img, paper)), seal: tex(sealCanvas(cfg.eras[cfg.to].zh)), roll: tex(rollCanvas(paper)), wood: tex(woodCanvas()), petal: tex(petalCanvas()) });
+        setA({ scroll: tex(paintScroll(cfg, img, paper)), seal: tex(sealCanvas(cfg.eras[cfg.to].zh)), roll: tex(rollCanvas(paper)), wood: tex(woodCanvas()), woodBump: tex(woodCanvas(true)), felt: tex(feltCanvas()), stone: tex(stoneCanvas()), petal: tex(petalCanvas()) });
         continueRender(h);
       });
   }, [cfg, h]);
   if (!A || s < -0.4 || s > 5.6) return null;
   const year = lerp(cfg.years[0], cfg.years[1], travelM(s / 5));
-  const ya = seg(s, 0.8, 1.3) * (1 - seg(s, 4.2, 4.5));
+  const ya = sm(seg(s, 0.7, 1.3)) * (1 - sm(seg(s, 4.15, 4.6)));
   // sceau volant : de sa place dans le plan d'arrivée (vue verticale) au cartouche
   const fk = eio(seg(s, 5.0, 5.45)), fx = lerp(960 + SEAL.dx, 156, fk), fy = lerp(SEAL.y - TOP, 136, fk), fsz = lerp(SEAL.size, 92, fk);
   return (
@@ -328,10 +456,7 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
           <Scene s={Math.max(0, Math.min(5, s))} A={A} />
         </ThreeCanvas>
       </AbsoluteFill>
-      {/* compteur d'années, écrit au pinceau */}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 930, textAlign: 'center', opacity: ya, fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 72, letterSpacing: 4, color: 'rgb(36,28,22)', textShadow: '0 0 16px rgba(246,241,231,0.95), 0 0 6px rgba(246,241,231,0.9)' }}>
-        {yearFmt(year)}<span style={{ fontSize: 36, marginLeft: 14, opacity: 0.8 }}>{year < 0 ? 'av. J.-C.' : ''}</span>
-      </div>
+      <YearPlate cfg={cfg} year={year} a={ya} />
       {s > 4.95 && s < 5.5 && (
         <div style={{ position: 'absolute', left: fx - fsz / 2, top: fy - fsz / 2, width: fsz, height: fsz, background: 'rgba(192,57,43,0.95)', borderRadius: 10 * fk, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: fsz * 0.7, color: '#f6eee0', opacity: 1 - seg(s, 5.4, 5.5), boxShadow: `0 ${10 * Math.sin(Math.PI * fk)}px ${30 * Math.sin(Math.PI * fk)}px rgba(60,20,10,0.35)` }}>
           {cfg.eras[cfg.to].zh}

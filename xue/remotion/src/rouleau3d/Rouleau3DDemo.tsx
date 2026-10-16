@@ -10,6 +10,7 @@ const CFG: Rouleau3DConfig = {
   at: 1.2, from: 1, to: 2, years: [-1046, -300],
   eras: [{ zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '戰', date: '−300' }, { zh: '秦', date: '−221' }],
   fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' },
+  periods: [{ from: -1046, zh: '西周', name: 'ZHOU OCCIDENTAUX' }, { from: -770, zh: '春秋', name: 'PRINTEMPS ET AUTOMNES' }, { from: -475, zh: '戰國', name: 'ROYAUMES COMBATTANTS' }],
 };
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const Tag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({ zh, name, dates, a }) => (
