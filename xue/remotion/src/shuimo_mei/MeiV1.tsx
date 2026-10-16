@@ -370,10 +370,9 @@ const Opening: React.FC = () => {
         <Caption text="美 · měi · beau" a={win(tf, A1 + 1.6, mt - 0.2, 0.4)} y={880} size={56} />
         <Label x={980} y={300} zh="羊" text="le mouton" color={GOM} a={win(tf, mt + 0.6, dico - 0.3, 0.4)} />
         <Caption text="Xu Shen 許慎 · Shuowen jiezi, le premier grand dictionnaire (vers 100)" a={win(tf, dico, haut - 0.2, 0.5)} y={960} size={42} />
-        <Caption text="« 美，甘也。从羊从大 » — savoureux : un mouton 羊 en haut, « grand » 大 en bas" a={win(tf, haut - 0.2, song - 0.3, 0.5)} y={960} size={42} />
+        <Caption text="Shuowen jiezi : « 美，甘也。从羊从大 »" a={win(tf, haut - 0.2, song - 0.3, 0.5)} y={960} size={42} />
         <Label x={980} y={720} zh="大" text="grand" color={AZ} a={win(tf, grand, song - 0.6, 0.4)} />
         <Caption text="Xu Xuan 徐鉉 (dynastie Song, 986) : 羊大則美" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} />
-        <Caption text="« Quand le mouton est grand, il est beau. »" a={win(tf, maxime + 0.2, FREEZE + 0.3, 0.4)} y={960} size={50} />
         <EraTag zh="漢" name="DYNASTIE HAN" dates="vers l'an 100" a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
         <EraTag zh="宋" name="DYNASTIE SONG" dates="Xe–XIIIe siècle" a={win(tf, song, FREEZE + 0.2, 0.6)} />
       </>}
@@ -517,16 +516,8 @@ const Shang: React.FC = () => {
             }
           }} />
       </Cam>
-      <Caption text="Remontons à l'origine…" a={win(t, A3 - 0.2, PL.debut + 0.8, 0.4)} y={960} size={52} />
-      <Label x={1300} y={760} zh="大" text="un homme, de face" color={AZ} a={win(t, hom + 0.3, corps - 0.1, 0.4)} />
-      <Caption text="pour savoir s'il pleuvrait, on interrogeait les ancêtres sur des os de divination" a={win(t, pluie - 0.2, sig - 0.2, 0.4)} y={960} size={42} />
-      <Caption text="une tête · deux bras ouverts · deux jambes écartées" a={win(t, corps, coif - 0.3, 0.4)} y={960} size={46} />
-      <Label x={1330} y={300} zh="" text="une haute coiffe" color={MAL} a={win(t, coif + 0.2, mt - 0.4, 0.4)} />
-      <Caption text={t < br + 0.6 ? 'quatre branches, dressées vers le ciel' : 'parfois deux (甲686)'} a={win(t, br, mt - 0.4, 0.4)} y={960} size={46} />
-      <Caption text="羊 sur l'os : un museau en pointe, deux cornes qui retombent" a={win(t, mus - 0.2, rien + 0.4, 0.4)} y={960} size={44} />
-      <Caption text="un homme paré — un danseur, sans doute, coiffé de plumes" a={win(t, rien + 0.6, terre - 0.2, 0.4)} y={960} size={44} />
-      <Caption text="les os de divination ne sont redécouverts qu'en 1899" a={win(t, terre + 0.2, jam + 0.2, 0.5)} y={960} size={44} />
-      <Caption text="Xu Shen n'en a jamais vu un seul" a={win(t, jam - 0.2, A('b05') - 0.2, 0.4)} y={960} size={48} />
+      <Caption text="parfois deux branches seulement (甲686)" a={win(t, br + 0.6, br + 2.4, 0.4)} y={960} size={46} />
+      <Caption text="os de divination identifiés en 1899, à Pékin" a={win(t, terre + 0.2, jam + 0.2, 0.5)} y={960} size={44} />
       <EraTag zh="商" name="DYNASTIE SHANG" dates="Anyang · v. 1200 av. J.-C." a={seg(t, CLIP0 + 1.0, CLIP0 + 1.8) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
     </AbsoluteFill>
   );
@@ -556,9 +547,7 @@ const Zhou: React.FC = () => {
         </TimeScrollStage>
       </Cam>
       <Caption text="un vase rituel en bronze (ding) : l'inscription est coulée avec le métal" a={win(t, bz, ep - 0.2, 0.5)} y={980} size={42} />
-      <Caption text="bronze Zhou (美爵) : le trait s'épaissit, devient plus régulier" a={win(t, ep, cf - 0.2, 0.5)} y={980} size={44} />
-      <Caption text="os (Shang) → bronze (Zhou) : la coiffe se resserre, ses branches se courbent" a={win(t, cf + 1.6, co - 0.3, 0.4)} y={980} size={42} />
-      <Caption text="…et l'on commence à y voir des cornes" a={win(t, co - 0.2, R2 + 0.2, 0.4)} y={980} size={48} />
+      <Caption text="bronze des Zhou de l'Ouest · 美爵" a={win(t, ep, cf - 0.2, 0.5)} y={980} size={44} />
       <EraTag zh="周" name="DYNASTIE ZHOU" dates="XIe siècle av. J.-C." a={seg(t, A5 - 0.6, A5 + 0.2) * (1 - seg(t, R2, R2 + 0.4))} />
       <EraTag zh="戰" name="ROYAUMES COMBATTANTS" dates="Ve–IIIe siècle av. J.-C." a={tagIn(TR2, t) * (1 - seg(t, R2E + 2.5, R2E + 3.2))} />
     </AbsoluteFill>
@@ -663,11 +652,8 @@ const Chu: React.FC = () => {
       }} />
       <Caption text="les Royaumes combattants (Ve–IIIe siècle av. J.-C.)" a={win(t, roy - 0.2, ret - 0.1, 0.4)} y={980} size={42} />
       <Caption text="Guodian 郭店 (1993) : les plus anciens écrits de Laozi 老子 (≈ 300 av. J.-C.)" a={win(t, lz - 0.2, mapTo, 0.4)} y={990} size={38} />
-      <Caption text="« Quand tout le monde sait ce qui est beau… voilà la laideur. »" a={win(t, beau - 0.2, p0 + 0.6, 0.4)} y={990} size={46} />
       <Caption text="天下皆智(知)美之為美也，惡已 · écriture de Chu, Guodian" a={win(t, p0 + 0.4, p1 - 0.2, 0.5)} y={990} size={42} />
       <Caption text="Laozi 老子 · portrait imaginé" a={win(t, p1 - 0.2, aut + 0.6, 0.5)} y={990} size={40} />
-      <Caption text="décider du beau, c'est décider aussi du laid" a={win(t, dec - 0.2, mai - 0.2, 0.4)} y={990} size={46} />
-      <Caption text="le vieux maître se méfiait de la beauté" a={win(t, mai, A('b07') - 0.2, 0.4)} y={990} size={46} />
     </AbsoluteFill>
   );
 };
@@ -710,14 +696,10 @@ const QinHan: React.FC = () => {
         }} />
       </Cam>
       <Caption text="221 av. J.-C. · le Premier Empereur impose le petit sceau 小篆" a={win(t, emp, ord - 0.1, 0.4)} y={960} size={44} />
-      <Caption text="pour unifier l'empire, chaque caractère est redessiné, bien symétrique" a={win(t, ord - 0.2, at('b07', 'cornes') - 0.2, 0.4)} y={960} size={42} />
-      <Caption text="la coiffe : deux cornes, trois traits…" a={win(t, at('b07', 'cornes') - 0.2, mt - 0.2, 0.4)} y={960} size={46} />
       <Label x={1170} y={250} zh="羊" text="le mouton (petit sceau)" color={GOM} a={win(t, mt - 0.1, mt + 2.3, 0.4)} />
-      <Caption text="…exactement le même caractère que le mouton" a={win(t, mt + 0.2, xs - 0.3, 0.4)} y={960} size={48} />
       <Caption text="Xu Shen 許慎, vers 100 : le Shuowen jiezi" a={win(t, xs + 0.2, at('b07', 'neufmille') - 0.2, 0.4)} y={1010} size={42} />
       <Caption text="plus de 9 000 caractères expliqués (9 353)" a={win(t, at('b07', 'neufmille') - 0.1, yeux - 0.1, 0.4)} y={1010} size={42} />
-      <Caption text="« 美，甘也。从羊从大 » — savoureux : un mouton sur un homme" a={win(t, yeux, sav - 0.2, 0.4)} y={990} size={42} />
-      <Caption text="« savoureux » — une erreur presque inévitable" a={win(t, sav, err + 1.4, 0.4)} y={990} size={48} />
+      <Caption text="Shuowen jiezi : « 美，甘也。从羊从大 » — « savoureux »" a={win(t, yeux, sav - 0.2, 0.4)} y={990} size={42} />
       <Caption text="Laozi sur soie (Mawangdui, 168 av. J.-C.) puis stèle des clercs (曹全碑) : le mouton reste" a={win(t, err + 1.4, B('b07') + 0.4, 0.4)} y={990} size={38} />
       <EraTag zh="秦" name="DYNASTIE QIN" dates="221 av. J.-C. · le petit sceau" a={seg(t, A7 - 0.5, A7) * (1 - seg(t, xs - 0.5, xs))} />
       <EraTag zh="漢" name="DYNASTIE HAN" dates="vers l'an 100 · Xu Shen" a={seg(t, xs - 0.3, xs + 0.3) * (1 - seg(t, B('b07') - 0.2, B('b07') + 0.3))} />
@@ -769,8 +751,7 @@ const Dico: React.FC = () => {
           });
         }} />
       </Cam>
-      <Caption text="l'erreur dure encore : 美 est rangé sous la clé du mouton 羊" a={win(t, cle - 0.2, dico + 0.4, 0.4)} y={1000} size={44} />
-      <Caption text="« beau », au rayon des moutons — à côté de l'agneau et du troupeau" a={win(t, ray - 0.2, A('b11') - 0.4, 0.4)} y={1000} size={44} />
+      <Caption text="dès le Shuowen (540 clés), 美 est classé sous la clé 羊" a={win(t, cle - 0.2, dico + 0.4, 0.4)} y={1000} size={44} />
     </AbsoluteFill>
   );
 };
@@ -808,8 +789,6 @@ const Traits: React.FC = () => {
       </Cam>
       <div style={{ position: 'absolute', right: 150, top: 380, fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 130, color: rgb(VER), opacity: win(t, co - 0.3, B('b11') + 0.6, 0.4) }}>{Math.max(0, Math.min(9, Math.round(prog(t))))}<span style={{ fontSize: 60 }}> / 9</span></div>
       <Caption text="美 · měi · 9 traits" a={win(t, A11 + 0.6, co - 0.3, 0.4)} y={990} size={52} />
-      <Caption text="en haut, six traits : deux petites cornes, trois traits couchés, un trait debout" a={win(t, at('b11', 'haut'), bas - 0.2, 0.4)} y={990} size={40} />
-      <Caption text="en bas, trois : un trait couché… puis les deux jambes" a={win(t, bas, B('b11') + 0.6, 0.4)} y={990} size={44} />
     </AbsoluteFill>
   );
 };
@@ -913,8 +892,6 @@ const Finale: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="Reprenons : dans toutes ses formes, deux dessins" a={win(t, fo, at('b08', 'homme') - 0.1, 0.4)} y={1010} size={40} />
-      <Caption text="l'accident : au petit sceau, la coiffe prend la forme du mouton… et le mouton reste" a={win(t, at('b08', 'sceau') + 0.2, nait - 0.2, 0.4)} y={1010} size={38} />
       <Caption text="měi · le beau" a={win(t, nait + 0.4, ml - 0.3, 0.4)} y={960} size={56} />
       <div style={{ position: 'absolute', width: '100%', top: 760, display: 'flex', justifyContent: 'center', gap: 200, fontFamily: 'ShuimoKai', fontSize: 84, color: inkCss }}>
         <span style={{ opacity: win(t, ml - 0.4, A9 - 0.3) }}>美丽<div style={{ fontFamily: 'ShuimoLatin', fontSize: 42, textAlign: 'center' }}>la beauté</div></span>
@@ -926,9 +903,7 @@ const Finale: React.FC = () => {
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 96, fontWeight: 600, color: inkCss }}>měi</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: rgb(VER) }}>9 traits</div>
       </div>
-      <Caption text="Le mouton, c'est le scribe qui l'a vu. Le danseur, lui, ne portait que des plumes." a={win(t, mx, par - 0.2, 0.5)} y={920} size={46} />
-      <Caption text="mais la parure ne dure pas…" a={win(t, par, tb + 1.0, 0.4)} y={920} size={50} />
-      <Caption text="老 · lǎo · vieux — un homme aux longs cheveux, appuyé sur un bâton" a={win(t, tb + 1.4, END + 0.2, 0.4)} y={920} size={44} />
+      <Caption text="老 · lǎo · vieux" a={win(t, tb + 1.4, END + 0.2, 0.4)} y={920} size={44} />
     </AbsoluteFill>
   );
 };
