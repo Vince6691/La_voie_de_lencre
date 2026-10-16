@@ -519,7 +519,7 @@
       const m = D.medians[i];
       const L = [0];
       for (let j = 1; j < m.length; j++) L.push(L[j - 1] + Math.hypot(m[j][0] - m[j - 1][0], m[j][1] - m[j - 1][1]));
-      const target = L[L.length - 1] * easeInOut(p);
+      const target = L[L.length - 1] * (o.strokeEase || easeInOut)(p); // o.strokeEase : profil du geste (attaque, corps, sortie)
       rvctx.globalCompositeOperation = 'source-over'; rvctx.clearRect(0, 0, 1024, 1024);
       rvctx.lineWidth = 150; rvctx.lineCap = 'round'; rvctx.lineJoin = 'round'; rvctx.strokeStyle = '#000';
       rvctx.beginPath(); rvctx.moveTo(m[0][0], 900 - m[0][1]);

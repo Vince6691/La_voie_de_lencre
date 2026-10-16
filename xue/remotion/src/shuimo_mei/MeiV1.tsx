@@ -59,6 +59,13 @@ const AZ = PIGMENT.child, VER = PIGMENT.hand, MAL = PIGMENT.roof, GOM = PIGMENT.
 const OCRE = [176, 112, 52];
 const P: Record<string, number[]> = { homme: AZ, coiffe: MAL, mouton: GOM };
 const GREY = [168, 160, 150], PAPERWHITE = [240, 233, 219];
+// profil d'un geste au pinceau : appui (le pinceau se pose), départ vif, le corps du trait ralentit, sortie douce
+const brushEase = (p: number) => {
+  if (p <= 0) return 0; if (p >= 1) return 1;
+  if (p < 0.08) return 0.03 * (p / 0.08);
+  const u = (p - 0.08) / 0.92, c = 1 - Math.pow(1 - u, 2.2); // départ rapide, ralentissement progressif
+  return 0.03 + 0.97 * (c * (1 - 0.12 * Math.sin(Math.PI * u) * (1 - u)));
+};
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── polices, moteur Canvas, image de Laozi
@@ -322,7 +329,7 @@ const Opening: React.FC = () => {
       <Paper />
       {/* paysages (estompés avant le figé, pour que la stèle et le mouton éclatent sur le papier nu) */}
       <Landscape seed={18} from={A1 - 0.5} to={song + 0.4} move="push" mood="aube" faint={0.45} />
-      <Landscape seed={22} from={song - 0.6} to={FREEZE} move="still" mood="brume" faint={0.5} />
+      <Landscape seed={22} from={song - 0.6} to={FREEZE} move="pan" mood="brume" faint={0.5} />
       <Cam keys={[[0, 960, 540, 1], [mt - 0.2, 760, 470, 1.12, 1.2], [dico - 0.4, 960, 540, 1.0, 1.2], [song + 0.4, 1200, 520, 1.06, 1.6], [ent - 0.2, 960, 540, 1.0, 1.4], [gros - 0.2, 1100, 520, 1.1, 1.2]]}
         punch={[mt + 0.6, at('b01', 'bon'), maxime + 0.1]}>
         <Draw draw={(ctx, tt, E) => {
@@ -379,6 +386,81 @@ const Opening: React.FC = () => {
   );
 };
 
+// ════════════════ finitions : sceaux d'époque qui frappent, tremblement de caméra, grain du papier, vignettage
+// le sceau de l'époque frappe en bas à droite du tableau, comme le cachet du peintre : chute, impact, l'encre
+// vermillon boit le papier (halo), la caméra tremble à peine ; il reste un moment puis pâlit
+const SEALS = (() => {
+  const g = () => GLYEND; // défini plus bas (constantes du clip) : évalué à la demande
+  return () => [
+    { t: g() + 0.2, zh: '商' },
+    { t: at('b05', 'inscr') + 0.6, zh: '周' },
+    { t: at('b07', 'sceau') + 0.9, zh: '秦' },
+  ];
+})();
+const shakeAt = (t: number) => {
+  let dx = 0, dy = 0;
+  for (const s of SEALS()) { const u = t - s.t; if (u < 0 || u > 0.4) continue; const a = 7 * Math.exp(-u * 11); dx += a * Math.sin(u * 95); dy += a * 0.7 * Math.cos(u * 83); }
+  return [dx, dy];
+};
+const Shake: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const t = useT(); const [dx, dy] = shakeAt(t);
+  return <AbsoluteFill style={{ transform: `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px)` }}>{children}</AbsoluteFill>;
+};
+const drawSeal = (ctx: CanvasRenderingContext2D, E: any, x: number, y: number, size: number, zh: string, u: number) => {
+  const drop = seg(u, 0, 0.14), life = 1 - seg(u, 2.6, 3.4);
+  if (u < 0 || life <= 0) return;
+  const sc = 1 + 0.6 * (1 - drop), a = drop * life;
+  // halo d'encre qui boit le papier, à l'impact
+  const bleed = seg(u, 0.12, 0.6);
+  if (bleed > 0) {
+    const g = ctx.createRadialGradient(x, y, size * 0.4, x, y, size * (0.75 + 0.25 * bleed));
+    g.addColorStop(0, rgb(VER, 0.18 * life)); g.addColorStop(1, rgb(VER, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, size, 0, 7); ctx.fill();
+  }
+  ctx.save(); ctx.translate(x, y); ctx.rotate(-0.04); ctx.scale(sc, sc); ctx.globalAlpha = a;
+  if (drop < 1) { ctx.shadowColor = 'rgba(40,20,10,0.35)'; ctx.shadowBlur = 30 * (1 - drop); ctx.shadowOffsetY = 18 * (1 - drop); }
+  // pierre gravée : carré aux bords usés
+  const r = rng(zh.charCodeAt(0)), h = size / 2;
+  ctx.beginPath();
+  const pts = 28;
+  for (let i = 0; i < pts; i++) { const side = Math.floor(i / 7), f = (i % 7) / 7, j = (r() - 0.5) * size * 0.025;
+    const P = side === 0 ? [-h + f * 2 * h, -h + j] : side === 1 ? [h + j, -h + f * 2 * h] : side === 2 ? [h - f * 2 * h, h + j] : [-h + j, h - f * 2 * h];
+    i ? ctx.lineTo(P[0], P[1]) : ctx.moveTo(P[0], P[1]); }
+  ctx.closePath(); ctx.fillStyle = rgb(VER, 0.92); ctx.fill();
+  ctx.shadowColor = 'transparent';
+  E.text(ctx, zh, 0, size * 0.04, { font: 'ShuimoKai', size: size * 0.72, color: '#f6eee0' });
+  // usure : petits manques dans l'encre du sceau
+  ctx.globalCompositeOperation = 'destination-out';
+  for (let i = 0; i < 26; i++) { ctx.beginPath(); ctx.arc((r() - 0.5) * size * 0.95, (r() - 0.5) * size * 0.95, 1 + r() * 3.5, 0, 7); ctx.fillStyle = `rgba(0,0,0,${0.4 + 0.5 * r()})`; ctx.fill(); }
+  ctx.restore();
+};
+const SealStamps: React.FC = () => (
+  <Draw draw={(ctx, tt, E) => { for (const s of SEALS()) drawSeal(ctx, E, 1700, 900, 128, s.zh, tt - s.t); }} />
+);
+// grain du papier (4 tirages qui alternent) et vignettage doux : une texture constante d'un plan à l'autre
+let grainTiles: HTMLCanvasElement[] | null = null;
+const GrainVignette: React.FC = () => {
+  const f = useCurrentFrame();
+  const ref = useRef<HTMLCanvasElement>(null);
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    if (!grainTiles) grainTiles = [0, 1, 2, 3].map((k) => {
+      const c = document.createElement('canvas'); c.width = 480; c.height = 270;
+      const x = c.getContext('2d')!, im = x.createImageData(480, 270), r = rng(900 + k);
+      for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (r() - 0.5) * 90; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+      x.putImageData(im, 0, 0); return c;
+    });
+    const ctx = ref.current.getContext('2d')!;
+    ctx.imageSmoothingEnabled = true; ctx.drawImage(grainTiles[f % 4], 0, 0, 1920, 1080);
+  });
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+      <canvas ref={ref} width={1920} height={1080} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', mixBlendMode: 'overlay', opacity: 0.16 }} />
+      <AbsoluteFill style={{ background: 'radial-gradient(ellipse 80% 75% at 50% 48%, rgba(60,40,20,0) 55%, rgba(60,40,20,0.22) 100%)' }} />
+    </AbsoluteFill>
+  );
+};
+
 // ════════════════ 1 bis. « Remontons à l'origine… » : les nuages passent et s'ouvrent sur la danse de la pluie (clip de
 // 8 s) ; sur la pose figée, le décor s'efface, le danseur reste seul, devient une silhouette d'encre, puis le 美 de l'os
 const PL = L.plages.danse;
@@ -404,6 +486,24 @@ const drawMorph = (ctx: CanvasRenderingContext2D, E: any, k: number, gx: { x: nu
   b.putImageData(im, 0, 0);
   ctx.save(); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(mcB!, 0, 0, 1920, 1080); ctx.restore();
 };
+// fusion d'encre entre deux formes (couleurs gardées) : les deux dessins se mêlent flous, puis on ne garde que le
+// cœur de l'encre (seuil sur l'opacité) — les traits coulent d'une écriture à l'autre au lieu d'un fondu
+let fmA: HTMLCanvasElement | null = null, fmB: HTMLCanvasElement | null = null;
+const inkMorph = (ctx: CanvasRenderingContext2D, k: number, drawA: (c: CanvasRenderingContext2D) => void, drawB: (c: CanvasRenderingContext2D) => void, alpha = 1) => {
+  if (!fmA) { fmA = document.createElement('canvas'); fmA.width = MW; fmA.height = MH; fmB = document.createElement('canvas'); fmB.width = MW; fmB.height = MH; }
+  const a = fmA.getContext('2d', { willReadFrequently: true })!, b = fmB!.getContext('2d', { willReadFrequently: true })!;
+  a.clearRect(0, 0, MW, MH); b.clearRect(0, 0, MW, MH);
+  a.save(); a.scale(MW / 1920, MH / 1080);
+  const m = k * k * (3 - 2 * k); // le mélange des deux formes reste bref
+  a.globalAlpha = 1 - m; drawA(a); a.globalAlpha = m; drawB(a); a.restore();
+  const blur = 6 * Math.sin(Math.PI * k);
+  b.filter = `blur(${blur.toFixed(2)}px)`; b.drawImage(fmA, 0, 0); b.filter = 'none';
+  const im = b.getImageData(0, 0, MW, MH), d = im.data, th = 0.36 + 0.1 * Math.sin(Math.PI * k);
+  for (let i = 3; i < d.length; i += 4) { const v = d[i] / 255; d[i] = 255 * Math.min(1, Math.max(0, (v - th) / 0.08)); }
+  b.putImageData(im, 0, 0);
+  ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(fmB!, 0, 0, 1920, 1080); ctx.restore();
+};
+const lerpPose = (p: { x: number; y: number; size: number }, q: { x: number; y: number; size: number }, k: number) => ({ x: p.x + (q.x - p.x) * k, y: p.y + (q.y - p.y) * k, size: p.size + (q.size - p.size) * k });
 const DanseIntro: React.FC = () => {
   const { fps } = useVideoConfig();
   return (
@@ -477,7 +577,7 @@ const Shang: React.FC = () => {
       <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [GLYEND, 960, 540, 1, 0.4], [os + 0.4, 960, 520, 1.06, 1.4], [coif - 0.3, 960, 330, 1.3, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [rien, 960, 520, 1.06, 1.0], [terre, 960, 560, 1.02, 1.0]]}
         punch={[sig + 0.2, corps, coif + 0.3, rien + 0.2]} calm={[[PL.debut, GLYEND + 0.3]]}>
         <Paper />
-        <Landscape seed={14} from={GLYEND - 0.6} to={A('b05') + 0.5} move="still" mood="aube" faint={0.85} />
+        <Landscape seed={14} from={GLYEND - 0.6} to={A('b05') + 0.5} move="pan" mood="aube" faint={0.85} />
           <Draw draw={(ctx, tt, E) => {
             // le signe né de la danse reste au centre : on le décrit trait par trait (plus de plastron)
             if (tt < GLYEND) return;
@@ -626,7 +726,7 @@ const Chu: React.FC = () => {
     <AbsoluteFill>
       <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [vers, 960, 540, 1.04, 0.8], [p0 + 0.2, 960, 540, 1.0, 1.0], [p1 - 0.6, 980, 470, 1.08, 2.0], [aut + 0.4, 960, 540, 1.0, 1.2]]} punch={[beau + 0.4, laid0 + 0.2, p1 - 0.2, dec, laid]}>
         <Paper />
-        <Landscape seed={26} from={A6 - 1.5} to={A('b07') + 0.5} move="still" mood="brume" faint={0.4} />
+        <Landscape seed={26} from={A6 - 1.5} to={A('b07') + 0.5} move="pan" mood="brume" faint={0.4} />
         <Draw draw={(ctx, tt, E) => {
           if (tt < vers - 0.6) return;
           // 1. le vers s'écrit à l'écran, caractère par caractère, dans l'écriture de Chu ; 美 en malachite, 惡 en ocre
@@ -689,12 +789,16 @@ const QinHan: React.FC = () => {
     <AbsoluteFill>
       <Cam keys={[[A7 - 0.3, 960, 540, 1.02], [sym - 0.3, 960, 360, 1.25, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [xs, 960, 540, 1.02, 1.0], [yeux, 900, 520, 1.1, 1.2], [ecr, 960, 540, 1.04, 1.0]]} punch={[sc + 0.6, mt + 1.3, sav + 0.2]}>
         <Paper />
-        <Landscape seed={3} from={A7 - 1.5} to={B('b07') + 1} move="still" mood="brume" faint={0.45} />
+        <Landscape seed={3} from={A7 - 1.5} to={B('b07') + 1} move="pan" mood="brume" faint={0.45} />
         <Draw draw={(ctx, tt, E) => {
           // le petit sceau tracé, la coiffe (malachite) qui passe à la gomme-gutte quand elle touche le 羊 du sceau
           const s1 = seg(tt, sc - 0.4, sc + 1.4) * (1 - seg(tt, xs - 0.4, xs + 0.2));
           const meet = seg(tt, mt + 1.0, mt + 2.0);
-          if (s1 > 0) E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 640, reveal: () => seg(tt, sc - 0.4, sc + 1.4), opacity: s1, color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, seg(tt, sym - 0.2, sym + 0.4)), GOM, meet) : mixc(INK, AZ, 0.6)), glow: 22 * win(tt, sym, xs, 0.4), glowColor: rgb(meet > 0.5 ? GOM : MAL, 0.6) });
+          // « une seule écriture : le petit sceau » : la forme de bronze coule et devient le petit sceau
+          const km = seg(tt, sc - 0.6, sc + 0.9), PQ = { x: 760, y: 520, size: 640 };
+          const sealCol = (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, seg(tt, sym - 0.2, sym + 0.4)), GOM, meet) : mixc(INK, AZ, 0.6));
+          if (s1 > 0 && km < 1) { inkMorph(ctx, ease(km), (c) => E.drawRealGlyph(c, 'mei_jinwen', { ...PQ, color: meiCol(1, 1) }), (c) => E.drawRealGlyph(c, 'mei_xiaozhuan', { ...PQ, color: sealCol }), s1); }
+          else if (s1 > 0) E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 640, opacity: s1, color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, seg(tt, sym - 0.2, sym + 0.4)), GOM, meet) : mixc(INK, AZ, 0.6)), glow: 22 * win(tt, sym, xs, 0.4), glowColor: rgb(meet > 0.5 ? GOM : MAL, 0.6) });
           // le mouton du petit sceau, posé à côté, puis il glisse sur la coiffe
           const ya = seg(tt, mt - 0.2, mt + 0.4) * (1 - seg(tt, mt + 2.2, mt + 2.8)) * (1 - seg(tt, xs - 0.4, xs + 0.2));
           if (ya > 0) {
@@ -709,13 +813,18 @@ const QinHan: React.FC = () => {
           const xa = win(tt, yeux - 0.3, err + 0.4, 0.6);
           if (xa > 0) {
             E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: 1450, y: 520, size: 560, opacity: xa * 0.22 * seg(tt, yeux + 1.0, yeux + 2.0), color: () => rgb(MAL) });
-            E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 560, opacity: xa, color: meiCol(0.6, 1, GOM) });
+            if (tt < err - 0.1) E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 560, opacity: xa, color: meiCol(0.6, 1, GOM) });
             '美甘也从羊从大'.split('').forEach((c, i) => E.text(ctx, c, 1180, 190 + i * 104, { font: 'ShuimoKai', size: 86, color: c === '羊' ? rgb(GOM) : inkCss, alpha: xa * seg(tt, yeux - 0.2 + i * 0.12, yeux + 0.2 + i * 0.12) }));
           }
           // soie de Mawangdui puis stèle des clercs : le mouton reste
           const mw = win(tt, err - 0.1, ecr + 0.3, 0.4), ls = seg(tt, ecr + 0.1, ecr + 0.6) * (1 - seg(tt, B('b07') + 0.2, B('b07') + 0.6));
-          if (mw > 0) E.drawRealGlyph(ctx, 'mei_mawangdui', { x: 960, y: 520, size: 600, opacity: mw, color: meiCol(0.6, 1, GOM) });
-          if (ls > 0) E.drawRealGlyph(ctx, 'mei_lishu', { x: 960, y: 520, size: 600, opacity: ls, color: meiCol(0.6, 1, GOM) });
+          // le petit sceau coule vers la soie de Mawangdui, puis vers l'écriture des clercs
+          const P1 = { x: 760, y: 520, size: 560 }, P2 = { x: 960, y: 520, size: 600 };
+          const k1 = seg(tt, err - 0.1, err + 1.0), k2 = seg(tt, ecr - 0.1, ecr + 0.9);
+          if (k1 > 0 && k1 < 1) inkMorph(ctx, ease(k1), (c) => E.drawRealGlyph(c, 'mei_xiaozhuan', { ...lerpPose(P1, P2, ease(k1)), color: meiCol(0.6, 1, GOM) }), (c) => E.drawRealGlyph(c, 'mei_mawangdui', { ...lerpPose(P1, P2, ease(k1)), color: meiCol(0.6, 1, GOM) }));
+          else if (k2 > 0 && k2 < 1) inkMorph(ctx, ease(k2), (c) => E.drawRealGlyph(c, 'mei_mawangdui', { ...P2, color: meiCol(0.6, 1, GOM) }), (c) => E.drawRealGlyph(c, 'mei_lishu', { ...P2, color: meiCol(0.6, 1, GOM) }));
+          else if (k1 >= 1 && k2 <= 0 && mw > 0) E.drawRealGlyph(ctx, 'mei_mawangdui', { ...P2, opacity: mw, color: meiCol(0.6, 1, GOM) });
+          else if (k2 >= 1 && ls > 0) E.drawRealGlyph(ctx, 'mei_lishu', { ...P2, opacity: ls, color: meiCol(0.6, 1, GOM) });
         }} />
       </Cam>
       <Caption text="221 av. J.-C. · le petit sceau 小篆" a={win(t, emp, ord - 0.1, 0.4)} y={960} size={44} />
@@ -779,7 +888,10 @@ const Traits: React.FC = () => {
   const t = useT();
   const A11 = A('b11'), nf = at('b11', 'neuf'), co = at('b11', 'cornes'), cs = at('b11', 'couches'), db = at('b11', 'debout'), bas = at('b11', 'bas'), cc = at('b11', 'couche'), jb = at('b11', 'jambes');
   // progression : 1–2 cornes, 3–4 deux traits couchés, 5 le trait debout, 6 le troisième trait couché, 7 le trait du bas, 8–9 les jambes
-  const prog = (tt: number) => 2 * seg(tt, co - 0.2, co + 0.9) + 2 * seg(tt, cs - 0.1, cs + 0.9) + 2 * seg(tt, db - 0.1, db + 1.0) + seg(tt, cc - 0.2, cc + 0.7) + 2 * seg(tt, jb - 0.4, jb + 0.9);
+  // chaque trait a son créneau : 75 % de geste, 25 % de pinceau levé (pause) avant le suivant
+  const lin = (u: number) => Math.min(1, Math.max(0, u));
+  const run = (tt: number, a: number, b: number, n: number) => { let s = 0; const sl = (b - a) / n; for (let i = 0; i < n; i++) s += lin((tt - a - i * sl) / (0.75 * sl)); return s; };
+  const prog = (tt: number) => run(tt, co - 0.2, co + 1.0, 2) + run(tt, cs - 0.1, cs + 1.0, 2) + run(tt, db - 0.1, db + 1.1, 2) + run(tt, cc - 0.2, cc + 0.7, 1) + run(tt, jb - 0.4, jb + 1.0, 2);
   const O = { x: 960, y: 520, size: 760 };
   return (
     <AbsoluteFill>
@@ -793,7 +905,7 @@ const Traits: React.FC = () => {
           ctx.moveTo(O.x - 400, O.y - 400); ctx.lineTo(O.x + 400, O.y + 400); ctx.moveTo(O.x + 400, O.y - 400); ctx.lineTo(O.x - 400, O.y + 400); ctx.stroke(); ctx.restore();
           const p = prog(tt);
           ctx.save(); ctx.globalAlpha = a;
-          E.drawStrokes(ctx, 'mei_regulier', { ...O, progress: p, brush: true, tip: true, color: (c: string) => rgb(mixc(INK, c === 'coiffe' ? GOM : AZ, seg(tt, nf, nf + 0.6) * 0.75)) });
+          E.drawStrokes(ctx, 'mei_regulier', { ...O, progress: p, brush: true, tip: true, strokeEase: brushEase, color: (c: string) => rgb(mixc(INK, c === 'coiffe' ? GOM : AZ, seg(tt, nf, nf + 0.6) * 0.75)) });
           ctx.restore();
           // numéro de chaque trait, en vermillon, près de son départ
           const D = (W() as any).STROKES?.mei_regulier;
@@ -957,7 +1069,7 @@ export const MeiV1: React.FC = () => {
   };
   return (
     <AbsoluteFill style={{ background: '#f3eee4' }}>
-      {ready && <>
+      {ready && <Shake>
         <Win from={0} to={A('b03') - 0.25}><Opening /></Win>
         <Win from={A('b03') - 0.25} to={A('b05') - 0.3}><Shang /></Win>
         <Win from={A('b05') - 0.3} to={R2E + 0.05}><Zhou /></Win>
@@ -968,7 +1080,9 @@ export const MeiV1: React.FC = () => {
         <Win from={A('b08') - 0.3} to={END}><Finale /></Win>
         <Win from={END} to={MEI_SECONDS + 1}><EndCard /></Win>
         <DanseIntro />
-      </>}
+        <SealStamps />
+      </Shake>}
+      {ready && <GrainVignette />}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/mei/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
       ))}

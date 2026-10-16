@@ -13,6 +13,7 @@ import { SHUIMO_DEMO_SECONDS, ShuimoDemo, ShuimoDemoProps } from './shuimo/Shuim
 import { MorphEncre, MorphProps } from './morph/MorphEncre';
 import { SHUIMO_XUE_SECONDS, ShuimoXue } from './shuimo_xue/ShuimoXue';
 import { ROULEAU_DEMO_SECONDS, RouleauDemo } from './rouleau/RouleauDemo';
+import { ROULEAU3D_DEMO_SECONDS, Rouleau3DDemo } from './rouleau3d/Rouleau3DDemo';
 
 export const FPS = 30;
 
@@ -50,5 +51,6 @@ export const RemotionRoot: React.FC = () => (
   <Composition id="VideoRevealDemo2" component={VideoRevealDemo2} durationInFrames={VIDEO_REVEAL_DEMO2_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   <Composition id="VideoRevealDemo3" component={VideoRevealDemo3} durationInFrames={VIDEO_REVEAL_DEMO3_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   <Composition id="RouleauDemo" component={RouleauDemo} durationInFrames={ROULEAU_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
+  <Composition id="Rouleau3DDemo" component={Rouleau3DDemo} durationInFrames={Math.round(ROULEAU3D_DEMO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   </>
 );
