@@ -399,7 +399,7 @@ const SEALS = (() => {
 })();
 const shakeAt = (t: number) => {
   let dx = 0, dy = 0;
-  for (const s of SEALS()) { const u = t - s.t; if (u < 0 || u > 0.4) continue; const a = 7 * Math.exp(-u * 11); dx += a * Math.sin(u * 95); dy += a * 0.7 * Math.cos(u * 83); }
+  for (const s of SEALS()) { const u = t - s.t; if (u < 0 || u > 0.4) continue; if (u < 0.3) dy += 4 * Math.sin(Math.PI * u / 0.3) * (1 - u / 0.3); }
   return [dx, dy];
 };
 const Shake: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -488,22 +488,6 @@ const drawMorph = (ctx: CanvasRenderingContext2D, E: any, k: number, gx: { x: nu
 };
 // fusion d'encre entre deux formes (couleurs gardées) : les deux dessins se mêlent flous, puis on ne garde que le
 // cœur de l'encre (seuil sur l'opacité) — les traits coulent d'une écriture à l'autre au lieu d'un fondu
-let fmA: HTMLCanvasElement | null = null, fmB: HTMLCanvasElement | null = null;
-const inkMorph = (ctx: CanvasRenderingContext2D, k: number, drawA: (c: CanvasRenderingContext2D) => void, drawB: (c: CanvasRenderingContext2D) => void, alpha = 1) => {
-  if (!fmA) { fmA = document.createElement('canvas'); fmA.width = MW; fmA.height = MH; fmB = document.createElement('canvas'); fmB.width = MW; fmB.height = MH; }
-  const a = fmA.getContext('2d', { willReadFrequently: true })!, b = fmB!.getContext('2d', { willReadFrequently: true })!;
-  a.clearRect(0, 0, MW, MH); b.clearRect(0, 0, MW, MH);
-  a.save(); a.scale(MW / 1920, MH / 1080);
-  const m = k * k * (3 - 2 * k); // le mélange des deux formes reste bref
-  a.globalAlpha = 1 - m; drawA(a); a.globalAlpha = m; drawB(a); a.restore();
-  const blur = 6 * Math.sin(Math.PI * k);
-  b.filter = `blur(${blur.toFixed(2)}px)`; b.drawImage(fmA, 0, 0); b.filter = 'none';
-  const im = b.getImageData(0, 0, MW, MH), d = im.data, th = 0.36 + 0.1 * Math.sin(Math.PI * k);
-  for (let i = 3; i < d.length; i += 4) { const v = d[i] / 255; d[i] = 255 * Math.min(1, Math.max(0, (v - th) / 0.08)); }
-  b.putImageData(im, 0, 0);
-  ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(fmB!, 0, 0, 1920, 1080); ctx.restore();
-};
-const lerpPose = (p: { x: number; y: number; size: number }, q: { x: number; y: number; size: number }, k: number) => ({ x: p.x + (q.x - p.x) * k, y: p.y + (q.y - p.y) * k, size: p.size + (q.size - p.size) * k });
 const DanseIntro: React.FC = () => {
   const { fps } = useVideoConfig();
   return (
@@ -794,11 +778,7 @@ const QinHan: React.FC = () => {
           // le petit sceau tracé, la coiffe (malachite) qui passe à la gomme-gutte quand elle touche le 羊 du sceau
           const s1 = seg(tt, sc - 0.4, sc + 1.4) * (1 - seg(tt, xs - 0.4, xs + 0.2));
           const meet = seg(tt, mt + 1.0, mt + 2.0);
-          // « une seule écriture : le petit sceau » : la forme de bronze coule et devient le petit sceau
-          const km = seg(tt, sc - 0.6, sc + 0.9), PQ = { x: 760, y: 520, size: 640 };
-          const sealCol = (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, seg(tt, sym - 0.2, sym + 0.4)), GOM, meet) : mixc(INK, AZ, 0.6));
-          if (s1 > 0 && km < 1) { inkMorph(ctx, ease(km), (c) => E.drawRealGlyph(c, 'mei_jinwen', { ...PQ, color: meiCol(1, 1) }), (c) => E.drawRealGlyph(c, 'mei_xiaozhuan', { ...PQ, color: sealCol }), s1); }
-          else if (s1 > 0) E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 640, opacity: s1, color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, seg(tt, sym - 0.2, sym + 0.4)), GOM, meet) : mixc(INK, AZ, 0.6)), glow: 22 * win(tt, sym, xs, 0.4), glowColor: rgb(meet > 0.5 ? GOM : MAL, 0.6) });
+          if (s1 > 0) E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 640, reveal: () => seg(tt, sc - 0.4, sc + 1.4), opacity: s1, color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, seg(tt, sym - 0.2, sym + 0.4)), GOM, meet) : mixc(INK, AZ, 0.6)), glow: 22 * win(tt, sym, xs, 0.4), glowColor: rgb(meet > 0.5 ? GOM : MAL, 0.6) });
           // le mouton du petit sceau, posé à côté, puis il glisse sur la coiffe
           const ya = seg(tt, mt - 0.2, mt + 0.4) * (1 - seg(tt, mt + 2.2, mt + 2.8)) * (1 - seg(tt, xs - 0.4, xs + 0.2));
           if (ya > 0) {
@@ -813,18 +793,13 @@ const QinHan: React.FC = () => {
           const xa = win(tt, yeux - 0.3, err + 0.4, 0.6);
           if (xa > 0) {
             E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: 1450, y: 520, size: 560, opacity: xa * 0.22 * seg(tt, yeux + 1.0, yeux + 2.0), color: () => rgb(MAL) });
-            if (tt < err - 0.1) E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 560, opacity: xa, color: meiCol(0.6, 1, GOM) });
+            E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 560, opacity: xa, color: meiCol(0.6, 1, GOM) });
             '美甘也从羊从大'.split('').forEach((c, i) => E.text(ctx, c, 1180, 190 + i * 104, { font: 'ShuimoKai', size: 86, color: c === '羊' ? rgb(GOM) : inkCss, alpha: xa * seg(tt, yeux - 0.2 + i * 0.12, yeux + 0.2 + i * 0.12) }));
           }
           // soie de Mawangdui puis stèle des clercs : le mouton reste
           const mw = win(tt, err - 0.1, ecr + 0.3, 0.4), ls = seg(tt, ecr + 0.1, ecr + 0.6) * (1 - seg(tt, B('b07') + 0.2, B('b07') + 0.6));
-          // le petit sceau coule vers la soie de Mawangdui, puis vers l'écriture des clercs
-          const P1 = { x: 760, y: 520, size: 560 }, P2 = { x: 960, y: 520, size: 600 };
-          const k1 = seg(tt, err - 0.1, err + 1.0), k2 = seg(tt, ecr - 0.1, ecr + 0.9);
-          if (k1 > 0 && k1 < 1) inkMorph(ctx, ease(k1), (c) => E.drawRealGlyph(c, 'mei_xiaozhuan', { ...lerpPose(P1, P2, ease(k1)), color: meiCol(0.6, 1, GOM) }), (c) => E.drawRealGlyph(c, 'mei_mawangdui', { ...lerpPose(P1, P2, ease(k1)), color: meiCol(0.6, 1, GOM) }));
-          else if (k2 > 0 && k2 < 1) inkMorph(ctx, ease(k2), (c) => E.drawRealGlyph(c, 'mei_mawangdui', { ...P2, color: meiCol(0.6, 1, GOM) }), (c) => E.drawRealGlyph(c, 'mei_lishu', { ...P2, color: meiCol(0.6, 1, GOM) }));
-          else if (k1 >= 1 && k2 <= 0 && mw > 0) E.drawRealGlyph(ctx, 'mei_mawangdui', { ...P2, opacity: mw, color: meiCol(0.6, 1, GOM) });
-          else if (k2 >= 1 && ls > 0) E.drawRealGlyph(ctx, 'mei_lishu', { ...P2, opacity: ls, color: meiCol(0.6, 1, GOM) });
+          if (mw > 0) E.drawRealGlyph(ctx, 'mei_mawangdui', { x: 960, y: 520, size: 600, opacity: mw, color: meiCol(0.6, 1, GOM) });
+          if (ls > 0) E.drawRealGlyph(ctx, 'mei_lishu', { x: 960, y: 520, size: 600, opacity: ls, color: meiCol(0.6, 1, GOM) });
         }} />
       </Cam>
       <Caption text="221 av. J.-C. · le petit sceau 小篆" a={win(t, emp, ord - 0.1, 0.4)} y={960} size={44} />
