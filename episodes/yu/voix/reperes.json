@@ -1,0 +1,204 @@
+{
+ "b01": {
+  "duration": 21.68,
+  "cues": {
+   "precepte": 2.7,
+   "table": 9.38,
+   "lit": 11.34,
+   "deux": 13.46,
+   "interdit": 15.6,
+   "parler": 21.18
+  }
+ },
+ "b02": {
+  "duration": 18.25,
+  "cues": {
+   "gauche": 1.81,
+   "droite": 4.85,
+   "moi": 7.33,
+   "enigme": 9.22,
+   "jeune": 11.94,
+   "os": 15.81
+  }
+ },
+ "b03": {
+  "duration": 37.69,
+  "cues": {
+   "anyang": 0.0,
+   "devin": 3.78,
+   "signe": 6.78,
+   "bouche": 8.97,
+   "langue": 9.9,
+   "son": 11.62,
+   "cinq": 15.58,
+   "traits": 18.54,
+   "croix": 21.74,
+   "pose": 26.14,
+   "pourquoi": 32.86,
+   "prononcait": 35.34
+  }
+ },
+ "b04": {
+  "duration": 19.44,
+  "cues": {
+   "siecles": 0.0,
+   "frappe": 5.18,
+   "repond": 6.42,
+   "flancs": 8.46,
+   "gauche": 13.82,
+   "rencontre": 17.18
+  }
+ },
+ "b05": {
+  "duration": 20.4,
+  "cues": {
+   "royaumes": 0.0,
+   "conseillers": 4.11,
+   "argumente": 7.79,
+   "hesite": 11.79,
+   "sceaux": 14.35,
+   "empile": 18.43
+  }
+ },
+ "b06": {
+  "duration": 22.76,
+  "cues": {
+   "han": 0.0,
+   "dico": 2.77,
+   "question": 4.37,
+   "reponse": 8.77,
+   "discuter": 11.13,
+   "table": 14.53,
+   "pleine": 16.9,
+   "lit": 19.25
+  }
+ },
+ "b07": {
+  "duration": 21.77,
+  "cues": {
+   "lettre": 0.0,
+   "voix": 6.1,
+   "soldats": 8.34,
+   "confins": 8.9,
+   "pinceau": 13.02,
+   "annees": 16.42,
+   "livre": 18.26
+  }
+ },
+ "b08": {
+  "duration": 28.87,
+  "cues": {
+   "annee": 0.0,
+   "traits": 4.18,
+   "partout": 9.78,
+   "hanyu": 11.94,
+   "anglais": 14.34,
+   "francais": 16.26,
+   "lois": 17.62,
+   "rien": 18.9,
+   "ecriture": 24.1,
+   "canton": 28.38
+  }
+ },
+ "b09": {
+  "duration": 29.81,
+  "cues": {
+   "formes": 0.03,
+   "parole": 4.11,
+   "cinq": 7.99,
+   "bouche": 11.95,
+   "face": 14.27,
+   "naissance": 18.95,
+   "mots": 22.31,
+   "chengyu": 25.23
+  }
+ },
+ "b10": {
+  "duration": 12.93,
+  "cues": {
+   "dire": 0.12,
+   "converser": 1.96,
+   "maitre": 4.68,
+   "armee": 9.4
+  }
+ },
+ "_ligne": {
+  "clips": {
+   "b01": {
+    "debut": 0.6,
+    "duree": 21.68
+   },
+   "b02": {
+    "debut": 23.18,
+    "duree": 18.25
+   },
+   "b03": {
+    "debut": 42.23,
+    "duree": 37.69
+   },
+   "b04": {
+    "debut": 86.12,
+    "duree": 19.44
+   },
+   "b05": {
+    "debut": 106.36,
+    "duree": 20.4
+   },
+   "b06": {
+    "debut": 128.76,
+    "duree": 22.76,
+    "pause": {
+     "coupe": 8.65,
+     "duree": 1.8
+    }
+   },
+   "b07": {
+    "debut": 154.12,
+    "duree": 21.77
+   },
+   "b08": {
+    "debut": 181.79,
+    "duree": 28.87
+   },
+   "b09": {
+    "debut": 211.46,
+    "duree": 29.81
+   },
+   "b10": {
+    "debut": 242.27,
+    "duree": 12.93
+   }
+  },
+  "rouleaux": [
+   {
+    "debut": 80.22,
+    "duree": 3.6,
+    "modele": "3d-court"
+   },
+   {
+    "debut": 176.19,
+    "duree": 5.3,
+    "modele": "3d-complet"
+   }
+  ],
+  "pauses": [
+   [
+    137.41,
+    1.8
+   ]
+  ],
+  "plages": {
+   "cloche": {
+    "debut": 84.12,
+    "duree": 2.0
+   },
+   "pinceau": {
+    "debut": 127.06,
+    "duree": 1.5
+   }
+  },
+  "fin": 255.5,
+  "total": 265.5,
+  "bruitages": []
+ }
+}
