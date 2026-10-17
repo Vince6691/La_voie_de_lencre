@@ -481,7 +481,7 @@ const Opening: React.FC = () => {
               const { pr: pg, lift, gap } = writeSlot(tt, t0, t1, n);
               if (pg <= 0) return;
               const tr = ci + (i * (qEnd - ci)) / 6, rd = win(tt, tr, tr + 0.45, 0.12); // la voix le lit
-              E.drawStrokes(ctx, key, { ...O, progress: pg, brush: true, color: () => (i < 3 ? inkCss : 'rgb(22,22,30)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
+              E.drawStrokes(ctx, key, { ...O, progress: pg, brush: false, color: () => (i < 3 ? inkCss : 'rgb(22,22,30)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
             });
             const bt = brushAt(E, tt, w0, wEnd), brush = bt?.tip ?? null, lifted = bt?.lifted ?? 0;
             // la main et le pinceau (image détourée, pointe en bas au centre) ; levé entre deux traits
