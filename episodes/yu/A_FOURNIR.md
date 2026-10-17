@@ -105,3 +105,32 @@ Director's note: curiosity and warmth — he collects words like treasures. The 
 
 Constraints: no text overlays, no readable characters, no extra main characters, no deformed hands, no snap zooms.
 ```
+
+## 6. Accroche : diptyque jour / nuit et pinceau (bloc 1) — Nano Banana, 3 images
+Le pinceau écrit 食不語 sur le panneau du jour et 寢不言 sur celui de la nuit, dans le **tiers droit laissé vide** de
+chaque panneau. Format carré (1:1), ≥ 1536 px. Aucun texte, aucun sceau dans les images.
+
+**Panneau du jour → `images/precepte_jour.png`**
+```
+Chinese ink-wash painting (shuimo) on aged cream xuan paper, soft grey ink tones with a few touches of pale ochre and vermilion, delicate brushwork, misty edges that fade into the bare paper.
+Daytime meal under the open eaves of a simple timber pavilion: two scholars in cross-collar robes kneel face to face on reed mats at a low lacquered table set with small bowls, a lidded bronze vessel and chopsticks; they eat in calm silence, eyes lowered, lips closed; a servant kneels a little behind, pouring from a ewer. Pine branch and a sliver of distant mountains in the background.
+All figures in the left two thirds of the square; the right third is empty pale paper with only faint mist (calligraphy will be added there).
+Square composition, no text, no calligraphy, no seal, no signature, no border.
+```
+
+**Panneau de la nuit → `images/precepte_nuit.png`**
+```
+Chinese ink-wash painting (shuimo) on aged cream xuan paper, night scene in deep indigo and grey ink washes, a full moon left as bare glowing paper, soft misty edges fading into the paper.
+A quiet bedchamber at night seen through a round moon window: a low wooden bed with a folded quilt and a hard pillow, a sleeper lying on his side, eyes closed, mouth shut; a half-rolled bamboo blind, the shadow of a plum branch across the floor, a small oil lamp just extinguished with a thin curl of smoke.
+All elements in the left two thirds of the square; the right third is empty dark-washed paper, smooth and calm (calligraphy will be added there).
+Square composition, no text, no calligraphy, no seal, no signature, no border.
+```
+
+**La main et le pinceau → `images/pinceau_main.png`** (je le détoure)
+```
+Cinematic 3D render, Pixar-quality, warm soft studio light.
+A scholar's right hand holding a traditional Chinese calligraphy brush perfectly vertical, seen from the side: slender fingers in the classic upright grip, a wide sleeve of dark indigo silk falling from the wrist; bamboo brush shaft, white goat-hair tip fully loaded with black ink, the very tip pointing straight down, a tiny drop of ink about to fall.
+The brush tip is at the bottom center of the frame; the hand and sleeve fill the upper half.
+Isolated on a pure plain white background, no shadow on the background, no table, no paper, no text.
+Vertical 2:3 composition.
+```

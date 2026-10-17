@@ -715,6 +715,48 @@
      "encre",
      "encre"
     ]
+   },
+   "yu_p_shi": {
+    "src": "glyphes/traits/p_shi.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
+   },
+   "yu_p_bu": {
+    "src": "glyphes/traits/p_bu.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
+   },
+   "yu_p_qin": {
+    "src": "glyphes/traits/p_qin.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
    }
   }
  }

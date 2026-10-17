@@ -51,6 +51,9 @@ const P: Record<string, number[]> = { parole: VER, trait: VER, langue: VER, cinq
 const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK, P[c] ?? INK, typeof k === 'number' ? k : k(c)));
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
+// ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.png', nuit: 'episodes/yu/images/precepte_nuit.png', pinceau: 'episodes/yu/images/pinceau_main.png' };
+const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
   const [h] = useState(() => delayRender('polices + moteur'));
@@ -59,7 +62,8 @@ const useSetup = () => {
     Promise.all([
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load(),
-    ]).then((fs) => { fs.forEach((f) => document.fonts.add(f)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
+      ...Object.entries(IMGSRC).map(([k, src]) => new Promise<void>((res) => { const im = new Image(); im.onload = () => { IMG[k as keyof typeof IMGSRC] = im; res(); }; im.onerror = () => res(); im.src = staticFile(src); })),
+    ]).then((fs) => { fs.slice(0, 2).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
   }, [h]);
   return ready;
 };
@@ -301,11 +305,34 @@ const inkBloom = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: numbe
   ctx.restore();
 };
 
-// ════════════════ 1. Accroche : « parler » se dédouble → deux gouttes d'encre donnent 語 et 言 → un rouleau suspendu
-// se déroule, le précepte 食不語，寢不言 s'écrit au pinceau → 語 puis 言 se détachent du rouleau (la nuit tombe sur « Au
-// lit ») → « On interdit l'un ici, l'autre là » : deux coups de pinceau vermillon les barrent → face à face, ils se parlent
+// ════════════════ 1. Accroche : « parler » se dédouble → deux gouttes d'encre donnent 語 et 言 → un diptyque peint se
+// révèle (le jour : un repas ; la nuit : une chambre sous la lune) et un pinceau, plein cadre, y écrit le précepte
+// 食不語 (jour) 寢不言 (nuit), la caméra collée à sa pointe → 語 puis 言 se détachent des panneaux → « On interdit
+// l'un ici, l'autre là » : deux coups de pinceau vermillon les barrent → face à face, ils se répondent
 const PRECEPT = '食不語寢不言'.split('');
-const SCROLL = { x: 1580, top: 60, w: 230, h: 780 };
+const PKEYS = ['yu_p_shi', 'yu_p_bu', 'yu_kai', 'yu_p_qin', 'yu_p_bu', 'yu_yan_kai'];
+const PANELS = [{ x: 140, y: 70, w: 790, h: 780 }, { x: 990, y: 70, w: 790, h: 780 }];
+const PCHAR = (i: number) => ({ x: i < 3 ? 810 : 1660, y: 210 + (i % 3) * 240, size: 220 });
+// pinceau : chaque caractère a son créneau, chaque trait 75 % de geste et 25 % de pinceau levé ; renvoie la progression
+// (nombre de traits) et la position de la pointe, qui glisse d'un trait au suivant pendant la pause
+const strokeTip = (E: any, key: string, O: { x: number; y: number; size: number }, pr: number) => {
+  const D = (W() as any).STROKES?.[key];
+  if (!D) return null;
+  const n = D.medians.length, i = Math.min(n - 1, Math.floor(pr)), f = pr - Math.floor(pr);
+  const P = (m: number[]) => [O.x - O.size / 2 + (m[0] * O.size) / 1024, O.y - O.size / 2 + ((900 - m[1]) * O.size) / 1024];
+  const along = (m: number[][], u: number) => {
+    const L = [0]; for (let j = 1; j < m.length; j++) L.push(L[j - 1] + Math.hypot(m[j][0] - m[j - 1][0], m[j][1] - m[j - 1][1]));
+    const tg = L[L.length - 1] * u; for (let j = 1; j < m.length; j++) if (L[j] >= tg) { const v = (tg - L[j - 1]) / Math.max(1e-6, L[j] - L[j - 1]); return [m[j - 1][0] + (m[j][0] - m[j - 1][0]) * v, m[j - 1][1] + (m[j][1] - m[j - 1][1]) * v]; }
+    return m[m.length - 1];
+  };
+  if (pr >= n) return { tip: P(D.medians[n - 1][D.medians[n - 1].length - 1]), lift: 1 };
+  return { tip: P(along(D.medians[i], f)), lift: 0 };
+};
+const writeSlot = (tt: number, t0: number, t1: number, n: number) => {
+  const sl = (t1 - t0) / n; let pr = 0, lift = 0, gap: [number, number] | null = null;
+  for (let i = 0; i < n; i++) { const u = (tt - t0 - i * sl) / (0.75 * sl); if (u >= 1) { pr += 1; if (tt < t0 + (i + 1) * sl) { lift = 1; gap = [i, (tt - t0 - i * sl - 0.75 * sl) / (0.25 * sl)]; } } else if (u > 0) pr += u; }
+  return { pr, lift, gap };
+};
 // tache d'encre qui éclate à l'impact d'une goutte : cœur sombre, gouttelettes projetées, lavis qui boit le papier
 const splash = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number, tt: number, r0 = 150, seed = 1) => {
   const u = tt - t0;
@@ -346,11 +373,11 @@ const Opening: React.FC = () => {
   // les deux caractères : positions selon la phase (nés au centre ; sur le rouleau ; détachés ; face à face)
   const charPos = (i: 0 | 1, tt: number) => {
     const born = i === 0 ? { x: 640, y: 470 } : { x: 1280, y: 470 };
-    const onScroll = { x: SCROLL.x, y: SCROLL.top + 120 + (i === 0 ? 2 : 5) * 100 + (i === 1 ? 20 : 0) };
-    const lifted = i === 0 ? { x: 720, y: 450 } : { x: 1130, y: 450 };
+    const onScroll = PCHAR(i === 0 ? 2 : 5);
+    const lifted = i === 0 ? { x: 540, y: 440 } : { x: 1370, y: 440 };
     const face = i === 0 ? { x: 700, y: 470 } : { x: 1220, y: 470 };
     const k1 = ease(seg(tt, (i === 0 ? tb : lt) - 0.1, (i === 0 ? tb : lt) + 0.7)), k2 = ease(seg(tt, df - 0.2, df + 0.8));
-    const sz1 = 100;
+    const sz1 = 220;
     let x = onScroll.x + (lifted.x - onScroll.x) * k1, y = onScroll.y + (lifted.y - onScroll.y) * k1, s = sz1 + (340 - sz1) * k1;
     x += (face.x - x) * k2; y += (face.y - y) * k2; s += (380 - s) * k2;
     return { x, y, s, born };
@@ -358,7 +385,9 @@ const Opening: React.FC = () => {
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[0, 960, 540, 1.04], [dx, 960, 520, 1.0, 1.0], [pr + 0.2, 1440, 470, 1.06, 1.6], [ci - 0.1, 1500, 440, 1.1, 1.4], [tb - 0.2, 960, 500, 1.0, 1.0], [lt - 0.1, 1050, 500, 1.04, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
+      <Cam keys={[[0, 960, 540, 1.04], [dx, 960, 520, 1.0, 1.0], [pr - 0.1, 960, 470, 1.0, 1.0],
+        ...PRECEPT.map((_, k): K => { const O = PCHAR(k), w0 = pr + 1.2, sl = (qEnd - w0) / 6; return [w0 + k * sl - 0.25, O.x - 40, O.y, 1.55, 0.45]; }),
+        [qEnd + 0.1, 960, 460, 1.0, 0.9], [tb + 0.1, 560, 460, 1.12, 1.0], [lt + 0.1, 1360, 460, 1.12, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
         punch={[y1 + 0.05, n1 + 0.05, tb + 0.6, lt + 0.6, it + 0.25, au + 0.25, pa + 0.2]}>
         <Draw draw={(ctx, tt, E) => {
           // 1. « parler » s'écrit, puis se dédouble au mot « deux »
@@ -376,33 +405,51 @@ const Opening: React.FC = () => {
             E.drawStrokes(ctx, 'yu_kai', { x: 640, y: 470, size: 460, progress: 14 * seg(tt, y1, y1 + 0.9), brush: false, color: pig(0), alpha: () => pair });
             E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 460, progress: 7 * seg(tt, n1, n1 + 0.7), brush: false, color: pig(0), alpha: () => pair });
           }
-          // 3. le rouleau suspendu se déroule ; le précepte s'écrit au pinceau, caractère par caractère (avec la voix)
-          const sa = seg(tt, pr - 0.1, pr + 0.4) * (1 - seg(tt, it - 0.3, it + 0.5));
-          if (sa > 0) {
-            const un = ease(seg(tt, pr, pr + 1.4)), H = 60 + (SCROLL.h - 60) * un;
-            ctx.save(); ctx.globalAlpha = sa;
-            ctx.shadowColor = 'rgba(40,30,20,0.35)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
-            ctx.fillStyle = '#5b6b5e'; ctx.fillRect(SCROLL.x - SCROLL.w / 2 - 22, SCROLL.top, SCROLL.w + 44, H); // montage de soie
-            ctx.shadowColor = 'transparent';
-            ctx.fillStyle = '#f2ead9'; ctx.fillRect(SCROLL.x - SCROLL.w / 2, SCROLL.top + 40, SCROLL.w, Math.max(0, H - 70));
-            ctx.fillStyle = '#3a2a1e'; ctx.fillRect(SCROLL.x - SCROLL.w / 2 - 30, SCROLL.top - 10, SCROLL.w + 60, 16); // baguette du haut
-            ctx.fillRect(SCROLL.x - SCROLL.w / 2 - 44, SCROLL.top + H - 6, SCROLL.w + 88, 22); // bâton du bas
-            ctx.fillStyle = '#7a5a3c'; [-1, 1].forEach((s2) => { ctx.beginPath(); ctx.arc(SCROLL.x + s2 * (SCROLL.w / 2 + 50), SCROLL.top + H + 5, 14, 0, 7); ctx.fill(); });
-            ctx.restore();
+          // 3. le diptyque se révèle (lavis depuis le centre) ; le pinceau écrit le précepte, caméra collée à la pointe
+          const da = seg(tt, pr - 0.1, pr + 0.9) * (1 - seg(tt, it - 0.3, it + 0.5));
+          if (da > 0) {
+            PANELS.forEach((pn, k) => {
+              const rv = ease(seg(tt, pr + 0.1 * k, pr + 1.1 + 0.1 * k));
+              ctx.save(); ctx.globalAlpha = da;
+              ctx.beginPath(); ctx.ellipse(pn.x + pn.w / 2, pn.y + pn.h / 2, pn.w * 0.75 * rv, pn.h * 0.75 * rv, 0, 0, 7); ctx.clip();
+              const im = k === 0 ? IMG.jour : IMG.nuit;
+              if (im) { const s2 = Math.max(pn.w / im.width, pn.h / im.height); ctx.drawImage(im, pn.x + (pn.w - im.width * s2) / 2, pn.y + (pn.h - im.height * s2) / 2, im.width * s2, im.height * s2); }
+              else { ctx.fillStyle = k === 0 ? 'rgba(214,204,186,0.6)' : 'rgba(70,78,100,0.45)'; ctx.fillRect(pn.x, pn.y, pn.w, pn.h); E.text(ctx, k === 0 ? 'panneau du jour (repas) — à fournir' : 'panneau de la nuit (chambre) — à fournir', pn.x + pn.w / 2 - 80, pn.y + pn.h / 2, { font: 'Cormorant', size: 34, weight: 700, color: '#4b4038' }); }
+              ctx.restore();
+              // liseré de montage (soie) autour du panneau
+              ctx.save(); ctx.globalAlpha = da * rv; ctx.strokeStyle = 'rgba(70,58,44,0.55)'; ctx.lineWidth = 3; ctx.strokeRect(pn.x - 8, pn.y - 8, pn.w + 16, pn.h + 16); ctx.restore();
+            });
+            // le précepte, caractère par caractère (1 créneau chacun, de « Un vieux précepte » à la fin de la citation)
+            const w0 = pr + 1.2, slot = (qEnd - w0) / 6;
+            let brush: number[] | null = null, lifted = 0;
             PRECEPT.forEach((c, i) => {
               if (i === 2 && tt > tb - 0.1 && tt < df + 1) return; // 語 détaché
               if (i === 5 && tt > lt - 0.1 && tt < df + 1) return; // 言 détaché
-              const t0 = pr + 1.3 + i * 0.36, k = seg(tt, t0, t0 + 0.22);
-              if (k <= 0) return;
-              const y = SCROLL.top + 120 + i * 100 + (i > 2 ? 20 : 0);
-              if (y > SCROLL.top + H - 50) return;
+              const O = PCHAR(i), key = PKEYS[i], D = (W() as any).STROKES?.[key];
+              if (!D) return;
+              const n = D.medians.length, t0 = w0 + i * slot, t1 = t0 + slot * 0.9;
+              const { pr: pg, lift, gap } = writeSlot(tt, t0, t1, n);
+              if (pg <= 0) return;
               const tr = ci + (i * (qEnd - ci)) / 6, rd = win(tt, tr, tr + 0.45, 0.12); // la voix le lit
-              const sc = 1 + 0.5 * (1 - k) + 0.12 * rd;
-              E.text(ctx, c, SCROLL.x, y, { font: 'ShuimoKai', size: 100 * sc, color: inkCss, alpha: sa * k, glow: 18 * rd, glowColor: 'rgba(120,100,70,0.5)' });
-              if (tt - t0 < 0.5) { ctx.save(); ctx.globalAlpha = sa * (1 - seg(tt, t0 + 0.1, t0 + 0.5)) * 0.5; ctx.filter = 'blur(8px)'; ctx.fillStyle = rgb(INK, 0.4); ctx.beginPath(); ctx.arc(SCROLL.x, y, 80, 0, 7); ctx.fill(); ctx.restore(); }
+              E.drawStrokes(ctx, key, { ...O, progress: pg, brush: true, color: () => (i < 3 ? inkCss : 'rgb(22,22,30)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
+              if (tt >= t0 && tt < t1 + slot * 0.1) {
+                const st = strokeTip(E, key, O, Math.min(pg, n - 0.001));
+                if (st) {
+                  if (gap) { const a2 = strokeTip(E, key, O, gap[0] + 0.999)!, b2 = strokeTip(E, key, O, Math.min(n - 0.001, gap[0] + 1))!; const g2 = ease(gap[1]); brush = [a2.tip[0] + (b2.tip[0] - a2.tip[0]) * g2, a2.tip[1] + (b2.tip[1] - a2.tip[1]) * g2]; lifted = 1; }
+                  else { brush = st.tip; lifted = lift; }
+                }
+              }
             });
-            // sceau du rouleau
-            if (tt > qEnd) drawSeal(ctx, E, SCROLL.x + 72, SCROLL.top + SCROLL.h - 80, 50, '論', tt - qEnd);
+            // la main et le pinceau (image détourée, pointe en bas au centre) ; levé entre deux traits
+            const ba = seg(tt, w0 - 0.4, w0) * (1 - seg(tt, qEnd, qEnd + 0.5));
+            if (brush && ba > 0) {
+              const bw = 520, im = IMG.pinceau;
+              ctx.save(); ctx.globalAlpha = ba; ctx.translate(brush[0] + 18 * lifted, brush[1] - 26 * lifted); ctx.rotate(-0.12);
+              if (im) ctx.drawImage(im, -bw / 2, -bw * (im.height / im.width) * 0.97, bw, bw * (im.height / im.width));
+              else { ctx.strokeStyle = '#5a4030'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, -420); ctx.stroke(); ctx.fillStyle = inkCss; ctx.beginPath(); ctx.moveTo(-12, -40); ctx.quadraticCurveTo(0, 10, 12, -40); ctx.fill(); }
+              ctx.restore();
+            }
+            if (tt > qEnd) drawSeal(ctx, E, 1740, 800, 56, '論', tt - qEnd);
           }
           // 4. la nuit tombe sur « Au lit » (lavis indigo, lune pâle), se lève sur « On interdit »
           const night = seg(tt, lt - 0.2, lt + 0.8) * (1 - seg(tt, it - 0.2, it + 0.6));
