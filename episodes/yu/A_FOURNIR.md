@@ -1,0 +1,94 @@
+# 語 — éléments à fournir
+
+Déposez les fichiers tels quels, sous n'importe quel nom : je les renomme et les range dans `images/` ou `clips/`.
+
+## 1. Glyphes anciens — FAIT
+語, 言, 吾, 五 (小學堂, CC0) → `glyphes/*_xiaoxue/`, planche `glyphes/planche_xiaoxue.png`. Rien à fournir.
+
+## 2. Conseillers en papier découpé (bloc 5) — Nano Banana, 2 images
+Fond **blanc uni** (détourage par `outils/video_shuimo/detourer.py`), 1:1, ≥ 1024 px. Deux poses, une par image.
+Aucun texte.
+
+**Commun (à coller dans chaque prompt) :**
+> Traditional Chinese red paper-cut (jianzhi) silhouette, a single sheet of vermilion red paper cut with scissors and
+> knife, crisp cut edges, fine openwork details (sleeve folds, belt, hat ribbons) cut out as negative space, flat,
+> no shading, no gradient, isolated on a pure white background, full figure, side view, no text, no seal, no frame.
+
+**Pose A — l'orateur :**
+> A slender court strategist in a long cross-collar robe with very wide sleeves and a tall narrow cap tied under the
+> chin, standing in profile facing right, one arm stretched forward with an open palm, mouth open mid-argument,
+> the other hand holding a bundle of bamboo slips against his chest.
+
+**Pose B — le contradicteur :**
+> A stout older court strategist in a long cross-collar robe with wide sleeves and a soft rounded cap, standing in
+> profile facing left, index finger raised in objection, leaning slightly back, a sly half-smile.
+
+## 3. Image classique (bloc 6) — **sujet à confirmer** ; proposition par défaut : le banquet silencieux
+Nano Banana, 16:9, ≥ 1376 × 768. Tiers droit vide (食不語 y sera calligraphié au montage). Aucun texte dans l'image.
+
+**Scène (par défaut) :**
+> A banquet in a timber hall: four guests in cross-collar robes kneel on reed mats behind low lacquered tables
+> set with bronze and lacquer bowls, ladles and cups; a servant pours from a bronze wine vessel; the guests eat in
+> calm silence, eyes lowered, no one speaking. All figures in the left two thirds of the frame; the right third is
+> empty background. No text, no calligraphy, no seal, no signature, no frame, no border.
+
+**Style — estampage de pierre gravée Han (recommandé) :**
+> An ink rubbing taken from a carved stone relief: figures and furniture as flat pale grey-white raised silhouettes
+> on a dense black ink ground, details incised as fine lines, stone grain and uneven ink density, composition in a
+> single horizontal register with a carved border line at top and bottom.
+
+## 4. Clips 3D Seedance (16:9, sans texte ni sous-titres)
+Image de départ Nano Banana conseillée (style Pixar, mêmes réglages que les clips du 學, du 教 et du 美).
+
+### Clip A — le carillon de bronze (bloc 4, 10 s)
+Entrée par la mer de nuages, sortie au pinceau au montage. Le son du clip n'est pas gardé (cloche synthétisée).
+
+```
+[Style global]: 3D cinematic cartoon, Pixar-quality rendering, warm amber torchlight in a dim timber hall, bronze
+greens and lacquer reds. Maintain consistent 3D cartoon style across all cuts, no photorealistic drift.
+Duration: 10s, 16:9.
+
+[00:00-00:05] Shot 1: The Strike (The Setup)
+A tall wooden rack carved with coiled dragons holds a row of eight oval bronze bells of decreasing size, hanging
+mouth down, their surfaces covered with rows of raised bosses and green patina. A musician in a plain dark
+cross-collar robe swings a long wooden beam suspended by ropes and strikes the largest bell.
+Camera: medium shot, slow dolly-in toward the bell, eye level, normal lens.
+
+[00:05-00:10] Shot 2: The Hall Answers (The Payoff)
+Reverse angle: a young nobleman in a black silk robe with red borders and a tall black cap sits on a reed mat at
+the far end of the hall; around him seated guests lift their heads at the same moment, eyes widening, a faint
+smile spreading on the nobleman's face as the sound fills the room. Dust motes tremble in the torchlight.
+Camera: wide shot, locked, then slow push-in on the nobleman's face for the last 2 seconds.
+Audio: one deep bronze bell tone with a long ringing decay, soft murmur of the guests.
+Director's note: the bell "speaks" and the hall "answers" — hold the shared reaction 1.5s.
+
+Constraints: no text overlays, no readable characters, no extra main characters, no deformed hands, no snap zooms.
+```
+
+### Clip B — Yang Xiong et les soldats (bloc 7, 12 s)
+Entrée à travers le caractère 語, sortie au pinceau au montage.
+
+```
+[Style global]: 3D cinematic cartoon, Pixar-quality rendering, cool early morning light in a rammed-earth
+courtyard, dusty ochres and soft blues. Maintain consistent 3D cartoon style across all cuts, no photorealistic
+drift. Duration: 12s, 16:9.
+
+[00:00-00:06] Shot 1: The Soldiers (The Setup)
+A courtyard inside the walls of a great capital: grey-tiled roofs, a rammed-earth wall, a row of tired young
+soldiers in red-brown knee-length tunics, leg wrappings and straw sandals, halberds leaning against the wall.
+They come from all corners of the empire: different faces, different builds, one with a fur-lined collar, one
+with a sun-darkened face and a straw hat on his back. They sit on the ground, chatting and laughing.
+Camera: wide shot, slow lateral dolly along the row, eye level.
+
+[00:06-00:12] Shot 2: The Scholar Listens (The Payoff)
+A thin middle-aged scholar with a short beard, in a plain dark blue cross-collar robe and a small black cap,
+crouches in front of one soldier, holding a square of pale silk on a small wooden board and a thin brush. The
+soldier says a word, gesturing; the scholar repeats it silently with his lips, delighted, and writes it down
+quickly. Behind him, two other soldiers lean in, curious, ready to give their own word.
+Camera: medium shot, slow push-in on the scholar's delighted face, normal lens.
+Audio: courtyard ambience, several voices speaking in different accents (unintelligible), the soft scratch of
+a brush.
+Director's note: curiosity and warmth — he collects words like treasures. The silk stays blank or blurry.
+
+Constraints: no text overlays, no readable characters, no extra main characters, no deformed hands, no snap zooms.
+```
