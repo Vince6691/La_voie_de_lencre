@@ -333,6 +333,30 @@ const writeSlot = (tt: number, t0: number, t1: number, n: number) => {
   for (let i = 0; i < n; i++) { const u = (tt - t0 - i * sl) / (0.75 * sl); if (u >= 1) { pr += 1; if (tt < t0 + (i + 1) * sl) { lift = 1; gap = [i, (tt - t0 - i * sl - 0.75 * sl) / (0.25 * sl)]; } } else if (u > 0) pr += u; }
   return { pr, lift, gap };
 };
+// créneaux d'écriture de chaque caractère, proportionnels à son nombre de traits (w0 → w1)
+const charSlots = (w0: number, w1: number) => {
+  const N = PKEYS.map((k) => (W() as any).STROKES?.[k]?.medians.length ?? 6), S = N.reduce((a, b) => a + b, 0) + 6 * 0.6;
+  let c = w0; return N.map((n) => { const d = ((w1 - w0) * (n + 0.6)) / S, r: [number, number] = [c, c + d]; c += d; return r; });
+};
+// pointe du pinceau à l'instant tt pendant l'écriture du précepte (w0 → qEnd), et si elle est levée
+const brushAt = (E: any, tt: number, w0: number, qEnd: number): { tip: number[]; lifted: number } | null => {
+  const SL = charSlots(w0, qEnd);
+  for (let i = 0; i < 6; i++) {
+    const O = PCHAR(i), key = PKEYS[i], D = (W() as any).STROKES?.[key];
+    if (!D) continue;
+    const n = D.medians.length, slot = SL[i][1] - SL[i][0], t0 = SL[i][0], t1 = t0 + slot * 0.9;
+    if (tt < t0 || tt >= t1 + slot * 0.1) continue;
+    const { pr: pg, lift, gap } = writeSlot(tt, t0, t1, n);
+    if (gap) { const a2 = strokeTip(E, key, O, gap[0] + 0.999)!, b2 = strokeTip(E, key, O, Math.min(n - 0.001, gap[0] + 1))!; const g2 = ease(gap[1]); return { tip: [a2.tip[0] + (b2.tip[0] - a2.tip[0]) * g2, a2.tip[1] + (b2.tip[1] - a2.tip[1]) * g2], lifted: 1 }; }
+    // entre deux caractères : la pointe glisse vers le premier trait du suivant
+    if (tt >= t1) { const a2 = strokeTip(E, key, O, n - 0.001)!, nx = i < 5 ? strokeTip(E, PKEYS[i + 1], PCHAR(i + 1), 0)! : a2; const g2 = ease((tt - t1) / (slot * 0.1)); return { tip: [a2.tip[0] + (nx.tip[0] - a2.tip[0]) * g2, a2.tip[1] + (nx.tip[1] - a2.tip[1]) * g2], lifted: 1 }; }
+    const st = strokeTip(E, key, O, Math.min(pg, n - 0.001));
+    return st ? { tip: st.tip, lifted: lift } : null;
+  }
+  return null;
+};
+// grossissement de la vue macro (on ne voit qu'un fragment de caractère)
+const MACRO = 6;
 // tache d'encre qui éclate à l'impact d'une goutte : cœur sombre, gouttelettes projetées, lavis qui boit le papier
 const splash = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number, tt: number, r0 = 150, seed = 1) => {
   const u = tt - t0;
@@ -369,6 +393,7 @@ const Opening: React.FC = () => {
   const di = at('b01', 'dire'), dx = at('b01', 'deux'), y1 = at('b01', 'yu1'), n1 = at('b01', 'yan1'), pr = at('b01', 'precepte'), ci = at('b01', 'citation');
   const tb = at('b01', 'table'), y2 = at('b01', 'yu2'), lt = at('b01', 'lit'), n2 = at('b01', 'yan2'), it = at('b01', 'interdit'), au = at('b01', 'autre'), df = at('b01', 'difference'), p1 = at('b01', 'p1'), pa = at('b01', 'parler');
   const qEnd = tb - 0.45; // fin de la citation chinoise
+  const wEnd = ci + 0.25; // fin de l'écriture au pinceau (le dézoom révèle la phrase pendant que la voix la lit)
   const out = seg(t, B('b01') + 0.2, A('b02') - 0.1);
   // les deux caractères : positions selon la phase (nés au centre ; sur le rouleau ; détachés ; face à face)
   const charPos = (i: 0 | 1, tt: number) => {
@@ -386,8 +411,7 @@ const Opening: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Cam keys={[[0, 960, 540, 1.04], [dx, 960, 520, 1.0, 1.0], [pr - 0.1, 960, 470, 1.0, 1.0],
-        ...PRECEPT.map((_, k): K => { const O = PCHAR(k), w0 = pr + 1.2, sl = (qEnd - w0) / 6; return [w0 + k * sl - 0.25, O.x - 40, O.y, 1.55, 0.45]; }),
-        [qEnd + 0.1, 960, 460, 1.0, 0.9], [tb + 0.1, 560, 460, 1.12, 1.0], [lt + 0.1, 1360, 460, 1.12, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
+        [qEnd + 0.05, 960, 460, 1.0, 1.7], [tb + 0.1, 560, 460, 1.12, 1.0], [lt + 0.1, 1360, 460, 1.12, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
         punch={[y1 + 0.05, n1 + 0.05, tb + 0.6, lt + 0.6, it + 0.25, au + 0.25, pa + 0.2]}>
         <Draw draw={(ctx, tt, E) => {
           // 1. « parler » s'écrit, puis se dédouble au mot « deux »
@@ -406,6 +430,18 @@ const Opening: React.FC = () => {
             E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 460, progress: 7 * seg(tt, n1, n1 + 0.7), brush: false, color: pig(0), alpha: () => pair });
           }
           // 3. le diptyque se révèle (lavis depuis le centre) ; le pinceau écrit le précepte, caméra collée à la pointe
+          // vue macro (dans le dessin, nette) : on plonge sur la pointe du pinceau, on la suit, puis grand dézoom sur la phrase
+          const w0m = pr + 0.5;
+          const zin = ease(seg(tt, w0m - 0.5, w0m + 0.1)), zout = ease(seg(tt, wEnd - 0.05, wEnd + 1.3));
+          const Z = 1 + (MACRO - 1) * zin * (1 - zout);
+          let mc = [960, 460];
+          if (Z > 1.001) {
+            const pts = [0.3, 0.2, 0.1, 0].map((d) => brushAt(E, Math.min(Math.max(tt - d, w0m + 0.01), wEnd - 0.02), w0m, wEnd)?.tip).filter(Boolean) as number[][];
+            const c0 = pts.length ? [pts.reduce((s, q) => s + q[0], 0) / pts.length, pts.reduce((s, q) => s + q[1], 0) / pts.length - 20] : [PCHAR(0).x, PCHAR(0).y];
+            const k = zin * (1 - zout);
+            mc = [960 + (c0[0] - 960) * k, 460 + (c0[1] - 460) * k];
+          }
+          ctx.save(); ctx.translate(960, 540); ctx.scale(Z, Z); ctx.translate(-mc[0], -mc[1] + 0 * 80);
           const da = seg(tt, pr - 0.1, pr + 0.9) * (1 - seg(tt, it - 0.3, it + 0.5));
           if (da > 0) {
             PANELS.forEach((pn, k) => {
@@ -420,37 +456,31 @@ const Opening: React.FC = () => {
               ctx.save(); ctx.globalAlpha = da * rv; ctx.strokeStyle = 'rgba(70,58,44,0.55)'; ctx.lineWidth = 3; ctx.strokeRect(pn.x - 8, pn.y - 8, pn.w + 16, pn.h + 16); ctx.restore();
             });
             // le précepte, caractère par caractère (1 créneau chacun, de « Un vieux précepte » à la fin de la citation)
-            const w0 = pr + 1.2, slot = (qEnd - w0) / 6;
-            let brush: number[] | null = null, lifted = 0;
+            const w0 = w0m, SL = charSlots(w0, wEnd);
             PRECEPT.forEach((c, i) => {
               if (i === 2 && tt > tb - 0.1 && tt < df + 1) return; // 語 détaché
               if (i === 5 && tt > lt - 0.1 && tt < df + 1) return; // 言 détaché
               const O = PCHAR(i), key = PKEYS[i], D = (W() as any).STROKES?.[key];
               if (!D) return;
-              const n = D.medians.length, t0 = w0 + i * slot, t1 = t0 + slot * 0.9;
+              const n = D.medians.length, slot = SL[i][1] - SL[i][0], t0 = SL[i][0], t1 = t0 + slot * 0.9;
               const { pr: pg, lift, gap } = writeSlot(tt, t0, t1, n);
               if (pg <= 0) return;
               const tr = ci + (i * (qEnd - ci)) / 6, rd = win(tt, tr, tr + 0.45, 0.12); // la voix le lit
               E.drawStrokes(ctx, key, { ...O, progress: pg, brush: true, color: () => (i < 3 ? inkCss : 'rgb(22,22,30)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
-              if (tt >= t0 && tt < t1 + slot * 0.1) {
-                const st = strokeTip(E, key, O, Math.min(pg, n - 0.001));
-                if (st) {
-                  if (gap) { const a2 = strokeTip(E, key, O, gap[0] + 0.999)!, b2 = strokeTip(E, key, O, Math.min(n - 0.001, gap[0] + 1))!; const g2 = ease(gap[1]); brush = [a2.tip[0] + (b2.tip[0] - a2.tip[0]) * g2, a2.tip[1] + (b2.tip[1] - a2.tip[1]) * g2]; lifted = 1; }
-                  else { brush = st.tip; lifted = lift; }
-                }
-              }
             });
+            const bt = brushAt(E, tt, w0, wEnd), brush = bt?.tip ?? null, lifted = bt?.lifted ?? 0;
             // la main et le pinceau (image détourée, pointe en bas au centre) ; levé entre deux traits
-            const ba = seg(tt, w0 - 0.4, w0) * (1 - seg(tt, qEnd, qEnd + 0.5));
+            const ba = seg(tt, w0 - 0.4, w0) * (1 - seg(tt, wEnd, wEnd + 0.5));
             if (brush && ba > 0) {
-              const bw = 520, im = IMG.pinceau;
+              const bw = 380, im = IMG.pinceau;
               ctx.save(); ctx.globalAlpha = ba; ctx.translate(brush[0] + 18 * lifted, brush[1] - 26 * lifted); ctx.rotate(-0.12);
               if (im) ctx.drawImage(im, -bw / 2, -bw * (im.height / im.width) * 0.97, bw, bw * (im.height / im.width));
               else { ctx.strokeStyle = '#5a4030'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, -420); ctx.stroke(); ctx.fillStyle = inkCss; ctx.beginPath(); ctx.moveTo(-12, -40); ctx.quadraticCurveTo(0, 10, 12, -40); ctx.fill(); }
               ctx.restore();
             }
-            if (tt > qEnd) drawSeal(ctx, E, 1740, 800, 56, '論', tt - qEnd);
+            if (tt > qEnd - 0.3) drawSeal(ctx, E, 1740, 800, 56, '論', tt - qEnd + 0.3);
           }
+          ctx.restore();
           // 4. la nuit tombe sur « Au lit » (lavis indigo, lune pâle), se lève sur « On interdit »
           const night = seg(tt, lt - 0.2, lt + 0.8) * (1 - seg(tt, it - 0.2, it + 0.6));
           if (night > 0) {
