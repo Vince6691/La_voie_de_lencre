@@ -532,7 +532,7 @@ const Pieces: React.FC = () => {
 
 // ════════════════ 3. La dynastie Shang : 言 (bouche, langue, son), 五 (cinq traits → croix), 吾
 // Anyang vue du ciel : position de la grande salle dans l'image (fraction de la largeur, de la hauteur), cible de la plongée
-const ANYANG_HALL = [0.56, 0.6];
+const ANYANG_HALL = [0.72, 0.49];
 const Shang: React.FC = () => {
   const t = useT();
   const A3 = A('b03'), dv = at('b03', 'devin'), sg = at('b03', 'signe'), bo = at('b03', 'bouche'), la = at('b03', 'langue'), so = at('b03', 'son'), ci = at('b03', 'cinq'), tr = at('b03', 'traits'), cr = at('b03', 'croix'), po = at('b03', 'pose'), pq = at('b03', 'pourquoi'), pn = at('b03', 'prononcait');
@@ -541,7 +541,7 @@ const Shang: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Landscape seed={14} from={A3 - 1.5} to={R1 + 0.6} move="pan" mood="aube" faint={0.55} />
-      <Cam keys={[[A3 - 0.3, 960, 560, 1.0], [dv, 700, 520, 1.08, 2.4], [sg - 0.3, 960, 540, 1.0, 1.0], [bo - 0.2, 700, 700, 1.25, 0.9], [la - 0.1, 700, 560, 1.25, 0.9], [so - 0.1, 700, 300, 1.25, 1.0], [ci - 0.3, 960, 540, 1.0, 1.0], [tr - 0.2, 1240, 540, 1.12, 1.0], [po - 0.3, 1240, 560, 1.06, 1.2], [pq - 0.2, 960, 540, 1.0, 1.0]]}
+      <Cam keys={[[A3 - 0.3, 960, 560, 1.0], [dv, 960, 540, 1.0, 2.4], [sg - 0.3, 960, 540, 1.0, 1.0], [bo - 0.2, 700, 700, 1.25, 0.9], [la - 0.1, 700, 560, 1.25, 0.9], [so - 0.1, 700, 300, 1.25, 1.0], [ci - 0.3, 960, 540, 1.0, 1.0], [tr - 0.2, 1240, 540, 1.12, 1.0], [po - 0.3, 1240, 560, 1.06, 1.2], [pq - 0.2, 960, 540, 1.0, 1.0]]}
         punch={[sg + 0.3, bo + 0.2, cr + 0.3, po + 0.8]} calm={[[R1 - 0.6, R1 + 3.6]]}>
         <Draw draw={(ctx, tt, E) => {
           // plan « tableau » : Anyang vue du ciel (lavis), la caméra plonge vers la grande salle, l'estampage s'y pose
@@ -550,7 +550,8 @@ const Shang: React.FC = () => {
             const k = ease(seg(tt, A3 - 0.3, dv + 0.9)), z = 1 + 1.3 * k;
             const cov = Math.max(1920 / im.width, 1080 / im.height), w = im.width * cov, h = im.height * cov;
             const fx = (ANYANG_HALL[0] - 0.5) * w * k, fy = (ANYANG_HALL[1] - 0.5) * h * k;
-            ctx.save(); ctx.globalAlpha = ia; ctx.translate(960, 540); ctx.scale(z, z); ctx.translate(-fx, -fy);
+            // la grande salle finit là où se pose l'estampage (700, 520)
+            ctx.save(); ctx.globalAlpha = ia; ctx.translate(960 - 260 * k, 540 - 20 * k); ctx.scale(z, z); ctx.translate(-fx, -fy);
             ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore();
           }
           // 言 de l'os : l'estampage se pose sur « le devin grave », le signe s'y révèle en blanc, puis passe à l'encre ; bouche, langue, son (vermillon) chacun sur son mot
@@ -586,6 +587,7 @@ const Shang: React.FC = () => {
       <Label x={1240} y={180} zh="吾" text="« moi »" color={AZ} a={win(t, po + 0.9, pq + 0.2, 0.4)} align="center" />
       <Caption text="吾 = « moi » : sens attesté plus tard, sous les Zhou" a={win(t, po + 1.6, pq - 0.2, 0.4)} y={940} size={44} />
       <Caption text="chinois archaïque : 五 et 吾, tous deux « nga » (reconstruction Baxter-Sagart)" a={win(t, pq + 0.4, R1 - 0.3, 0.4)} y={940} size={44} />
+      <Caption text="Anyang · vue imaginée" a={IMG.anyang ? win(t, A3 + 0.4, dv + 0.3, 0.4) : 0} y={955} size={44} />
       <EraTag {...cartouche('shang', 'Anyang · v. 1200 av. J.-C.')} a={seg(t, A3 + 0.2, A3 + 1.0) * (1 - win(t, dv - 0.3, sg + 1.8, 0.3)) * (1 - seg(t, R1 - 0.3, R1))} />
     </AbsoluteFill>
   );

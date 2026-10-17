@@ -136,7 +136,7 @@ Vertical 2:3 composition.
 ```
 
 
-## 7. Anyang vue du ciel (ouverture du bloc 3) → `images/anyang_ciel.jpg`
+## 7. Anyang vue du ciel (ouverture du bloc 3) — FAIT (`images/anyang_ciel.jpg`)
 Plan « tableau » des Shang (le plastron est exclu : déjà montré dans d'autres épisodes). La caméra plonge vers la grande
 salle, puis l'estampage de 言 s'y pose. Nano Banana, **16:9**, ≥ 1920 × 1080. Même univers que le diptyque de
 l'accroche. **La grande salle un peu à droite du centre, vers les 3/5 de la hauteur** (cible de la plongée ; je recale si besoin).

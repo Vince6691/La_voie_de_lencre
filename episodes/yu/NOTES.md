@@ -60,3 +60,6 @@ le balayage gris (refusé) les retient sous 8.
 reproposer). L'estampage de 言 se pose dès « le devin grave » (avec la gravure), le signe se révèle toujours sur « signe ».
 **Remplacement** : tableau Shang = **Anyang vue du ciel** (choisi parmi : le devin qui parle, Anyang vue du ciel, la bouche
 qui parle) ; image à fournir (A_FOURNIR §7), plongée vers la grande salle (`ANYANG_HALL` à recaler sur l'image).
+Image `anyang_ciel.jpg` reçue : plongée de ×2,3 vers la grande salle (72 %, 49 %), qui finit sous l'estampage ; légende
+« Anyang · vue imaginée » (le rempart de l'image est une licence : aucun rempart n'a été retrouvé autour du site du palais
+de Yinxu, protégé par un fossé ; la ville voisine de Huanbei, elle, était murée). Contrôle : `apercus/planche_note_v1d.jpg`.
