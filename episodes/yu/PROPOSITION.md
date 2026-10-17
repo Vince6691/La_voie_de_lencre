@@ -104,7 +104,7 @@ Discuter, se renvoyer la parole, c'est yǔ. ⏸ Voilà pourquoi on ne yǔ pas à
 pleine. Et au lit, on ne yán même pas : on se tait tout à fait.
 > plan : cartouche `han` ; lattes du Shuowen (直言曰言，論難曰語 ; 語，論也。从言吾聲), **feuilletage qui s'arrête net**
 > sur la bonne latte ; **cascade frappée** sur la phrase-réponse : 語 en colonne bronze → sceau Jin → petit sceau, un
-> coup de sceau par mot fort, **cloche** discrète sur le dernier ; 言 seul, une bouche tournée vers le vide ; 語, deux
+> coup par forme (cloche pour le bronze, sceau, sceau + gong) ; 言 seul, une bouche tournée vers le vide ; 語, deux
 > bouches face à face (vermillon / azurite), un trait d'encre fait l'aller-retour ; **image classique** (sujet à
 > préciser) révélée sur « à table » ; l'humour tient en une phrase (« la bouche pleine »), juste après la réponse.
 
@@ -177,11 +177,15 @@ os : estampage · cloche : clip 3D puis estampage de l'inscription · conseiller
 rouges · bambou : latte · dictionnaire : lattes du Shuowen · image classique (style ancien) · Yang Xiong : médaillon au
 trait puis clip 3D · cartes sur papier · aujourd'hui : mosaïque de mots, lavis de couleurs pour les dialectes.
 
-## Bruitages
-- **Cloche de bronze** (leitmotiv) : longue résonance synthétisée (`audio/sfx_src/fabriquer_yu.py`), entière au bloc 4,
-  puis 0,25–0,3 aux blocs 6 et 9.
-- Tonnerre lointain (ouverture du récit ancien, bloc 2), gravure sur l'os (bloc 3), coups de sceau (blocs 3, 5, 6),
-  feuilletage de lattes qui s'arrête net (bloc 6), pinceau sur les tracés, gong (≤ 3 : bloc 4, bloc 6, « Ainsi naît »).
+## Bruitages (posés : liste `bruitages` d'episode.json)
+- **Cloche de bronze** (leitmotiv) : bianzhong synthétisé (`audio/sfx_src/fabriquer_yu.py`, 7 s, fondamentale 174 Hz,
+  partiels inharmoniques battants) : entière dans la plage du clip A (0,55), seconde frappe sur « On le frappe… » (0,28) ;
+  0,25 sur la forme de bronze de la cascade (bloc 6) et sur « face à face » (bloc 9).
+- Accroche : une **goutte d'encre** (synthétisée) sur 語 et sur 言, pinceau sous l'écriture du précepte, sceau 論.
+- Tonnerre (fin du bloc 2, « gravées sur les os »), gravure (devin), sceaux 商 / 周 / 戰 (bandeau), ciseaux sur les
+  conseillers en papier découpé, sceau sur les sceaux de Jin, pinceau du balayage, feuilletage (dictionnaire), cascade :
+  cloche → sceau → sceau + gong ; pinceau (Yang Xiong, simplification) ; gong ≤ 3 (fin bloc 4, cascade, « Ainsi
+  naît ») ; **tambour de guerre** après « désignait une armée » (chute, annonce du 師).
 - Jamais par-dessus la voix : chaque son posé dans le silence qui précède.
 
 ## Chapitres YouTube (provisoires : recalculés depuis `voix/reperes.json` après la voix)

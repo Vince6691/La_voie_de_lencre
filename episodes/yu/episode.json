@@ -177,7 +177,35 @@
    "armee": "Pourtant"
   }
  },
- "bruitages": [],
+ "bruitages": [
+    ["goutte", "b01", "yu1", -0.05, 0.45],
+    ["goutte", "b01", "yan1", -0.05, 0.45],
+    ["pinceau", "b01", "precepte", 0.5, 0.3],
+    ["pinceau", "b01", "precepte", 1.9, 0.3],
+    ["pinceau", "b01", "precepte", 3.3, 0.3],
+    ["sceau", "b01", "table", -0.75, 0.35],
+    ["tonnerre", "b02", "os", 0.3, 0.4],
+    ["gravure", "b03", "devin", 0.3, 0.4],
+    ["sceau", "b03", "pourquoi", -0.6, 0.4],
+    ["cloche", "b04", null, -1.8, 0.55],
+    ["cloche", "b04", "frappe", 0.55, 0.28],
+    ["sceau", "b04", "rencontre", 0.4, 0.4],
+    ["gong", "b04", null, 20.45, 0.35],
+    ["ciseau", "b05", "conseillers", -0.2, 0.35],
+    ["sceau", "b05", "sceaux", 0.2, 0.3],
+    ["sceau", "b05", "empile", 1.2, 0.4],
+    ["pinceau", "b06", null, -1.6, 0.5],
+    ["feuilles", "b06", "dico", -0.3, 0.5],
+    ["cloche", "b06", "reponse", -1.85, 0.25],
+    ["sceau", "b06", "reponse", -1.32, 0.45],
+    ["sceau", "b06", "reponse", -0.87, 0.5],
+    ["gong", "b06", "reponse", -0.87, 0.3],
+    ["pinceau", "b07", "pinceau", 0, 0.35],
+    ["pinceau", "b08", "traits", -0.1, 0.4],
+    ["cloche", "b09", "face", 0.3, 0.25],
+    ["gong", "b09", "naissance", -0.5, 0.35],
+    ["tambour", "b10", null, 13.1, 0.45]
+  ],
  "glyphes": {
   "reels": {
    "yu_jinwen": {
