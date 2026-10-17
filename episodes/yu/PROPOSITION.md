@@ -1,4 +1,4 @@
-# 語 (yǔ) — proposition tout shuimo, voix off v2 (≈ 5 min + écran de fin) — v2
+# 語 (yǔ) — proposition tout shuimo, voix off v2 (≈ 5 min + écran de fin) — v3
 
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : « Deux mots pour parler ». Le précepte 食不語，寢不言 sert d'accroche (citation seule, attribuée en une
@@ -23,7 +23,7 @@ vouloir : une bouche d'où sort la parole (言), et en face « moi » (吾), une
 au-dessus) · **五 les deux traits croisés en malachite** · **口 la bouche de 吾 en azurite**.
 **Leitmotiv sonore :** la **cloche de bronze**. Frappée en entier au bloc 4 (le premier 語), elle revient discrètement
 (0,25–0,3) sur chaque « réponse » : la définition du dictionnaire (bloc 6) et « deux bouches face à face » (bloc 9).
-`⏸` = pause (1–2 s) ; `⏸⏸` = silence long (un seul : avant la réponse du bloc 6) ; `[ROULEAU]` = voix muette.
+`⏸` = pause (1–2 s) ; `⏸⏸` = silence long (un seul : avant la réponse du bloc 6) ; `[ROULEAU]` = voix muette (rouleaux 3D uniquement, plus de rouleau 2D).
 
 ## Formes retenues (小學堂, `glyphes/*_xiaoxue/`, planche `glyphes/planche_xiaoxue.png`)
 | Époque (cartouche `periodes.ts`) | Support | Forme | Fichier | Ce qui change |
@@ -67,8 +67,9 @@ Pour le son. On prononçait les deux à peu près de la même façon.
 > (fondu enchaîné net, malachite) ; 吾 : le X descend sur une bouche azurite, coup de sceau ; petit gag visuel sur « le
 > scribe se lasse » : le quatrième trait bâille, s'arrête à mi-course.
 
-`[ROULEAU 1 — 2D classique (rouleau-du-temps), Shang → Zhou, 5 s : 吾 en curseur, il passe le sceau 周 ; cartouche
-cartouche('zhou', 'fin des Printemps et Automnes')]`
+`[ROULEAU 1 — **rouleau 3D court** (rouleau-3d, 3,6 s, sceau rouge) : Shang → Zhou, compteur de −1200 à −550 ;
+cartouche('zhou', 'fin des Printemps et Automnes'). Sa cloche (celle du rouleau court) s'éteint dans le silence où
+entre la mer de nuages du clip A : on vérifiera à l'oreille qu'elle ne fait pas doublon avec la cloche de Xu]`
 
 ## 4. La cloche qui parle — 1:30
 Six siècles plus tard, au sud-est, dans le petit royaume de Xu. Un prince fait fondre un carillon de bronze. On le
@@ -88,10 +89,12 @@ parole se pose au-dessus de « moi », les deux bouches l'une sur l'autre.
 > l'encre rouge (coup de sceau), 語 empilé (02, 03) ; caméra qui descend de la bouche du haut à celle du bas ; latte
 > de bambou de Guodian (04).
 
-`[ROULEAU 2 — 2D rapide (rouleau-du-temps), Royaumes → Han, 3,5 s, sens inverse, impact sec]`
+`[TRANSITION SANS ROULEAU — Royaumes → Han (deux siècles seulement) : coups de pinceau (coup-de-pinceau) qui balaient
+le paysage des deux pavillons vers le papier nu, la dernière empreinte de sceau 語 reste seule ; un **coup de sceau**
+pose le cartouche `han` (validé dans le 教, Han → Song). Le saut est dit par la voix : « Deux siècles plus tard »]`
 
 ## 6. La dynastie Han : la réponse — 2:35
-Sous les Han, un dictionnaire tranche enfin notre question. ⏸⏸ 直言曰言，論難曰語. Parler tout droit, c'est yán. ⏸
+Deux siècles plus tard, sous les Han, un dictionnaire tranche enfin notre question. ⏸⏸ 直言曰言，論難曰語. Parler tout droit, c'est yán. ⏸
 Discuter, se renvoyer la parole, c'est yǔ. ⏸ Voilà pourquoi on ne yǔ pas à table : on ne lance pas de débat la bouche
 pleine. Et au lit, on ne yán même pas : on se tait tout à fait.
 > plan : cartouche `han` ; lattes du Shuowen (直言曰言，論難曰語 ; 語，論也。从言吾聲), **feuilletage qui s'arrête net**
@@ -111,7 +114,7 @@ Vingt-sept ans d'enquête. Le livre s'appelle 方言 : les parlers des pays.
 > « venus des confins » ; le médaillon revient sur « Vingt-sept ans ».
 > voix : 揚雄 en milieu de phrase (jamais en fin de bloc) ; 2 prises.
 
-`[ROULEAU 3 — **rouleau 3D complet** (rouleau-3d, 5,3 s, sceau miel) sur le plus grand saut : Han → aujourd'hui,
+`[ROULEAU 2 — **rouleau 3D complet** (rouleau-3d, 5,3 s, sceau miel) sur le plus grand saut : Han → aujourd'hui,
 compteur de l'an 1 à 1956, sceaux 唐 宋 元 明 清 traversés ; cartouche `aujourdhui`]`
 
 ## 8. Aujourd'hui : une écriture, plusieurs voix — 3:45
@@ -147,19 +150,21 @@ Et celui dont on attend toujours la réponse, c'est le maître : shī. Pourtant,
 ---
 
 ## Chiffres
-≈ 575 mots à 125 mots/min (≈ 4 min 36) + 13,8 s de rouleaux (5 + 3,5 + 5,3) + pauses → **≈ 5 min 05**, puis 10 s
+≈ 575 mots à 125 mots/min (≈ 4 min 36) + 10,4 s de transitions (3,6 + 1,5 + 5,3) + pauses → **≈ 5 min**, puis 10 s
 d'écran de fin. Pour tenir 5 min : couper « On argumente, on réplique, on retourne l'adversaire » et « Et au lit, on ne
 yán même pas : on se tait tout à fait » (−7 s), voire 英語 (−3 s).
 Sauts d'époque annoncés : « il y a plus de trois mille ans », « Six siècles plus tard », « Puis viennent les Royaumes
-combattants », « Sous les Han », « En 1956 ».
+combattants », « Deux siècles plus tard, sous les Han », « En 1956 ».
 
 ## Rouleaux (règle de la skill)
 | # | Où | Type | Durée |
 |---|---|---|---|
-| 1 | Shang → Zhou | 2D classique, 吾 en curseur | 5 s |
-| 2 | Royaumes → Han | 2D rapide, sens inverse | 3,5 s |
-| 3 | Han → aujourd'hui (plus grand saut) | **3D complet**, sceau miel | 5,3 s |
-Pas de rouleau 3D court : le seul candidat (rouleau 2) est à ≈ 1 min 10 du complet (minimum 1 min 30).
+| 1 | Shang → Zhou (≈ 1:28) | **3D court**, sceau rouge | 3,6 s |
+| — | Royaumes → Han (≈ 2:32) | pas de rouleau : coups de pinceau + coup de sceau du cartouche | ≈ 1,5 s |
+| 2 | Han → aujourd'hui (≈ 3:40, plus grand saut) | **3D complet**, sceau miel | 5,3 s |
+Plus aucun rouleau 2D (demande de l'utilisateur). Règle de la skill respectée : deux rouleaux 3D au plus, un complet sur
+le plus grand saut, le court à plus d'1 min 30 du complet (≈ 2 min 10 d'écart). Le saut Royaumes → Han, court (deux
+siècles), passe par le geste du pinceau et la voix (« Deux siècles plus tard »).
 
 ## Traitements variés (pas de clipart)
 os : estampage · cloche : clip 3D puis estampage de l'inscription · conseillers : papier découpé · sceaux : empreintes
