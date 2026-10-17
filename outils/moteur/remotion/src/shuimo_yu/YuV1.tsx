@@ -52,7 +52,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.png', nuit: 'episodes/yu/images/precepte_nuit.png', pinceau: 'episodes/yu/images/pinceau_main.png' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.png', nuit: 'episodes/yu/images/precepte_nuit.png', pinceau: 'episodes/yu/images/pinceau_main.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -303,6 +303,21 @@ const inkBloom = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: numbe
     ctx.fillStyle = g; ctx.fill();
   }
   ctx.restore();
+};
+
+// un baimiao qui se trace (trace_baimiao.py : R = instant d'arrivée, A = encre), dessiné dans le rectangle (x, y, w, h)
+let bmCache: { data: Uint8ClampedArray; cv: HTMLCanvasElement; last: number } | null = null;
+const drawBaimiao = (ctx: CanvasRenderingContext2D, p: number, x: number, y: number, w: number, h: number) => {
+  const im = IMG.yx;
+  if (!im || p <= 0) return;
+  if (!bmCache) { const cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height; const c = cv.getContext('2d', { willReadFrequently: true })!; c.drawImage(im, 0, 0); bmCache = { data: c.getImageData(0, 0, im.width, im.height).data.slice(), cv, last: -1 }; }
+  const thr = p * 262;
+  if (Math.abs(thr - bmCache.last) > 0.01) {
+    const c = bmCache.cv.getContext('2d', { willReadFrequently: true })!, out = c.createImageData(im.width, im.height), o = out.data, d = bmCache.data;
+    for (let i = 0; i < d.length; i += 4) { const a = d[i + 3]; if (!a) continue; const hd = Math.min(1, Math.max(0, (thr - d[i]) / 8)); if (hd <= 0) continue; o[i] = INK[0]; o[i + 1] = INK[1]; o[i + 2] = INK[2]; o[i + 3] = a * hd; }
+    c.putImageData(out, 0, 0); bmCache.last = thr;
+  }
+  ctx.drawImage(bmCache.cv, x, y, w, h);
 };
 
 // ════════════════ 1. Accroche : « parler » se dédouble → deux gouttes d'encre donnent 語 et 言 → un diptyque peint se
@@ -673,7 +688,21 @@ const Royaumes: React.FC = () => {
           });
         }} />
       </Cam>
-      <Placeholder title="Les conseillers · papier découpé" sub="deux silhouettes Nano Banana détourées (A_FOURNIR.md, § 2)" a={win(t, co - 0.3, sc - 0.4, 0.5)} />
+      {/* deux conseillers en papier découpé, face à face : ils se renvoient la parole (un balancement chacun son tour) */}
+      <Draw draw={(ctx, tt) => {
+        const a = win(tt, co - 0.4, sc - 0.3, 0.6);
+        if (a <= 0 || !IMG.ca || !IMG.cb) return;
+        const turn = Math.floor(Math.max(0, tt - ar) / 0.8) % 2, ph = ((Math.max(0, tt - ar)) % 0.8) / 0.8, act = seg(tt, ar - 0.2, ar + 0.2);
+        ([[IMG.ca, 620, 1, 0], [IMG.cb, 1300, -1, 1]] as [HTMLImageElement, number, number, number][]).forEach(([im, x, dir, who], k) => {
+          const enter = ease(seg(tt, co - 0.4 + 0.3 * k, co + 0.6 + 0.3 * k)), H = 620, W2 = (im.width / im.height) * H;
+          const lean = act * (turn === who ? 0.07 * Math.sin(Math.PI * ph) : 0) * dir;
+          ctx.save(); ctx.globalAlpha = a; ctx.translate(x - dir * 260 * (1 - enter), 900); ctx.rotate(lean);
+          ctx.shadowColor = 'rgba(80,20,10,0.25)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 6;
+          ctx.drawImage(im, -W2 / 2, -H, W2, H); ctx.restore();
+        });
+        // la parole qui passe de l'un à l'autre : trois points d'encre vermillon
+        if (act > 0) { const f = ph, dir2 = turn === 0 ? 1 : -1; for (let i = 0; i < 3; i++) { const u = clamp(f * 1.3 - i * 0.15), x = 960 - dir2 * 200 + dir2 * 400 * u; ctx.save(); ctx.globalAlpha = a * act * Math.sin(Math.PI * u); ctx.fillStyle = rgb(VER, 0.9); ctx.beginPath(); ctx.arc(x, 420 - 60 * Math.sin(Math.PI * u), 10, 0, 7); ctx.fill(); ctx.restore(); } }
+      }} />
       <Caption text="le cinq dédoublé · sceaux du royaume de Jin" a={win(t, em - 0.1, PB.debut, 0.4)} y={940} size={44} />
       <EraTag {...cartouche('royaumes', 'Ve–IIIe siècle av. J.-C.')} a={seg(t, A5 - 0.4, A5 + 0.4) * (1 - seg(t, PB.debut, PB.debut + 0.5))} />
       {void ar}{void he}
@@ -762,7 +791,14 @@ const Han: React.FC = () => {
       <Caption text="« Parler tout droit : 言. Discuter, répliquer : 語. »" a={win(t, p0 + 0.2, rp + 0.2, 0.4)} y={940} size={46} />
       <Label x={560} y={880} zh="言" text="yán" color={VER} a={win(t, rp, tb - 0.4, 0.4)} align="center" />
       <Label x={1320} y={880} zh="語" text="yǔ" color={VER} a={win(t, dc, tb - 0.4, 0.4)} align="center" />
-      <Placeholder title="Image classique · à choisir" sub="par défaut : un banquet silencieux, estampage de pierre gravée Han" a={win(t, tb - 0.2, B('b06') + 0.3, 0.5)} />
+      {/* le banquet silencieux : estampage (image recomposée), révélé sur « Voilà pourquoi on ne 語 pas à table » */}
+      <Draw draw={(ctx, tt) => {
+        const a = win(tt, tb - 0.2, B('b06') + 0.4, 0.6), im = IMG.banquet;
+        if (a <= 0 || !im) return;
+        const z = 1 + 0.05 * seg(tt, tb, B('b06') + 0.4), w = 1320 * z, h = (im.height / im.width) * w;
+        ctx.save(); ctx.globalAlpha = a; ctx.shadowColor = 'rgba(30,20,10,0.4)'; ctx.shadowBlur = 40; ctx.drawImage(im, 1010 - w / 2, 520 - h / 2, w, h); ctx.restore();
+      }} />
+      <Caption text="banquet · estampage d'un relief de pierre (image recomposée)" a={win(t, tb + 0.4, B('b06') + 0.3, 0.4)} y={940} size={44} />
       <EraTag {...cartouche('han', "vers l'an 100 · le dictionnaire")} a={seg(t, A6 - 0.5, A6 + 0.3) * (1 - seg(t, B('b06'), B('b06') + 0.5))} />
       {void li}
     </AbsoluteFill>
@@ -797,7 +833,18 @@ const YangXiong: React.FC = () => {
           E.text(ctx, '方言', 620, 470, { font: 'ShuimoKai', size: 260, color: inkCss, alpha: ba * seg(tt, lv + 0.6, lv + 1.2) });
         }} />
       </Cam>
-      <Placeholder title="Médaillon · Yang Xiong 揚雄" sub="portrait au trait à générer (portrait.py) · « portrait imaginé »" a={win(t, A7 + 0.2, mapFrom + 0.2, 0.5)} />
+      {/* médaillon au trait de Yang Xiong, qui se trace dès qu'il est nommé */}
+      <Draw draw={(ctx, tt) => {
+        const m = win(tt, A7 + 0.3, mapFrom + 0.3, 0.5);
+        if (m <= 0) return;
+        ctx.save(); ctx.globalAlpha = m;
+        ctx.shadowColor = 'rgba(40,30,20,0.28)'; ctx.shadowBlur = 34; ctx.fillStyle = '#f6f0e4'; ctx.beginPath(); ctx.ellipse(1300, 470, 300, 360, 0, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
+        ctx.strokeStyle = rgb(VER, 0.75); ctx.lineWidth = 4; ctx.beginPath(); ctx.ellipse(1300, 470, 284, 344, 0, 0, 7); ctx.stroke(); ctx.clip();
+        drawBaimiao(ctx, clamp((tt - (A7 + 0.6)) / 2.6), 1300 - 0.78 * 760, 500 - 0.78 * 400, 1376 * 0.78, 768 * 0.78);
+        ctx.restore();
+      }} />
+      <Label x={560} y={520} zh="揚雄" text="Yang Xiong" color={INK} a={win(t, A7 + 0.8, mapFrom + 0.2, 0.4)} align="center" />
+      <Caption text="portrait imaginé" a={win(t, A7 + 1.2, mapFrom + 0.2, 0.4)} y={940} size={44} />
       <MapPanel from={mapFrom} to={mapTo} draw={(ctx, u, E, tt) => {
         const v = { lon: 112.5, lat: 34.2, k: 52 }, vb = v;
         E.mapLayer(ctx, v, vb, 120, 'yu_han', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));

@@ -5,7 +5,7 @@ Déposez les fichiers tels quels, sous n'importe quel nom : je les renomme et le
 ## 1. Glyphes anciens — FAIT
 語, 言, 吾, 五 (小學堂, CC0) → `glyphes/*_xiaoxue/`, planche `glyphes/planche_xiaoxue.png`. Rien à fournir.
 
-## 2. Conseillers en papier découpé (bloc 5) — Nano Banana, 2 images
+## 2. Conseillers en papier découpé (bloc 5) — FAIT (`images/conseiller_a.png`, `conseiller_b.png`, détourés)
 Fond **blanc uni** (détourage par `outils/video_shuimo/detourer.py`), 1:1, ≥ 1024 px. Deux poses, une par image.
 Aucun texte.
 
@@ -23,7 +23,7 @@ Aucun texte.
 > A stout older court strategist in a long cross-collar robe with wide sleeves and a soft rounded cap, standing in
 > profile facing left, index finger raised in objection, leaning slightly back, a sly half-smile.
 
-## 3. Image classique (bloc 6) — **sujet à confirmer** ; proposition par défaut : le banquet silencieux
+## 3. Image classique (bloc 6) — FAIT : banquet silencieux en estampage (`images/banquet_estampage.jpg`)
 Nano Banana, 16:9, ≥ 1376 × 768. Tiers droit vide (食不語 y sera calligraphié au montage). Aucun texte dans l'image.
 
 **Scène (par défaut) :**
@@ -37,7 +37,7 @@ Nano Banana, 16:9, ≥ 1376 × 768. Tiers droit vide (食不語 y sera calligrap
 > on a dense black ink ground, details incised as fine lines, stone grain and uneven ink density, composition in a
 > single horizontal register with a carved border line at top and bottom.
 
-## 5. Médaillon de Yang Xiong en baimiao 白描 (bloc 7) — Nano Banana, 16:9, ≥ 1920 px
+## 5. Médaillon de Yang Xiong en baimiao 白描 (bloc 7) — FAIT (`images/yangxiong_baimiao.jpg`, tracé `yangxiong_trace.png`)
 Rien que du trait noir sur blanc pur : je l'anime trait par trait (`trace_baimiao.py`) dans un médaillon, avec la
 mention « portrait imaginé ».
 ```
