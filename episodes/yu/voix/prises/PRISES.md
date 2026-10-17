@@ -54,3 +54,5 @@ Durée totale : 8 min 20 s
 | b10 | prise 2 | 8:03.4 |
 
 Durée : 8 min 18 s
+
+**Retenues (17/10)** : prise 1 de chaque bloc (v2 pour b01–b06, b08–b10 ; v1 pour b07).

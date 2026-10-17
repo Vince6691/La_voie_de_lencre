@@ -312,7 +312,7 @@ const Opening: React.FC = () => {
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[0, 960, 540, 1.02], [pr - 0.2, 1320, 540, 1.0, 1.0], [tb - 0.3, 1320, 400, 1.14, 1.2], [lt - 0.3, 1320, 680, 1.14, 1.0], [it - 0.3, 960, 540, 1.0, 1.2], [pa - 0.4, 960, 520, 1.06, 1.2]]} punch={[dx + 0.6, tb + 0.2, lt + 0.2, pa]}>
+      <Cam keys={[[0, 960, 540, 1.02], [pr - 0.2, 1400, 540, 1.0, 1.0], [tb - 0.3, 1440, 440, 1.08, 1.2], [lt - 0.3, 1440, 600, 1.08, 1.0], [it - 0.3, 960, 540, 1.0, 1.2], [pa - 0.4, 960, 520, 1.06, 1.2]]} punch={[dx + 0.6, tb + 0.2, lt + 0.2, pa]}>
         <Draw draw={(ctx, tt, E) => {
           // le précepte en colonne, caractère par caractère ; 語 puis 言 en vermillon sur leur mot
           const col = seg(tt, pr - 0.3, pr + 0.3) * (1 - seg(tt, it - 0.4, it + 0.3));
@@ -322,7 +322,7 @@ const Opening: React.FC = () => {
             const isY = i === 2, isL = i === 5;
             const hl = isY ? seg(tt, tb, tb + 0.4) : isL ? seg(tt, lt, lt + 0.4) : 0;
             const y = 150 + i * 112 + (i > 2 ? 30 : 0);
-            E.text(ctx, c, 1320, y, { font: 'ShuimoKai', size: 116, color: rgb(mixc(INK, VER, hl)), alpha: k * col * (hl > 0 || tt < tb ? 1 : 0.55), glow: 20 * hl, glowColor: rgb(VER, 0.6) });
+            E.text(ctx, c, 1480, y, { font: 'ShuimoKai', size: 116, color: rgb(mixc(INK, VER, hl)), alpha: k * col * (hl > 0 || tt < tb ? 1 : 0.55), glow: 20 * hl, glowColor: rgb(VER, 0.6) });
           });
           const two = pair(tt);
           if (two > 0) {
@@ -332,10 +332,10 @@ const Opening: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, pr + 2.0, it - 0.2, 0.5)} y={905} size={46} />
-      <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, pr - 0.2, tb - 0.4, 0.4)} y={140} size={44} />
-      <Label x={1010} y={300} zh="語" text="yǔ" color={VER} a={win(t, tb + 0.1, lt + 1.4, 0.3)} align="right" />
-      <Label x={1010} y={830} zh="言" text="yán" color={VER} a={win(t, lt + 0.1, it - 0.2, 0.3)} align="right" />
+      <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, tb - 0.3, it - 0.2, 0.5)} y={905} size={46} />
+      <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, pr - 0.2, tb - 0.4, 0.4)} y={905} size={44} />
+      <Label x={1170} y={300} zh="語" text="yǔ" color={VER} a={win(t, tb + 0.1, lt + 1.4, 0.3)} align="right" />
+      <Label x={1170} y={830} zh="言" text="yán" color={VER} a={win(t, lt + 0.1, it - 0.2, 0.3)} align="right" />
       <Label x={640} y={830} zh="" text="yǔ" color={VER} a={Math.min(1, pair(t)) * seg(t, dx + 0.6, dx + 1.0) * (1 - out)} align="center" />
       <Label x={1280} y={830} zh="" text="yán" color={VER} a={Math.min(1, pair(t)) * seg(t, dx + 1.4, dx + 1.8) * (1 - out)} align="center" />
     </AbsoluteFill>
@@ -468,8 +468,8 @@ const Cloche: React.FC = () => {
       </Cam>
       <Placeholder title="Clip A · le carillon de bronze" sub="Seedance, 10 s (prompt : A_FOURNIR.md) — entrée par la mer de nuages" a={win(t, PL.debut + 0.2, fl - 0.1, 0.5)} />
       <Caption text="cloche de 余贎逐兒 · fin des Printemps et Automnes" a={win(t, fl + 0.4, ga - 0.3, 0.4)} y={940} size={44} />
-      <Label x={330} y={300} zh="言" text="la parole" color={VER} a={win(t, ga, re + 0.6, 0.3)} align="center" />
-      <Label x={330} y={760} zh="口" text="la bouche" color={AZ} a={win(t, de, re + 0.6, 0.3)} align="center" />
+      <Label x={240} y={300} zh="言" text="la parole" color={VER} a={win(t, ga, re + 0.6, 0.3)} align="center" />
+      <Label x={240} y={760} zh="口" text="la bouche" color={AZ} a={win(t, de, re + 0.6, 0.3)} align="center" />
       <Label x={1600} y={520} zh="五" text="le cinq" color={MAL} a={win(t, co, re + 0.6, 0.3)} align="center" />
       <EraTag {...cartouche('zhou', 'fin des Printemps et Automnes')} a={r3TagIn(R3A, t) * (1 - seg(t, B('b04'), B('b04') + 0.5))} />
     </AbsoluteFill>
