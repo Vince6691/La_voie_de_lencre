@@ -113,8 +113,11 @@ const Draw: React.FC<{ draw: (ctx: CanvasRenderingContext2D, t: number, E: any) 
     const E = W().E;
     if (!E || !ref.current) return;
     const ctx = ref.current.getContext('2d')!;
+    // état remis à zéro à chaque image : en rendu continu, une transformation, un filtre ou une opacité laissés par
+    // l'image précédente empêchaient l'effacement complet (dictionnaire figé sous 美国)
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.filter = 'none'; ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
     ctx.clearRect(0, 0, 1920, 1080);
-    draw(ctx, t, E);
+    ctx.save(); draw(ctx, t, E); ctx.restore();
   });
   return <canvas ref={ref} width={1920} height={1080} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;
 };
@@ -178,8 +181,9 @@ const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: n
 );
 // légende sur un voile de papier (lisible même sur un estampage sombre)
 // (au-dessus des 8 % du bas, où passe la barre de progression YouTube ; 44 px au moins, lisible au téléphone)
-const Caption: React.FC<{ text: string; a: number; y?: number; size?: number }> = ({ text, a, y = 900, size = 44 }) => (
-  <div style={{ position: 'absolute', width: '100%', top: Math.min(y, 975 - 1.7 * Math.max(size, 44)), textAlign: 'center', opacity: a }}>
+// `x` : centre de la légende quand elle doit éviter un objet (par défaut, centrée sur l'écran)
+const Caption: React.FC<{ text: string; a: number; y?: number; size?: number; x?: number }> = ({ text, a, y = 900, size = 44, x }) => (
+  <div style={{ position: 'absolute', top: Math.min(y, 975 - 1.7 * Math.max(size, 44)), textAlign: 'center', opacity: a, whiteSpace: 'nowrap', ...(x === undefined ? { width: '100%' } : { left: x, transform: 'translateX(-50%)' }) }}>
     <span style={{ display: 'inline-block', padding: '4px 22px', borderRadius: 14, background: 'rgba(246,241,231,0.78)', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: Math.max(size, 44), color: '#4b4038', textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</span>
   </div>
 );
@@ -440,7 +444,7 @@ const Opening: React.FC = () => {
         <Label x={980} y={300} zh="羊" text="le mouton" color={GOM} a={win(tf, mt + 0.6, dico - 0.3, 0.4)} />
         <Caption text="Xu Shen 許慎 · Shuowen jiezi, vers 100" a={win(tf, dico, haut - 0.2, 0.5)} y={960} size={42} />
         <Label x={980} y={720} zh="大" text="grand" color={AZ} a={win(tf, grand, song - 0.6, 0.4)} />
-        <Caption text="Xu Xuan 徐鉉 · note à son édition du Shuowen, 986" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} />
+        <Caption text="Xu Xuan 徐鉉 · note à son édition du Shuowen, 986" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} x={560} />
         <EraTag {...cartouche('han', "vers l'an 100")} a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
         <EraTag {...cartouche('song', 'Xe–XIIIe siècle')} a={win(tf, song, FREEZE + 0.2, 0.6)} />
       </>}
@@ -978,7 +982,8 @@ const Dico: React.FC = () => {
     <AbsoluteFill>
       <Cam keys={[[A10 - 0.3, 960, 540, 1.02], [cle, 700, 600, 1.12, 1.2], [dico + 0.6, 1180, 540, 1.1, 1.4], [trp + 0.4, 1200, 560, 1.14, 1.0]]} punch={[ray + 0.1, FLIP1, mg + 0.85, ms + 0.6]}>
         <Paper />
-        <Draw draw={(ctx, tt, E) => {
+        {/* démonté dès qu'il est invisible : un canvas seulement effacé n'était pas rafraîchi en rendu continu */}
+        {book > 0 && <Draw draw={(ctx, tt, E) => {
           const a = seg(tt, A10 - 0.3, A10 + 0.6) * (1 - seg(tt, mg - 0.2, mg + 0.4));
           if (a <= 0) return;
           // livre ouvert : page de gauche (index des clés), page de droite (羊部)
@@ -1018,7 +1023,7 @@ const Dico: React.FC = () => {
             E.text(ctx, py2, 1200, y - 20, { font: 'Cormorant', size: 44, weight: 700, align: 'left', color: '#5b4f44', alpha: pg });
             E.text(ctx, fr, 1200, y + 26, { font: 'Cormorant', size: 44, align: 'left', color: '#5b4f44', alpha: pg });
           });
-        }} />
+        }} />}
       </Cam>
       {/* 美国 : « le beau pays »… qui n'a rien de beau, c'est le « mé » d'Amérique ; puis 美食, la bonne cuisine */}
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: (1 - book) * (1 - seg(t, B('b10') - 0.3, B('b10'))) }}>
