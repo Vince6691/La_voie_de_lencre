@@ -106,7 +106,7 @@ Director's note: curiosity and warmth — he collects words like treasures. The 
 Constraints: no text overlays, no readable characters, no extra main characters, no deformed hands, no snap zooms.
 ```
 
-## 6. Accroche : diptyque jour / nuit et pinceau (bloc 1) — Nano Banana, 3 images
+## 6. Accroche : diptyque jour / nuit et pinceau (bloc 1) — FAIT (`precepte_jour.jpg`, `precepte_nuit.jpg`, `pinceau_main.png`, `pinceau_pointe_macro.png`, détourés)
 Le pinceau écrit 食不語 sur le panneau du jour et 寢不言 sur celui de la nuit, dans le **tiers droit laissé vide** de
 chaque panneau. Format carré (1:1), ≥ 1536 px. Aucun texte, aucun sceau dans les images.
 

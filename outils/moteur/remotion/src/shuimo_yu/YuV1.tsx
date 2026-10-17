@@ -52,7 +52,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.png', nuit: 'episodes/yu/images/precepte_nuit.png', pinceau: 'episodes/yu/images/pinceau_main.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -326,8 +326,9 @@ const drawBaimiao = (ctx: CanvasRenderingContext2D, p: number, x: number, y: num
 // l'un ici, l'autre là » : deux coups de pinceau vermillon les barrent → face à face, ils se répondent
 const PRECEPT = '食不語寢不言'.split('');
 const PKEYS = ['yu_p_shi', 'yu_p_bu', 'yu_kai', 'yu_p_qin', 'yu_p_bu', 'yu_yan_kai'];
-const PANELS = [{ x: 140, y: 70, w: 790, h: 780 }, { x: 990, y: 70, w: 790, h: 780 }];
-const PCHAR = (i: number) => ({ x: i < 3 ? 810 : 1660, y: 210 + (i % 3) * 240, size: 220 });
+// panneaux 16:9 côte à côte ; le précepte s'écrit dans la moitié droite, laissée vide, de chacun
+const PANELS = [{ x: 70, y: 200, w: 880, h: 495 }, { x: 970, y: 200, w: 880, h: 495 }];
+const PCHAR = (i: number) => ({ x: (i < 3 ? 70 : 970) + 0.74 * 880, y: 295 + (i % 3) * 152, size: 150 });
 // pinceau : chaque caractère a son créneau, chaque trait 75 % de geste et 25 % de pinceau levé ; renvoie la progression
 // (nombre de traits) et la position de la pointe, qui glisse d'un trait au suivant pendant la pause
 const strokeTip = (E: any, key: string, O: { x: number; y: number; size: number }, pr: number) => {
@@ -414,7 +415,7 @@ const Opening: React.FC = () => {
   const charPos = (i: 0 | 1, tt: number) => {
     const born = i === 0 ? { x: 640, y: 470 } : { x: 1280, y: 470 };
     const onScroll = PCHAR(i === 0 ? 2 : 5);
-    const lifted = i === 0 ? { x: 540, y: 440 } : { x: 1370, y: 440 };
+    const lifted = i === 0 ? { x: 470, y: 450 } : { x: 1370, y: 450 };
     const face = i === 0 ? { x: 700, y: 470 } : { x: 1220, y: 470 };
     const k1 = ease(seg(tt, (i === 0 ? tb : lt) - 0.1, (i === 0 ? tb : lt) + 0.7)), k2 = ease(seg(tt, df - 0.2, df + 0.8));
     const sz1 = 220;
@@ -426,7 +427,7 @@ const Opening: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Cam keys={[[0, 960, 540, 1.04], [dx, 960, 520, 1.0, 1.0], [pr - 0.1, 960, 470, 1.0, 1.0],
-        [qEnd + 0.05, 960, 460, 1.0, 1.7], [tb + 0.1, 560, 460, 1.12, 1.0], [lt + 0.1, 1360, 460, 1.12, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
+        [qEnd + 0.05, 960, 460, 1.0, 1.7], [tb + 0.1, 510, 450, 1.25, 1.0], [lt + 0.1, 1410, 450, 1.25, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
         punch={[y1 + 0.05, n1 + 0.05, tb + 0.6, lt + 0.6, it + 0.25, au + 0.25, pa + 0.2]}>
         <Draw draw={(ctx, tt, E) => {
           // 1. « parler » s'écrit, puis se dédouble au mot « deux »
@@ -481,19 +482,24 @@ const Opening: React.FC = () => {
               const { pr: pg, lift, gap } = writeSlot(tt, t0, t1, n);
               if (pg <= 0) return;
               const tr = ci + (i * (qEnd - ci)) / 6, rd = win(tt, tr, tr + 0.45, 0.12); // la voix le lit
-              E.drawStrokes(ctx, key, { ...O, progress: pg, brush: false, color: () => (i < 3 ? inkCss : 'rgb(22,22,30)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
+              E.drawStrokes(ctx, key, { ...O, progress: pg, brush: false, color: () => (i < 3 ? inkCss : 'rgb(238,232,214)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
             });
             const bt = brushAt(E, tt, w0, wEnd), brush = bt?.tip ?? null, lifted = bt?.lifted ?? 0;
             // la main et le pinceau (image détourée, pointe en bas au centre) ; levé entre deux traits
             const ba = seg(tt, w0 - 0.4, w0) * (1 - seg(tt, wEnd, wEnd + 0.5));
             if (brush && ba > 0) {
-              const bw = 380, im = IMG.pinceau;
-              ctx.save(); ctx.globalAlpha = ba; ctx.translate(brush[0] + 18 * lifted, brush[1] - 26 * lifted); ctx.rotate(-0.12);
-              if (im) ctx.drawImage(im, -bw / 2, -bw * (im.height / im.width) * 0.97, bw, bw * (im.height / im.width));
-              else { ctx.strokeStyle = '#5a4030'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, -420); ctx.stroke(); ctx.fillStyle = inkCss; ctx.beginPath(); ctx.moveTo(-12, -40); ctx.quadraticCurveTo(0, 10, 12, -40); ctx.fill(); }
+              const hand = IMG.pinceau, tipIm = IMG.pointe, hA = 1 - seg(Z, 2.0, 3.4), pA = seg(Z, 2.0, 3.4);
+              ctx.save(); ctx.translate(brush[0] + 10 * lifted / Z, brush[1] - 22 * lifted / Z);
+              if (hand && hA > 0) { // main détourée : pointe du pinceau en (159, 1457) sur 1661 × 1460
+                const w = 520, s2 = w / hand.width; ctx.globalAlpha = ba * hA; ctx.drawImage(hand, -159 * s2, -1457 * s2, w, hand.height * s2);
+              }
+              if (tipIm && pA > 0) { // gros plan de la pointe : (86, 715) sur 180 × 719, ≈ 760 px de haut à l'écran
+                const h = 760 / Z, s2 = h / tipIm.height; ctx.globalAlpha = ba * pA; ctx.drawImage(tipIm, -86 * s2, -715 * s2, tipIm.width * s2, h);
+              }
+              if (!hand && !tipIm) { ctx.globalAlpha = ba; ctx.strokeStyle = '#5a4030'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, -420); ctx.stroke(); }
               ctx.restore();
             }
-            if (tt > qEnd - 0.3) drawSeal(ctx, E, 1740, 800, 56, '論', tt - qEnd + 0.3);
+            if (tt > qEnd - 0.3) drawSeal(ctx, E, 1800, 650, 48, '論', tt - qEnd + 0.3);
           }
           ctx.restore();
           // 4. la nuit tombe sur « Au lit » (lavis indigo, lune pâle), se lève sur « On interdit »
