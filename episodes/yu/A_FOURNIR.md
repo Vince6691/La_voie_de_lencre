@@ -135,3 +135,15 @@ Isolated on a pure plain white background, no shadow on the background, no table
 Vertical 2:3 composition.
 ```
 
+
+## 7. Anyang vue du ciel (ouverture du bloc 3) → `images/anyang_ciel.jpg`
+Plan « tableau » des Shang (le plastron est exclu : déjà montré dans d'autres épisodes). La caméra plonge vers la grande
+salle, puis l'estampage de 言 s'y pose. Nano Banana, **16:9**, ≥ 1920 × 1080. Même univers que le diptyque de
+l'accroche. **La grande salle un peu à droite du centre, vers les 3/5 de la hauteur** (cible de la plongée ; je recale si besoin).
+Coin haut gauche calme (cartouche). Aucun texte.
+```
+Chinese ink-wash painting (shuimo) on aged cream xuan paper, soft grey ink washes with touches of pale ochre, a small vermilion sun rising in the mist, delicate brushwork, misty edges fading into the bare paper. High bird's-eye view at dawn.
+A great walled settlement on the south bank of a wide river that curves around it: long timber halls with steep thatched roofs standing on raised rammed-earth platforms, arranged around open courtyards in rows facing south; the largest hall, with a broad stone-free earthen terrace and a wide flight of earthen steps, sits slightly right of center, about three fifths down the frame. Around the halls: clusters of small round thatched huts half sunk in the ground, a few workshops with thin smoke rising, narrow earth paths, millet fields in pale ochre strips. No tiled roofs, no pagodas, no walls of brick, no stone bridges.
+Far in the background to the left, the faint blue-grey ridges of distant mountains; morning mist lying on the river and between the halls.
+Top-left corner kept calm and pale (only mist). 16:9 composition, no people visible at this distance, no text, no calligraphy, no seal, no signature, no border.
+```

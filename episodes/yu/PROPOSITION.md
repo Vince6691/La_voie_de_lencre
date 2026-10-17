@@ -63,8 +63,8 @@ une bouche, une langue qui en sort, et sans doute, au-dessus, le son qui s'envol
 Un autre signe compte : cinq. D'abord cinq traits, couchés l'un sur l'autre. Puis plus court : deux traits, et un X
 entre les deux. ⏸ Pose ce cinq sur une bouche, et tu obtiens 吾, qui voudra dire plus tard « moi ». Pourquoi cinq ?
 Pour le son. On prononçait les deux à peu près de la même façon.
-> plan : cartouche `shang` ; Anyang à l'aube (paysage) ; **pas de plastron** (déjà montré dans d'autres épisodes) :
-> l'estampage se pose sur « le devin grave » (bruitage gravure) ; 言 jiaguwen révélé en blanc puis à
+> plan : cartouche `shang` ; **plan « tableau » : Anyang vue du ciel** (lavis, image `anyang_ciel.jpg`), la caméra
+> plonge vers la grande salle ; **pas de plastron** (déjà montré dans d'autres épisodes) ; l'estampage se pose sur « le devin grave » (bruitage gravure) ; 言 jiaguwen révélé en blanc puis à
 > l'encre, vermillon sur « une bouche », caméra bouche → langue → trait du haut ; précision discrète à l'écran
 > « lecture la plus répandue » (autre hypothèse : un instrument à vent) ; 五 en cinq traits (`wu5/00`) puis X entre
 > deux traits (`wu5/02`), fondu enchaîné net, malachite ; 吾 : le X descend sur une bouche azurite, coup de sceau ;

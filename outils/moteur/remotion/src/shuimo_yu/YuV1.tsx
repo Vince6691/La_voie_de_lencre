@@ -52,7 +52,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', anyang: 'episodes/yu/images/anyang_ciel.jpg' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -531,6 +531,8 @@ const Pieces: React.FC = () => {
 };
 
 // ════════════════ 3. La dynastie Shang : 言 (bouche, langue, son), 五 (cinq traits → croix), 吾
+// Anyang vue du ciel : position de la grande salle dans l'image (fraction de la largeur, de la hauteur), cible de la plongée
+const ANYANG_HALL = [0.56, 0.6];
 const Shang: React.FC = () => {
   const t = useT();
   const A3 = A('b03'), dv = at('b03', 'devin'), sg = at('b03', 'signe'), bo = at('b03', 'bouche'), la = at('b03', 'langue'), so = at('b03', 'son'), ci = at('b03', 'cinq'), tr = at('b03', 'traits'), cr = at('b03', 'croix'), po = at('b03', 'pose'), pq = at('b03', 'pourquoi'), pn = at('b03', 'prononcait');
@@ -542,6 +544,15 @@ const Shang: React.FC = () => {
       <Cam keys={[[A3 - 0.3, 960, 560, 1.0], [dv, 700, 520, 1.08, 2.4], [sg - 0.3, 960, 540, 1.0, 1.0], [bo - 0.2, 700, 700, 1.25, 0.9], [la - 0.1, 700, 560, 1.25, 0.9], [so - 0.1, 700, 300, 1.25, 1.0], [ci - 0.3, 960, 540, 1.0, 1.0], [tr - 0.2, 1240, 540, 1.12, 1.0], [po - 0.3, 1240, 560, 1.06, 1.2], [pq - 0.2, 960, 540, 1.0, 1.0]]}
         punch={[sg + 0.3, bo + 0.2, cr + 0.3, po + 0.8]} calm={[[R1 - 0.6, R1 + 3.6]]}>
         <Draw draw={(ctx, tt, E) => {
+          // plan « tableau » : Anyang vue du ciel (lavis), la caméra plonge vers la grande salle, l'estampage s'y pose
+          const im = IMG.anyang, ia = seg(tt, A3 - 0.3, A3 + 0.5) * (1 - seg(tt, dv + 0.1, dv + 0.9));
+          if (im && ia > 0) {
+            const k = ease(seg(tt, A3 - 0.3, dv + 0.9)), z = 1 + 1.3 * k;
+            const cov = Math.max(1920 / im.width, 1080 / im.height), w = im.width * cov, h = im.height * cov;
+            const fx = (ANYANG_HALL[0] - 0.5) * w * k, fy = (ANYANG_HALL[1] - 0.5) * h * k;
+            ctx.save(); ctx.globalAlpha = ia; ctx.translate(960, 540); ctx.scale(z, z); ctx.translate(-fx, -fy);
+            ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore();
+          }
           // 言 de l'os : l'estampage se pose sur « le devin grave », le signe s'y révèle en blanc, puis passe à l'encre ; bouche, langue, son (vermillon) chacun sur son mot
           const ya = seg(tt, dv - 0.2, dv + 0.8) * (1 - seg(tt, R1 - 0.5, R1));
           const side = ease(seg(tt, ci - 0.2, ci + 0.8));

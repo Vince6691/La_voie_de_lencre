@@ -58,3 +58,5 @@ Re-notes : Design 6,5 → **8,5** · Historique 7,5 → **8,5** · Technique et 
 le balayage gris (refusé) les retient sous 8.
 **Mise à jour (3)** : plastron **supprimé** à la demande de l'utilisateur (déjà montré dans d'autres épisodes ; ne pas le
 reproposer). L'estampage de 言 se pose dès « le devin grave » (avec la gravure), le signe se révèle toujours sur « signe ».
+**Remplacement** : tableau Shang = **Anyang vue du ciel** (choisi parmi : le devin qui parle, Anyang vue du ciel, la bouche
+qui parle) ; image à fournir (A_FOURNIR §7), plongée vers la grande salle (`ANYANG_HALL` à recaler sur l'image).
