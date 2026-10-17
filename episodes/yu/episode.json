@@ -164,5 +164,545 @@
    "armee": "Pourtant"
   }
  },
- "bruitages": []
+ "bruitages": [],
+ "glyphes": {
+  "reels": {
+   "yu_jinwen": {
+    "img": "glyphes/yu_xiaoxue/00.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "余贎逐兒鐘",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        215,
+        0
+       ],
+       [
+        215,
+        238
+       ],
+       [
+        0,
+        238
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        238
+       ],
+       [
+        215,
+        238
+       ],
+       [
+        215,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_xi": {
+    "img": "glyphes/yu_xiaoxue/02.png",
+    "label": "璽印",
+    "era": "Royaumes",
+    "piece": "璽彙2774 (Jin)",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        200,
+        0
+       ],
+       [
+        200,
+        162
+       ],
+       [
+        0,
+        162
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        162
+       ],
+       [
+        200,
+        162
+       ],
+       [
+        200,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_xi2": {
+    "img": "glyphes/yu_xiaoxue/03.png",
+    "label": "璽印",
+    "era": "Royaumes",
+    "piece": "璽彙3193 (Jin)",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        200,
+        0
+       ],
+       [
+        200,
+        155
+       ],
+       [
+        0,
+        155
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        155
+       ],
+       [
+        200,
+        155
+       ],
+       [
+        200,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_chu": {
+    "img": "glyphes/yu_xiaoxue/04.png",
+    "label": "楚簡",
+    "era": "Royaumes",
+    "piece": "郭店·五行34",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        200,
+        0
+       ],
+       [
+        200,
+        180
+       ],
+       [
+        0,
+        180
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        180
+       ],
+       [
+        200,
+        180
+       ],
+       [
+        200,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_xiaozhuan": {
+    "img": "glyphes/yu_xiaoxue/05.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·言部",
+    "defaut": "bouche",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        190,
+        0
+       ],
+       [
+        190,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ],
+     [
+      "cinq",
+      [
+       [
+        190,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        228
+       ],
+       [
+        190,
+        228
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_mawangdui": {
+    "img": "glyphes/yu_xiaoxue/07.png",
+    "label": "帛書",
+    "era": "Han",
+    "piece": "縱橫家書 (馬王堆)",
+    "defaut": "bouche",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        190,
+        0
+       ],
+       [
+        190,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ],
+     [
+      "cinq",
+      [
+       [
+        190,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        205
+       ],
+       [
+        190,
+        205
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_lishu": {
+    "img": "glyphes/yu_xiaoxue/08.png",
+    "label": "隸書",
+    "era": "Han",
+    "piece": "祀三公山碑",
+    "defaut": "bouche",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        190,
+        0
+       ],
+       [
+        190,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ],
+     [
+      "cinq",
+      [
+       [
+        190,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        197
+       ],
+       [
+        190,
+        197
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_yan_jiaguwen": {
+    "img": "glyphes/yan_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲499 (言)",
+    "defaut": "langue",
+    "polys": [
+     [
+      "trait",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        62
+       ],
+       [
+        0,
+        62
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        250
+       ],
+       [
+        400,
+        250
+       ],
+       [
+        400,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_wu_jiaguwen": {
+    "img": "glyphes/wu_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "燕796 (吾)",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "bouche",
+      [
+       [
+        0,
+        196
+       ],
+       [
+        400,
+        196
+       ],
+       [
+        400,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_wu5_traits": {
+    "img": "glyphes/wu5_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "林1.18.13 (五)",
+    "defaut": "cinq",
+    "polys": []
+   },
+   "yu_wu5_croix": {
+    "img": "glyphes/wu5_xiaoxue/02.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲561 (五)",
+    "defaut": "cinq",
+    "polys": []
+   },
+   "yu_shi_jiaguwen": {
+    "img": "glyphes/shi_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "鐵4.3 (𠂤)",
+    "defaut": "encre",
+    "polys": []
+   }
+  },
+  "traits": {
+   "yu_kai": {
+    "src": "glyphes/traits/yu.json",
+    "comp": [
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "cinq",
+     "cinq",
+     "cinq",
+     "cinq",
+     "bouche",
+     "bouche",
+     "bouche"
+    ]
+   },
+   "yu_simp": {
+    "src": "glyphes/traits/yu_simp.json",
+    "comp": [
+     "parole",
+     "parole",
+     "cinq",
+     "cinq",
+     "cinq",
+     "cinq",
+     "bouche",
+     "bouche",
+     "bouche"
+    ]
+   },
+   "yu_yan_kai": {
+    "src": "glyphes/traits/yan.json",
+    "comp": [
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole"
+    ]
+   },
+   "yu_wu_kai": {
+    "src": "glyphes/traits/wu.json",
+    "comp": [
+     "cinq",
+     "cinq",
+     "cinq",
+     "cinq",
+     "bouche",
+     "bouche",
+     "bouche"
+    ]
+   },
+   "yu_shi_kai": {
+    "src": "glyphes/traits/shi.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
+   }
+  }
+ }
 }
