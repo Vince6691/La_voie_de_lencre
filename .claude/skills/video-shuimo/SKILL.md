@@ -30,6 +30,8 @@ Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temp
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
 
 ## Principes
+- **Note artistique** (skill `note-artistique`) : à la fin du plan, de la voix, des images fixes et du rendu vidéo, proposer
+  la note des quatre experts (Technique, Artistique, Design, Storytelling, objectif 8/10) ; corrections après validation.
 - **Toujours dialoguer avec l'utilisateur en français.**
 - **Vidéo autonome** : un renvoi à un épisode précédent est permis, mais on réexplique toujours les bases (un caractère
   = un assemblage de petits dessins ; ce que représente chaque composante), quitte à se répéter d'un épisode à l'autre.
