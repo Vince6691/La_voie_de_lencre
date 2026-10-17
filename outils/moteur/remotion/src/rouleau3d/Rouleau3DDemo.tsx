@@ -1,12 +1,12 @@
-// Démo du rouleau du temps en 3D : plan Zhou (2D) → rouleau 3D (5 s) → plan des Royaumes combattants (2D).
+// Démos du rouleau du temps en 3D : plan Zhou (2D) → rouleau 3D → plan des Royaumes combattants (2D).
+// Rouleau3DDemo : version complète (5,3 s, sceau miel) ; Rouleau3DCourtDemo : version courte (3,6 s, sceau rouge).
 import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Sequence, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose } from '../shuimo/layout';
-import { Rouleau3DConfig, Rouleau3DStage, r3TagIn } from './Rouleau3D';
+import { Rouleau3DConfig, Rouleau3DStage, r3Seconds, r3TagIn } from './Rouleau3D';
 
-export const ROULEAU3D_DEMO_SECONDS = 8.1;
-const CFG: Rouleau3DConfig = {
+const BASE: Rouleau3DConfig = {
   at: 1.2, from: 1, to: 2, years: [-1046, -300],
   eras: [{ zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '戰', date: '−300' }, { zh: '秦', date: '−221' }],
   fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' },
@@ -23,7 +23,13 @@ const Tag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({
   </div>
 );
 
-export const Rouleau3DDemo: React.FC = () => {
+const CFG_COMPLET: Rouleau3DConfig = { ...BASE };
+const CFG_COURT: Rouleau3DConfig = { ...BASE, variant: 'court', stone: 'rouge' };
+export const ROULEAU3D_DEMO_SECONDS = BASE.at + r3Seconds(CFG_COMPLET) + 1.6;
+export const ROULEAU3D_COURT_DEMO_SECONDS = BASE.at + r3Seconds(CFG_COURT) + 1.6;
+export const Rouleau3DDemo: React.FC = () => <Demo CFG={CFG_COMPLET} />;
+export const Rouleau3DCourtDemo: React.FC = () => <Demo CFG={CFG_COURT} />;
+const Demo: React.FC<{ CFG: Rouleau3DConfig }> = ({ CFG }) => {
   const [h] = useState(() => delayRender('polices'));
   useEffect(() => {
     Promise.all([
@@ -33,13 +39,13 @@ export const Rouleau3DDemo: React.FC = () => {
   }, [h]);
   const { fps } = useVideoConfig();
   const t = useCurrentFrame() / fps;
-  const end = CFG.at + 5.3;
+  const end = CFG.at + r3Seconds(CFG);
   return (
     <AbsoluteFill style={{ background: '#f8f5ee' }}>
       <Sequence durationInFrames={Math.round((CFG.at + 0.2) * fps)}>
         <ShuimoBackground shot={compose(9, { move: 'still', mood: 'jour', duration: 10 })} duration={10} halo={false} />
       </Sequence>
-      <Sequence from={Math.round((end - 0.3) * fps)}>
+      <Sequence from={Math.round((CFG.variant === 'court' ? CFG.at + 2.9 : end - 0.3) * fps)}>
         <ShuimoBackground shot={compose(26, { move: 'still', mood: 'brume', duration: 10 })} duration={10} halo={false} />
       </Sequence>
       <Tag zh="周" name="DYNASTIE ZHOU" dates="XIe siècle av. J.-C." a={1 - clamp((t - CFG.at + 0.3) / 0.4)} />

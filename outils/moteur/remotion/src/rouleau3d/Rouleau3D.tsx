@@ -25,6 +25,8 @@ export type Rouleau3DConfig = {
   fromLand: { seed: number; mood: Mood }; toLand: { seed: number; mood: Mood };
   midSeeds?: number[]; // paysages traversés (2), puis 2 marges
   periods?: { from: number; zh: string; name: string }[]; // périodes affichées au-dessus du compteur d'années
+  variant?: 'complet' | 'court'; // complet 5,3 s (verticale → rasante → plongée) ; court 3,6 s (rasante d'emblée, sortie en fondu)
+  stone?: 'miel' | 'rouge'; // pierre du sceau : Shoushan miel, ou pierre « sang de poulet » (鸡血石) rouge
 };
 
 // ── géométrie de la peinture, en « pixels de plan » P (un plan 2D = 1920 × 1080 P) ──
@@ -50,17 +52,18 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const V3 = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 const vl = (a: THREE.Vector3, b: THREE.Vector3, k: number) => a.clone().lerp(b, k);
 
-const LEN_REF = 5.8; // déroulé de référence : défilement 4 s, impact à 4 s, tenue sur le sceau, plongée
-// le premier mouvement (verticale → s'élève) est resserré : 0,5 s gagnées sur les 1,7 premières secondes, sans à-coup
-const GAIN = 0.5, LEN = LEN_REF - GAIN;
-const toRef = (u: number) => (u <= 0 ? u : u + GAIN * sm(u / (1.7 - GAIN)));
-const dur = (c: Rouleau3DConfig) => c.duration ?? LEN;
-// temps de référence (déroulé de 5 s) : on étire tout si la durée change
-const tRef = (c: Rouleau3DConfig, t: number) => toRef(((t - c.at) * LEN) / dur(c));
-const IMPACT = 4.0;
-const centerAt = (s: number) => lerp(C0, C1, travelM(s / 5)); // P au centre du rouleau (x = 0)
 const yearFmt = (y: number) => (y < 0 ? `−${Math.abs(Math.round(y))}` : `${Math.round(y)}`);
-export const r3TagIn = (c: Rouleau3DConfig, t: number) => sm(seg(tRef(c, t), 6.05, 6.45));
+// déroulés : V(c) donne les temps de chaque variante (en temps de référence s, 0 = début du rouleau)
+type Timing = {
+  len: number; toRef: (u: number) => number; lenRef: number; impact: number; travel: (s: number) => number;
+  cam: (s: number) => { p: THREE.Vector3; l: THREE.Vector3 };
+  canvasIn: [number, number]; canvasOut: [number, number]; year: [number, number, number, number]; petals: [number, number, number, number];
+  seal: { show: number; appear: number; fly: [number, number]; fade: [number, number] }; tag: [number, number]; sound: string; stampOff: number;
+};
+const dur = (c: Rouleau3DConfig) => c.duration ?? V(c).len;
+const tRef = (c: Rouleau3DConfig, t: number) => { const v = V(c); return v.toRef(((t - c.at) * v.len) / dur(c)); };
+export const r3Seconds = (c: Rouleau3DConfig) => dur(c);
+export const r3TagIn = (c: Rouleau3DConfig, t: number) => { const v = V(c); return sm(seg(tRef(c, t), v.tag[0], v.tag[1])); };
 
 // ── la peinture du rouleau (une seule fois) ──
 const shotsOf = (c: Rouleau3DConfig): Shot[] => {
@@ -90,6 +93,66 @@ const drawSealSquare = (g: CanvasRenderingContext2D, x: number, y: number, s: nu
   }
   g.restore();
 };
+// ── inscriptions (題跋) : poèmes en colonnes de droite à gauche, signature plus petite, sceaux de nom et de collection.
+// Placés hors des plans de départ et d'arrivée (qui doivent rester identiques aux plans 2D). Encre réaliste : densité
+// variable d'un caractère à l'autre, légère bavure dans les fibres, manques du pinceau sec.
+type Inscr = { x: number; y: number; size: number; font: string; cols: string[]; sig?: string; seal?: string; ink?: number };
+const INSCRIPTIONS: Inscr[] = [
+  { x: 1600, y: 190, size: 70, font: 'ShuimoKai', cols: ['嫋嫋兮秋風', '洞庭波兮', '木葉下'], sig: '錄楚辭湘夫人 丙申秋日', seal: '遊心', ink: 0.85 },
+  { x: 5560, y: 170, size: 78, font: 'ShuimoKai', cols: ['蒹葭蒼蒼', '白露為霜', '所謂伊人', '在水一方'], sig: '錄詩經蒹葭於墨道山房', seal: '墨道', ink: 0.92 },
+  { x: 6500, y: 160, size: 90, font: 'ShuimoCao', cols: ['千山鸟飞绝', '万径人踪灭', '孤舟蓑笠翁', '独钓寒江雪'], sig: '柳宗元江雪', seal: '雲水', ink: 0.95 },
+  { x: 10950, y: 200, size: 72, font: 'ShuimoKai', cols: ['行到水窮處', '坐看雲起時'], sig: '王維句', seal: '長樂', ink: 0.88 },
+];
+// sceaux de collection, épars près des bords des feuilles (comme sur les rouleaux anciens)
+// (les sceaux utilisent fonts/ChongxiSeal-sceaux.otf, sous-ensemble de ChongxiSeal : ajouter les caractères avec pyftsubset)
+const COLLECT: { x: number; y: number; size: number; text: string; white: boolean }[] = [
+  { x: 3990, y: 1040, size: 92, text: '墨道珍藏', white: true }, { x: 5700, y: 980, size: 62, text: '清賞', white: false },
+  { x: 7560, y: 210, size: 70, text: '神品', white: true }, { x: 260, y: 1010, size: 80, text: '寶', white: false },
+];
+const sealStamp = (g: CanvasRenderingContext2D, x: number, y: number, size: number, text: string, white: boolean, seed: number) => {
+  const R0 = rng(seed), n = text.length, cols = n > 2 ? 2 : 1, rows = Math.ceil(n / cols), w = cols === 1 && n === 2 ? size * 0.62 : size;
+  const t = document.createElement('canvas'); t.width = Math.ceil(w) + 8; t.height = Math.ceil(size) + 8; const q = t.getContext('2d')!;
+  q.translate(4, 4);
+  q.fillStyle = 'rgb(178,40,32)';
+  if (white) q.fillRect(0, 0, w, size); else { q.lineWidth = size * 0.06; q.strokeStyle = q.fillStyle; q.strokeRect(size * 0.03, size * 0.03, w - size * 0.06, size - size * 0.06); }
+  q.globalCompositeOperation = white ? 'destination-out' : 'source-over';
+  q.textAlign = 'center'; q.textBaseline = 'middle'; const fs = (size / rows) * 0.92; q.font = `${fs}px ShuimoSceau`;
+  [...text].forEach((ch, i) => { const col = Math.floor(i / rows), row = i % rows; q.fillText(ch, w - (col + 0.5) * (w / cols), (row + 0.5) * (size / rows)); });
+  q.globalCompositeOperation = 'destination-out'; // usure, encre de sceau inégale
+  for (let i = 0; i < 90; i++) { q.globalAlpha = 0.2 + 0.6 * R0(); q.beginPath(); q.arc(R0() * w, R0() * size, 0.6 + R0() * size * 0.02, 0, 7); q.fill(); }
+  g.save(); g.globalAlpha = 0.86; g.translate(x, y); g.rotate((R0() - 0.5) * 0.04); g.drawImage(t, -t.width / 2, -t.height / 2); g.restore();
+};
+const inscribe = (g: CanvasRenderingContext2D, it: Inscr, seed: number) => {
+  const R0 = rng(seed), lh = it.size * 1.08, cw = it.size * 1.25, sigSize = it.size * 0.58;
+  const W = Math.ceil((it.cols.length + 1.2) * cw + 40), H = Math.ceil(Math.max(...it.cols.map((c) => c.length)) * lh + 260);
+  const t = document.createElement('canvas'); t.width = W; t.height = H; const q = t.getContext('2d')!;
+  q.textAlign = 'center'; q.textBaseline = 'top';
+  const ink = it.ink ?? 0.85;
+  it.cols.forEach((col, ci) => {
+    const cx = W - 20 - (ci + 0.5) * cw + (R0() - 0.5) * 4;
+    [...col].forEach((ch, k) => {
+      // le pinceau se recharge en tête de colonne : encre plus dense, puis s'éclaircit
+      const a = ink * (1 - 0.22 * (k / Math.max(1, col.length - 1))) * (0.9 + 0.1 * R0());
+      q.save(); q.translate(cx + (R0() - 0.5) * 3, 10 + k * lh + (R0() - 0.5) * 3); q.rotate((R0() - 0.5) * 0.03);
+      q.globalAlpha = a; q.fillStyle = 'rgb(24,19,15)'; q.font = `${it.size * (0.94 + 0.1 * R0())}px ${it.font}`; q.fillText(ch, 0, 0); q.restore();
+    });
+  });
+  let sealY = 0;
+  const sx = W - 20 - (it.cols.length + 0.45) * cw;
+  if (it.sig) {
+    const y0 = 10 + lh * 0.6;
+    [...it.sig].forEach((ch, k) => { if (ch === ' ') return; q.globalAlpha = ink * 0.85; q.fillStyle = 'rgb(24,19,15)'; q.font = `${sigSize}px ${it.font}`; q.fillText(ch, sx, y0 + k * sigSize * 1.05); });
+    sealY = y0 + it.sig.length * sigSize * 1.05 + sigSize * 0.4;
+  }
+  // pinceau sec : petits manques dans les traits
+  q.globalCompositeOperation = 'destination-out'; q.globalAlpha = 1;
+  for (let i = 0; i < W * H / 260; i++) { q.fillStyle = `rgba(0,0,0,${0.15 + 0.5 * R0()})`; q.fillRect(R0() * W, R0() * H, 1 + R0() * 2.5, 0.8 + R0() * 1.5); }
+  // bavure dans les fibres (copie floue, légère) puis le trait net, posés en « multiplier » sur le papier
+  g.save(); g.globalCompositeOperation = 'multiply';
+  g.filter = 'blur(1.6px)'; g.globalAlpha = 0.35; g.drawImage(t, it.x - W, it.y);
+  g.filter = 'none'; g.globalAlpha = 0.95; g.drawImage(t, it.x - W, it.y); g.restore();
+  if (it.seal) sealStamp(g, it.x - W + sx, it.y + sealY + it.size * 0.55, it.size * 1.05, it.seal, seed % 2 === 0, seed + 7);
+};
 const paintScroll = (c: Rouleau3DConfig, img: Record<string, HTMLImageElement>, paper: HTMLImageElement) => {
   const cv = document.createElement('canvas'); cv.width = Math.round(PW * Q); cv.height = Math.round(PH * Q);
   const g = cv.getContext('2d')!; g.scale(Q, Q);
@@ -116,6 +179,8 @@ const paintScroll = (c: Rouleau3DConfig, img: Record<string, HTMLImageElement>, 
     t.fillStyle = gr; t.fillRect(0, 0, tc.width, tc.height);
     g.drawImage(tc, k * SH - F, TOP);
   });
+  INSCRIPTIONS.forEach((it, i) => inscribe(g, it, 40 + i));
+  COLLECT.forEach((s2, i) => sealStamp(g, s2.x, s2.y, s2.size, s2.text, s2.white, 90 + i));
   // bordures de soie (haut et bas), filets d'encre
   const silk = (y: number, h: number) => { g.fillStyle = 'rgba(214,201,170,0.92)'; g.fillRect(0, y, PW, h); g.fillStyle = 'rgba(120,95,60,0.08)'; for (let x = 0; x < PW; x += 6) g.fillRect(x, y, 2, h); };
   silk(0, TOP); silk(TOP + 1080, PH - TOP - 1080);
@@ -181,14 +246,17 @@ const feltCanvas = () => {
   return cv;
 };
 // pierre de Shoushan couleur miel (tianhuang) : veines, nuages, fines « peaux de radis »
-const stoneCanvas = () => {
+const stoneCanvas = (red = false) => {
   const cv = document.createElement('canvas'); cv.width = cv.height = 512; const g = cv.getContext('2d')!;
-  const gr = g.createLinearGradient(0, 0, 0, 512); gr.addColorStop(0, '#e3ad5e'); gr.addColorStop(0.5, '#cf8f3e'); gr.addColorStop(1, '#b8742c');
+  const R0 = rng(red ? 21 : 8);
+  const gr = g.createLinearGradient(0, 0, 0, 512);
+  if (red) { gr.addColorStop(0, '#a3221b'); gr.addColorStop(0.5, '#8c1712'); gr.addColorStop(1, '#6e100d'); } // pierre « sang de poulet »
+  else { gr.addColorStop(0, '#e3ad5e'); gr.addColorStop(0.5, '#cf8f3e'); gr.addColorStop(1, '#b8742c'); }
   g.fillStyle = gr; g.fillRect(0, 0, 512, 512);
-  const R0 = rng(8);
   for (let i = 0; i < 60; i++) { const x = R0() * 512, y = R0() * 512, r = 20 + R0() * 80, rg = g.createRadialGradient(x, y, 0, x, y, r);
-    rg.addColorStop(0, R0() < 0.5 ? 'rgba(255,220,150,0.18)' : 'rgba(150,80,25,0.16)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
-  for (let i = 0; i < 14; i++) { g.strokeStyle = `rgba(120,55,15,${0.15 + R0() * 0.3})`; g.lineWidth = 0.6 + R0() * 1.6; g.beginPath();
+    rg.addColorStop(0, red ? (R0() < 0.55 ? 'rgba(225,60,45,0.28)' : R0() < 0.5 ? 'rgba(60,8,6,0.3)' : 'rgba(205,190,175,0.22)') : R0() < 0.5 ? 'rgba(255,220,150,0.18)' : 'rgba(150,80,25,0.16)');
+    rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
+  for (let i = 0; i < 14; i++) { g.strokeStyle = red ? `rgba(40,4,4,${0.2 + R0() * 0.35})` : `rgba(120,55,15,${0.15 + R0() * 0.3})`; g.lineWidth = 0.6 + R0() * 1.6; g.beginPath();
     let x = R0() * 512, y = R0() * 512; g.moveTo(x, y);
     for (let k = 0; k < 30; k++) { x += (R0() - 0.3) * 22; y += (R0() - 0.5) * 22; g.lineTo(x, y); } g.stroke(); }
   return cv;
@@ -208,38 +276,76 @@ const H0 = 3.375 / (2 * Math.tan((17.5 * Math.PI) / 180)); // hauteur qui cadre 
 const T = V3(STOP_X, 0, ZS - 0.45); // un peu au-delà du sceau : plus de peinture dans le champ
 const XEND = (SEAL1 - SEAL.dx - C1) / UNIT; // centre du plan d'arrivée à la fin
 const P3 = T.clone().add(V3(-1.55, 1.3, 3.1)), P4 = V3(XEND, H0, ZC);
-const KEYS: { t: number; p: THREE.Vector3; l: THREE.Vector3 }[] = [
-  { t: 0, p: V3(0, H0, ZC), l: V3(0, 0, ZC) },
-  { t: 1.0, p: V3(0.1, 6.6, ZC + 2.2), l: V3(0.5, 0, ZC - 0.15) },
-  { t: 2.2, p: T.clone().add(V3(-2.1, 1.55, 3.6)), l: T.clone() },
-  { t: 3.95, p: P3, l: T.clone().add(V3(0.2, 0, 0)) },
-  // tenue sur le sceau après l'impact : la caméra s'en approche à peine
-  { t: 4.8, p: P3.clone().lerp(T, 0.12), l: T.clone().add(V3(0.25, 0, 0.1)) },
-  { t: 5.3, p: P3.clone().lerp(P4, 0.5).add(V3(0, 1.3, 0)), l: T.clone().lerp(V3(XEND, 0, ZC), 0.6) },
-  { t: 5.8, p: P4, l: V3(XEND, 0, ZC) },
-];
-const PCURVE = new THREE.CatmullRomCurve3(KEYS.map((k) => k.p), false, 'centripetal');
-const LCURVE = new THREE.CatmullRomCurve3(KEYS.map((k) => k.l), false, 'centripetal');
-// paramètre de courbe en fonction du temps : cubique monotone (Fritsch–Carlson), vitesse nulle aux deux bouts
-const TMAP = (() => {
+
+type Key = { t: number; p: THREE.Vector3; l: THREE.Vector3 };
+// trajectoire lisse (Catmull-Rom) parcourue à vitesse continue : cubique monotone (Fritsch–Carlson), vitesse nulle aux bouts
+const path = (KEYS: Key[]) => {
+  const PC = new THREE.CatmullRomCurve3(KEYS.map((k) => k.p), false, 'centripetal');
+  const LC = new THREE.CatmullRomCurve3(KEYS.map((k) => k.l), false, 'centripetal');
   const x = KEYS.map((k) => k.t), y = KEYS.map((_, i) => i / (KEYS.length - 1)), n = x.length;
   const d = x.slice(0, -1).map((_, i) => (y[i + 1] - y[i]) / (x[i + 1] - x[i]));
   const m = x.map((_, i) => (i === 0 || i === n - 1 ? 0 : (2 * d[i - 1] * d[i]) / (d[i - 1] + d[i])));
-  return (t: number) => {
+  const tmap = (t: number) => {
     if (t <= x[0]) return 0; if (t >= x[n - 1]) return 1;
     let i = 0; while (t > x[i + 1]) i++;
     const h = x[i + 1] - x[i], u = (t - x[i]) / h, u2 = u * u, u3 = u2 * u;
     return (2 * u3 - 3 * u2 + 1) * y[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * y[i + 1] + (u3 - u2) * h * m[i + 1];
   };
-})();
-function camAt(s: number) {
-  const k = TMAP(s);
-  return { p: PCURVE.getPoint(k), l: LCURVE.getPoint(k) };
-}
+  return (s: number) => { const k = tmap(s); return { p: PC.getPoint(k), l: LC.getPoint(k) }; };
+};
+// complet : verticale (le plan 2D exact) → s'élève → rasante → glisse → impact, tenue → remonte → plonge à la verticale
+// (le premier mouvement est resserré : 0,5 s gagnées sur les 1,7 premières secondes, sans à-coup)
+const GAIN = 0.5;
+const COMPLET: Timing = {
+  len: 5.8 - GAIN, lenRef: 5.8, toRef: (u) => (u <= 0 ? u : u + GAIN * sm(u / (1.7 - GAIN))), impact: 4.0, travel: (s) => travelM(s / 5),
+  cam: path([
+    { t: 0, p: V3(0, H0, ZC), l: V3(0, 0, ZC) },
+    { t: 1.0, p: V3(0.1, 6.6, ZC + 2.2), l: V3(0.5, 0, ZC - 0.15) },
+    { t: 2.2, p: T.clone().add(V3(-2.1, 1.55, 3.6)), l: T.clone() },
+    { t: 3.95, p: P3, l: T.clone().add(V3(0.2, 0, 0)) },
+    { t: 4.8, p: P3.clone().lerp(T, 0.12), l: T.clone().add(V3(0.25, 0, 0.1)) }, // tenue sur le sceau
+    { t: 5.3, p: P3.clone().lerp(P4, 0.5).add(V3(0, 1.3, 0)), l: T.clone().lerp(V3(XEND, 0, ZC), 0.6) },
+    { t: 5.8, p: P4, l: V3(XEND, 0, ZC) },
+  ]),
+  canvasIn: [-0.35, -0.05], canvasOut: [5.78, 5.98], year: [0.7, 1.3, 4.85, 5.25], petals: [0.35, 1.2, 5.0, 5.5],
+  seal: { show: 5.78, appear: 5.78, fly: [5.98, 6.45], fade: [6.42, 6.52] }, tag: [6.05, 6.45], sound: 'rouleau/rouleau3d.wav', stampOff: 4.8,
+};
+// court : rasante d'emblée (fondu depuis le plan 2D), défilement, impact à 2,3 s, tenue, la caméra s'élève un peu et le plan
+// d'arrivée revient en fondu ; le sceau 2D prend le relais et s'envole vers le cartouche
+const COURT: Timing = {
+  len: 3.6, lenRef: 3.6, toRef: (u) => u, impact: 2.3, travel: (s) => travelM(s / 2.875),
+  cam: path([
+    { t: 0, p: T.clone().add(V3(-2.7, 1.7, 3.9)), l: T.clone().add(V3(-0.5, 0, 0)) },
+    { t: 2.2, p: P3, l: T.clone().add(V3(0.2, 0, 0)) },
+    { t: 2.9, p: P3.clone().lerp(T, 0.14), l: T.clone().add(V3(0.25, 0, 0.1)) },
+    { t: 3.6, p: P3.clone().lerp(T, 0.2).add(V3(0, 0.9, 0)), l: T.clone().add(V3(0.3, 0, 0.1)) },
+  ]),
+  canvasIn: [-0.3, 0], canvasOut: [2.95, 3.3], year: [0.05, 0.4, 2.7, 3.0], petals: [0, 0.4, 2.8, 3.2],
+  seal: { show: 2.95, appear: 3.15, fly: [3.15, 3.55], fade: [3.5, 3.6] }, tag: [3.2, 3.55], sound: 'rouleau/rouleau3d_court.wav', stampOff: 3.1,
+};
+const V = (c: Rouleau3DConfig) => (c.variant === 'court' ? COURT : COMPLET);
+// pose de la caméra à l'instant s (trajectoire + légère avancée à l'impact, aucune vibration) ; partagée par la scène 3D
+// et par le calcul de la place du sceau à l'écran (relais par le sceau 2D)
+const poseAt = (v: Timing, s: number) => {
+  const { p, l } = v.cam(s);
+  const di = s - v.impact, push = di < 0 ? 0 : 0.07 * Math.min(1, di / 0.05) * Math.exp(-Math.max(0, di - 0.05) * 4.5);
+  p.lerp(l, push);
+  const dir = l.clone().sub(p).normalize(), top = sm((-dir.y - 0.82) / 0.17);
+  return { p, l, up: V3(0, 1 - top, -top).normalize(), top };
+};
+const sealOnScreen = (v: Timing, s: number) => {
+  const cam = new THREE.PerspectiveCamera(35, 16 / 9, 0.05, 100), { p, l, up } = poseAt(v, s);
+  cam.up.copy(up); cam.position.copy(p); cam.lookAt(l); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
+  const x = (SEAL1 - lerp(C0, C1, v.travel(s))) / UNIT, h = SEAL.size / UNIT / 2;
+  const pr = (q: THREE.Vector3) => { const r = q.project(cam); return [(r.x + 1) * 960, (1 - r.y) * 540]; };
+  const c = pr(V3(x, 0, ZS)), a = pr(V3(x - h, 0, ZS)), b = pr(V3(x + h, 0, ZS)), u = pr(V3(x, 0, ZS - h)), d = pr(V3(x, 0, ZS + h));
+  const size = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  return { x: c[0], y: c[1], size, angle: Math.atan2(b[1] - a[1], b[0] - a[0]), squash: Math.hypot(d[0] - u[0], d[1] - u[1]) / size };
+};
 
 type Assets = { scroll: THREE.CanvasTexture; seal: THREE.CanvasTexture; roll: THREE.CanvasTexture; wood: THREE.CanvasTexture; woodBump: THREE.CanvasTexture; felt: THREE.CanvasTexture; stone: THREE.CanvasTexture; petal: THREE.CanvasTexture };
 const NP = 120, ND = 240;
-const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
+const Scene: React.FC<{ s: number; A: Assets; v: Timing; red: boolean }> = ({ s, A, v, red }) => {
   const { camera, gl } = useThree();
   const petals = useRef<THREE.InstancedMesh>(null), dust = useRef<THREE.Points>(null);
   const seeds = useMemo(() => { const r = rng(11); return Array.from({ length: Math.max(NP, ND) }, () => [r(), r(), r(), r(), r(), r()]); }, []);
@@ -257,15 +363,12 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
     return { knob, cord, box };
   }, [A, gl]);
 
-  const c = centerAt(s), travel = (c - C0) / UNIT;
+  const IMPACT = v.impact;
+  const c = lerp(C0, C1, v.travel(s)), travel = (c - C0) / UNIT;
   A.scroll.repeat.set((VIS * UNIT) / PW, 1); A.scroll.offset.set((c - (VIS * UNIT) / 2) / PW, 0);
   const sealX = (SEAL1 - c) / UNIT;
-  const { p, l } = camAt(s);
-  // impact : la caméra s'avance à peine vers le sceau (aucune vibration)
-  const di = s - IMPACT, push = di < 0 ? 0 : 0.07 * Math.min(1, di / 0.05) * Math.exp(-Math.max(0, di - 0.05) * 4.5);
-  p.lerp(l, push);
-  const dir = l.clone().sub(p).normalize(), top = sm((-dir.y - 0.82) / 0.17);
-  camera.up.copy(V3(0, 1 - top, -top).normalize()); camera.position.copy(p); camera.lookAt(l);
+  const { p, l, up: camUp, top } = poseAt(v, s), di = s - IMPACT;
+  camera.up.copy(camUp); camera.position.copy(p); camera.lookAt(l);
 
   // sceau de jade : descend (accéléré), frappe, remonte
   const down = seg(s, IMPACT - 0.5, IMPACT), up = seg(s, IMPACT + 0.3, IMPACT + 0.75);
@@ -280,7 +383,7 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
 
   // pétales : soufflés dans le sens du défilement, rafale quand le rouleau file
   const wind = -travel * 0.55 - 0.35 * s, M = new THREE.Matrix4(), Qt = new THREE.Quaternion(), E = new THREE.Euler(), S = new THREE.Vector3();
-  const pa = seg(s, 0.35, 1.2) * (1 - seg(s, 5.0, 5.5));
+  const pa = seg(s, v.petals[0], v.petals[1]) * (1 - seg(s, v.petals[2], v.petals[3]));
   const place = (m: THREE.InstancedMesh | null) => {
     if (!m) return;
     for (let i = 0; i < NP; i++) {
@@ -356,10 +459,10 @@ const Scene: React.FC<{ s: number; A: Assets }> = ({ s, A }) => {
         </mesh>
       )}
       {/* le sceau : pierre de Shoushan couleur miel, pommeau tourné, cordon et gland de soie rouge */}
-      {s > IMPACT - 0.55 && s < IMPACT + 0.8 && (
+      {s > IMPACT - 0.55 && s < v.stampOff && (
         <group position={[sealX, sy, ZS]} rotation={[sTilt, sRot, 0.6 * sTilt]} scale={[1 + squash * 0.5, 1 - squash, 1 + squash * 0.5]}>
-          <mesh geometry={G.box} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive="#6a3208" emissiveIntensity={0.12} /></mesh>
-          <mesh geometry={G.knob} position={[0, 0.28, 0]} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive="#6a3208" emissiveIntensity={0.12} /></mesh>
+          <mesh geometry={G.box} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive={red ? "#5a0606" : "#6a3208"} emissiveIntensity={red ? 0.18 : 0.12} /></mesh>
+          <mesh geometry={G.knob} position={[0, 0.28, 0]} castShadow><meshPhysicalMaterial map={A.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive={red ? "#5a0606" : "#6a3208"} emissiveIntensity={red ? 0.18 : 0.12} /></mesh>
           <mesh position={[0, -0.279, 0]}><boxGeometry args={[0.43, 0.004, 0.43]} /><meshStandardMaterial color="#a8241c" roughness={0.75} /></mesh>
           <group position={[0, 0.43, 0]} rotation={[0, 0, sway]}>
             <group position={[0, -0.43, 0]}>
@@ -434,7 +537,7 @@ const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number }> = (
 // ── la scène complète : 3D, compteur d'années, sceau volant, son ──
 export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
   const { fps, width, height } = useVideoConfig();
-  const t = useCurrentFrame() / fps, s = tRef(cfg, t);
+  const t = useCurrentFrame() / fps, s = tRef(cfg, t), v = V(cfg);
   const [A, setA] = useState<Assets | null>(null);
   const [h] = useState(() => delayRender('rouleau 3D'));
   useEffect(() => {
@@ -445,32 +548,35 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load().then((f) => document.fonts.add(f)),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load().then((f) => document.fonts.add(f)),
       new FontFace('ShuimoCaps', `url(${staticFile('fonts/Cinzel.ttf')})`, { weight: '400 900' }).load().then((f) => document.fonts.add(f)),
+      new FontFace('ShuimoCao', `url(${staticFile('fonts/LiuJianMaoCao-Regular.ttf')})`).load().then((f) => document.fonts.add(f)),
+      new FontFace('ShuimoSceau', `url(${staticFile('fonts/ChongxiSeal-sceaux.otf')})`).load().then((f) => document.fonts.add(f)),
     ]).then(() => Promise.all([load(staticFile('shuimo/paper.jpg')), ...files.map((f) => load(staticFile(`shuimo/elements/${f}`)))]))
       .then(([paper, ...ims]) => {
         const img: Record<string, HTMLImageElement> = {}; files.forEach((f, i) => (img[f] = ims[i]));
-        setA({ scroll: tex(paintScroll(cfg, img, paper)), seal: tex(sealCanvas(cfg.eras[cfg.to].zh)), roll: tex(rollCanvas(paper)), wood: tex(woodCanvas()), woodBump: tex(woodCanvas(true)), felt: tex(feltCanvas()), stone: tex(stoneCanvas()), petal: tex(petalCanvas()) });
+        setA({ scroll: tex(paintScroll(cfg, img, paper)), seal: tex(sealCanvas(cfg.eras[cfg.to].zh)), roll: tex(rollCanvas(paper)), wood: tex(woodCanvas()), woodBump: tex(woodCanvas(true)), felt: tex(feltCanvas()), stone: tex(stoneCanvas(cfg.stone === 'rouge')), petal: tex(petalCanvas()) });
         continueRender(h);
       });
   }, [cfg, h]);
   const sealUrl = useMemo(() => (A ? (A.seal.image as HTMLCanvasElement).toDataURL() : ''), [A]);
-  if (!A || s < -0.4 || s > 6.6) return null;
-  const year = lerp(cfg.years[0], cfg.years[1], travelM(s / 5));
-  const ya = sm(seg(s, 0.7, 1.3)) * (1 - sm(seg(s, 4.85, 5.25)));
+  if (!A || s < -0.4 || s > v.seal.fade[1] + 0.1) return null;
+  const year = lerp(cfg.years[0], cfg.years[1], v.travel(s));
+  const ya = sm(seg(s, v.year[0], v.year[1])) * (1 - sm(seg(s, v.year[2], v.year[3])));
   // sceau volant : de sa place dans le plan d'arrivée (vue verticale) au cartouche
-  const fk = eio(seg(s, 5.98, 6.45)), fx = lerp(960 + SEAL.dx, 156, fk), fy = lerp(SEAL.y - TOP, 136, fk), fsz = lerp(SEAL.size, 92, fk);
+  const fk = eio(seg(s, v.seal.fly[0], v.seal.fly[1])), s0 = sealOnScreen(v, Math.min(s, v.seal.fly[0]));
+  const fx = lerp(s0.x, 156, fk), fy = lerp(s0.y, 136, fk), fsz = lerp(s0.size, 92, fk), fa = lerp(s0.angle, 0, fk), fq = lerp(s0.squash, 1, fk);
   return (
     <AbsoluteFill>
-      <AbsoluteFill style={{ opacity: seg(s, -0.35, -0.05) * (1 - seg(s, 5.78, 5.98)) }}>
+      <AbsoluteFill style={{ opacity: seg(s, v.canvasIn[0], v.canvasIn[1]) * (1 - seg(s, v.canvasOut[0], v.canvasOut[1])) }}>
         <ThreeCanvas width={width} height={height} shadows flat gl={{ antialias: true }} camera={{ fov: 35, position: [0, H0, ZC], near: 0.05, far: 100 }}>
-          <Scene s={Math.max(0, Math.min(LEN_REF, s))} A={A} />
+          <Scene s={Math.max(0, Math.min(v.lenRef, s))} A={A} v={v} red={cfg.stone === 'rouge'} />
         </ThreeCanvas>
       </AbsoluteFill>
       <YearPlate cfg={cfg} year={year} a={ya} />
-      {s >= 5.78 && s < 6.55 && (
-        <img src={sealUrl} style={{ position: 'absolute', left: fx - fsz / 2, top: fy - fsz / 2, width: fsz, height: fsz, opacity: 1 - seg(s, 6.42, 6.52), filter: `drop-shadow(0 ${10 * Math.sin(Math.PI * fk)}px ${16 * Math.sin(Math.PI * fk)}px rgba(60,20,10,0.35))` }} />
+      {s >= v.seal.show && s < v.seal.fade[1] + 0.03 && (
+        <img src={sealUrl} style={{ position: 'absolute', left: fx - fsz / 2, top: fy - fsz / 2, width: fsz, height: fsz, transform: `rotate(${fa}rad) scaleY(${fq})`, opacity: seg(s, v.seal.show - 0.001, v.seal.appear) * (1 - seg(s, v.seal.fade[0], v.seal.fade[1])), filter: `drop-shadow(0 ${10 * Math.sin(Math.PI * fk)}px ${16 * Math.sin(Math.PI * fk)}px rgba(60,20,10,0.35))` }} />
       )}
       {/* souffle du rouleau, impact du sceau à 4 s, cloche quand le sceau s'envole (rouleau/rouleau3d.wav, calé sur 5,3 s) */}
-      <Sequence from={Math.round(cfg.at * fps)} layout="none"><Audio src={staticFile('rouleau/rouleau3d.wav')} volume={0.8} playbackRate={LEN / dur(cfg)} /></Sequence>
+      <Sequence from={Math.round(cfg.at * fps)} layout="none"><Audio src={staticFile(v.sound)} volume={0.8} playbackRate={v.len / dur(cfg)} /></Sequence>
     </AbsoluteFill>
   );
 };
