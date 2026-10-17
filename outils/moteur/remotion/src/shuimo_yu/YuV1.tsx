@@ -52,7 +52,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', plastron: 'episodes/yu/images/plastron_brasier.png' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -175,48 +175,6 @@ const rubbing = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
   ctx.clip();
   for (let i = 0; i < 900; i++) { ctx.fillStyle = `rgba(200,192,180,${0.03 + 0.06 * r()})`; ctx.fillRect(x - w / 2 + r() * w, y - h / 2 + r() * h, 1 + 3 * r(), 1 + 3 * r()); }
   ctx.restore();
-};
-// plastron de tortue à l'encre, chauffé sur un brasier : la chaleur rougit un point, la fumée monte en lavis, les
-// fissures courent (dont une en 卜) ; avec l'image peinte (images/plastron_brasier.png, détourée), le plastron et le
-// brasier viennent de l'image, seuls la chaleur, les fissures et la fumée sont animés
-const plastron = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number, heat: number, crack: number, tt: number) => {
-  if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
-  // brasier sous le plastron : braises vermillon, lueur
-  const fire = heat * (0.85 + 0.15 * Math.sin(tt * 17) * Math.sin(tt * 5.3));
-  if (fire > 0 && !IMG.plastron) {
-    const g = ctx.createRadialGradient(40, 420, 10, 40, 420, 300); g.addColorStop(0, `rgba(230,96,40,${0.55 * fire})`); g.addColorStop(1, 'rgba(230,96,40,0)');
-    ctx.fillStyle = g; ctx.fillRect(-300, 120, 700, 500);
-    const r = rng(3);
-    for (let i = 0; i < 26; i++) { ctx.fillStyle = `rgba(${200 + 40 * r()},${60 + 50 * r()},30,${(0.5 + 0.4 * r()) * fire})`; ctx.beginPath(); ctx.ellipse(-120 + 320 * r(), 400 + 40 * r(), 10 + 18 * r(), 6 + 8 * r(), 0, 0, 7); ctx.fill(); }
-  }
-  const im = IMG.plastron;
-  if (im) { const h = 900, w = (im.width / im.height) * h; ctx.drawImage(im, -w / 2, -h / 2 + 60, w, h); }
-  else {
-  ctx.fillStyle = 'rgba(214,196,160,0.42)'; ctx.strokeStyle = inkCss; ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(0, -330); ctx.bezierCurveTo(190, -330, 230, -120, 215, 40); ctx.bezierCurveTo(205, 220, 120, 330, 0, 340); ctx.bezierCurveTo(-120, 330, -205, 220, -215, 40); ctx.bezierCurveTo(-230, -120, -190, -330, 0, -330); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.lineWidth = 2.5; ctx.strokeStyle = rgb(INK, 0.5);
-  ctx.beginPath(); ctx.moveTo(0, -330); ctx.lineTo(0, 340); for (const yy of [-180, -40, 110, 240]) { ctx.moveTo(-200, yy + 20); ctx.quadraticCurveTo(0, yy - 20, 200, yy + 20); } ctx.stroke();
-  }
-  if (heat > 0) { const g = ctx.createRadialGradient(70, -40, 0, 70, -40, 70); g.addColorStop(0, `rgba(200,60,25,${0.8 * heat})`); g.addColorStop(1, 'rgba(200,60,25,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(70, -40, 70, 0, 7); ctx.fill(); }
-  if (crack > 0) {
-    ctx.strokeStyle = inkCss; ctx.lineCap = 'round';
-    ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 6 * crack, -40 - 150 * crack); ctx.lineTo(66, -40 - 210 * crack); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 + 70 * crack, -40 - 50 * crack); ctx.lineTo(70 + 120 * crack, -40 - 64 * crack); ctx.stroke();
-    const k2 = seg(crack, 0.4, 1);
-    ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(70, -40); ctx.lineTo(70 - 90 * k2, -40 + 60 * k2); ctx.lineTo(70 - 150 * k2, -40 + 52 * k2); ctx.moveTo(70, -40); ctx.lineTo(70 + 30 * k2, -40 + 130 * k2); ctx.stroke();
-  }
-  ctx.restore();
-  // fumée : volutes de lavis qui montent et s'élargissent
-  if (heat > 0) {
-    ctx.save(); ctx.filter = 'blur(16px)';
-    for (let i = 0; i < 7; i++) {
-      const u = ((tt * 0.22 + i / 7) % 1), px = x + 70 + 60 * Math.sin(u * 6 + i), py = y - 40 - 520 * u;
-      ctx.fillStyle = rgb([90, 84, 78], 0.2 * heat * a * (1 - u) * Math.min(1, u * 5));
-      ctx.beginPath(); ctx.ellipse(px, py, 40 + 90 * u, 30 + 60 * u, 0, 0, 7); ctx.fill();
-    }
-    ctx.restore();
-  }
 };
 // latte de bambou (verticale), légèrement bombée, nœuds ; le texte y est écrit à l'encre
 const slip = (ctx: CanvasRenderingContext2D, x: number, top: number, h: number, a: number) => {
@@ -572,7 +530,7 @@ const Pieces: React.FC = () => {
   );
 };
 
-// ════════════════ 3. La dynastie Shang : le plastron, 言 (bouche, langue, son), 五 (cinq traits → croix), 吾
+// ════════════════ 3. La dynastie Shang : 言 (bouche, langue, son), 五 (cinq traits → croix), 吾
 const Shang: React.FC = () => {
   const t = useT();
   const A3 = A('b03'), dv = at('b03', 'devin'), sg = at('b03', 'signe'), bo = at('b03', 'bouche'), la = at('b03', 'langue'), so = at('b03', 'son'), ci = at('b03', 'cinq'), tr = at('b03', 'traits'), cr = at('b03', 'croix'), po = at('b03', 'pose'), pq = at('b03', 'pourquoi'), pn = at('b03', 'prononcait');
@@ -581,14 +539,11 @@ const Shang: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Landscape seed={14} from={A3 - 1.5} to={R1 + 0.6} move="pan" mood="aube" faint={0.55} />
-      <Cam keys={[[A3 - 0.3, 960, 560, 1.0], [dv, 1000, 520, 1.1, 2.4], [sg - 0.3, 960, 540, 1.0, 1.0], [bo - 0.2, 700, 700, 1.25, 0.9], [la - 0.1, 700, 560, 1.25, 0.9], [so - 0.1, 700, 300, 1.25, 1.0], [ci - 0.3, 960, 540, 1.0, 1.0], [tr - 0.2, 1240, 540, 1.12, 1.0], [po - 0.3, 1240, 560, 1.06, 1.2], [pq - 0.2, 960, 540, 1.0, 1.0]]}
+      <Cam keys={[[A3 - 0.3, 960, 560, 1.0], [dv, 700, 520, 1.08, 2.4], [sg - 0.3, 960, 540, 1.0, 1.0], [bo - 0.2, 700, 700, 1.25, 0.9], [la - 0.1, 700, 560, 1.25, 0.9], [so - 0.1, 700, 300, 1.25, 1.0], [ci - 0.3, 960, 540, 1.0, 1.0], [tr - 0.2, 1240, 540, 1.12, 1.0], [po - 0.3, 1240, 560, 1.06, 1.2], [pq - 0.2, 960, 540, 1.0, 1.0]]}
         punch={[sg + 0.3, bo + 0.2, cr + 0.3, po + 0.8]} calm={[[R1 - 0.6, R1 + 3.6]]}>
         <Draw draw={(ctx, tt, E) => {
-          // plan « tableau » : le plastron chauffé sur le brasier, la fumée, la fissure
-          const pa = seg(tt, A3 - 0.5, A3 + 0.6) * (1 - seg(tt, sg - 0.6, sg + 0.2));
-          plastron(ctx, 1000, 470, pa, seg(tt, A3, A3 + 1.2), seg(tt, dv + 0.4, dv + 1.8), tt);
-          // 言 de l'os : révélé en blanc sur un estampage, puis à l'encre ; bouche, langue, son (vermillon) chacun sur son mot
-          const ya = seg(tt, sg - 0.3, sg + 0.5) * (1 - seg(tt, R1 - 0.5, R1));
+          // 言 de l'os : l'estampage se pose sur « le devin grave », le signe s'y révèle en blanc, puis passe à l'encre ; bouche, langue, son (vermillon) chacun sur son mot
+          const ya = seg(tt, dv - 0.2, dv + 0.8) * (1 - seg(tt, R1 - 0.5, R1));
           const side = ease(seg(tt, ci - 0.2, ci + 0.8));
           const GY = { x: 700 - 280 * side, y: 520, size: 680 - 280 * side };
           const ink = seg(tt, sg + 0.6, sg + 1.4);
@@ -596,7 +551,7 @@ const Shang: React.FC = () => {
             rubbing(ctx, 700, 520, 560, 760, ya * (1 - ink) * (1 - side), 11);
             const k = (c: string) => (c === 'bouche' ? seg(tt, bo, bo + 0.4) : c === 'langue' ? seg(tt, la, la + 0.4) : seg(tt, so, so + 0.4));
             const hi = (c: string) => (c === 'bouche' ? win(tt, bo, la + 0.3, 0.2) : c === 'langue' ? win(tt, la, so + 0.3, 0.2) : win(tt, so, ci, 0.3));
-            E.drawRealGlyph(ctx, 'yu_yan_jiaguwen', { ...GY, reveal: () => seg(tt, sg - 0.2, sg + 0.6), opacity: ya,
+            E.drawRealGlyph(ctx, 'yu_yan_jiaguwen', { ...GY, reveal: () => seg(tt, dv + 0.5, sg + 0.6), opacity: ya,
               color: (c: string) => rgb(mixc(mixc([240, 233, 219], INK, ink), VER, k(c))), glow: 24 * Math.max(hi('bouche'), hi('langue'), hi('trait')), glowColor: rgb(VER, 0.6) });
           }
           // 五 : cinq traits couchés, puis deux traits et une croix (fondu net) ; puis la croix se pose sur une bouche → 吾
@@ -620,7 +575,7 @@ const Shang: React.FC = () => {
       <Label x={1240} y={180} zh="吾" text="« moi »" color={AZ} a={win(t, po + 0.9, pq + 0.2, 0.4)} align="center" />
       <Caption text="吾 = « moi » : sens attesté plus tard, sous les Zhou" a={win(t, po + 1.6, pq - 0.2, 0.4)} y={940} size={44} />
       <Caption text="chinois archaïque : 五 et 吾, tous deux « nga » (reconstruction Baxter-Sagart)" a={win(t, pq + 0.4, R1 - 0.3, 0.4)} y={940} size={44} />
-      <EraTag {...cartouche('shang', 'Anyang · v. 1200 av. J.-C.')} a={seg(t, A3 + 0.2, A3 + 1.0) * (1 - seg(t, R1 - 0.3, R1))} />
+      <EraTag {...cartouche('shang', 'Anyang · v. 1200 av. J.-C.')} a={seg(t, A3 + 0.2, A3 + 1.0) * (1 - win(t, dv - 0.3, sg + 1.8, 0.3)) * (1 - seg(t, R1 - 0.3, R1))} />
     </AbsoluteFill>
   );
 };

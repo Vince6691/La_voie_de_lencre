@@ -56,3 +56,5 @@ Appliqué (contrôle : `apercus/planche_note_v1b.jpg`) :
   code prend `images/plastron_brasier.png` dès qu'il existe (chaleur, fissures et fumée à recaler sur l'image).
 Re-notes : Design 6,5 → **8,5** · Historique 7,5 → **8,5** · Technique et Artistique : 7 en attendant le plastron (visé 7,5) ;
 le balayage gris (refusé) les retient sous 8.
+**Mise à jour (3)** : plastron **supprimé** à la demande de l'utilisateur (déjà montré dans d'autres épisodes ; ne pas le
+reproposer). L'estampage de 言 se pose dès « le devin grave » (avec la gravure), le signe se révèle toujours sur « signe ».

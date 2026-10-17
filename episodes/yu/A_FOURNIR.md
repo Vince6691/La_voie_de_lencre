@@ -135,14 +135,3 @@ Isolated on a pure plain white background, no shadow on the background, no table
 Vertical 2:3 composition.
 ```
 
-## 7. Plastron Shang en tableau (bloc 3, note artistique du 17/10) → `images/plastron_brasier.png`
-Remplace le plastron dessiné au trait. Je le détoure, puis j'anime par-dessus le point de chaleur, les fissures (dont
-une en 卜) et la fumée. Exactitude : on n'a pas posé l'os sur le feu. Le devin appliquait une **baguette incandescente**
-dans des creux taillés au dos de la carapace ; le brasier sert seulement à la chauffer. Nano Banana, **1:1**, ≥ 1536 px,
-fond blanc uni.
-```
-Chinese ink-wash painting (shuimo) on plain white paper, soft grey ink tones with touches of pale ochre and a little vermilion for the embers, delicate brushwork, misty edges that fade into the white background.
-A cleaned and polished turtle plastron (the flat underside of a tortoise shell: an elongated oval with notched edges, a straight central seam and the faint curved seams of its plates), standing upright on a small low wooden stand, seen from the front, smooth and still uncracked, occupying the upper two thirds of the square, centered.
-At its foot, slightly to the right, a small round bronze brazier on three short legs, full of glowing embers; a thin wooden stick rests in the embers, its tip glowing; a faint curl of smoke rises.
-No hands, no people, no ground line, no landscape, no text, no calligraphy, no seal, no border. Isolated on a pure plain white background.
-```
