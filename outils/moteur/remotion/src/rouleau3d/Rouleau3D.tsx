@@ -50,10 +50,13 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const V3 = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 const vl = (a: THREE.Vector3, b: THREE.Vector3, k: number) => a.clone().lerp(b, k);
 
-const LEN = 5.8; // déroulé de référence : défilement 4 s, impact à 4 s, tenue sur le sceau, plongée
+const LEN_REF = 5.8; // déroulé de référence : défilement 4 s, impact à 4 s, tenue sur le sceau, plongée
+// le premier mouvement (verticale → s'élève) est resserré : 0,5 s gagnées sur les 1,7 premières secondes, sans à-coup
+const GAIN = 0.5, LEN = LEN_REF - GAIN;
+const toRef = (u: number) => (u <= 0 ? u : u + GAIN * sm(u / (1.7 - GAIN)));
 const dur = (c: Rouleau3DConfig) => c.duration ?? LEN;
 // temps de référence (déroulé de 5 s) : on étire tout si la durée change
-const tRef = (c: Rouleau3DConfig, t: number) => ((t - c.at) * LEN) / dur(c);
+const tRef = (c: Rouleau3DConfig, t: number) => toRef(((t - c.at) * LEN) / dur(c));
 const IMPACT = 4.0;
 const centerAt = (s: number) => lerp(C0, C1, travelM(s / 5)); // P au centre du rouleau (x = 0)
 const yearFmt = (y: number) => (y < 0 ? `−${Math.abs(Math.round(y))}` : `${Math.round(y)}`);
@@ -459,14 +462,14 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
     <AbsoluteFill>
       <AbsoluteFill style={{ opacity: seg(s, -0.35, -0.05) * (1 - seg(s, 5.78, 5.98)) }}>
         <ThreeCanvas width={width} height={height} shadows flat gl={{ antialias: true }} camera={{ fov: 35, position: [0, H0, ZC], near: 0.05, far: 100 }}>
-          <Scene s={Math.max(0, Math.min(LEN, s))} A={A} />
+          <Scene s={Math.max(0, Math.min(LEN_REF, s))} A={A} />
         </ThreeCanvas>
       </AbsoluteFill>
       <YearPlate cfg={cfg} year={year} a={ya} />
       {s >= 5.78 && s < 6.55 && (
         <img src={sealUrl} style={{ position: 'absolute', left: fx - fsz / 2, top: fy - fsz / 2, width: fsz, height: fsz, opacity: 1 - seg(s, 6.42, 6.52), filter: `drop-shadow(0 ${10 * Math.sin(Math.PI * fk)}px ${16 * Math.sin(Math.PI * fk)}px rgba(60,20,10,0.35))` }} />
       )}
-      {/* souffle du rouleau, impact du sceau à 4 s, cloche quand le sceau s'envole (rouleau/rouleau3d.wav, calé sur 5,8 s) */}
+      {/* souffle du rouleau, impact du sceau à 4 s, cloche quand le sceau s'envole (rouleau/rouleau3d.wav, calé sur 5,3 s) */}
       <Sequence from={Math.round(cfg.at * fps)} layout="none"><Audio src={staticFile('rouleau/rouleau3d.wav')} volume={0.8} playbackRate={LEN / dur(cfg)} /></Sequence>
     </AbsoluteFill>
   );
