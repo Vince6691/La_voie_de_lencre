@@ -71,11 +71,11 @@
  "queue": 10,
  "reperes_cles": {
   "b01": {
+   "deux": "le chinois a deux",
    "precepte": "Un vieux précepte",
    "table": "À table",
    "lit": "Au lit",
-   "deux": "Deux mots",
-   "interdit": "et l'on interdit",
+   "interdit": "On interdit",
    "parler": "et parler"
   },
   "b02": {
@@ -105,7 +105,9 @@
    "frappe": "On le frappe",
    "repond": "et la salle",
    "flancs": "Sur ses flancs",
-   "gauche": "la parole à",
+   "gauche": "la parole en haut",
+   "dessous": "une seconde bouche",
+   "cote": "et le cinq",
    "rencontre": "Les deux pièces"
   },
   "b05": {
@@ -114,14 +116,14 @@
    "argumente": "On argumente",
    "hesite": "Le signe, lui",
    "sceaux": "sur les sceaux",
-   "empile": "les deux bouches"
+   "empile": "se dédouble"
   },
   "b06": {
    "han": "Trois siècles",
    "dico": "un dictionnaire",
    "question": "notre question",
-   "reponse": "Parler tout droit",
-   "discuter": "Discuter",
+   "reponse": "言, c'est parler",
+   "discuter": "语, c'est discuter",
    "table": "Voilà pourquoi",
    "pleine": "on ne lance",
    "lit": "Et au lit"

@@ -305,37 +305,39 @@ const inkBloom = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: numbe
 const PRECEPT = '食不語寢不言'.split('');
 const Opening: React.FC = () => {
   const t = useT();
-  const A1 = A('b01'), pr = at('b01', 'precepte'), tb = at('b01', 'table'), lt = at('b01', 'lit'), dx = at('b01', 'deux'), it = at('b01', 'interdit'), pa = at('b01', 'parler');
+  const A1 = A('b01'), dx = at('b01', 'deux'), pr = at('b01', 'precepte'), tb = at('b01', 'table'), lt = at('b01', 'lit'), it = at('b01', 'interdit'), pa = at('b01', 'parler');
   const out = seg(t, B('b01') + 0.2, A('b02') - 0.1);
+  // « deux mots » : 語 et 言 côte à côte (avant le précepte, puis de nouveau sur « On interdit l'un ici, l'autre là »)
+  const pair = (tt: number) => win(tt, A1 - 0.1, pr + 0.2, 0.4) + seg(tt, it - 0.2, it + 0.4);
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[0, 960, 540, 1], [tb - 0.3, 1320, 380, 1.14, 1.2], [lt - 0.3, 1320, 690, 1.14, 1.0], [dx - 0.2, 960, 540, 1.0, 1.2], [pa - 0.4, 960, 520, 1.06, 1.2]]} punch={[tb + 0.2, lt + 0.2, pa]}>
+      <Cam keys={[[0, 960, 540, 1.02], [pr - 0.2, 1320, 540, 1.0, 1.0], [tb - 0.3, 1320, 400, 1.14, 1.2], [lt - 0.3, 1320, 680, 1.14, 1.0], [it - 0.3, 960, 540, 1.0, 1.2], [pa - 0.4, 960, 520, 1.06, 1.2]]} punch={[dx + 0.6, tb + 0.2, lt + 0.2, pa]}>
         <Draw draw={(ctx, tt, E) => {
-          // le précepte en colonne, caractère par caractère (bruitage pinceau) ; 語 puis 言 en vermillon sur leur mot
-          const col = 1 - seg(tt, dx - 0.4, dx + 0.6);
+          // le précepte en colonne, caractère par caractère ; 語 puis 言 en vermillon sur leur mot
+          const col = seg(tt, pr - 0.3, pr + 0.3) * (1 - seg(tt, it - 0.4, it + 0.3));
           PRECEPT.forEach((c, i) => {
-            const t0 = A1 + 0.9 + i * 0.32, k = seg(tt, t0, t0 + 0.4);
+            const t0 = pr + 0.5 + i * 0.32, k = seg(tt, t0, t0 + 0.4);
             if (k <= 0 || col <= 0) return;
             const isY = i === 2, isL = i === 5;
             const hl = isY ? seg(tt, tb, tb + 0.4) : isL ? seg(tt, lt, lt + 0.4) : 0;
             const y = 150 + i * 112 + (i > 2 ? 30 : 0);
             E.text(ctx, c, 1320, y, { font: 'ShuimoKai', size: 116, color: rgb(mixc(INK, VER, hl)), alpha: k * col * (hl > 0 || tt < tb ? 1 : 0.55), glow: 20 * hl, glowColor: rgb(VER, 0.6) });
           });
-          // « Deux mots pour dire parler » : 語 et 言 côte à côte, tracés trait par trait
-          const two = seg(tt, dx - 0.2, dx + 0.4);
+          const two = pair(tt);
           if (two > 0) {
-            E.drawStrokes(ctx, 'yu_kai', { x: 640, y: 470, size: 480, progress: 14 * seg(tt, dx, dx + 2.2), brush: false, color: pig(seg(tt, it, it + 0.6)), alpha: () => two });
-            E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 480, progress: 7 * seg(tt, dx + 0.9, dx + 2.4), brush: false, color: pig(seg(tt, it + 0.6, it + 1.2)), alpha: () => two });
+            const pg = seg(tt, it, it + 0.6);
+            E.drawStrokes(ctx, 'yu_kai', { x: 640, y: 470, size: 480, progress: 14 * seg(tt, dx - 0.2, dx + 1.6), brush: false, color: pig(pg), alpha: () => two });
+            E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 480, progress: 7 * seg(tt, dx + 0.8, dx + 2.0), brush: false, color: pig(pg), alpha: () => two });
           }
         }} />
       </Cam>
-      <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, pr + 0.4, dx - 0.2, 0.5)} y={905} size={46} />
+      <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, pr + 2.0, it - 0.2, 0.5)} y={905} size={46} />
       <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, pr - 0.2, tb - 0.4, 0.4)} y={140} size={44} />
       <Label x={1010} y={300} zh="語" text="yǔ" color={VER} a={win(t, tb + 0.1, lt + 1.4, 0.3)} align="right" />
-      <Label x={1010} y={830} zh="言" text="yán" color={VER} a={win(t, lt + 0.1, dx - 0.2, 0.3)} align="right" />
-      <Label x={640} y={830} zh="" text="yǔ" color={VER} a={win(t, dx + 1.2, B('b01'), 0.4) * (1 - out)} align="center" />
-      <Label x={1280} y={830} zh="" text="yán" color={VER} a={win(t, dx + 1.8, B('b01'), 0.4) * (1 - out)} align="center" />
+      <Label x={1010} y={830} zh="言" text="yán" color={VER} a={win(t, lt + 0.1, it - 0.2, 0.3)} align="right" />
+      <Label x={640} y={830} zh="" text="yǔ" color={VER} a={Math.min(1, pair(t)) * seg(t, dx + 0.6, dx + 1.0) * (1 - out)} align="center" />
+      <Label x={1280} y={830} zh="" text="yán" color={VER} a={Math.min(1, pair(t)) * seg(t, dx + 1.4, dx + 1.8) * (1 - out)} align="center" />
     </AbsoluteFill>
   );
 };
@@ -447,27 +449,28 @@ const R3B: Rouleau3DConfig = {
 // ════════════════ 4. La cloche (fin des Printemps et Automnes) : le premier 語
 const Cloche: React.FC = () => {
   const t = useT();
-  const PL = L.plages.cloche, A4 = A('b04'), fr = at('b04', 'frappe'), rp = at('b04', 'repond'), fl = at('b04', 'flancs'), ga = at('b04', 'gauche'), re = at('b04', 'rencontre');
+  const PL = L.plages.cloche, A4 = A('b04'), fr = at('b04', 'frappe'), rp = at('b04', 'repond'), fl = at('b04', 'flancs'), ga = at('b04', 'gauche'), de = at('b04', 'dessous'), co = at('b04', 'cote'), re = at('b04', 'rencontre');
   return (
     <AbsoluteFill>
       <Paper />
       <Landscape seed={9} from={PL.debut - 0.5} to={B('b04') + 1} move="push" mood="jour" faint={0.5} />
-      <Cam keys={[[PL.debut, 960, 540, 1.0], [fl - 0.2, 960, 540, 1.0, 0.6], [ga - 0.3, 760, 520, 1.12, 1.2], [ga + 1.4, 1120, 520, 1.12, 1.2], [re - 0.3, 960, 540, 1.02, 1.0]]} punch={[fl + 0.8, re + 0.2]} calm={[[R1 - 0.5, fl]]}>
+      <Cam keys={[[PL.debut, 960, 540, 1.0], [fl - 0.2, 960, 540, 1.0, 0.6], [ga - 0.3, 760, 400, 1.14, 1.0], [de - 0.2, 760, 660, 1.14, 1.0], [co - 0.2, 1120, 520, 1.12, 1.0], [re - 0.3, 960, 540, 1.02, 1.0]]} punch={[fl + 0.8, re + 0.2]} calm={[[R1 - 0.5, fl]]}>
         <Draw draw={(ctx, tt, E) => {
           const a = seg(tt, fl - 0.4, fl + 0.4) * (1 - seg(tt, B('b04') + 0.3, B('b04') + 0.9));
           if (a <= 0) return;
           // estampage de l'inscription, le signe révélé en blanc, puis passé à l'encre et aux pigments
           const ink = seg(tt, fl + 1.6, fl + 2.6);
           rubbing(ctx, 960, 520, 820, 820, a * (1 - ink), 23);
-          const pv = seg(tt, ga - 0.1, ga + 0.4), cw = seg(tt, ga + 1.1, ga + 1.6);
+          const pv = seg(tt, ga - 0.1, ga + 0.4), bw = seg(tt, de - 0.1, de + 0.4), cw = seg(tt, co - 0.1, co + 0.4);
           E.drawRealGlyph(ctx, 'yu_jinwen', { x: 960, y: 520, size: 700, reveal: () => seg(tt, fl, fl + 1.2), opacity: a,
-            color: (c: string) => rgb(mixc(mixc([240, 233, 219], INK, ink), P[c], c === 'parole' ? pv : cw)), glow: 26 * win(tt, re - 0.1, re + 1.2, 0.3), glowColor: 'rgba(246,241,231,0.9)' });
+            color: (c: string) => rgb(mixc(mixc([240, 233, 219], INK, ink), P[c], c === 'parole' ? pv : c === 'bouche' ? bw : cw)), glow: 26 * win(tt, re - 0.1, re + 1.2, 0.3), glowColor: 'rgba(246,241,231,0.9)' });
         }} />
       </Cam>
       <Placeholder title="Clip A · le carillon de bronze" sub="Seedance, 10 s (prompt : A_FOURNIR.md) — entrée par la mer de nuages" a={win(t, PL.debut + 0.2, fl - 0.1, 0.5)} />
       <Caption text="cloche de 余贎逐兒 · fin des Printemps et Automnes" a={win(t, fl + 0.4, ga - 0.3, 0.4)} y={940} size={44} />
-      <Label x={560} y={950} zh="言" text="la parole" color={VER} a={win(t, ga, ga + 1.6, 0.3)} align="center" />
-      <Label x={1360} y={950} zh="吾" text="« moi »" color={AZ} a={win(t, ga + 1.3, re + 0.6, 0.3)} align="center" />
+      <Label x={330} y={300} zh="言" text="la parole" color={VER} a={win(t, ga, re + 0.6, 0.3)} align="center" />
+      <Label x={330} y={760} zh="口" text="la bouche" color={AZ} a={win(t, de, re + 0.6, 0.3)} align="center" />
+      <Label x={1600} y={520} zh="五" text="le cinq" color={MAL} a={win(t, co, re + 0.6, 0.3)} align="center" />
       <EraTag {...cartouche('zhou', 'fin des Printemps et Automnes')} a={r3TagIn(R3A, t) * (1 - seg(t, B('b04'), B('b04') + 0.5))} />
     </AbsoluteFill>
   );
@@ -482,7 +485,7 @@ const Royaumes: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Landscape seed={26} from={A5 - 1} to={PB.debut + 0.8} move="pan" mood="brume" faint={0.6} />
-      <Cam keys={[[A5 - 0.3, 960, 540, 1.0], [sc - 0.3, 760, 540, 1.06, 1.0], [em - 0.2, 700, 380, 1.18, 1.0], [em + 1.1, 700, 660, 1.18, 1.0]]} punch={[sc + 0.3, sc + 1.1, em + 0.3]}>
+      <Cam keys={[[A5 - 0.3, 960, 540, 1.0], [sc - 0.3, 760, 540, 1.06, 1.0], [em - 0.2, 830, 520, 1.2, 1.0]]} punch={[sc + 0.3, sc + 1.1, em + 0.3]}>
         <Draw draw={(ctx, tt, E) => {
           // deux empreintes de sceau (璽彙 2774, 3193) : carré vermillon, le signe en réserve (papier)
           [[760, 'yu_xi', sc], [1300, 'yu_xi2', sc + 0.8]].forEach(([x, key, t0]) => {
@@ -491,13 +494,13 @@ const Royaumes: React.FC = () => {
             const k = 1 + 0.25 * (1 - seg(u, 0, 0.14));
             ctx.save(); ctx.globalAlpha = a; ctx.translate(x as number, 520); ctx.scale(k, k);
             ctx.fillStyle = rgb(VER, 0.9); ctx.fillRect(-230, -230, 460, 460); ctx.restore();
-            const hi = (c: string) => (key === 'yu_xi' ? win(tt, em, PB.debut, 0.3) * (c === 'cinq' ? 0 : 1) : 0);
-            E.drawRealGlyph(ctx, key as string, { x: x as number, y: 520, size: 400 * k, opacity: a, color: (c: string) => (hi(c) > 0 ? rgb(mixc([246, 238, 222], P[c], 0.75 * hi(c))) : '#f6eee0'), glow: 20 * hi('parole'), glowColor: 'rgba(255,248,235,0.9)' });
+            const hi = (c: string) => (key === 'yu_xi' ? win(tt, em, PB.debut, 0.3) * (c === 'cinq' ? 1 : 0) : 0);
+            E.drawRealGlyph(ctx, key as string, { x: x as number, y: 520, size: 400 * k, opacity: a, color: (c: string) => (hi(c) > 0 ? rgb(mixc([246, 238, 222], P[c], 0.75 * hi(c))) : '#f6eee0'), glow: 20 * hi('cinq'), glowColor: 'rgba(255,248,235,0.9)' });
           });
         }} />
       </Cam>
       <Placeholder title="Les conseillers · papier découpé" sub="deux silhouettes Nano Banana détourées (A_FOURNIR.md, § 2)" a={win(t, co - 0.3, sc - 0.4, 0.5)} />
-      <Caption text="les deux bouches, l'une sur l'autre · sceaux du royaume de Jin" a={win(t, em - 0.1, PB.debut, 0.4)} y={940} size={44} />
+      <Caption text="le cinq dédoublé · sceaux du royaume de Jin" a={win(t, em - 0.1, PB.debut, 0.4)} y={940} size={44} />
       <EraTag {...cartouche('royaumes', 'Ve–IIIe siècle av. J.-C.')} a={seg(t, A5 - 0.4, A5 + 0.4) * (1 - seg(t, PB.debut, PB.debut + 0.5))} />
       {void ar}{void he}
     </AbsoluteFill>
