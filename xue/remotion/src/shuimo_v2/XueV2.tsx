@@ -1,4 +1,4 @@
-// 學 / 学, version tout shuimo, voix off v2 (≈ 4 min) — xue/shuimo_v2/PROPOSITION.md.
+// 學 / 学, version tout shuimo, voix off v2 (≈ 4 min) — episodes/xue/PROPOSITION.md.
 // Question : où sont passées les deux mains ? Voyage Shang → Zhou → Qin → Han → aujourd'hui, trois rouleaux du temps
 // différents (5 s classique, 3,5 s rapide, 6 s long), clips vidéo intégrés au papier (VideoEncre ; ici les clips
 // d'exemple, réutilisés à chaque emplacement, en attendant les clips Seedance), glyphes réels et tracé des traits
@@ -12,7 +12,7 @@ import { TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau
 import { VideoReveal } from '../video_encre/VideoReveal';
 import { CloudReveal } from '../video_encre/CloudReveal';
 import { loadLegacy, W } from '../legacy';
-import cuesData from '../data/cues_sx.json';
+import cuesData from '../data/episodes/xue.json';
 
 type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b08' | 'b09';
 const C = cuesData as unknown as Record<Clip, { duration: number; cues: Record<string, number> }>;
@@ -484,7 +484,7 @@ export const XueV2: React.FC = () => {
   const ready = useSetup();
   const { fps } = useVideoConfig();
   const voice = (k: Clip, start: number, extra: Partial<React.ComponentProps<typeof Audio>> = {}) => (
-    <Sequence key={k + start} from={Math.round(start * fps)}><Audio src={staticFile(`voice_sx/${k}.wav`)} {...extra} /></Sequence>
+    <Sequence key={k + start} from={Math.round(start * fps)}><Audio src={staticFile(`episodes/xue/voix/${k}.wav`)} {...extra} /></Sequence>
   );
   return (
     <AbsoluteFill style={{ background: '#f3eee4' }}>
@@ -501,7 +501,7 @@ export const XueV2: React.FC = () => {
       {voice('b07', A7, { endAt: Math.round(B7CUT * fps) })}
       {voice('b07', A7 + B7CUT + B7GAP, { startFrom: Math.round(B7CUT * fps) })}
       {voice('b08', A8)}{voice('b09', A9)}
-      <Audio src={staticFile('audio/bed_sx.wav')} volume={0.55} />
+      <Audio src={staticFile('episodes/xue/audio/musique.wav')} volume={0.55} />
     </AbsoluteFill>
   );
 };

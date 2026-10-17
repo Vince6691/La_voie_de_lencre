@@ -22,7 +22,7 @@ SPOKEN = {'1250': 'douze cent cinquante', '221': 'deux cent vingt et un', '100':
 TL = json.loads(open('src/timeline.js').read().split('=', 1)[1].strip().rstrip(';'))
 words_out = []
 for i, text in enumerate(TEXTS, 1):
-    w = wave.open(f'assets/voice_fast/s{i:02d}.wav'); sr = w.getframerate()
+    w = wave.open(f'../episodes/xue/fond_noir/voice_fast/s{i:02d}.wav'); sr = w.getframerate()
     a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(float) / 32768
     hop = int(sr * 0.02)
     db = np.array([20 * np.log10(np.sqrt(np.mean(a[j:j + hop] ** 2)) + 1e-9) for j in range(0, len(a) - hop, hop)])

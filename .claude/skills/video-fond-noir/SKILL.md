@@ -5,11 +5,11 @@ description: Chef d'orchestre d'une vidéo longue 墨道 « fond noir » à part
 
 # Vidéo 墨道 « fond noir » — de l'input (un caractère) à la vidéo publiée
 
-Style de référence : `xue/remotion/src/Xue.tsx` (rendu `xue/rendu/xue_remotion.mp4`). Pour le style papier / paysages
+Style de référence : `xue/remotion/src/Xue.tsx` (rendu `episodes/xue/fond_noir/rendu/xue_remotion.mp4`). Pour le style papier / paysages
 à l'encre, voir la skill `video-shuimo` (validée sur le 學, composition `XueV2`).
 
 **Input : un caractère** (ex. 家). Tout le reste se décide avec l'utilisateur, par étapes. Modèle complet existant :
-`xue/` (學, README, SCRIPT.md, tools/, remotion/). Skills appelées : `voix-off-modo`, `fiche-caractere`,
+`xue/` (moteur : README, tools/, remotion/) et `episodes/xue/fond_noir/` (學 : SCRIPT.md, voix, rendus). Skills appelées : `voix-off-modo`, `fiche-caractere`,
 `fond-shuimo`, `rouleau-du-temps`, `encre-3d`, `coup-de-pinceau`, `motion-design`.
 
 ## Principes
@@ -47,7 +47,7 @@ Proposer, puis faire choisir :
 Skill `voix-off-modo`, **mouture v2** : caractère à l'écran + question en 10 s, relance à chaque saut d'époque,
 retournement aux deux tiers, 2 phrases concrètes pour 1 poétique, « Alors le pinceau unit… » + pinyin, le caractère
 aujourd'hui, maxime, passerelle. Livrer le script par blocs avec `> plan :` et la durée estimée.
-Proposer 1–2 variantes d'accroche. Écrire `SCRIPT.md` (sources en bas). **Attendre la validation du texte.**
+Proposer 1–2 variantes d'accroche. Écrire `episodes/<pinyin>/fond_noir/SCRIPT.md` (sources en bas). **Attendre la validation du texte.**
 
 ## Étape 4 — Storyboard et choix des éléments ⟶ validation
 Tableau plan par plan : temps, texte, fond, élément visuel, transition, son. Pour chaque bloc, choisir dans le
@@ -89,7 +89,7 @@ d'époque ; le caractère (ou sa composante en cours) reste lisible à l'écran 
   améliorations.
 
 ## Étape 7 — Rendu final (sur demande)
-Rendu 1080p (`render.sh`), loudnorm −14 LUFS (TP −1,5) → `rendu/`, sous-titres `.srt` (`tools/subtitles.py`),
+Rendu 1080p (`render.sh`), loudnorm −14 LUFS (TP −1,5) → `episodes/<pinyin>/fond_noir/rendu/`, sous-titres `.srt` (`tools/subtitles.py`),
 aperçu 720p compressé pour le téléphone, commit.
 
 ## Étape 8 — Paquet YouTube (propositions)

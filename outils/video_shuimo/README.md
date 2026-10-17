@@ -1,7 +1,7 @@
 # Outils vidéo shuimo (série 墨道)
 
 Outils communs à tous les épisodes « tout shuimo » (skill `video-shuimo`). Chaque épisode a son dossier
-(ex. `xue/shuimo_v2/`, ou `episodes/<pinyin>/` pour les suivants) avec un `episode.json` (voir `modele_episode.json`
+(`episodes/<pinyin>/`, ex. `episodes/xue/`) avec un `episode.json` (voir `modele_episode.json`
 et la documentation en tête de `episode.py`).
 
 | Outil | Rôle | Entrée → sortie |
@@ -48,4 +48,4 @@ La composition lit `reperes` : `cues[bNN].cues[nom]` (temps dans le clip) et `_l
 `rouleaux[i].debut`, `pauses`, `fin`, `total`) ; un repère absolu = `clips[bNN].debut + cue`
 (+ durée de la pause si le repère est après la coupe).
 
-Épisode de référence : 學 (`xue/shuimo_v2/episode.json`, composition `XueV2`).
+Épisode de référence : 學 (`episodes/xue/episode.json`, composition `XueV2`).

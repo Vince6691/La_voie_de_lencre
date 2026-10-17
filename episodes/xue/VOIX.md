@@ -1,5 +1,5 @@
 # Textes envoyés au synthétiseur (ElevenLabs « Chinese narration », eleven_v4)
-Noms chinois en caractères (la voix bascule en mandarin), nombres en lettres. Un clip par bloc → `assets/voice_sx/b01..b09.mp3`.
+Noms chinois en caractères (la voix bascule en mandarin), nombres en lettres. Un clip par bloc → `voix/b01..b09.mp3`.
 
 b01: 學. Apprendre, en chinois… Regardez bien : ce caractère cache deux mains. Aujourd'hui, plus personne ne les voit. Où sont-elles passées ?
 b02: En chinois moderne, on l'écrit en huit traits. Il en fallait seize. Entre les deux : trois mille ans, un empereur, un dictionnaire… et deux mains qui s'effacent. Pour les retrouver, il faut remonter jusqu'au premier qui l'a tracé.

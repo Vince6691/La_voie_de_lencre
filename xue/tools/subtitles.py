@@ -1,5 +1,5 @@
 """Sous-titres SRT (français) calés sur la voix off : chaque sous-titre se termine sur un silence
-détecté dans la prise (assets/voice_fast, pauses comprises)."""
+détecté dans la prise (../episodes/xue/fond_noir/voice_fast, pauses comprises)."""
 import json, sys
 sys.path.insert(0, 'tools')
 from silences import silences
@@ -37,7 +37,7 @@ def ts(x):
 
 out = []
 for k, cues in L.items():
-    sil, dur = silences(f'assets/voice_fast/s{k:02d}.wav')
+    sil, dur = silences(f'../episodes/xue/fond_noir/voice_fast/s{k:02d}.wav')
     lead = sil[0][1] if sil and sil[0][0] == 0 else 0  # silence de tête ajouté au montage
     sil = [s for s in sil if s[0] > 0]
     v0 = TL['voice'][k - 1]['start']
@@ -46,5 +46,5 @@ for k, cues in L.items():
         b = dur + 0.2 if i is None else sil[i][0] + 0.3
         out.append(f'{len(out) + 1}\n{ts(v0 + a)} --> {ts(v0 + b)}\n{txt}\n')
         if i is not None: a = sil[i][1]
-open('rendu/xue_evolution.fr.srt', 'w').write('\n'.join(out))
+open('../episodes/xue/fond_noir/rendu/xue_evolution.fr.srt', 'w').write('\n'.join(out))
 print(len(out), 'sous-titres')

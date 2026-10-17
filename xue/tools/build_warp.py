@@ -5,7 +5,7 @@ Entrées :
   out/cm/sNN.wav       prise Chuck Miller (silences rognés), pour aligner phrase à phrase
   out/voice_raw/sNN.wav  nouvelle prise (silences rognés, −18 LUFS)
 Sorties :
-  assets/voice_fast/sNN.wav  nouvelle prise + pauses insérées (début de clip et entre phrases)
+  ../episodes/xue/fond_noir/voice_fast/sNN.wav  nouvelle prise + pauses insérées (début de clip et entre phrases)
   src/warp.js, tools/warp.json  ancres → temps de la nouvelle prise
   tools/gaps.json            silence après chaque clip (lu par build_timeline.py)
 """
@@ -98,7 +98,7 @@ for k in range(1, 11):
             last = cut
     parts.append(a[last:])
     y = np.concatenate(parts)
-    o = wave.open(f'assets/voice_fast/s{k:02d}.wav', 'wb')
+    o = wave.open(f'../episodes/xue/fond_noir/voice_fast/s{k:02d}.wav', 'wb')
     o.setnchannels(1); o.setsampwidth(2); o.setframerate(sr); o.writeframes(y.tobytes()); o.close()
     print(k, f'{nw_len:.2f}s → {len(y) / sr:.2f}s')
 

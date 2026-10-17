@@ -6,7 +6,7 @@ description: Chef d'orchestre d'une vidéo longue 墨道 « tout shuimo » à pa
 # Vidéo 墨道 « tout shuimo » — de l'input (un caractère) à la vidéo
 
 **Input : un caractère.** Modèle validé par l'utilisateur : le 學 en shuimo, composition `XueV2`
-(`xue/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `xue/shuimo_v2/`
+(`xue/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `episodes/xue/`
 (PROPOSITION.md, VOIX.md, episode.json), aperçu `xue/out/preview/xue_shuimo_v2d_720.mp4`.
 
 **Outils communs : `outils/video_shuimo/`** (README) — `voix_prep.py`, `reperes.py`, `musique.py`, pilotés par

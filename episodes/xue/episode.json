@@ -1,7 +1,7 @@
 {
- "voix": "../assets/voice_sx",
- "reperes": "../assets/voice_sx/cues_sx.json",
- "musique": "../assets/audio/bed_sx.wav",
+ "voix": "voix",
+ "reperes": "voix/reperes.json",
+ "musique": "audio/musique.wav",
  "debut": 0.6,
  "sequence": [
   {
