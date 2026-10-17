@@ -5,10 +5,11 @@
 // l'époque d'arrivée ; la caméra remonte puis plonge à la verticale sur le paysage d'arrivée, qui redevient le plan 2D ;
 // le sceau s'envole vers le cartouche d'époque.
 //
-// Utilisation :
-//   const C: Rouleau3DConfig = { at: 105.2, eras, from: 1, to: 2, years: [-1046, -300], fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' } };
-//   <Rouleau3DStage cfg={C} />   (plein cadre, de at − 0,3 à at + durée ; à l'appelant les plans 2D avant et après)
-//   r3TagIn(C, t) : opacité du cartouche d'arrivée (le sceau volant s'y pose en (156, 136), 92 px).
+// Utilisation (skill rouleau-3d) :
+//   const C: Rouleau3DConfig = { at: 105.2, de: 'zhou_occ', vers: 'royaumes', fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' } };
+//   <Rouleau3DStage cfg={C} />   (plein cadre, de at − 0,3 à at + r3Seconds(C) ; à l'appelant les plans 2D avant et après)
+//   r3TagIn(C, t) : opacité du cartouche d'arrivée (le sceau volant s'y pose en (156, 136), 92 px) ;
+//   cartouches : cartouche(C.de) / cartouche(C.vers) (src/periodes.ts) — mêmes sceaux et mêmes noms que le rouleau.
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
@@ -17,14 +18,17 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { compose, Mood, Shot } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
-import { Era, travelM } from '../rouleau/TimeScroll';
+import { travelM } from '../rouleau/TimeScroll';
+import { periode, periodesEntre } from '../periodes';
 
 export type Rouleau3DConfig = {
   at: number; duration?: number; // 5,8 s par défaut (le son est calé dessus)
-  eras: Era[]; from: number; to: number; years: [number, number];
+  de: string; vers: string; // périodes de départ et d'arrivée (identifiants de src/periodes.ts : 'shang', 'zhou_occ', 'royaumes'…)
+  annees?: [number, number]; // années du compteur (par défaut : début de chaque période)
   fromLand: { seed: number; mood: Mood }; toLand: { seed: number; mood: Mood };
   midSeeds?: number[]; // paysages traversés (2), puis 2 marges
-  periods?: { from: number; zh: string; name: string }[]; // périodes affichées au-dessus du compteur d'années
+  inscriptions?: Inscr[]; // poèmes inscrits sur le rouleau (par défaut : INSCRIPTIONS) — idéalement des vers qui contiennent le caractère étudié
+  collection?: Collect[]; // sceaux de collection (par défaut : COLLECT)
   variant?: 'complet' | 'court'; // complet 5,3 s (verticale → rasante → plongée) ; court 3,6 s (rasante d'emblée, sortie en fondu)
   stone?: 'miel' | 'rouge'; // pierre du sceau : Shoushan miel, ou pierre « sang de poulet » (鸡血石) rouge
 };
@@ -52,6 +56,7 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const V3 = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 const vl = (a: THREE.Vector3, b: THREE.Vector3, k: number) => a.clone().lerp(b, k);
 
+const yearsOf = (c: Rouleau3DConfig): [number, number] => c.annees ?? [periode(c.de).debut, periode(c.vers).debut];
 const yearFmt = (y: number) => (y < 0 ? `−${Math.abs(Math.round(y))}` : `${Math.round(y)}`);
 // déroulés : V(c) donne les temps de chaque variante (en temps de référence s, 0 = début du rouleau)
 type Timing = {
@@ -76,18 +81,24 @@ const MOODFILL: Partial<Record<Mood, (g: CanvasRenderingContext2D, w: number, h:
   brume: (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(250,248,243,0.15)'); gr.addColorStop(0.55, 'rgba(250,248,243,0.5)'); gr.addColorStop(1, 'rgba(250,248,243,0.25)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); },
   nuit: (g, w, h) => { g.globalCompositeOperation = 'multiply'; g.fillStyle = 'rgba(120,130,160,0.55)'; g.fillRect(0, 0, w, h); g.globalCompositeOperation = 'source-over'; },
 };
+// texte d'un sceau d'époque : un caractère au centre, deux caractères l'un sous l'autre (春秋, 三國…)
+const sealText = (g: CanvasRenderingContext2D, zh: string, s: number) => {
+  g.textAlign = 'center'; g.textBaseline = 'middle'; const ch = [...zh];
+  if (ch.length === 1) { g.font = `${s * 0.7}px ShuimoKai`; g.fillText(zh, 0, s * 0.03); return; }
+  g.font = `${s * 0.42}px ShuimoKai`; ch.slice(0, 2).forEach((c, i) => g.fillText(c, 0, (i - 0.5) * s * 0.44 + s * 0.02));
+};
 const drawSealSquare = (g: CanvasRenderingContext2D, x: number, y: number, s: number, zh: string, a: number, ghost = false) => {
   g.save(); g.translate(x, y); g.globalAlpha = a;
   if (ghost) {
     g.strokeStyle = VER; g.lineWidth = s * 0.03; g.setLineDash([s * 0.06, s * 0.05]); g.strokeRect(-s * 0.45, -s * 0.45, s * 0.9, s * 0.9); g.setLineDash([]);
-    g.fillStyle = 'rgba(192,57,43,0.35)'; g.font = `${s * 0.7}px ShuimoKai`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(zh, 0, s * 0.03);
+    g.fillStyle = 'rgba(192,57,43,0.35)'; sealText(g, zh, s);
   } else {
     const R0 = rng(zh.charCodeAt(0));
     g.fillStyle = VER; g.beginPath();
     for (let i = 0; i < 40; i++) { const k = i / 40, side = Math.floor(k * 4), f = (k * 4) % 1, j = (R0() - 0.5) * s * 0.025;
       const p = [[-1 + 2 * f, -1], [1, -1 + 2 * f], [1 - 2 * f, 1], [-1, 1 - 2 * f]][side]; g.lineTo((p[0] * s) / 2 + j, (p[1] * s) / 2 + j); }
     g.closePath(); g.fill();
-    g.fillStyle = '#f6eee0'; g.font = `${s * 0.7}px ShuimoKai`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(zh, 0, s * 0.03);
+    g.fillStyle = '#f6eee0'; sealText(g, zh, s);
     g.globalCompositeOperation = 'destination-out';
     for (let i = 0; i < 70; i++) { g.globalAlpha = 0.25 + 0.5 * R0(); g.beginPath(); g.arc((R0() - 0.5) * s, (R0() - 0.5) * s, 0.5 + R0() * s * 0.012, 0, 7); g.fill(); }
   }
@@ -96,8 +107,9 @@ const drawSealSquare = (g: CanvasRenderingContext2D, x: number, y: number, s: nu
 // ── inscriptions (題跋) : poèmes en colonnes de droite à gauche, signature plus petite, sceaux de nom et de collection.
 // Placés hors des plans de départ et d'arrivée (qui doivent rester identiques aux plans 2D). Encre réaliste : densité
 // variable d'un caractère à l'autre, légère bavure dans les fibres, manques du pinceau sec.
-type Inscr = { x: number; y: number; size: number; font: string; cols: string[]; sig?: string; seal?: string; ink?: number };
-const INSCRIPTIONS: Inscr[] = [
+export type Inscr = { x: number; y: number; size: number; font: string; cols: string[]; sig?: string; seal?: string; ink?: number };
+export type Collect = { x: number; y: number; size: number; text: string; white: boolean };
+export const INSCRIPTIONS: Inscr[] = [
   { x: 1600, y: 190, size: 70, font: 'ShuimoKai', cols: ['嫋嫋兮秋風', '洞庭波兮', '木葉下'], sig: '錄楚辭湘夫人 丙申秋日', seal: '遊心', ink: 0.85 },
   { x: 5560, y: 170, size: 78, font: 'ShuimoKai', cols: ['蒹葭蒼蒼', '白露為霜', '所謂伊人', '在水一方'], sig: '錄詩經蒹葭於墨道山房', seal: '墨道', ink: 0.92 },
   { x: 6500, y: 160, size: 90, font: 'ShuimoCao', cols: ['千山鸟飞绝', '万径人踪灭', '孤舟蓑笠翁', '独钓寒江雪'], sig: '柳宗元江雪', seal: '雲水', ink: 0.95 },
@@ -105,7 +117,7 @@ const INSCRIPTIONS: Inscr[] = [
 ];
 // sceaux de collection, épars près des bords des feuilles (comme sur les rouleaux anciens)
 // (les sceaux utilisent fonts/ChongxiSeal-sceaux.otf, sous-ensemble de ChongxiSeal : ajouter les caractères avec pyftsubset)
-const COLLECT: { x: number; y: number; size: number; text: string; white: boolean }[] = [
+export const COLLECT: Collect[] = [
   { x: 3990, y: 1040, size: 92, text: '墨道珍藏', white: true }, { x: 5700, y: 980, size: 62, text: '清賞', white: false },
   { x: 7560, y: 210, size: 70, text: '神品', white: true }, { x: 260, y: 1010, size: 80, text: '寶', white: false },
 ];
@@ -179,14 +191,14 @@ const paintScroll = (c: Rouleau3DConfig, img: Record<string, HTMLImageElement>, 
     t.fillStyle = gr; t.fillRect(0, 0, tc.width, tc.height);
     g.drawImage(tc, k * SH - F, TOP);
   });
-  INSCRIPTIONS.forEach((it, i) => inscribe(g, it, 40 + i));
-  COLLECT.forEach((s2, i) => sealStamp(g, s2.x, s2.y, s2.size, s2.text, s2.white, 90 + i));
+  (c.inscriptions ?? INSCRIPTIONS).forEach((it, i) => inscribe(g, it, 40 + i));
+  (c.collection ?? COLLECT).forEach((s2, i) => sealStamp(g, s2.x, s2.y, s2.size, s2.text, s2.white, 90 + i));
   // bordures de soie (haut et bas), filets d'encre
   const silk = (y: number, h: number) => { g.fillStyle = 'rgba(214,201,170,0.92)'; g.fillRect(0, y, PW, h); g.fillStyle = 'rgba(120,95,60,0.08)'; for (let x = 0; x < PW; x += 6) g.fillRect(x, y, 2, h); };
   silk(0, TOP); silk(TOP + 1080, PH - TOP - 1080);
   g.fillStyle = 'rgba(90,70,45,0.55)'; g.fillRect(0, TOP - 3, PW, 3); g.fillRect(0, TOP + 1080, PW, 3);
   // frise du temps sur la soie : graduations tous les 50 ans, années tous les 100
-  const [y0, y1] = c.years, xOf = (y: number) => SEAL0 + ((y - y0) / (y1 - y0)) * (SEAL1 - SEAL0);
+  const [y0, y1] = yearsOf(c), xOf = (y: number) => SEAL0 + ((y - y0) / (y1 - y0)) * (SEAL1 - SEAL0);
   const by = TOP + 1080 + 40;
   g.strokeStyle = 'rgba(29,25,21,0.7)'; g.lineWidth = 3; g.beginPath(); g.moveTo(0, by); g.lineTo(PW, by); g.stroke();
   g.fillStyle = INK; g.textAlign = 'center'; g.textBaseline = 'top';
@@ -197,12 +209,10 @@ const paintScroll = (c: Rouleau3DConfig, img: Record<string, HTMLImageElement>, 
     if (big) { g.font = '600 46px ShuimoLatin'; g.fillText(yearFmt(y), x, by + 26); }
   }
   // sceaux d'époque : départ (déjà apposé), arrivée en attente (pointillés), les autres apposés au passage
-  c.eras.forEach((e, i) => {
-    if (i === c.to) { drawSealSquare(g, SEAL1, SEAL.y, SEAL.size, e.zh, 1, true); return; }
-    if (i === c.from) drawSealSquare(g, SEAL0, SEAL.y, SEAL.size, e.zh, 0.95);
-  });
+  drawSealSquare(g, SEAL0, SEAL.y, SEAL.size, periode(c.de).sceau, 0.95);
+  drawSealSquare(g, SEAL1, SEAL.y, SEAL.size, periode(c.vers).sceau, 1, true);
   g.font = '600 40px ShuimoLatin'; g.fillStyle = 'rgba(29,25,21,0.85)';
-  g.fillText(c.eras[c.from].date, SEAL0, by + 80 > PH ? by + 26 : TOP + 1080 + 92);
+  g.fillText(yearFmt(y0), SEAL0, by + 80 > PH ? by + 26 : TOP + 1080 + 92);
   return cv;
 };
 const sealCanvas = (zh: string) => { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const g = cv.getContext('2d')!; drawSealSquare(g, 256, 256, 470, zh, 1); return cv; };
@@ -497,12 +507,13 @@ const Rule: React.FC<{ flip?: boolean }> = ({ flip }) => (
 );
 const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number }> = ({ cfg, year, a }) => {
   if (a <= 0) return null;
-  const [y0, y1] = cfg.years, k = clamp((year - y0) / (y1 - y0));
-  const per = cfg.periods ?? [];
-  let pi = -1; per.forEach((p, i) => { if (year >= p.from) pi = i; });
+  const [y0, y1] = yearsOf(cfg), k = clamp((year - y0) / (y1 - y0));
+  // périodes traversées, avec les mêmes noms que les cartouches (src/periodes.ts)
+  const per = periodesEntre(y0, y1, cfg.de).map((p) => ({ from: p.debut, zh: p.zh, name: p.nom }));
+  let pi = 0; per.forEach((p, i) => { if (year >= p.from) pi = i; });
   const P = per[pi], next = per[pi + 1];
-  // fondu du nom de période autour de chaque changement
-  const pa = P ? Math.min(clamp((year - P.from) / 25), next ? clamp((next.from - year) / 25) : 1) : 0;
+  // fondu du nom de période autour de chaque changement (le premier est affiché d'emblée)
+  const pa = P ? Math.min(pi === 0 ? 1 : clamp((year - P.from) / 25), next ? clamp((next.from - year) / 25) : 1) : 0;
   const digits = yearFmt(year).split('');
   return (
     <AbsoluteFill style={{ opacity: a, pointerEvents: 'none' }}>
@@ -553,13 +564,13 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
     ]).then(() => Promise.all([load(staticFile('shuimo/paper.jpg')), ...files.map((f) => load(staticFile(`shuimo/elements/${f}`)))]))
       .then(([paper, ...ims]) => {
         const img: Record<string, HTMLImageElement> = {}; files.forEach((f, i) => (img[f] = ims[i]));
-        setA({ scroll: tex(paintScroll(cfg, img, paper)), seal: tex(sealCanvas(cfg.eras[cfg.to].zh)), roll: tex(rollCanvas(paper)), wood: tex(woodCanvas()), woodBump: tex(woodCanvas(true)), felt: tex(feltCanvas()), stone: tex(stoneCanvas(cfg.stone === 'rouge')), petal: tex(petalCanvas()) });
+        setA({ scroll: tex(paintScroll(cfg, img, paper)), seal: tex(sealCanvas(periode(cfg.vers).sceau)), roll: tex(rollCanvas(paper)), wood: tex(woodCanvas()), woodBump: tex(woodCanvas(true)), felt: tex(feltCanvas()), stone: tex(stoneCanvas(cfg.stone === 'rouge')), petal: tex(petalCanvas()) });
         continueRender(h);
       });
   }, [cfg, h]);
   const sealUrl = useMemo(() => (A ? (A.seal.image as HTMLCanvasElement).toDataURL() : ''), [A]);
   if (!A || s < -0.4 || s > v.seal.fade[1] + 0.1) return null;
-  const year = lerp(cfg.years[0], cfg.years[1], v.travel(s));
+  const year = lerp(yearsOf(cfg)[0], yearsOf(cfg)[1], v.travel(s));
   const ya = sm(seg(s, v.year[0], v.year[1])) * (1 - sm(seg(s, v.year[2], v.year[3])));
   // sceau volant : de sa place dans le plan d'arrivée (vue verticale) au cartouche
   const fk = eio(seg(s, v.seal.fly[0], v.seal.fly[1])), s0 = sealOnScreen(v, Math.min(s, v.seal.fly[0]));

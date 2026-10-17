@@ -8,6 +8,7 @@ episode.json (chemins relatifs au fichier) :
   sequence     liste ordonnée : {"clip": "b01", "apres": 0.9}
                                 {"clip": "b07", "pause": {"repere": "reponse", "decalage": -0.12, "duree": 1.7}, "apres": 0.8}
                                 {"rouleau": 5, "apres": 0.3}
+                                {"rouleau3d": "complet", "apres": 0.3}   (ou "court" ; skill rouleau-3d)
                « apres » = silence avant l'élément suivant ; « pause » = silence inséré dans le clip juste avant un repère
   queue        durée de l'écran de fin après le dernier clip (s)
   reperes_cles {clip: {nom: "expression de la voix"}} : le repère tombe au début du premier mot de l'expression
@@ -22,6 +23,9 @@ def charger(chemin):
     for k in ('voix', 'reperes', 'musique'):
         cfg[k] = os.path.normpath(os.path.join(base, cfg[k]))
     return cfg
+
+
+ROULEAU3D = {'complet': 5.3, 'court': 3.6}  # durées des rouleaux 3D (Rouleau3D.tsx : r3Seconds)
 
 
 def ligne_de_temps(cfg, durees, reperes=None):
@@ -45,6 +49,10 @@ def ligne_de_temps(cfg, durees, reperes=None):
         elif 'plage' in el:  # plage sans voix réservée à un clip (son du clip éventuel : son, son_decalage, son_volume)
             plages[el['nom']] = {'debut': round(t, 3), 'duree': el['plage'], **{k: el[k] for k in ('son', 'son_decalage', 'son_volume', 'son_duree') if k in el}}
             t += el['plage']
+        elif 'rouleau3d' in el:  # rouleau du temps en 3D (skill rouleau-3d) : « complet » 5,3 s ou « court » 3,6 s
+            d = ROULEAU3D[el['rouleau3d']]
+            rouleaux.append({'debut': round(t, 3), 'duree': d, 'modele': f"3d-{el['rouleau3d']}"})
+            t += d
         else:
             rouleaux.append({'debut': round(t, 3), 'duree': el['rouleau']})
             t += el['rouleau']

@@ -15,6 +15,7 @@ import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
 import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
+import { cartouche } from '../periodes';
 import { CloudReveal } from '../video_encre/CloudReveal';
 import { Rig, drawGlyphDance } from '../danse/GlyphDance';
 import { VideoReveal } from '../video_encre/VideoReveal';
@@ -147,7 +148,7 @@ const MapPanel: React.FC<{ from: number; to: number; draw: (ctx: CanvasRendering
 // ── cartouches, étiquettes, textes (tailles lisibles sur téléphone)
 const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({ zh, name, dates, a }) => (
   <div style={{ position: 'absolute', left: 110, top: 90, display: 'flex', alignItems: 'center', gap: 26, opacity: a }}>
-    <div style={{ width: 92, height: 92, background: rgb(VER, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 64, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>{zh}</div>
+    <div style={{ width: 92, height: 92, background: rgb(VER, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: [...zh].length > 1 ? 38 : 64, writingMode: [...zh].length > 1 ? 'vertical-rl' : undefined, lineHeight: 1, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>{zh}</div>
     <div>
       <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss }}>{name}</div>
       <div style={{ fontFamily: 'ShuimoLatin', fontSize: 30, color: '#6b5d50' }}>{dates}</div>
@@ -379,8 +380,8 @@ const Opening: React.FC = () => {
         <Caption text="Xu Shen 許慎 · Shuowen jiezi, vers 100" a={win(tf, dico, haut - 0.2, 0.5)} y={960} size={42} />
         <Label x={980} y={720} zh="大" text="grand" color={AZ} a={win(tf, grand, song - 0.6, 0.4)} />
         <Caption text="Xu Xuan 徐鉉, 986" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} />
-        <EraTag zh="漢" name="DYNASTIE HAN" dates="vers l'an 100" a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
-        <EraTag zh="宋" name="DYNASTIE SONG" dates="Xe–XIIIe siècle" a={win(tf, song, FREEZE + 0.2, 0.6)} />
+        <EraTag {...cartouche('han_or', "vers l'an 100")} a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
+        <EraTag {...cartouche('song', 'Xe–XIIIe siècle')} a={win(tf, song, FREEZE + 0.2, 0.6)} />
       </>}
     </AbsoluteFill>
   );
@@ -629,7 +630,7 @@ const Shang: React.FC = () => {
             }
           }} />
       </Cam>
-      <EraTag zh="商" name="DYNASTIE SHANG" dates="Anyang · v. 1200 av. J.-C." a={seg(t, CLIP0 + 1.0, CLIP0 + 1.8) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
+      <EraTag {...cartouche('shang', 'Anyang · v. 1200 av. J.-C.')} a={seg(t, CLIP0 + 1.0, CLIP0 + 1.8) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
     </AbsoluteFill>
   );
 };
@@ -657,8 +658,8 @@ const Zhou: React.FC = () => {
           }} />
         </TimeScrollStage>
       </Cam>
-      <EraTag zh="周" name="DYNASTIE ZHOU" dates="XIe siècle av. J.-C." a={seg(t, A5 - 0.6, A5 + 0.2) * (1 - seg(t, R2, R2 + 0.4))} />
-      <EraTag zh="戰" name="ROYAUMES COMBATTANTS" dates="Ve–IIIe siècle av. J.-C." a={tagIn(TR2, t) * (1 - seg(t, R2E + 2.5, R2E + 3.2))} />
+      <EraTag {...cartouche('zhou_occ', 'XIe siècle av. J.-C.')} a={seg(t, A5 - 0.6, A5 + 0.2) * (1 - seg(t, R2, R2 + 0.4))} />
+      <EraTag {...cartouche('royaumes', 'Ve–IIIe siècle av. J.-C.')} a={tagIn(TR2, t) * (1 - seg(t, R2E + 2.5, R2E + 3.2))} />
     </AbsoluteFill>
   );
 };
@@ -804,8 +805,8 @@ const QinHan: React.FC = () => {
       </Cam>
       <Caption text="221 av. J.-C. · le petit sceau 小篆" a={win(t, emp, ord - 0.1, 0.4)} y={960} size={44} />
       <Label x={1170} y={250} zh="羊" text="le mouton (petit sceau)" color={GOM} a={win(t, mt - 0.1, mt + 2.3, 0.4)} />
-      <EraTag zh="秦" name="DYNASTIE QIN" dates="221 av. J.-C. · le petit sceau" a={seg(t, A7 - 0.5, A7) * (1 - seg(t, xs - 0.5, xs))} />
-      <EraTag zh="漢" name="DYNASTIE HAN" dates="vers l'an 100 · Xu Shen" a={seg(t, xs - 0.3, xs + 0.3) * (1 - seg(t, B('b07') - 0.2, B('b07') + 0.3))} />
+      <EraTag {...cartouche('qin', '221 av. J.-C. · le petit sceau')} a={seg(t, A7 - 0.5, A7) * (1 - seg(t, xs - 0.5, xs))} />
+      <EraTag {...cartouche('han_or', "vers l'an 100 · Xu Shen")} a={seg(t, xs - 0.3, xs + 0.3) * (1 - seg(t, B('b07') - 0.2, B('b07') + 0.3))} />
     </AbsoluteFill>
   );
 };
