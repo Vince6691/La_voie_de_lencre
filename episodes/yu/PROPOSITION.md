@@ -1,4 +1,4 @@
-# 語 (yǔ) — proposition tout shuimo, voix off v2 (≈ 5 min + écran de fin) — v4
+# 語 (yǔ) — proposition tout shuimo, voix off v2 (≈ 5 min + écran de fin) — v5
 
 ## Cadrage (réponses de l'utilisateur)
 - **Angle** : « Deux mots pour parler ». Le précepte 食不語，寢不言 sert d'accroche (citation seule, attribuée en une
@@ -184,6 +184,39 @@ trait puis clip 3D · cartes sur papier · aujourd'hui : mosaïque de mots, lavi
   feuilletage de lattes qui s'arrête net (bloc 6), pinceau sur les tracés, gong (≤ 3 : bloc 4, bloc 6, « Ainsi naît »).
 - Jamais par-dessus la voix : chaque son posé dans le silence qui précède.
 
+## Chapitres YouTube (provisoires : recalculés depuis `voix/reperes.json` après la voix)
+Un chapitre par changement de tableau, chacun ≥ 10 s, le premier à 0:00.
+```
+0:00 Deux mots pour parler
+0:20 Les pièces du caractère
+0:38 Shang : une bouche, un X
+1:30 La cloche qui parle
+2:05 Royaumes combattants : on se dispute
+2:35 Han : la réponse
+3:05 Yang Xiong et les soldats
+3:45 Aujourd'hui : une écriture, plusieurs voix
+4:15 Reprenons : deux bouches face à face
+4:45 Dire et converser
+```
+
+## Miniature (concept)
+- **Une seule idée** : deux bouches anciennes face à face, de profil, en très grand — la bouche de 言 en **vermillon**
+  à gauche, celle de 吾 en **azurite** à droite, un trait d'encre qui fait l'aller-retour entre elles.
+- **語** calligraphié noir en haut à droite (≈ 25 % de la hauteur), papier xuan clair, aucun paysage chargé.
+- **Texte** (≤ 4 mots, tiers gauche, lisible à 120 px) : « PARLER ≠ PARLER » ; variante : « 2 MOTS POUR PARLER ? ».
+- Rien dans le coin bas droit (durée YouTube). Prompt Nano Banana (skill `thumbnail-shuimo-generator`) et test 120 px
+  (`thumbnail-ctr-optimizer`) après validation de la voix.
+- Cohérence titre / miniature : titre 1 (« Pourquoi le chinois a deux mots pour “parler” ») avec « PARLER ≠ PARLER ».
+
+## Tests avant la voix (images fixes, aucun rendu vidéo)
+Les trois plans nouveaux pour la série, jugés en images fixes avant d'enregistrer, pour ne pas découvrir un défaut
+après la voix (une planche contact, demi-résolution, `npx remotion still … --scale=0.5`) :
+1. **Deux bouches face à face** (blocs 6 et 9, miniature) : 言 vermillon / 吾 azurite, trait d'encre à mi-course.
+2. **Plastron qui craque au feu** (bloc 3, plan tableau) : 3 images (avant, craquelures à mi-course, fumée en lavis).
+3. **Conseillers en papier découpé** (bloc 5) : une pose de chaque, détourés, devant les deux pavillons.
+Critère : Technique ≥ 8,5 sur ces images (note artistique ciblée, sans passe complète). Le n° 3 attend l'image Nano
+Banana (prompt fourni dans `A_FOURNIR.md`).
+
 ## Titres possibles
 1. Pourquoi le chinois a deux mots pour « parler »
 2. Ce caractère chinois cache deux bouches face à face
@@ -209,7 +242,7 @@ trait puis clip 3D · cartes sur papier · aujourd'hui : mosaïque de mots, lavi
    s'affiche. Suffisant ?
 3. **Humour** : deux touches dans la voix (« la bouche pleine », « le fa de France ») ; plus de gag visuel (note
    artistique v3).
-4. **Miniature** : candidat retenu, le plan des deux bouches face à face (vermillon / azurite) sur papier.
+4. **Miniature** : concept fixé (voir « Miniature »).
 
 ## À vérifier avant enregistrement
 Voir `SOURCES.md` (+ 法國 : 法 transcrit le « Fa » de France, à confirmer).
