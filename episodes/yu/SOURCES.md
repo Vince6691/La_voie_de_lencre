@@ -16,3 +16,5 @@
 | 師 désignait d'abord une armée (二千五百人為師) | 說文 ; 甲骨文 𠂤 | à vérifier pour la passerelle |
 | 法國 : 法 transcrit la première syllabe de France (« Fa-lan-xi ») | usage courant | à confirmer (formulation de l'humour) |
 | Pékin / Canton peu intercompréhensibles | mandarin et cantonais (yue) | fait (formulation « pas toujours ») |
+| 吾 au sens de « moi » : attesté sous les Zhou, pas sur les os (où 吾 est rare) | usage des textes Zhou | à vérifier (voix : « qui voudra dire plus tard ») |
+| Chronologie : Royaumes combattants (−221) → Shuowen (vers 100) ≈ trois siècles ; Yang Xiong (−53 / 18) un siècle avant le Shuowen | 史記 / 漢書 | fait |

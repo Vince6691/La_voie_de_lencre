@@ -1,14 +1,22 @@
 # 語 — notes artistiques
 
 ## 2026-10-17 · Étape 1 · plan v3
-| Domaine | Note |
-|---|---|
-| Technique | 7,5 |
-| Artistique | 7,5 |
-| Historique | 6,5 (erreurs factuelles : correction obligatoire) |
-| Design | 7,5 |
-| Storytelling | 7 |
+| Domaine | Note | Après corrections (plan v4) |
+|---|---|---|
+| Technique | 7,5 | 8 |
+| Artistique | 7,5 | 8 |
+| Historique | 6,5 (erreurs factuelles) | 8 |
+| Design | 7,5 | 8 |
+| Storytelling | 7 | 8 |
 
-Corrections proposées : (1) faits et chronologie ; (2) seconde énigme « que fait "moi" dans la parole ? » ;
-(3) bloc 8 désencombré ; (4) Shang plus beau, gags risqués retirés, conseillers par détourage ; (5) accroche lisible
-sans le son. Décision de l'utilisateur : en attente.
+Corrections **retenues** (toutes) :
+1. Faits et chronologie : 五 en cinq traits (4 traits = 亖) ; « Trois siècles plus tard » (Royaumes → Shuowen) ;
+   Yang Xiong « un siècle plus tôt, déjà » ; 吾 « qui voudra dire plus tard “moi” » ; « sans doute » pour le son de
+   言 ; étiquette « les pièces, avant 語 » sur le bandeau ; 成語 = expressions toutes faites.
+2. Seconde énigme au bloc 2 (« que vient faire “moi” dans la parole ? »), résolue au bloc 9.
+3. Bloc 8 allégé : plus de gag du code de lois ; mosaïque → 汉语 qui se pose sur la carte des dialectes.
+4. Shang : plan « tableau » (plastron qui craque au feu) ; plus de trait qui bâille ; conseillers en papier découpé
+   détourés d'une image Nano Banana.
+5. Accroche lisible sans le son (traduction en légende, étiquettes yǔ / yán) ; miniature : les deux bouches.
+
+Restent à surveiller : bloc 3 long (≈ 45 s de voix) — à juger à l'écoute ; durée ≈ 5 min 05 (coupes prêtes).
