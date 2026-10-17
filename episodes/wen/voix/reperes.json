@@ -1,241 +1,334 @@
 {
  "b01": {
-  "duration": 16.69,
+  "duration": 27.87,
   "cues": {
-   "homme": 6.91,
-   "tatouage": 12.39,
-   "comment": 13.79
+   "milliard": 1.42,
+   "zhongwen": 4.06,
+   "wenhua": 6.62,
+   "fawen": 9.74,
+   "pourtant": 11.74,
+   "homme": 13.66,
+   "debout": 14.74,
+   "face": 15.3,
+   "tatouage": 19.46,
+   "prince": 20.82,
+   "jamais": 22.7,
+   "roi": 23.46,
+   "comment": 24.37
   }
  },
  "b02": {
-  "duration": 31.72,
+  "duration": 25.72,
   "cues": {
-   "os": 5.48,
-   "bras": 8.76,
-   "marque": 13.08,
-   "croix": 14.2,
-   "shirakawa": 17.72,
-   "morts": 21.8,
-   "rois": 24.84,
-   "honneur": 26.64,
-   "excuse": 30.28
+   "os": 4.38,
+   "bras": 5.83,
+   "marque": 9.86,
+   "croix": 10.98,
+   "tatouage": 14.38,
+   "punition": 16.26,
+   "rois": 19.38,
+   "wending": 20.38,
+   "sens": 22.22,
+   "peau": 25.14
   }
  },
  "b03": {
-  "duration": 38.16,
+  "duration": 44.51,
   "cues": {
-   "duc": 3.53,
-   "probleme": 7.05,
-   "fuite": 11.69,
-   "tatouer": 13.61,
-   "carriere": 17.61,
-   "neveu": 20.29,
-   "roi": 22.45,
-   "bronze": 26.57,
-   "coeur": 33.45,
-   "grand": 35.85
+   "clan": 0.0,
+   "taibo": 2.45,
+   "tatouer": 3.89,
+   "regner": 5.33,
+   "prince": 6.77,
+   "carriere": 9.65,
+   "bronze": 13.01,
+   "coeur": 16.05,
+   "orne": 18.37,
+   "sens": 23.25,
+   "roi": 27.19,
+   "caractere": 30.19,
+   "fils": 33.2,
+   "wu": 39.68,
+   "duo": 41.12,
+   "raff": 42.53,
+   "force": 43.88
   }
  },
  "b04": {
-  "duration": 36.32,
+  "duration": 38.52,
   "cues": {
-   "royaumes": 2.85,
-   "mutations": 5.29,
-   "ciel": 9.61,
-   "hommes": 13.05,
-   "etoiles": 16.97,
-   "rites": 20.76,
-   "peau": 24.09,
-   "bambou": 26.61,
-   "disparait": 29.89,
-   "sort": 32.45
+   "motifs": 0.21,
+   "ecriture": 2.97,
+   "bambou": 5.57,
+   "sens": 8.45,
+   "quitte": 13.17,
+   "chu": 15.33,
+   "sort": 17.25,
+   "cote": 19.45,
+   "qin": 20.77,
+   "sceau": 22.57,
+   "symetrique": 24.37,
+   "vide": 27.09,
+   "scribes": 28.65,
+   "tete": 30.69,
+   "quatre": 35.61,
+   "ne": 38.21
   }
  },
  "b05": {
-  "duration": 46.36,
+  "duration": 44.73,
   "cues": {
-   "sceau": 5.52,
-   "vide": 12.0,
-   "scribes": 13.84,
-   "quatre": 22.6,
-   "ne": 25.44,
-   "han": 26.88,
-   "tiying": 28.32,
-   "abolit": 37.84,
-   "visage": 40.88,
-   "nom": 42.72,
-   "wen": 43.68
+   "han": 0.0,
+   "tiying": 1.58,
+   "pere": 4.7,
+   "coupe": 7.9,
+   "abolit": 11.82,
+   "visage": 14.58,
+   "nom": 15.74,
+   "wen": 16.62,
+   "simple": 18.78,
+   "mot": 24.02,
+   "transformer": 28.54,
+   "hommes": 31.5,
+   "armes": 35.62,
+   "elever": 37.18,
+   "appelons": 41.84,
+   "sens": 43.67
   }
  },
  "b06": {
-  "duration": 32.13,
+  "duration": 36.96,
   "cues": {
-   "soie": 4.73,
-   "motif": 7.06,
-   "song": 9.33,
-   "ecriture": 13.7,
-   "deserteurs": 15.25,
-   "caracteres": 22.01,
-   "diqing": 23.49,
-   "remede": 27.93,
-   "garde": 31.49
+   "reprenons": 0.06,
+   "formes": 3.5,
+   "tete": 7.26,
+   "bras": 8.86,
+   "jambes": 10.62,
+   "marque": 13.78,
+   "os": 14.78,
+   "bronze": 16.18,
+   "rien": 18.06,
+   "sens": 19.66,
+   "orn": 20.54,
+   "ecr": 21.38,
+   "cul": 22.38,
+   "naissance": 23.66,
+   "ecritures": 27.07,
+   "jiagu": 28.65,
+   "jinwen": 31.51,
+   "wenzi": 34.24
   }
  },
  "b07": {
-  "duration": 39.1,
+  "duration": 16.59,
   "cues": {
-   "traits": 1.81,
-   "reprenons": 4.74,
-   "formes": 7.53,
-   "tete": 11.49,
-   "bras": 13.21,
-   "jambes": 15.33,
-   "marque": 18.49,
-   "os": 19.6,
-   "bronze": 20.89,
-   "rien": 22.69,
-   "naissance": 24.33,
-   "chinois": 31.29,
-   "bunka": 35.07
-  }
- },
- "b08": {
-  "duration": 16.79,
-  "cues": {
-   "peau": 4.32,
-   "autre": 5.52,
-   "tete": 9.76,
-   "plumes": 10.96,
-   "mouton": 14.56,
-   "manger": 15.92
+   "peau": 4.35,
+   "cote": 5.54,
+   "yuwen": 6.7,
+   "ecoliers": 8.84,
+   "autre": 10.3,
+   "parole": 12.43,
+   "ecriture": 14.18,
+   "bientot": 15.44
   }
  },
  "_ligne": {
   "clips": {
    "b01": {
     "debut": 0.6,
-    "duree": 16.69
+    "duree": 27.87,
+    "pause": {
+     "coupe": 11.66,
+     "duree": 1.3
+    }
    },
    "b02": {
-    "debut": 18.19,
-    "duree": 31.72
+    "debut": 30.67,
+    "duree": 25.72
    },
    "b03": {
-    "debut": 55.91,
-    "duree": 38.16
+    "debut": 62.39,
+    "duree": 44.51
    },
    "b04": {
-    "debut": 94.87,
-    "duree": 36.32
+    "debut": 107.7,
+    "duree": 38.52,
+    "pause": {
+     "coupe": 20.62,
+     "duree": 5.0
+    }
    },
    "b05": {
-    "debut": 135.59,
-    "duree": 46.36
+    "debut": 152.62,
+    "duree": 44.73,
+    "pause": {
+     "coupe": 18.58,
+     "duree": 3.4
+    }
    },
    "b06": {
-    "debut": 185.55,
-    "duree": 32.13
+    "debut": 207.15,
+    "duree": 36.96
    },
    "b07": {
-    "debut": 225.88,
-    "duree": 39.1
-   },
-   "b08": {
-    "debut": 265.98,
-    "duree": 16.79
+    "debut": 245.11,
+    "duree": 16.59
    }
   },
   "rouleaux": [
    {
-    "debut": 50.61,
+    "debut": 57.09,
     "duree": 5
    },
    {
-    "debut": 131.79,
-    "duree": 3.5
+    "debut": 128.32,
+    "duree": 5.0
    },
    {
-    "debut": 219.48,
-    "duree": 6
+    "debut": 201.75,
+    "duree": 5
    }
   ],
-  "pauses": [],
-  "fin": 283.27,
-  "total": 286.47,
+  "pauses": [
+   [
+    12.26,
+    1.3
+   ],
+   [
+    128.32,
+    5.0
+   ],
+   [
+    171.2,
+    3.4
+   ]
+  ],
+  "fin": 262.2,
+  "total": 265.4,
   "bruitages": [
    [
     "pinceau",
     0.3,
-    0.45
+    0.35
+   ],
+   [
+    "pinceau",
+    4.66,
+    0.3
+   ],
+   [
+    "tapotement",
+    11.29,
+    0.7
    ],
    [
     "sceau",
-    23.87,
+    12.31,
+    0.45
+   ],
+   [
+    "gong",
+    12.34,
+    0.22
+   ],
+   [
+    "sceau",
+    14.54,
+    0.25
+   ],
+   [
+    "sceau",
+    14.94,
+    0.31
+   ],
+   [
+    "sceau",
+    15.34,
+    0.37
+   ],
+   [
+    "sceau",
+    15.74,
+    0.43
+   ],
+   [
+    "sceau",
+    16.14,
+    0.49
+   ],
+   [
+    "gong",
+    21.71,
+    0.35
+   ],
+   [
+    "sceau",
+    24.9,
+    0.55
+   ],
+   [
+    "sceau",
+    35.25,
     0.55
    ],
    [
     "gravure",
-    24.27,
+    35.65,
     0.4
    ],
    [
     "sceau",
-    54.61,
+    61.09,
     0.7
    ],
    [
     "sceau",
-    83.28,
+    76.2,
     0.5
    ],
    [
-    "pinceau",
-    121.68,
-    0.4
-   ],
-   [
     "sceau",
-    134.59,
+    132.32,
     0.7
    ],
    [
     "pinceau",
-    141.11,
+    113.47,
+    0.4
+   ],
+   [
+    "pinceau",
+    135.27,
     0.4
    ],
    [
     "effondrement",
-    181.87,
+    171.5,
     0.6
    ],
    [
-    "pinceau",
-    190.08,
-    0.4
-   ],
-   [
     "gong",
-    217.44,
+    199.69,
     0.45
    ],
    [
     "sceau",
-    224.28,
+    205.75,
     0.7
    ],
    [
     "pinceau",
-    226.08,
+    207.35,
     0.4
    ],
    [
     "gong",
-    250.21,
+    230.81,
     0.5
    ],
    [
     "gong",
-    269.7,
+    248.86,
     0.45
    ]
   ]

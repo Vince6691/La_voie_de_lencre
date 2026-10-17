@@ -47,6 +47,7 @@ for pl in L.get('plages', {}).values():
     a = pl['debut']; b = a + max(pl['duree'], pl.get('son_decalage', 0) + pl.get('son_duree', 0))
     env *= 1 - 0.65 * np.clip(np.minimum((t - a) / 0.8, (b + 1.0 - t) / 1.0), 0, 1)
 for a, d in L['pauses']:
+    if any(abs(r['debut'] - a) < 0.01 for r in L['rouleaux']): continue  # pause déjà creusée comme rouleau
     env *= 1 - 0.7 * np.clip(np.minimum((t - a) / 0.3, (a + d + 0.2 - t) / 0.5), 0, 1)
 # coupures nettes (episode.json « coupures » : [[bloc, repère|null, décalage, bloc, repère|null, décalage]…]) :
 # la musique se coupe d'un coup (0,05 s) au premier point et revient doucement (1,5 s) au second — ex. le figé du 美

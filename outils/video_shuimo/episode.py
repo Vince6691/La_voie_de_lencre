@@ -39,6 +39,8 @@ def ligne_de_temps(cfg, durees, reperes=None):
                 coupe = reperes[c][p['repere']] + p.get('decalage', 0)
                 clips[c]['pause'] = {'coupe': round(coupe, 3), 'duree': p['duree']}
                 pauses.append([round(clips[c]['debut'] + coupe, 3), p['duree']])
+                if p.get('rouleau'):  # rouleau du temps joué pendant la pause (mêmes sons et même creux musical)
+                    rouleaux.append({'debut': round(clips[c]['debut'] + coupe, 3), 'duree': p['duree']})
                 t += p['duree']
         elif 'plage' in el:  # plage sans voix réservée à un clip (son du clip éventuel : son, son_decalage, son_volume)
             plages[el['nom']] = {'debut': round(t, 3), 'duree': el['plage'], **{k: el[k] for k in ('son', 'son_decalage', 'son_volume', 'son_duree') if k in el}}
@@ -48,4 +50,5 @@ def ligne_de_temps(cfg, durees, reperes=None):
             t += el['rouleau']
         t += el.get('apres', 0)
     fin = round(t, 3)
+    rouleaux.sort(key=lambda r: r['debut'])
     return {'clips': clips, 'rouleaux': rouleaux, 'pauses': pauses, 'plages': plages, 'fin': fin, 'total': round(fin + cfg.get('queue', 0), 3)}

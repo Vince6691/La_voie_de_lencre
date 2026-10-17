@@ -26,7 +26,7 @@ ligne de temps `_ligne` du fichier de repères au lieu de recalculer les temps),
 déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce schéma dès leur arrivée. (Le 學, épisode
 pilote, est resté dans `xue/` ; ne pas le prendre comme modèle de rangement.)
 
-Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `coup-de-pinceau`, `encre-3d`,
+Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `mosaique-de-mots` (transition : les mots qui dessinent le caractère), `coup-de-pinceau`, `encre-3d`,
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
 
 ## Principes
