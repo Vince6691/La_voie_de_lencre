@@ -5,7 +5,7 @@ description: Génère la « fiche caractère » de la série 墨道 pour n'impor
 
 # Fiche caractère (layout papier xuan)
 
-Outil : `fiche-caractere/make.py` à la racine du dépôt (voir `fiche-caractere/README.md`).
+Outil : `outils/fiche-caractere/make.py` à la racine du dépôt (voir `outils/fiche-caractere/README.md`).
 
 ## Étapes
 1. Identifier le caractère (un seul par fiche ; pour plusieurs, lancer une fois par caractère).
@@ -13,7 +13,7 @@ Outil : `fiche-caractere/make.py` à la racine du dépôt (voir `fiche-caractere
    - **pinyin** : laisser le calcul automatique, sauf caractère à plusieurs lectures (ex. 行, 樂, 長) : passer `--pinyin` avec la lecture voulue dans le contexte ;
    - **étiquette** : par défaut `楷書 / KAISHU / écriture régulière · canon des Tang`. Pour une forme simplifiée : `--label 简体字 --title simplifié --subtitle "Chine · 1956"` (ou la date pertinente). Pour une vidéo en anglais : `--subtitle` traduit et `--unit STROKES --unit1 STROKE` ;
    - **sceau** : le caractère lui-même par défaut.
-3. Lancer depuis `fiche-caractere/` :
+3. Lancer depuis `outils/fiche-caractere/` :
    ```sh
    python3 make.py 福                 # image seule
    python3 make.py 福 --video         # image + tracé animé

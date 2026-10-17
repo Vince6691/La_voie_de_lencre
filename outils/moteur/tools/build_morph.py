@@ -14,7 +14,7 @@ PAIRS = {
     'paysage': {'focus': (0.64, 0.36), 'tall': 1.0},
     'vieil_homme': {'focus': (0.67, 0.52), 'tall': 2.1},
     # épisodes : paire rangée dans le dossier d'images de l'épisode (dir)
-    'tiying': {'focus': (0.268, 0.47), 'tall': 1.0, 'dir': '../episodes/wen/images'},
+    'tiying': {'focus': (0.268, 0.47), 'tall': 1.0, 'dir': '../../episodes/wen/images'},
 }
 
 

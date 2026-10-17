@@ -5,11 +5,11 @@ l'évolution du caractère 學 / 学 (*xué*, « apprendre ») depuis les os ora
 forme simplifiée, composante par composante.
 
 > Les contenus propres à l'épisode 學 (textes, voix, rendus, version shuimo) sont dans `episodes/xue/` ;
-> ce dossier `xue/` contient le moteur et les outils partagés par toute la série.
+> ce dossier `outils/moteur/` contient le moteur et les outils partagés par toute la série.
 
-- **Vidéo finale** : `../episodes/xue/fond_noir/rendu/xue_evolution.mp4`
-- **Sous-titres** : `../episodes/xue/fond_noir/rendu/xue_evolution.fr.srt` (à téléverser sur YouTube)
-- **Texte de la voix off** : `../episodes/xue/fond_noir/SCRIPT.md`
+- **Vidéo finale** : `../../episodes/xue/fond_noir/rendu/xue_evolution.mp4`
+- **Sous-titres** : `../../episodes/xue/fond_noir/rendu/xue_evolution.fr.srt` (à téléverser sur YouTube)
+- **Texte de la voix off** : `../../episodes/xue/fond_noir/SCRIPT.md`
 
 ## Principe pédagogique
 
@@ -45,8 +45,8 @@ police LXGW WenKai TC (contours extraits par `tools/extract_glyphs.py`).
 
 ## Version Remotion (`remotion/`)
 
-Proposition enrichie, rendue avec [Remotion](https://www.remotion.dev) → `../episodes/xue/fond_noir/rendu/xue_remotion.mp4` (≈ 2 min 53),
-voix « Chinese narration » (`eleven_v4`, `../episodes/xue/fond_noir/voice_cn/`) : les noms chinois sont écrits en caractères
+Proposition enrichie, rendue avec [Remotion](https://www.remotion.dev) → `../../episodes/xue/fond_noir/rendu/xue_remotion.mp4` (≈ 2 min 53),
+voix « Chinese narration » (`eleven_v4`, `../../episodes/xue/fond_noir/voice_cn/`) : les noms chinois sont écrits en caractères
 dans le texte envoyé au synthétiseur, la voix bascule alors en mandarin sur ces mots.
 
 - **Respirations** : `tools/build_warp.py` insère des pauses dans la voix (début de scène, après les
@@ -95,14 +95,14 @@ python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
 ```
 
 `src/index.html?play` rejoue l'animation en temps réel dans un navigateur (servir le dossier
-`xue/` en HTTP).
+`outils/moteur/` en HTTP).
 
-- Voix off (version Canvas, `../episodes/xue/fond_noir/rendu/xue_evolution.mp4`) : ElevenLabs, voix « German Epic Trailer Voice – Helmut », modèle `eleven_v4`
+- Voix off (version Canvas, `../../episodes/xue/fond_noir/rendu/xue_evolution.mp4`) : ElevenLabs, voix « German Epic Trailer Voice – Helmut », modèle `eleven_v4`
   avec balises d'interprétation (`[deep voice]`, `[dramatically]`…) et noms chinois en API
-  (`../episodes/xue/fond_noir/voice_v4/*.mp3`). Les deux versions partagent désormais la prise « François Louis »
-  (`../episodes/xue/fond_noir/voice_fl/`, silences rognés dans `../episodes/xue/fond_noir/voice_fast/`) : `./tools/render_all.sh`
+  (`../../episodes/xue/fond_noir/voice_v4/*.mp3`). Les deux versions partagent désormais la prise « François Louis »
+  (`../../episodes/xue/fond_noir/voice_fl/`, silences rognés dans `../../episodes/xue/fond_noir/voice_fast/`) : `./tools/render_all.sh`
   régénère la version Canvas avec cette voix. `src/warp.js` recale les ancres de l'animation
-  sur la prise courante. (`../episodes/xue/fond_noir/voice/` : première prise, « Helmut German »,
+  sur la prise courante. (`../../episodes/xue/fond_noir/voice/` : première prise, « Helmut German »,
   `eleven_multilingual_v2`, conservée pour comparaison.)
 - Musique et bruitages : synthèse procédurale (`tools/audio.py`) — bourdon, cordes,
   guzheng pentatonique, taiko, souffles, craquements d'os, gong de bronze.

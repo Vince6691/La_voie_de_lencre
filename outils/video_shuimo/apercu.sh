@@ -3,10 +3,10 @@
 #   ./apercu.sh <Composition> brouillon            → toute la vidéo en 360p (≈ 2–3× plus rapide que le 720p)
 #   ./apercu.sh <Composition> scene <début> <fin>  → un passage seulement (secondes), en 540p, quelques minutes
 #   ./apercu.sh <Composition> final                → 720p, loudnorm −14 LUFS (le vrai aperçu téléphone)
-# Sorties : xue/out/preview/<composition>_<mode>[_<début>-<fin>].mp4
+# Sorties : outils/moteur/out/preview/<composition>_<mode>[_<début>-<fin>].mp4
 set -e
 C=$1; MODE=${2:-brouillon}
-cd "$(dirname "$0")/../../xue/remotion"
+cd "$(dirname "$0")/../moteur/remotion"
 node sync.mjs >/dev/null
 HS=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
 [ -x "$HS" ] && BROWSER="--browser-executable=$HS" || BROWSER=""

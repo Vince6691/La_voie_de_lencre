@@ -11,11 +11,11 @@ vite avec un tapotement ; **léger temps d'arrêt** une fois le caractère const
 Ce n'est pas réservé à l'intro : c'est une transition (vers le présent, vers la synthèse, d'un chapitre à l'autre).
 
 ## Où est quoi
-- Composant : `xue/remotion/src/mosaique/MosaicTransition.tsx` — `MosaicTransition`, `MosaicConfig`, `mosaicSeconds`.
+- Composant : `outils/moteur/remotion/src/mosaique/MosaicTransition.tsx` — `MosaicTransition`, `MosaicConfig`, `mosaicSeconds`.
 - Démo : composition `MosaiqueDemo` (`src/mosaique/MosaiqueDemo.tsx`, 学 : 学生 → 大学 → 数学, puis 学 à l'encre).
 - Original (avec la cascade du temps qui suit) : `Mosaic` dans `src/shuimo_wen/WenV1.tsx` (calé sur les repères de la
   voix b01).
-- Sons et tuile de fibres : `xue/assets/mosaique/` (`ambiance.wav` atelier, `tapotement.wav`, `sceau.wav`,
+- Sons et tuile de fibres : `outils/moteur/assets/mosaique/` (`ambiance.wav` atelier, `tapotement.wav`, `sceau.wav`,
   `xuan_fibres.png`), copiés dans `public/mosaique/` par `node sync.mjs`. Fond : `shuimo/paper.jpg`.
 - Canvas seul (pas de moteur legacy) ; la composition doit charger les polices `ShuimoKai` et `ShuimoLatin`
   (voir `MosaiqueDemo`).

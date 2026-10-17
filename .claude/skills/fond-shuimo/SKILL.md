@@ -10,10 +10,10 @@ voilé), **pas de brouillard** devant ou entre les montagnes (l'utilisateur n'en
 pinceau** (ils relèvent du skill `coup-de-pinceau`, à ajouter seulement si on le demande).
 
 ## Où est quoi
-- Banque : `xue/assets/shuimo/` — `planches/` (planches Nano Banana d'origine), `PROMPTS.md` (prompts et bloc de
+- Banque : `outils/moteur/assets/shuimo/` — `planches/` (planches Nano Banana d'origine), `PROMPTS.md` (prompts et bloc de
   style moderne), `elements/` (éléments détourés + `index.json`), `paper.jpg`. Doc : `assets/shuimo/README.md`.
-- Détourage : `python3 xue/tools/build_shuimo.py [--sheet]` (depuis `xue/`), puis `node sync.mjs` dans `remotion/`.
-- Code : `xue/remotion/src/shuimo/` — `layout.ts` (`compose`), `ShuimoBackground.tsx` (rendu), `ShuimoDemo.tsx`
+- Détourage : `python3 tools/build_shuimo.py [--sheet]` (depuis `outils/moteur/`), puis `node sync.mjs` dans `remotion/`.
+- Code : `outils/moteur/remotion/src/shuimo/` — `layout.ts` (`compose`), `ShuimoBackground.tsx` (rendu), `ShuimoDemo.tsx`
   (composition `ShuimoDemo`, props `clouds`, `mist`, `strokes`).
 
 ## Utilisation

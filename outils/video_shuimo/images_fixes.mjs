@@ -3,7 +3,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
-const ROOT = path.resolve(import.meta.dirname, '../../xue/remotion');
+const ROOT = path.resolve(import.meta.dirname, '../moteur/remotion');
 const req = createRequire(path.join(ROOT, 'package.json'));
 const { bundle } = req('@remotion/bundler');
 const { selectComposition, renderStill, openBrowser } = req('@remotion/renderer');

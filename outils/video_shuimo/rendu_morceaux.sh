@@ -4,17 +4,17 @@
 #   ./rendu_morceaux.sh <Composition> <pinyin> morceau <début> <fin> → images [début, fin] sans son (≈ 45 min / 3000 images)
 #   ./rendu_morceaux.sh <Composition> <pinyin> assembler           → bande son (bande_son.py : voix + bruitages + musique)
 #                                                                   + concaténation → episodes/<pinyin>/apercus/<pinyin>_720.mp4
-# Morceaux : xue/out/preview/morceaux/<composition>/m_<début>.mp4 (assemblés dans l'ordre des débuts, réencodés ensemble).
+# Morceaux : outils/moteur/out/preview/morceaux/<composition>/m_<début>.mp4 (assemblés dans l'ordre des débuts, réencodés ensemble).
 # Pour refaire la fin seulement : recouper le morceau précédent (ffmpeg -frames:v N) puis rendre la suite ; l'assemblage
 # réencode tout, donc des morceaux aux réglages différents ne posent plus de problème.
 set -e
 C=$1; P=$2; MODE=$3
 R="$(cd "$(dirname "$0")/../.." && pwd)"; NAME=$(echo "$C" | tr 'A-Z' 'a-z')
-O=$R/xue/out/preview/morceaux/$NAME; B=$R/xue/out/preview/morceaux/bundle_$NAME; mkdir -p $O
+O=$R/outils/moteur/out/preview/morceaux/$NAME; B=$R/outils/moteur/out/preview/morceaux/bundle_$NAME; mkdir -p $O
 HS=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
 [ -x "$HS" ] && BROWSER="--browser-executable=$HS" || BROWSER=""
 FF=$(python3 -c "import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())")
-cd $R/xue/remotion
+cd $R/outils/moteur/remotion
 case $MODE in
   bundle) node sync.mjs >/dev/null; rm -rf $B; npx remotion bundle src/index.ts --out-dir=$B ;;
   morceau) npx remotion render $B "$C" $O/m_$(printf %06d $4).mp4 --frames=$4-$5 --scale=0.6666666666666666 --crf=30 --concurrency=$(nproc) --muted $BROWSER ;;

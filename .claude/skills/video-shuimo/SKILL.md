@@ -6,8 +6,8 @@ description: Chef d'orchestre d'une vidéo longue 墨道 « tout shuimo » à pa
 # Vidéo 墨道 « tout shuimo » — de l'input (un caractère) à la vidéo
 
 **Input : un caractère.** Modèle validé par l'utilisateur : le 學 en shuimo, composition `XueV2`
-(`xue/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `episodes/xue/`
-(PROPOSITION.md, VOIX.md, episode.json), aperçu `xue/out/preview/xue_shuimo_v2d_720.mp4`.
+(`outils/moteur/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `episodes/xue/`
+(PROPOSITION.md, VOIX.md, episode.json), aperçu `outils/moteur/out/preview/xue_shuimo_v2d_720.mp4`.
 
 **Outils communs : `outils/video_shuimo/`** (README) — `voix_prep.py`, `reperes.py`, `musique.py`, pilotés par
 l'`episode.json` de l'épisode (modèle : `modele_episode.json`).
@@ -21,10 +21,10 @@ episodes/<pinyin>/
   voix/mots/ (bNN.json, minutage Scribe)   voix/prises/ (toutes les prises)
   clips/ (NN_scene.mp4, clips Seedance renommés)   images/ (Nano Banana)   audio/ (musique.wav)   apercus/
 ```
-Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (modèle à jour : `shuimo_jiao/JiaoV1.tsx`, qui lit la
+Composition Remotion : `outils/moteur/remotion/src/shuimo_<pinyin>/` (modèle à jour : `shuimo_jiao/JiaoV1.tsx`, qui lit la
 ligne de temps `_ligne` du fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`. Les fichiers
 déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce schéma dès leur arrivée. (Le 學, épisode
-pilote, est resté dans `xue/` ; ne pas le prendre comme modèle de rangement.)
+pilote, est maintenant rangé de la même façon dans `episodes/xue/`.)
 
 Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `mosaique-de-mots` (transition : les mots qui dessinent le caractère), `coup-de-pinceau`, `encre-3d`,
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
@@ -130,7 +130,7 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
 - **Accident d'écriture** (ex. faux 孝 des Han) : seule la forme concernée reste nette et grossit, la partie fautive en ocre,
   le faux caractère au-dessus, barré au moment de la réfutation.
 - **Fin** : toutes les couleurs reviennent ensemble sur « Ainsi naît », puis mots courants (教室 / 教师…).
-- Implémentation de référence : `drawBand` dans `xue/remotion/src/shuimo_jiao/JiaoV1.tsx` (phases calées sur les repères
+- Implémentation de référence : `drawBand` dans `outils/moteur/remotion/src/shuimo_jiao/JiaoV1.tsx` (phases calées sur les repères
   `formes`, `yao`, `enfant`, `main`, `han`, `pasde`, `naissance` du bloc).
 
 ## Étape 5 — Vérifier, puis rendre
@@ -140,7 +140,7 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
   secondes) ; à proposer avant tout rendu quand seule la voix a changé.
 - Itérations rapides : `outils/video_shuimo/apercu.sh <Composition> scene <début> <fin>` (un passage en 540p, quelques
   minutes) ou `brouillon` (toute la vidéo en 360p) ; ne jamais dépasser `nproc` en concurrence (4 cœurs ici).
-- Rendu 720p (`apercu.sh <Composition> final`) : `--scale=0.6666666666666666 --crf=30`, puis loudnorm −14 LUFS → `xue/out/preview/`. Navigateur :
+- Rendu 720p (`apercu.sh <Composition> final`) : `--scale=0.6666666666666666 --crf=30`, puis loudnorm −14 LUFS → `outils/moteur/out/preview/`. Navigateur :
   `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`.
 - Retours de l'utilisateur → corriger → images fixes → nouveau rendu. Commit et push à chaque étape.
 

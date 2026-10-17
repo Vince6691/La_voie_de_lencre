@@ -10,7 +10,7 @@ const cp = (from, to) => { fs.mkdirSync(path.dirname(to), { recursive: true }); 
 for (const f of ['vendor/gsap.min.js', 'vendor/MorphSVGPlugin.min.js', 'vendor/CustomEase.min.js', 'vendor/brush.js', 'timeline.js', 'warp.js', 'geodata.js', 'fontglyphs.js', 'strokes.js', 'realglyphs.js', 'shuowen.js', 'portrait.js', 'glyphs.js', 'engine.js', 'lavis.js', 'scenes.js']) cp(`${X}/src/${f}`, `${here}/public/legacy/${f}`);
 for (const f of fs.readdirSync(`${X}/assets/fonts`)) cp(`${X}/assets/fonts/${f}`, `${here}/public/fonts/${f}`);
 // voix de la version fond noir du 學 (episodes/xue/fond_noir/voice_fast)
-const XF = path.resolve(X, '..', 'episodes/xue/fond_noir');
+const XF = path.resolve(X, '../..', 'episodes/xue/fond_noir');
 for (const f of fs.readdirSync(`${XF}/voice_fast`)) if (f.endsWith('.wav')) cp(`${XF}/voice_fast/${f}`, `${here}/public/voice/${f}`);
 // fond sonore (versionné, écrit par tools/audio.py) ; données générées (out/) ou leur copie versionnée
 const pick = (gen, kept) => (fs.existsSync(gen) ? gen : kept);
@@ -39,7 +39,7 @@ for (const f of fs.readdirSync(`${X}/assets/mosaique`)) cp(`${X}/assets/mosaique
 for (const f of fs.readdirSync(`${X}/assets/exemples_videos`)) cp(`${X}/assets/exemples_videos/${f}`, `${here}/public/exemples_videos/${f}`);
 // épisodes shuimo (episodes/<pinyin>/, outils/video_shuimo) : voix, musique, clips, images → public/episodes/<pinyin>/ ;
 // repères → src/data/episodes/<pinyin>.json ; glyphes de tous les épisodes → public/legacy/episodes.js (chargé par legacy.ts)
-const EP = path.resolve(X, '..', 'episodes');
+const EP = path.resolve(X, '../..', 'episodes');
 let extra = '';
 if (fs.existsSync(EP)) for (const p of fs.readdirSync(EP)) {
   const e = `${EP}/${p}`;

@@ -5,7 +5,7 @@
 // caractère ; temps d'arrêt (reflet, lumière qui monte) ; sortie : les mots se condensent en un seul caractère à
 // l'encre (posé où la scène suivante l'attend) ou s'effacent.
 // Temps en secondes, LOCAUX (0 = début de la séquence qui contient le composant). Pas de moteur legacy : canvas seul ;
-// la police ShuimoKai doit être chargée par la composition. Sons et tuile de fibres : xue/assets/mosaique (sync.mjs).
+// la police ShuimoKai doit être chargée par la composition. Sons et tuile de fibres : outils/moteur/assets/mosaique (sync.mjs).
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 

@@ -194,7 +194,7 @@ for kind, t in cues['cues']:
 # ───────────── voix
 voice = np.zeros(N)
 for i, v in enumerate(TL['voice']):
-    w = wave.open(f'../episodes/xue/fond_noir/voice_fast/s{i + 1:02d}.wav')
+    w = wave.open(f'../../episodes/xue/fond_noir/voice_fast/s{i + 1:02d}.wav')
     a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(float) / 32768
     add(voice, a, v['start'])
 

@@ -76,7 +76,7 @@ Voix 3 min 23 (7 blocs, prise 1 provisoire) + 2 rouleaux de 5 s + 2 pauses (roul
    d'`episode.json`) : b04 avant « Puis la dynastie 秦 » (rouleau 2), b05 avant « Une simple lettre » (effondrement).
 4. **Musique et bruitages (fait)** : `musique.py` ; liste `bruitages` d'`episode.json` (pinceau, sceau, gravure,
    effondrement, gong).
-5. **Composition** `xue/remotion/src/shuimo_wen/WenV1.tsx` (+ `TiyingReveal.tsx`, `Effondrement.tsx`).
+5. **Composition** `outils/moteur/remotion/src/shuimo_wen/WenV1.tsx` (+ `TiyingReveal.tsx`, `Effondrement.tsx`).
 6. **Aperçus** : `apercu.sh WenV1 brouillon` (fait), puis `final` 720p.
 
 ## Titres possibles

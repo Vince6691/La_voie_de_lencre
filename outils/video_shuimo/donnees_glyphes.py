@@ -9,7 +9,7 @@ Lit la section « glyphes » de episode.json :
   }
 - reels : (options « fusion », « graines », « interieur » : voir reel()) (option « fusion » : seuil de partage d'un trait continu, 0,25 par défaut) formes historiques (小學堂, CC0) découpées par composante (polygones dans la boîte 400, le premier qui
   contient le pixel l'emporte ; un trait continu reste entier sauf partage réel), vectorisées (potrace) ;
-  même format que xue/tools/build_real_glyphs.py → window.REALGLYPHS[clé] (E.drawRealGlyph).
+  même format que outils/moteur/tools/build_real_glyphs.py → window.REALGLYPHS[clé] (E.drawRealGlyph).
 - traits : ordre et forme des traits (Make Me a Hanzi / hanzi-writer-data, Arphic Public License),
   composante de chaque trait → window.STROKES[clé] (E.drawStrokes).
 Le fichier produit complète les tables du projet (Object.assign) ; sync.mjs le copie dans public/legacy/episodes/."""
@@ -97,7 +97,7 @@ def main(chemin):
     open(out, 'w', encoding='utf-8').write(
         "// Glyphes de l'épisode — généré par outils/video_shuimo/donnees_glyphes.py depuis episode.json.\n"
         "// Formes réelles : 小學堂字形演變資料庫 (Academia Sinica), CC0. Traits : Make Me a Hanzi / hanzi-writer-data,\n"
-        "// Arphic Public License (xue/assets/strokes/ARPHICPL.TXT).\n"
+        "// Arphic Public License (outils/moteur/assets/strokes/ARPHICPL.TXT).\n"
         "Object.assign(window.REALGLYPHS = window.REALGLYPHS || {}, " + json.dumps(reels, ensure_ascii=False, separators=(',', ':')) + ");\n"
         "Object.assign(window.STROKES = window.STROKES || {}, " + json.dumps(traits, ensure_ascii=False, separators=(',', ':')) + ");\n")
     print('réels :', {k: [p['c'] for p in v['paths']] for k, v in reels.items()})

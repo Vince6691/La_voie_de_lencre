@@ -9,11 +9,11 @@ Exemples :
 
 Tracés : Make Me a Hanzi (paquet npm hanzi-writer-data, licence Arphic Public License), installé
 automatiquement dans node_modules/ au premier usage. Pinyin : pypinyin (installé si absent).
-Polices : ../xue/assets/fonts (LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant)."""
+Polices : ../moteur/assets/fonts (LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant)."""
 import argparse, json, os, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FONTS = os.path.join(HERE, '..', 'xue', 'assets', 'fonts')
+FONTS = os.path.join(HERE, '..', 'moteur', 'assets', 'fonts')
 CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
 
 

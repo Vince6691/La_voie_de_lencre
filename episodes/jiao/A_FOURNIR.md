@@ -5,7 +5,7 @@ Déposer les fichiers tels quels (n'importe quel nom) : je les renomme et les ra
 ## 1. Glyphes anciens — FAIT (je les ai récupérés)
 19 formes de 教 et 26 de 文 téléchargées depuis 小學堂 (CC0) → `glyphes/` (voir `glyphes/SOURCE.md`). Rien à fournir.
 
-## 2. Dessin 白描 de Confucius (indispensable) — même style que `xue/assets/portrait/xushen_a.jpg`
+## 2. Dessin 白描 de Confucius (indispensable) — même style que `outils/moteur/assets/portrait/xushen_a.jpg`
 Image 16:9, ≥ 1376 × 768, traits noirs purs sur fond blanc, aucun gris : je la vectorise et la peins trait par
 trait (`build_portrait.py`). Prompt Nano Banana :
 

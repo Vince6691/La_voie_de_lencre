@@ -9,13 +9,13 @@ Validé par l'utilisateur (« très bien fait ») après plusieurs itérations :
 en curseur, rythme spectaculaire, **un seul mouvement de caméra à la fin** (pas de plongée puis retour).
 
 ## Où est quoi
-- Composant : `xue/remotion/src/rouleau/TimeScroll.tsx` — `TimeScrollStage`, `TimeScrollConfig`, `ERAS_XUE`,
+- Composant : `outils/moteur/remotion/src/rouleau/TimeScroll.tsx` — `TimeScrollStage`, `TimeScrollConfig`, `ERAS_XUE`,
   `cursorPose`, `arrivePose`, `morphK`, `tagIn`, `travelM`, `IMPACT`, `Seal`.
 - Démo autonome : composition `RouleauDemo` (`src/rouleau/RouleauDemo.tsx`, 周 → 秦, curseur point d'encre).
 - Exemple complet : `src/shuimo_xue/` (essai tout shuimo du 學, Shang → Zhou, le 學 en curseur dessiné par le canvas
   `InkStage` avec `glyphPose` = `cursorPose` / `arrivePose`).
-- Sons : `xue/assets/rouleau/` (`rouleau.wav` 5 s : souffle, glissando de guzheng, silence, impact ; `gong.wav`),
-  générés par `python3 tools/build_sfx.py` (depuis `xue/`), copiés par `node sync.mjs`.
+- Sons : `outils/moteur/assets/rouleau/` (`rouleau.wav` 5 s : souffle, glissando de guzheng, silence, impact ; `gong.wav`),
+  générés par `python3 tools/build_sfx.py` (depuis `outils/moteur/`), copiés par `node sync.mjs`.
 - Dépend du fond shuimo (skill `fond-shuimo`) : paysages `compose(seed…)`, papier, éléments du ciel.
 
 ## Utilisation

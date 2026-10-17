@@ -1,6 +1,6 @@
 # Formes de 教 et 文 — 小學堂 (Academia Sinica)
 
-Source : [小學堂字形演變資料庫](https://xiaoxue.iis.sinica.edu.tw/yanbian), licence **CC0 1.0** (cf. `xue/assets/glyphs/xiaoxue/SOURCE.md`).
+Source : [小學堂字形演變資料庫](https://xiaoxue.iis.sinica.edu.tw/yanbian), licence **CC0 1.0** (cf. `outils/moteur/assets/glyphs/xiaoxue/SOURCE.md`).
 Téléchargées le 11/10/2026 (`index.json` : police, pièce d'origine, texte du Shuowen). 668 × 668 px, noir sur transparent.
 
 ## Formes retenues pour le montage
@@ -15,5 +15,5 @@ Téléchargées le 11/10/2026 (`index.json` : police, pièce d'origine, texte du
 | 文 (passerelle) | `wen_xiaoxue/08.png` (ou 05, 06) | 文方鼎 / 旂鼎, Zhou occidentaux | homme de face, motif sur la poitrine |
 | 文 os oraculaire | `wen_xiaoxue/00.png` | 甲3940 | motif en V sur la poitrine |
 
-Le 學 (rappel, bloc 2) vient de `xue/assets/glyphs/xiaoxue/` (déjà dans le dépôt).
-Prochaine étape : découpage par composante (爻 / 子 / 攴) et vectorisation, sur le modèle de `xue/tools/build_real_glyphs.py`.
+Le 學 (rappel, bloc 2) vient de `outils/moteur/assets/glyphs/xiaoxue/` (déjà dans le dépôt).
+Prochaine étape : découpage par composante (爻 / 子 / 攴) et vectorisation, sur le modèle de `outils/moteur/tools/build_real_glyphs.py`.

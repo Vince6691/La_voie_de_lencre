@@ -5,7 +5,7 @@ description: Ajoute des coups de pinceau animés (série 墨道) dans une vidéo
 
 # Coups de pinceau (encre lisse, Remotion)
 
-Code : `xue/remotion/src/shuimo/InkEvents.tsx` (rendu SVG) et `common.ts` (cadre 1920 × 1080, aléa, type
+Code : `outils/moteur/remotion/src/shuimo/InkEvents.tsx` (rendu SVG) et `common.ts` (cadre 1920 × 1080, aléa, type
 `InkEvent`). Validé par l'utilisateur dans la démo `ShuimoDemo` : il préfère ces traits aux gouttes d'encre.
 
 ## Ce que fait un coup de pinceau
@@ -37,7 +37,7 @@ const t = useCurrentFrame() / useVideoConfig().fps;
 - Garder le **centre libre** pour le contenu (caractère, texte) : traits sur les bords seulement, 2 ou 3 par plan
   de 8 s environ, pas plus. Les espacer d'au moins 2 s.
 - **Caler sur la voix** quand il y en a une : faire partir un trait au début d'une pause de la narration
-  (pauses de `xue/tools/gaps.json` ou silences détectés par `xue/tools/silences.py`), pas pendant une phrase clé.
+  (pauses de `outils/moteur/tools/gaps.json` ou silences détectés par `outils/moteur/tools/silences.py`), pas pendant une phrase clé.
 - Ne pas réintroduire les gouttes d'encre (rejetées par l'utilisateur) ni de texture de pinceau sèche.
 - Vérifier avec des images fixes (`npx remotion still <Composition> out/x.png --frame=N --scale=0.5`) avant tout
   rendu ; l'utilisateur regarde souvent sur téléphone : lui envoyer un extrait 720p compressé, pas le 1080p.

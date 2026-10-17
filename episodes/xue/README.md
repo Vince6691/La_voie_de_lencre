@@ -1,7 +1,7 @@
 # 學 / 学 (xué) — apprendre
 
 Premier épisode de la série 墨道, en deux versions. Le moteur et les outils communs restent dans `xue/`
-(moteur Canvas `xue/src/`, outils `xue/tools/`, compositions Remotion `xue/remotion/`).
+(moteur Canvas `outils/moteur/src/`, outils `outils/moteur/tools/`, compositions Remotion `outils/moteur/remotion/`).
 
 ## Version tout shuimo (composition `XueV2`, ≈ 4 min)
 Même organisation que les autres épisodes (`outils/video_shuimo`) :
@@ -14,6 +14,6 @@ Même organisation que les autres épisodes (`outils/video_shuimo`) :
 - `fond_noir/SCRIPT.md` : texte de la voix off
 - `fond_noir/rendu/` : `xue_evolution.mp4` (+ `.fr.srt`), `xue_remotion.mp4`
 - `fond_noir/voice*/` : prises de voix successives (`voice_fast` = prise courante, silences rognés et pauses insérées,
-  utilisée par `xue/tools/*.py` et copiée par `xue/remotion/sync.mjs`)
+  utilisée par `outils/moteur/tools/*.py` et copiée par `outils/moteur/remotion/sync.mjs`)
 
-Détails techniques de la version fond noir : `xue/README.md`.
+Détails techniques de la version fond noir : `outils/moteur/README.md`.

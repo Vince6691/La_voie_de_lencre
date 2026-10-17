@@ -30,7 +30,7 @@ les données de tracé (`hanzi-writer-data`, environ 30 Mo, dans `node_modules/`
 **Sources et licences**
 - Tracés et ordre des traits : *Make Me a Hanzi*, via hanzi-writer-data, licence Arphic Public License.
   Couvre environ 9 500 caractères, simplifiés et traditionnels.
-- Polices : `../xue/assets/fonts` (LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant), licence OFL.
+- Polices : `../moteur/assets/fonts` (LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant), licence OFL.
 
 Le rendu (`fiche.html`) est une page autonome : `window.FICHE = {…}`, puis `window.draw(t)` dessine l'image
 à l'instant `t`.

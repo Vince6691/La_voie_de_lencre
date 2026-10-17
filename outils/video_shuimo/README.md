@@ -29,7 +29,7 @@ episodes/<pinyin>/
   audio/           musique.wav
   apercus/         aperçus 720p (ignorés par git si trop lourds)
 ```
-Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (le projet Remotion commun), chemins ajoutés à `sync.mjs`.
+Composition Remotion : `outils/moteur/remotion/src/shuimo_<pinyin>/` (le projet Remotion commun), chemins ajoutés à `sync.mjs`.
 Noms : dossier et composition en pinyin sans tons ; clips de voix `b01`… dans l'ordre des blocs.
 
 ## Enchaînement
@@ -41,7 +41,7 @@ python3 voix_prep.py ../../<episode>/episode.json     # après chaque nouvelle p
 python3 reperes.py   ../../<episode>/episode.json     # repères + ligne de temps (« _ligne »)
 python3 musique.py   ../../<episode>/episode.json     # fond musical
 ```
-Puis `node sync.mjs` dans `xue/remotion` (le projet Remotion commun) copie voix, repères et musique dans
+Puis `node sync.mjs` dans `outils/moteur/remotion` (le projet Remotion commun) copie voix, repères et musique dans
 `public/` et `src/data/` (ajouter les chemins de l'épisode à `sync.mjs`).
 
 La composition lit `reperes` : `cues[bNN].cues[nom]` (temps dans le clip) et `_ligne` (`clips[bNN].debut`,
