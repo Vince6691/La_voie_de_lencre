@@ -9,6 +9,7 @@ from scipy import signal
 from scipy.io import wavfile
 
 SR, DUR = 48000, 7.6
+GUZHENG = 0.22  # niveau du glissando (le souffle est à 0,55)
 A = 'assets/rouleau3d/'
 rng = np.random.default_rng(9)
 def load(f):
@@ -23,6 +24,22 @@ mix = np.zeros(n)
 wh = load('souffle.wav'); wh = wh / np.abs(wh).max()
 put(mix, wh, 0.55, 0.55)
 mix *= 1 - np.clip((t - 3.45) / 0.3, 0, 1) * (t < 4.0)
+
+# glissando de guzheng (cordes pincées, Karplus-Strong) pendant l'accélération, discret sous le souffle
+def pluck(f, dur=1.6):
+    N = int(SR / f); buf = rng.uniform(-1, 1, N); out = np.zeros(int(SR * dur))
+    for k in range(len(out)):
+        out[k] = buf[k % N]; buf[k % N] = 0.996 * 0.5 * (buf[k % N] + buf[(k + 1) % N])
+    return out * np.exp(-np.arange(len(out)) / SR / 0.9)
+notes = [293.66, 329.63, 369.99, 440, 493.88, 587.33, 659.25, 739.99, 880, 987.77, 1174.66, 1318.5, 1480]
+times = 0.7 + 1.8 * (1 - 0.86 ** np.arange(len(notes))) / (1 - 0.86 ** len(notes))  # de plus en plus serré
+gl = np.zeros(n)
+for f, at in zip(notes, times):
+    p = pluck(f); put(gl, p, at, 0.6)
+gl = signal.lfilter(*signal.butter(2, 5500 / (SR / 2)), gl)  # adoucit l'attaque métallique
+gl += 0.3 * signal.fftconvolve(gl, rng.standard_normal(int(0.6 * SR)) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.25))[:n] / 40
+gl *= 1 - np.clip((t - 3.45) / 0.3, 0, 1) * (t < 4.0)
+mix += GUZHENG * gl / (np.abs(gl).max() + 1e-9)
 
 # impact : le premier coup du bruitage (1,97–2,32 s), un grave bref sous lui, une courte réverbération de pièce
 imp = load('impact.wav'); i0 = int(1.975 * SR); hit = imp[i0:i0 + int(0.35 * SR)]
