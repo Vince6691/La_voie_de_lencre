@@ -147,7 +147,7 @@ Et celui dont on attend toujours la réponse, c'est le maître : shī. Pourtant,
 ---
 
 ## Chiffres
-≈ 600 mots à 125 mots/min (≈ 4 min 50) + 13,8 s de rouleaux (5 + 3,5 + 5,3) + pauses → **≈ 5 min 10**, puis 10 s
+≈ 575 mots à 125 mots/min (≈ 4 min 36) + 13,8 s de rouleaux (5 + 3,5 + 5,3) + pauses → **≈ 5 min 05**, puis 10 s
 d'écran de fin. Pour tenir 5 min : couper « On argumente, on réplique, on retourne l'adversaire » et « Et au lit, on ne
 yán même pas : on se tait tout à fait » (−7 s), voire 英語 (−3 s).
 Sauts d'époque annoncés : « il y a plus de trois mille ans », « Six siècles plus tard », « Puis viennent les Royaumes
