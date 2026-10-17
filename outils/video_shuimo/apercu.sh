@@ -15,7 +15,7 @@ NAME=$(echo "$C" | tr 'A-Z' 'a-z')
 case $MODE in
   brouillon) npx remotion render src/index.ts "$C" $OUT/${NAME}_brouillon.mp4 --scale=0.3333333333333333 --crf=34 --concurrency=$N --audio-codec=aac --audio-bitrate=96k $BROWSER ;;
   scene) F0=$(python3 -c "print(round($3*30))"); F1=$(python3 -c "print(round($4*30))")
-    npx remotion render src/index.ts "$C" $OUT/${NAME}_scene_$3-$4.mp4 --frames=$F0-$F1 --scale=0.5 --crf=30 --concurrency=$N --audio-codec=aac $BROWSER ;;
+    npx remotion render src/index.ts "$C" $OUT/${NAME}_scene_$3-$4.mp4 --frames=$F0-$F1 --scale=0.5 --crf=30 --concurrency=$N --timeout=200000 --audio-codec=aac $BROWSER ;;
   final) npx remotion render src/index.ts "$C" $OUT/${NAME}_raw.mp4 --scale=0.6666666666666666 --crf=30 --concurrency=$N --audio-codec=aac $BROWSER
     FF=$(python3 -c "import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())")
     $FF -y -loglevel error -i $OUT/${NAME}_raw.mp4 -c:v copy -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 160k $OUT/${NAME}_720.mp4 ;;

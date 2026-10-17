@@ -1072,8 +1072,9 @@ export const MeiV1: React.FC = () => {
         <DanseIntro />
         <SealStamps />
       </Shake>}
-      {ready && <Rouleau3DStage cfg={R3A} />}
-      {ready && <Rouleau3DStage cfg={R3B} />}
+      {/* montés seulement autour de leur passage (peinture du rouleau et polices au montage) */}
+      {ready && <Win from={R2 - 1.5} to={R2 + r3Seconds(R3A) + 3.5}><Rouleau3DStage cfg={R3A} /></Win>}
+      {ready && <Win from={R3 - 1.5} to={R3 + r3Seconds(R3B) + 3.5}><Rouleau3DStage cfg={R3B} /></Win>}
       {ready && <GrainVignette />}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/mei/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
