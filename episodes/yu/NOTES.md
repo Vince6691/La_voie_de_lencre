@@ -32,3 +32,15 @@ la table + bloc 3 resserré ; (c) signature visuelle du face-à-face ; (d) chapi
 | Historique | 8 | 8 |
 | Design | 8 | 9 (chapitres calés sur les tableaux, miniature à une idée, cohérence titre / miniature) |
 | Storytelling | 8 | 8 |
+
+## 2026-10-17 · Étapes 2–3 · voix (v2 validée) + images fixes (`apercus/note_v1`, 44 instants) + bruitages
+Clips A et B encore en attente (non notés). Aucune vidéo rendue.
+| Domaine | Note | Constats |
+|---|---|---|
+| Technique | 7 | glyphes réels et pigments tenus partout ; macro du pinceau nette ; mais 2:06 balayage au pinceau = barres grises numériques, 0:48 plastron Shang schématique (contour + quadrillage, braises « clipart ») |
+| Artistique | 7 | vrais tableaux (diptyque, papier découpé, banquet estampé, baimiao, rouleaux 3D) ; Shang sans tableau ; double cloche possible (rouleau court 1:22,8 puis cloche de Xu 1:24,7) |
+| Historique | 7,5 | nuances présentes (Baxter-Sagart, lettre attribuée, portrait imaginé) ; mais bandeau 3:34 : colonne 甲骨文 sans « les pièces, avant 語 » (promis en v4) ; cloche : 余贎逐兒 à l'écran, 余贎乘兒鐘 au plan ; 2:20 la bouche de 言 en azurite (couleur réservée à la bouche de 吾) |
+| Design | 6,5 | collisions : 0:07 légende sous le pinceau ; 0:16 語 coupé au bord ; 1:36 estampage sur le cartouche ; 2:11 légende Shuowen sur le cartouche ; 2:24–2:30 banquet sur le cartouche ; 3:20 et 4:12 deux légendes superposées en fondu ; 3:27 « 汉语 » posé sur la Corée ; 2:51 titre du 方言 illisible |
+| Storytelling | 8 | voix validée, énigme posée / résolue, relances, chute au tambour de guerre |
+Corrections proposées (en attente de validation) : (1) passe collisions Design ; (2) exactitude bandeau / cloche / couleur ;
+(3) plastron Shang en vrai tableau (image à fournir) ; (4) balayage au pinceau en vraie encre ; (5) éviter la double cloche.
