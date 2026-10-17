@@ -338,6 +338,7 @@ let frozenCanvas: HTMLCanvasElement | null = null;
 const Opening: React.FC = () => {
   const t = useT();
   const A1 = A('b01'), mt = at('b01', 'mouton'), dico = at('b01', 'dico'), haut = at('b01', 'haut'), grand = at('b01', 'grand'), song = at('b01', 'song'), maxime = at('b01', 'maxime'), ent = at('b01', 'entendu'), gros = at('b01', 'gros');
+  const lt = at('b01', 'lettre');
   const tf = Math.min(t, FREEZE);
   const shat = t >= SHATTER;
   return (
@@ -389,6 +390,18 @@ const Opening: React.FC = () => {
           });
         }} />
       </Cam>
+      {/* « un lettré obstiné, 许慎 » : son portrait au trait se trace en médaillon (on le retrouve à sa table en b07) */}
+      <Draw draw={(ctx, tt) => {
+        const m = win(tt, lt - 0.1, dico + 0.9, 0.4);
+        if (m <= 0) return;
+        ctx.save(); ctx.globalAlpha = m;
+        ctx.shadowColor = 'rgba(40,30,20,0.28)'; ctx.shadowBlur = 34; ctx.fillStyle = '#f6f0e4'; ctx.fillRect(1380, 150, 470, 520); ctx.shadowBlur = 0;
+        ctx.strokeStyle = rgb(VER, 0.75); ctx.lineWidth = 3; ctx.strokeRect(1395, 165, 440, 490);
+        ctx.beginPath(); ctx.rect(1395, 165, 440, 490); ctx.clip();
+        ctx.translate(1615 - 0.37 * 943, 410 - 0.37 * (BMY + 391 * BMS)); ctx.scale(0.37, 0.37);
+        drawBaimiao(ctx, clamp((tt - lt) / 1.0), 1, 'xushen');
+        ctx.restore();
+      }} />
       {!shat && <>
         <Caption text="美 · měi · beau" a={win(tf, A1 + 1.6, mt - 0.2, 0.4)} y={880} size={56} />
         <Label x={980} y={300} zh="羊" text="le mouton" color={GOM} a={win(tf, mt + 0.6, dico - 0.3, 0.4)} />
@@ -802,6 +815,17 @@ const QinHan: React.FC = () => {
             const x = 1330 + (cx - 1330) * slide, y = 420 + (cy - 420) * slide;
             E.drawRealGlyph(ctx, 'mei_yang_xiaozhuan', { x, y, size: 380 - 90 * slide, opacity: ya * (1 - 0.6 * slide), color: () => rgb(GOM), glow: 18, glowColor: rgb(GOM, 0.5) });
           }
+          // « exactement le même caractère que le mouton » : os, bronze, petit sceau frappés en colonne, coup par coup
+          const cas = 1 - seg(tt, R3 - 0.5, R3 - 0.1);
+          [['mei_jiaguwen', 0.36], ['mei_jinwen', 1.12], ['mei_xiaozhuan', 2.0]].forEach(([g, d], i) => {
+            const u = tt - (mt + (d as number)), a = clamp(u / 0.08) * cas;
+            if (a <= 0) return;
+            const k = 1 + 0.25 * (1 - seg(u, 0, 0.14)), y = 260 + i * 270;
+            ctx.save(); ctx.globalAlpha = a; ctx.translate(1720, y); ctx.scale(k, k);
+            ctx.strokeStyle = rgb(VER, 0.85); ctx.lineWidth = 5; ctx.strokeRect(-105, -105, 210, 210);
+            ctx.restore();
+            E.drawRealGlyph(ctx, g as string, { x: 1720, y, size: 190 * k, opacity: a, color: (c: string) => rgb(c === 'coiffe' ? mixc(MAL, GOM, i / 2) : INK) });
+          });
           // Xu Shen à sa table (baimiao repris de la vidéo du 學), qui se trace en 2,5 s, puis s'efface devant l'analyse
           drawBaimiao(ctx, clamp((tt - (xs + 0.1)) / 2.5), 1 - seg(tt, yeux - 0.5, yeux + 0.1), 'xushen');
           // sa citation en colonne ; derrière, l'os qu'il n'a jamais vu (en transparence)
@@ -826,17 +850,24 @@ const QinHan: React.FC = () => {
 };
 
 // ════════════════ 6. Le dictionnaire : 美 au rayon des moutons
+// feuilletage : de « dictionnaires chinois » jusqu'à « beau » ; en-têtes et caractères des pages qui défilent
+const FLIP0 = at('b10', 'dico') + 0.5, FLIP1 = FLIP0 + 1.5;
+const FLIPS = ['人部', '口部', '土部', '女部', '心部', '手部', '木部', '水部', '火部', '牛部', '犬部'];
+const FLIPC = '你他們吃喝唱地城場好媽姐想情愛打拿找林樹森河海湖燈熱燒牛物特狗狼猫';
 const KEYS = ['一', '丨', '丶', '人', '口', '土', '大', '女', '子', '心', '手', '木', '水', '火', '羊', '羽'];
 const ENTRIES: [string, string, string][] = [['羊', 'yáng', 'mouton'], ['美', 'měi', 'beau'], ['羔', 'gāo', 'agneau'], ['群', 'qún', 'troupeau']];
 const Dico: React.FC = () => {
   const t = useT();
   const A10 = A('b10'), cle = at('b10', 'cle'), dico = at('b10', 'dico'), ray = at('b10', 'rayon'), agn = at('b10', 'agneau'), trp = at('b10', 'troupeau');
+  const mg = at('b10', 'meiguo'), bp = at('b10', 'beaupays'), enf = at('b10', 'enfin'), ame = at('b10', 'amerique'), ms = at('b10', 'meishi'), pdu = at('b10', 'perdu');
+  const book = 1 - seg(t, mg - 0.2, mg + 0.4);
   return (
     <AbsoluteFill>
-      <Cam keys={[[A10 - 0.3, 960, 540, 1.02], [cle, 700, 600, 1.12, 1.2], [dico + 0.6, 1180, 540, 1.1, 1.4], [trp + 0.4, 1200, 560, 1.14, 1.0]]} punch={[ray + 0.1]}>
+      <Cam keys={[[A10 - 0.3, 960, 540, 1.02], [cle, 700, 600, 1.12, 1.2], [dico + 0.6, 1180, 540, 1.1, 1.4], [trp + 0.4, 1200, 560, 1.14, 1.0]]} punch={[ray + 0.1, FLIP1, mg + 0.85, ms + 0.6]}>
         <Paper />
         <Draw draw={(ctx, tt, E) => {
-          const a = seg(tt, A10 - 0.3, A10 + 0.6);
+          const a = seg(tt, A10 - 0.3, A10 + 0.6) * (1 - seg(tt, mg - 0.2, mg + 0.4));
+          if (a <= 0) return;
           // livre ouvert : page de gauche (index des clés), page de droite (羊部)
           ctx.save(); ctx.globalAlpha = a;
           ctx.fillStyle = 'rgba(60,46,34,0.18)'; E.roundRect(ctx, 330, 150, 1260, 820, 18); ctx.fill();
@@ -855,8 +886,19 @@ const Dico: React.FC = () => {
           const di = KEYS.indexOf('羊'), cur = Math.min(k, di), px = 440 + (cur % 4) * 140, py = 300 + Math.floor(cur / 4) * 150;
           const dot = win(tt, cle - 1.6, dico, 0.3);
           if (dot > 0) { ctx.save(); ctx.globalAlpha = dot; ctx.fillStyle = inkCss; ctx.beginPath(); ctx.arc(px - 62, py + 30, 12, 0, 7); ctx.fill(); ctx.restore(); }
-          // page de droite : 羊部
-          const pg = seg(tt, dico - 0.3, dico + 0.6);
+          // page de droite : on feuillette vite (une page toutes les 0,15 s), et l'on s'arrête net sur 羊部
+          if (tt > FLIP0 && tt < FLIP1) {
+            const u = (tt - FLIP0) / 0.15, n = Math.floor(u), f = u - n;
+            E.text(ctx, FLIPS[n % FLIPS.length], 1275, 210, { font: 'ShuimoKai', size: 64, color: '#5b4f44', alpha: a });
+            for (let i = 0; i < 4; i++) E.text(ctx, FLIPC[(n * 4 + i * 7) % FLIPC.length], 1090, 350 + i * 150, { font: 'ShuimoKai', size: 100, color: inkCss, alpha: a * 0.8 });
+            // la page qui tourne : un pan de papier qui passe de droite à gauche, ombré
+            const xr = 1580 - 620 * ease(f);
+            ctx.save(); ctx.globalAlpha = a;
+            const gr = ctx.createLinearGradient(xr - 90, 0, xr + 30, 0); gr.addColorStop(0, 'rgba(60,46,34,0)'); gr.addColorStop(0.75, 'rgba(60,46,34,0.22)'); gr.addColorStop(1, 'rgba(248,243,232,1)');
+            ctx.fillStyle = gr; ctx.fillRect(Math.max(970, xr - 90), 140, Math.min(1580, xr + 30) - Math.max(970, xr - 90), 820);
+            ctx.restore();
+          }
+          const pg = seg(tt, FLIP1 - 0.05, FLIP1 + 0.05);
           if (pg <= 0) return;
           E.text(ctx, '羊部', 1275, 210, { font: 'ShuimoKai', size: 64, color: rgb(mixc(INK, GOM, 0.7)), alpha: pg });
           ENTRIES.forEach(([c, py2, fr], i) => {
@@ -869,6 +911,24 @@ const Dico: React.FC = () => {
           });
         }} />
       </Cam>
+      {/* 美国 : « le beau pays »… qui n'a rien de beau, c'est le « mé » d'Amérique ; puis 美食, la bonne cuisine */}
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: (1 - book) * (1 - seg(t, B('b10') - 0.3, B('b10'))) }}>
+        <div style={{ position: 'relative', height: 330, width: 900 }}>
+          {[['美国', 'Měiguó', 'les États-Unis', mg + 0.85, ms - 0.2], ['美食', 'měishí', 'la bonne cuisine', ms + 0.6, B('b10')]].map(([zh, py, fr, a0, a1]) => (
+            <div key={zh as string} style={{ position: 'absolute', inset: 0, textAlign: 'center', opacity: win(t, a0 as number, a1 as number, 0.35) }}>
+              <div style={{ fontFamily: 'ShuimoKai', fontSize: 230, lineHeight: 1.1, color: inkCss }}>
+                <span style={{ color: rgb(mixc(INK, GOM, 0.75)) }}>{(zh as string)[0]}</span>{(zh as string)[1]}
+              </div>
+              <div style={{ fontFamily: 'ShuimoLatin', fontSize: 58, fontWeight: 600, color: '#4b4038' }}>{py} · {fr}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ height: 150, position: 'relative', width: 1400, fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 52, color: '#5b4f44', textAlign: 'center' }}>
+          <div style={{ position: 'absolute', inset: 0, opacity: win(t, bp, enf + 0.6, 0.35) }}>美 beau · 国 pays</div>
+          <div style={{ position: 'absolute', inset: 0, opacity: win(t, ame - 0.9, ms - 0.2, 0.35) }}>A<b style={{ color: rgb(VER) }}>mé</b>rique → 亚<b style={{ color: rgb(VER) }}>美</b>利加 → <b style={{ color: rgb(VER) }}>美</b>国</div>
+          <div style={{ position: 'absolute', inset: 0, opacity: win(t, pdu - 0.1, B('b10'), 0.35), color: rgb(mixc(INK, GOM, 0.8)), fontFamily: 'ShuimoKai', fontSize: 72 }}>羊</div>
+        </div>
+      </div>
     </AbsoluteFill>
   );
 };
@@ -978,12 +1038,12 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 
 const Finale: React.FC = () => {
   const t = useT();
-  const A8 = A('b08'), fo = at('b08', 'formes'), nait = at('b08', 'naissance'), ml = at('b08', 'meili'), wm = at('b08', 'wanmei');
+  const A8 = A('b08'), fo = at('b08', 'formes'), nait = at('b08', 'naissance'), ml = at('b08', 'shang'), par8 = at('b08', 'parer'), ciel = at('b08', 'ciel'), beau8 = at('b08', 'beau');
   const A9 = A('b09'), mx = at('b09', 'maxime'), dn = at('b09', 'danseur'), par = at('b09', 'parure'), tb = at('b09', 'tombent'), bl = at('b09', 'blancs');
   return (
     <AbsoluteFill>
       <Cam keys={[[A8 - 0.3, 960, 540, 1.02], [A8 + 0.2, 960, 500, 1.1, 1.6], [fo - 0.9, 960, 540, 1.02, 0.9], [at('b08', 'sceau'), 900, 420, 1.12, 1.0], [nait, 960, 540, 1.02, 1.0], [A9 + 0.3, 960, 540, 1.0, 1.0], [dn, 1100, 470, 1.12, 1.4], [bl - 0.6, 1100, 500, 1.06, 1.0]]}
-        punch={[at('b08', 'homme'), at('b08', 'coiffe'), at('b08', 'sceau'), nait, tb + 0.6]}>
+        punch={[at('b08', 'homme'), at('b08', 'coiffe'), at('b08', 'sceau'), ciel, nait, tb + 0.6]}>
         <Paper />
         <Landscape seed={30} from={A8 - 1.5} to={END + 0.5} move="pan" mood="aube" faint={0.5} />
         <Draw draw={(ctx, tt, E) => {
@@ -1007,14 +1067,21 @@ const Finale: React.FC = () => {
               E.drawRealGlyph(ctx, 'mei_jiaguwen', { ...O, opacity: da * (1 - fall), color: () => rgb(mixc(MAL, GREY, fall)), alpha: (c: string) => (c === 'coiffe' ? 1 : 0) });
               ctx.restore();
             }
+            // « Le danseur, lui… » : sa silhouette d'encre revient une seconde sur le signe (écho de la danse de la pluie)
+            const ds = win(tt, dn - 0.1, dn + 1.3, 0.35);
+            if (ds > 0 && IMG.sil) {
+              const sc = O.size / G_DANCER.size;
+              ctx.save(); ctx.globalAlpha = 0.5 * ds; ctx.drawImage(IMG.sil, O.x - G_DANCER.x * sc, O.y - G_DANCER.y * sc, 1920 * sc, 1080 * sc); ctx.restore();
+            }
             if (lao > 0) E.drawRealGlyph(ctx, 'mei_lao_jiaguwen', { ...O, opacity: lao, color: () => rgb(mixc(INK, [120, 112, 104], 0.4)), glow: 16 * lao, glowColor: 'rgba(255,255,255,0.8)' });
           }
         }} />
       </Cam>
       <div style={{ position: 'absolute', width: '100%', top: 760, display: 'flex', justifyContent: 'center', gap: 200, fontFamily: 'ShuimoKai', fontSize: 84, color: inkCss }}>
-        <span style={{ opacity: win(t, ml - 0.4, A9 - 0.3) }}>美丽<div style={{ fontFamily: 'ShuimoLatin', fontSize: 42, textAlign: 'center' }}>la beauté</div></span>
-        <span style={{ opacity: win(t, wm - 0.4, A9 - 0.3) }}>完美<div style={{ fontFamily: 'ShuimoLatin', fontSize: 42, textAlign: 'center' }}>la perfection</div></span>
       </div>
+      {/* se parer pour parler au ciel, puis le nom */}
+      <Caption text="se parer · pour parler au ciel" a={win(t, par8 - 0.1, nait - 0.1, 0.4)} y={930} size={48} />
+      <Caption text="美 · měi · le beau" a={win(t, beau8 - 0.2, A9 - 0.3, 0.4)} y={930} size={56} />
       {/* fiche : 美, pinyin, nombre de traits */}
       <div style={{ position: 'absolute', left: 230, top: 280, opacity: win(t, A9 - 0.2, dn + 3.0, 0.6) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 280, color: inkCss, lineHeight: 1 }}>美</div>

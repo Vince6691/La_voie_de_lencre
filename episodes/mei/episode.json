@@ -82,6 +82,7 @@
    "beau": "beau",
    "mouton": "c'est le caractère",
    "officiel": "l'explication officielle",
+   "lettre": "un lettré",
    "dico": "premier grand",
    "haut": "un mouton en",
    "grand": "et le mot",
@@ -129,7 +130,8 @@
    "inscr": "des inscriptions",
    "epaissit": "Le trait s'épaissit",
    "coiffe": "La coiffe perd",
-   "cornes": "des cornes"
+   "cornes": "des cornes",
+   "naitre": "en train"
   },
   "b06": {
    "royaumes": "Royaumes combattants",
@@ -152,6 +154,7 @@
    "cornes": "deux cornes",
    "mouton": "C'est exactement",
    "xushen": "Trois siècles",
+   "vingt": "vingt ans",
    "neufmille": "neuf mille",
    "yeux": "sous les yeux",
    "savoureux": "savoureux",
@@ -165,7 +168,13 @@
    "cherche": "on cherche",
    "rayon": "au rayon",
    "agneau": "l'agneau",
-   "troupeau": "troupeau"
+   "troupeau": "troupeau",
+   "meiguo": "partout",
+   "beaupays": "le beau pays",
+   "enfin": "Enfin",
+   "amerique": "d'Amérique",
+   "meishi": "Et 美食",
+   "perdu": "n'a pas"
   },
   "b11": {
    "pinceau": "prenons le",
@@ -187,9 +196,11 @@
    "bronze": "des branches courbes",
    "sceau": "Au petit sceau",
    "reste": "et le mouton reste",
+   "shang": "Pour les",
+   "parer": "C'était se",
+   "ciel": "au ciel",
    "naissance": "Ainsi naît",
-   "meili": "la beauté",
-   "wanmei": "la perfection"
+   "beau": "le beau"
   },
   "b09": {
    "maxime": "Le mouton, c'est",
@@ -278,13 +289,6 @@
    0.3
   ],
   [
-   "gong",
-   "b07",
-   "mouton",
-   1.3,
-   0.4
-  ],
-  [
    "sceau",
    "b10",
    "rayon",
@@ -367,6 +371,97 @@
    "sceau",
    0.9,
    0.6
+  ],
+  [
+   "sceau",
+   "b07",
+   "mouton",
+   0.36,
+   0.5
+  ],
+  [
+   "sceau",
+   "b07",
+   "mouton",
+   1.12,
+   0.55
+  ],
+  [
+   "sceau",
+   "b07",
+   "mouton",
+   2.0,
+   0.6
+  ],
+  [
+   "gong",
+   "b07",
+   "mouton",
+   2.0,
+   0.35
+  ],
+  [
+   "tonnerre",
+   "b12",
+   null,
+   -0.25,
+   0.6
+  ],
+  [
+   "tambour",
+   "b12",
+   "danse",
+   0,
+   0.35
+  ],
+  [
+   "tambour",
+   "b12",
+   "frappaient",
+   0,
+   0.45
+  ],
+  [
+   "tambour",
+   "b12",
+   "tambours",
+   0.1,
+   0.5
+  ],
+  [
+   "tambour",
+   "b04",
+   "signe",
+   0,
+   0.25
+  ],
+  [
+   "tambour",
+   "b04",
+   "rien",
+   0,
+   0.25
+  ],
+  [
+   "tambour",
+   "b07",
+   "mouton",
+   2.0,
+   0.3
+  ],
+  [
+   "tambour",
+   "b09",
+   "danseur",
+   0,
+   0.3
+  ],
+  [
+   "feuilles",
+   "b10",
+   "dico",
+   0.5,
+   0.55
   ]
  ],
  "glyphes": {

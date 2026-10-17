@@ -28,3 +28,10 @@
   bœuf, bois de cerf, coiffe en tête de mouton (高華平, qui garde le sens « savoureux »).
 - **Légende** : Wang Yirong découvrant les os dans ses médicaments (1899).
 - **À vérifier** : graphie exacte de Chu. (Comparaison 羌 / 美 écartée : trop proches à l’œil.)
+
+## Ajouts du récit (voix v11)
+- Xu Shen 許慎 et le Shuowen jiezi : postface datée de l'an 100, ouvrage présenté à la cour en 121 par son fils Xu Chong
+  → « plus de vingt ans » de travail ; 9 353 caractères expliqués → « plus de neuf mille ».
+- 美国 Měiguó : abréviation de 美利坚合众国, transcription phonétique d'« America » (亚美利加 Yàměilìjiā) ; 美 y note le son
+  « mé », pas le sens « beau » (choix d'un caractère flatteur, d'où la lecture populaire « le beau pays »).
+- 美食 měishí : « bonne chère, gastronomie » (美 au sens de « bon, savoureux »).

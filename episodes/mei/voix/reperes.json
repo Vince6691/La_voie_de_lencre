@@ -1,20 +1,21 @@
 {
  "b01": {
-  "duration": 27.28,
+  "duration": 30.17,
   "cues": {
-   "beau": 0.94,
-   "mouton": 3.15,
-   "officiel": 6.24,
-   "dico": 10.78,
-   "haut": 13.34,
-   "grand": 14.66,
-   "bon": 16.86,
-   "donc": 18.94,
-   "song": 20.54,
-   "marbre": 22.42,
-   "maxime": 25.42,
-   "entendu": 26.06,
-   "gros": 26.82
+   "beau": 1.0,
+   "mouton": 3.21,
+   "officiel": 6.55,
+   "lettre": 9.64,
+   "dico": 12.76,
+   "haut": 15.72,
+   "grand": 17.16,
+   "bon": 19.48,
+   "donc": 21.56,
+   "song": 23.48,
+   "marbre": 25.32,
+   "maxime": 28.28,
+   "entendu": 28.92,
+   "gros": 29.72
   }
  },
  "b02": {
@@ -61,13 +62,14 @@
   }
  },
  "b05": {
-  "duration": 15.17,
+  "duration": 17.68,
   "cues": {
-   "bronze": 3.79,
-   "inscr": 5.63,
-   "epaissit": 6.99,
-   "coiffe": 10.11,
-   "cornes": 14.59
+   "bronze": 3.84,
+   "inscr": 5.72,
+   "epaissit": 7.08,
+   "coiffe": 10.12,
+   "cornes": 14.76,
+   "naitre": 16.84
   }
  },
  "b06": {
@@ -87,32 +89,39 @@
   }
  },
  "b07": {
-  "duration": 36.65,
+  "duration": 39.22,
   "cues": {
-   "empereur": 0.86,
-   "sceau": 4.22,
+   "empereur": 0.78,
+   "sceau": 4.19,
    "ordre": 5.66,
-   "symetrique": 10.1,
+   "symetrique": 9.94,
    "cornes": 12.5,
-   "mouton": 14.62,
-   "xushen": 18.06,
-   "neufmille": 22.94,
-   "yeux": 25.42,
-   "savoureux": 30.62,
-   "erreur": 31.85,
-   "ecriture": 34.06
+   "mouton": 14.54,
+   "xushen": 17.9,
+   "vingt": 23.02,
+   "neufmille": 24.94,
+   "yeux": 27.5,
+   "savoureux": 32.86,
+   "erreur": 34.41,
+   "ecriture": 36.74
   }
  },
  "b10": {
-  "duration": 14.26,
+  "duration": 30.57,
   "cues": {
    "encore": 0.0,
-   "cle": 4.78,
-   "dico": 7.5,
-   "cherche": 10.14,
-   "rayon": 11.26,
-   "agneau": 13.13,
-   "troupeau": 13.82
+   "cle": 4.83,
+   "dico": 7.57,
+   "cherche": 10.15,
+   "rayon": 11.27,
+   "agneau": 13.11,
+   "troupeau": 13.87,
+   "meiguo": 15.71,
+   "beaupays": 18.59,
+   "enfin": 20.03,
+   "amerique": 25.2,
+   "meishi": 26.19,
+   "perdu": 29.68
   }
  },
  "b11": {
@@ -130,19 +139,21 @@
   }
  },
  "b08": {
-  "duration": 24.28,
+  "duration": 26.19,
   "cues": {
-   "reprenons": 0.14,
-   "formes": 2.9,
-   "homme": 3.98,
-   "coiffe": 6.26,
-   "plumes": 8.32,
-   "bronze": 9.58,
-   "sceau": 11.78,
-   "reste": 14.7,
-   "naissance": 16.3,
-   "meili": 20.94,
-   "wanmei": 23.5
+   "reprenons": 0.03,
+   "formes": 2.99,
+   "homme": 4.07,
+   "coiffe": 6.47,
+   "plumes": 8.53,
+   "bronze": 9.91,
+   "sceau": 12.11,
+   "reste": 14.87,
+   "shang": 16.47,
+   "parer": 21.11,
+   "ciel": 23.15,
+   "naissance": 24.15,
+   "beau": 25.83
   }
  },
  "b09": {
@@ -159,30 +170,30 @@
   "clips": {
    "b01": {
     "debut": 0.6,
-    "duree": 27.28
+    "duree": 30.17
    },
    "b02": {
-    "debut": 28.68,
+    "debut": 31.57,
     "duree": 1.29
    },
    "b03": {
-    "debut": 33.97,
+    "debut": 36.86,
     "duree": 1.35
    },
    "b12": {
-    "debut": 36.87,
+    "debut": 39.76,
     "duree": 10.14
    },
    "b04": {
-    "debut": 47.31,
+    "debut": 50.2,
     "duree": 41.53
    },
    "b05": {
-    "debut": 89.64,
-    "duree": 15.17
+    "debut": 92.53,
+    "duree": 17.68
    },
    "b06": {
-    "debut": 110.81,
+    "debut": 116.21,
     "duree": 27.21,
     "pause": {
      "coupe": 19.3,
@@ -190,55 +201,55 @@
     }
    },
    "b07": {
-    "debut": 143.32,
-    "duree": 36.65,
+    "debut": 148.72,
+    "duree": 39.22,
     "pause": {
-     "coupe": 17.91,
+     "coupe": 17.75,
      "duree": 3.6
     }
    },
    "b10": {
-    "debut": 184.17,
-    "duree": 14.26
+    "debut": 192.14,
+    "duree": 30.57
    },
    "b11": {
-    "debut": 199.43,
+    "debut": 223.71,
     "duree": 14.6
    },
    "b08": {
-    "debut": 215.03,
-    "duree": 24.28
+    "debut": 239.31,
+    "duree": 26.19
    },
    "b09": {
-    "debut": 240.51,
+    "debut": 266.7,
     "duree": 12.55
    }
   },
   "rouleaux": [
    {
-    "debut": 105.21,
+    "debut": 110.61,
     "duree": 5.3,
     "modele": "3d-complet"
    },
    {
-    "debut": 161.23,
+    "debut": 166.47,
     "duree": 3.6,
     "modele": "3d-court"
    }
   ],
   "pauses": [
    [
-    130.11,
+    135.51,
     4.5
    ],
    [
-    161.23,
+    166.47,
     3.6
    ]
   ],
   "plages": {
    "danse": {
-    "debut": 35.62,
+    "debut": 38.51,
     "duree": 1.25,
     "son": "clips/03_danseur_v2.mp4",
     "son_decalage": 0.75,
@@ -246,8 +257,8 @@
     "son_duree": 8.0
    }
   },
-  "fin": 253.36,
-  "total": 256.56,
+  "fin": 279.55,
+  "total": 282.75,
   "bruitages": [
    [
     "pinceau",
@@ -256,118 +267,178 @@
    ],
    [
     "sceau",
-    4.35,
+    4.41,
     0.4
    ],
    [
     "ciseau",
-    23.32,
+    26.22,
     0.5
    ],
    [
     "ciseau",
-    24.32,
+    27.22,
     0.45
    ],
    [
     "sceau",
-    26.17,
+    29.03,
     0.55
    ],
    [
     "marbre",
-    30.22,
+    33.11,
     0.75
    ],
    [
     "gravure",
-    52.48,
+    55.37,
     0.4
    ],
    [
     "sceau",
-    71.56,
+    74.45,
     0.45
    ],
    [
     "sceau",
-    93.43,
+    96.37,
     0.5
    ],
    [
     "pinceau",
-    124.92,
+    130.32,
     0.35
    ],
    [
     "pinceau",
-    127.02,
+    132.42,
     0.3
    ],
    [
-    "gong",
-    159.24,
-    0.4
-   ],
-   [
     "sceau",
-    195.43,
+    203.41,
     0.45
    ],
    [
     "pinceau",
-    206.45,
+    230.73,
     0.4
    ],
    [
     "pinceau",
-    207.69,
+    231.97,
     0.4
    ],
    [
     "pinceau",
-    208.89,
+    233.17,
     0.4
    ],
    [
     "pinceau",
-    211.73,
+    236.01,
     0.4
    ],
    [
     "pinceau",
-    213.11,
+    237.39,
     0.4
    ],
    [
     "gong",
-    226.81,
+    251.42,
     0.35
    ],
    [
     "sceau",
-    231.33,
+    263.46,
     0.45
    ],
    [
     "gong",
-    252.31,
+    278.5,
     0.35
    ],
    [
     "sceau",
-    47.37,
+    50.26,
     0.6
    ],
    [
     "sceau",
-    95.87,
+    98.85,
     0.6
    ],
    [
     "sceau",
-    148.44,
+    153.81,
     0.6
+   ],
+   [
+    "sceau",
+    163.62,
+    0.5
+   ],
+   [
+    "sceau",
+    164.38,
+    0.55
+   ],
+   [
+    "sceau",
+    165.26,
+    0.6
+   ],
+   [
+    "gong",
+    165.26,
+    0.35
+   ],
+   [
+    "tonnerre",
+    39.51,
+    0.6
+   ],
+   [
+    "tambour",
+    43.83,
+    0.35
+   ],
+   [
+    "tambour",
+    47.83,
+    0.45
+   ],
+   [
+    "tambour",
+    48.89,
+    0.5
+   ],
+   [
+    "tambour",
+    57.89,
+    0.25
+   ],
+   [
+    "tambour",
+    79.73,
+    0.25
+   ],
+   [
+    "tambour",
+    165.26,
+    0.3
+   ],
+   [
+    "tambour",
+    269.2,
+    0.3
+   ],
+   [
+    "feuilles",
+    200.21,
+    0.55
    ]
   ]
  }
