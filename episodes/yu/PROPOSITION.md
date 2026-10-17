@@ -76,7 +76,7 @@ cartouche('zhou', 'fin des Printemps et Automnes'). Sa cloche (celle du rouleau 
 entre la mer de nuages du clip A : on vérifiera à l'oreille qu'elle ne fait pas doublon avec la cloche de Xu]`
 
 ## 4. La cloche qui parle — 1:30
-Six siècles plus tard, au sud-est, dans le petit royaume de Xu. Un prince fait fondre un carillon de bronze. On le
+Six siècles plus tard, à l'est, un prince fait fondre un carillon de bronze. On le
 frappe… et la salle lui répond. ⏸ Sur ses flancs, gravé dans le bronze, apparaît l'un des tout premiers 語 que l'on
 connaisse : la parole à gauche, « moi » à droite. ⏸ Les deux pièces se sont enfin rencontrées.
 > plan : **clip Seedance A** (carillon de bronze frappé au maillet, la cour écoute ; entrée par la mer de nuages, sortie
@@ -113,7 +113,7 @@ Un siècle plus tôt, déjà, un lettré, 揚雄, s'était aperçu que l'empire 
 venus des confins pour garder la capitale. Il les interrogeait, et notait leurs mots au pinceau, sur des carrés de soie. ⏸
 Vingt-sept ans d'enquête. Le livre s'appelle 方言 : les parlers des pays.
 > plan : cartouche cartouche('han', 'vers l\'an 1 · Yang Xiong') ; **médaillon au trait** de Yang Xiong dès qu'il est
-> nommé (option de la skill), puis **clip Seedance B** (soldats fatigués dans une cour de Chang'an, Yang Xiong les
+> nommé, légende discrète « selon une lettre qui lui est attribuée » sur « soldats », (option de la skill), puis **clip Seedance B** (soldats fatigués dans une cour de Chang'an, Yang Xiong les
 > écoute et note ; entrée à travers le caractère 語 resté à l'écran, sortie au pinceau) ; **carte 1** : empire Han sur
 > papier, régions des parlers (Qin, Jin, Qi, Yan, Chu, Wu-Yue, Shu), flèches d'encre qui convergent vers Chang'an sur
 > « venus des confins » ; le médaillon revient sur « Vingt-sept ans ».

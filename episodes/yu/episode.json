@@ -10,15 +10,20 @@
   },
   {
    "clip": "b02",
-   "apres": 1.0
+   "apres": 0.8
   },
   {
    "clip": "b03",
-   "apres": 0.7
+   "apres": 0.3
   },
   {
-   "rouleau": 5,
+   "rouleau3d": "court",
    "apres": 0.3
+  },
+  {
+   "plage": 2.0,
+   "nom": "cloche",
+   "apres": 0.0
   },
   {
    "clip": "b04",
@@ -26,28 +31,138 @@
   },
   {
    "clip": "b05",
-   "pause": {
-    "repere": "reponse",
-    "decalage": -0.12,
-    "duree": 1.7
-   },
-   "apres": 1.0
+   "apres": 0.3
+  },
+  {
+   "plage": 1.5,
+   "nom": "pinceau",
+   "apres": 0.2
   },
   {
    "clip": "b06",
-   "apres": 0.5
+   "pause": {
+    "repere": "reponse",
+    "decalage": -0.12,
+    "duree": 1.8
+   },
+   "apres": 0.8
+  },
+  {
+   "clip": "b07",
+   "apres": 0.3
+  },
+  {
+   "rouleau3d": "complet",
+   "apres": 0.3
+  },
+  {
+   "clip": "b08",
+   "apres": 0.8
+  },
+  {
+   "clip": "b09",
+   "apres": 1.0
+  },
+  {
+   "clip": "b10",
+   "apres": 0.3
   }
  ],
- "queue": 3.2,
+ "queue": 10,
  "reperes_cles": {
   "b01": {
-   "mains": "deux mains"
+   "precepte": "Un vieux précepte",
+   "table": "À table",
+   "lit": "Au lit",
+   "deux": "Deux mots",
+   "interdit": "on interdit",
+   "parler": "et parler"
+  },
+  "b02": {
+   "gauche": "À gauche",
+   "droite": "À droite",
+   "moi": "pour dire",
+   "enigme": "Mais que vient",
+   "jeune": "Le caractère est",
+   "os": "gravées sur"
   },
   "b03": {
-   "signe": "C'est là"
+   "anyang": "Anyang",
+   "devin": "le devin",
+   "signe": "Le signe de",
+   "bouche": "une bouche",
+   "langue": "une langue",
+   "son": "et sans doute",
+   "cinq": "Un autre signe",
+   "traits": "D'abord cinq",
+   "croix": "Puis plus court",
+   "pose": "Pose ce cinq",
+   "pourquoi": "Pourquoi cinq",
+   "prononcait": "On prononçait"
+  },
+  "b04": {
+   "siecles": "Six siècles",
+   "frappe": "On le frappe",
+   "repond": "et la salle",
+   "flancs": "Sur ses flancs",
+   "gauche": "la parole à",
+   "rencontre": "Les deux pièces"
   },
   "b05": {
-   "reponse": "Les mains n'ont pas"
+   "royaumes": "Puis viennent",
+   "conseillers": "des conseillers",
+   "argumente": "On argumente",
+   "hesite": "Le signe, lui",
+   "sceaux": "sur les sceaux",
+   "empile": "les deux bouches"
+  },
+  "b06": {
+   "han": "Trois siècles",
+   "dico": "un dictionnaire",
+   "question": "notre question",
+   "reponse": "Parler tout droit",
+   "discuter": "Discuter",
+   "table": "Voilà pourquoi",
+   "pleine": "on ne lance",
+   "lit": "Et au lit"
+  },
+  "b07": {
+   "lettre": "Un siècle plus tôt",
+   "voix": "d'une seule voix",
+   "soldats": "les soldats",
+   "confins": "venus des confins",
+   "pinceau": "notait leurs mots",
+   "annees": "Vingt-sept ans",
+   "livre": "Le livre"
+  },
+  "b08": {
+   "annee": "En mille",
+   "traits": "La parole se réduit",
+   "partout": "est partout",
+   "hanyu": "la langue chinoise",
+   "anglais": "l'anglais",
+   "francais": "le français",
+   "lois": "langue des lois",
+   "rien": "Enfin",
+   "ecriture": "Une seule écriture",
+   "canton": "à Canton"
+  },
+  "b09": {
+   "formes": "Reprenons",
+   "parole": "La parole",
+   "cinq": "Le cinq",
+   "bouche": "Et dessous",
+   "face": "Voilà ce que",
+   "naissance": "Ainsi naît",
+   "mots": "On le retrouve",
+   "chengyu": "et dans"
+  },
+  "b10": {
+   "dire": "Dire",
+   "converser": "Converser",
+   "maitre": "Et celui",
+   "armee": "Pourtant"
   }
- }
+ },
+ "bruitages": []
 }
