@@ -88,7 +88,7 @@ const useT = () => useCurrentFrame() / useVideoConfig().fps;
 const LAOZI = 'episodes/mei/images/laozi_reference.jpg';
 const laoziImg: { img: HTMLImageElement | null } = { img: null };
 // autres images : fin du clip (pose figée), silhouette détourée (detourer.py), tracé du baimiao (trace_baimiao.py)
-const IMGSRC = { fin: 'episodes/mei/clips/03_danseur_v2_fin.jpg', sil: 'episodes/mei/clips/03_danseur_v2_silhouette.png', trace: 'episodes/mei/images/laozi_baimiao_trace.png', xushen: 'episodes/mei/images/xushen_baimiao_trace.png' };
+const IMGSRC = { fin: 'episodes/mei/clips/03_danseur_v2_fin.jpg', sil: 'episodes/mei/clips/03_danseur_v2_silhouette.png', trace: 'episodes/mei/images/laozi_baimiao_trace.png', xushen: 'episodes/mei/images/xushen_baimiao_trace.png', papier: 'shuimo/paper.jpg' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 const useSetup = () => {
   const [h] = useState(() => delayRender('polices + moteur + images'));
@@ -166,7 +166,7 @@ const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number }> =
     <div style={{ width: 92, height: 92, background: rgb(VER, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: [...zh].length > 1 ? 38 : 64, writingMode: [...zh].length > 1 ? 'vertical-rl' : undefined, lineHeight: 1, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>{zh}</div>
     <div>
       <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss }}>{name}</div>
-      <div style={{ fontFamily: 'ShuimoLatin', fontSize: 30, color: '#6b5d50' }}>{dates}</div>
+      <div style={{ fontFamily: 'ShuimoLatin', fontSize: 36, fontWeight: 500, color: '#5e5044' }}>{dates}</div>
     </div>
   </div>
 );
@@ -177,9 +177,10 @@ const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: n
   </div>
 );
 // légende sur un voile de papier (lisible même sur un estampage sombre)
-const Caption: React.FC<{ text: string; a: number; y?: number; size?: number }> = ({ text, a, y = 990, size = 38 }) => (
-  <div style={{ position: 'absolute', width: '100%', top: y, textAlign: 'center', opacity: a }}>
-    <span style={{ display: 'inline-block', padding: '4px 22px', borderRadius: 14, background: 'rgba(246,241,231,0.78)', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: size, color: '#4b4038', textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</span>
+// (au-dessus des 8 % du bas, où passe la barre de progression YouTube ; 44 px au moins, lisible au téléphone)
+const Caption: React.FC<{ text: string; a: number; y?: number; size?: number }> = ({ text, a, y = 900, size = 44 }) => (
+  <div style={{ position: 'absolute', width: '100%', top: Math.min(y, 975 - 1.7 * Math.max(size, 44)), textAlign: 'center', opacity: a }}>
+    <span style={{ display: 'inline-block', padding: '4px 22px', borderRadius: 14, background: 'rgba(246,241,231,0.78)', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: Math.max(size, 44), color: '#4b4038', textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</span>
   </div>
 );
 // glyphe réel : l'homme et la coiffe, chacun mêlé à son pigment selon man / coif
@@ -203,17 +204,49 @@ const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; ch
   cx = Math.min(1920 - 960 / s, Math.max(960 / s, cx)); cy = Math.min(1080 - 540 / s, Math.max(540 / s, cy));
   return <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${960 - cx * s}px, ${540 - cy * s}px) scale(${s})` }}>{children}</AbsoluteFill>;
 };
-
 // plastron de tortue à l'encre (contour, plaques), chauffé en un point, puis fendu en forme de 卜
-// vase tripode (ding) en bronze, en lavis vert-de-gris
+// ding de bronze peint à l'encre : lavis de patine (vert-de-gris), bande de 雲雷紋 (spirales du tonnerre), contour au
+// pinceau sec (trois passages décalés), pieds effilés, ombre de lavis au sol
+const DING_SPOTS = (() => { let v = 7; const r = () => ((v = (v * 16807) % 2147483647) / 2147483647); return Array.from({ length: 70 }, () => [r() * 560 - 280, r() * 380 - 160, 3 + 9 * r(), r()]); })();
+const dingBody = (ctx: CanvasRenderingContext2D) => { ctx.beginPath(); ctx.moveTo(-300, -170); ctx.lineTo(300, -170); ctx.bezierCurveTo(305, 110, 200, 225, 0, 225); ctx.bezierCurveTo(-200, 225, -305, 110, -300, -170); ctx.closePath(); };
 const ding = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number) => {
   if (a <= 0) return;
   ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
-  ctx.fillStyle = 'rgba(92,120,104,0.55)'; ctx.strokeStyle = 'rgba(40,52,46,0.9)'; ctx.lineWidth = 6;
-  for (const lx of [-170, 0, 170]) { ctx.beginPath(); ctx.moveTo(lx - 18, 160); ctx.lineTo(lx - 10, 330); ctx.lineTo(lx + 10, 330); ctx.lineTo(lx + 18, 160); ctx.closePath(); ctx.fill(); ctx.stroke(); }
-  ctx.beginPath(); ctx.moveTo(-300, -170); ctx.lineTo(300, -170); ctx.bezierCurveTo(300, 120, 200, 220, 0, 220); ctx.bezierCurveTo(-200, 220, -300, 120, -300, -170); ctx.closePath(); ctx.fill(); ctx.stroke();
-  for (const sx of [-1, 1]) { ctx.beginPath(); ctx.moveTo(sx * 180, -170); ctx.lineTo(sx * 180, -270); ctx.lineTo(sx * 250, -270); ctx.lineTo(sx * 250, -170); ctx.stroke(); }
-  ctx.strokeStyle = 'rgba(40,52,46,0.55)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-290, -120); ctx.lineTo(290, -120); ctx.stroke();
+  // ombre de lavis au sol
+  ctx.save(); ctx.filter = 'blur(18px)'; ctx.fillStyle = 'rgba(60,52,44,0.28)'; ctx.beginPath(); ctx.ellipse(0, 338, 300, 26, 0, 0, 7); ctx.fill(); ctx.restore();
+  // pieds effilés (lavis puis contour)
+  for (const lx of [-170, 0, 170]) {
+    ctx.beginPath(); ctx.moveTo(lx - 26, 170); ctx.quadraticCurveTo(lx - 22, 260, lx - 8, 332); ctx.lineTo(lx + 8, 332); ctx.quadraticCurveTo(lx + 22, 260, lx + 26, 170); ctx.closePath();
+    ctx.fillStyle = 'rgba(64,88,78,0.5)'; ctx.fill(); ctx.strokeStyle = 'rgba(34,40,36,0.85)'; ctx.lineWidth = 4; ctx.stroke();
+  }
+  // anses : arcs épais au pinceau
+  for (const sx of [-1, 1]) {
+    ctx.beginPath(); ctx.moveTo(sx * 170, -168); ctx.quadraticCurveTo(sx * 168, -285, sx * 215, -285); ctx.quadraticCurveTo(sx * 262, -285, sx * 258, -168);
+    ctx.strokeStyle = 'rgba(40,50,44,0.9)'; ctx.lineWidth = 16; ctx.lineCap = 'round'; ctx.stroke();
+    ctx.strokeStyle = 'rgba(92,124,108,0.6)'; ctx.lineWidth = 6; ctx.stroke();
+  }
+  // panse : lavis de patine, plus sombre sur les bords, taches de vert-de-gris
+  ctx.save(); dingBody(ctx); ctx.clip();
+  const g = ctx.createRadialGradient(-60, -20, 40, 0, 20, 360); g.addColorStop(0, 'rgba(118,146,128,0.42)'); g.addColorStop(0.7, 'rgba(70,98,86,0.58)'); g.addColorStop(1, 'rgba(44,62,56,0.75)');
+  ctx.fillStyle = g; ctx.fillRect(-320, -180, 640, 420);
+  DING_SPOTS.forEach(([sx, sy, r, k]) => { ctx.fillStyle = k > 0.5 ? 'rgba(150,186,160,0.22)' : 'rgba(40,56,50,0.18)'; ctx.beginPath(); ctx.arc(sx, sy, r, 0, 7); ctx.fill(); });
+  // bande de spirales du tonnerre (雲雷紋), à l'encre, sous la lèvre
+  ctx.strokeStyle = 'rgba(30,38,34,0.55)'; ctx.lineWidth = 3;
+  for (let k = -5; k <= 5; k++) {
+    const cx = k * 52, cy = -118, sp = k % 2 ? 1 : -1;
+    ctx.beginPath(); ctx.moveTo(cx - 20, cy + 18); ctx.lineTo(cx - 20, cy - 18); ctx.lineTo(cx + 20, cy - 18); ctx.lineTo(cx + 20, cy + 12 * sp); ctx.lineTo(cx - 8, cy + 12 * sp); ctx.lineTo(cx - 8, cy - 6 * sp); ctx.lineTo(cx + 8, cy - 6 * sp); ctx.stroke();
+  }
+  ctx.beginPath(); ctx.moveTo(-300, -150); ctx.lineTo(300, -150); ctx.moveTo(-300, -84); ctx.bezierCurveTo(-100, -80, 100, -80, 300, -84); ctx.stroke();
+  // reflet clair sur le flanc gauche
+  const h = ctx.createLinearGradient(-280, 0, -120, 0); h.addColorStop(0, 'rgba(246,241,231,0)'); h.addColorStop(0.5, 'rgba(246,241,231,0.18)'); h.addColorStop(1, 'rgba(246,241,231,0)');
+  ctx.fillStyle = h; ctx.fillRect(-300, -70, 200, 260);
+  ctx.restore();
+  // contour au pinceau sec : trois passages légèrement décalés, de plus en plus fins
+  [[0, 0, 7, 0.85], [2.5, -1.5, 3.5, 0.5], [-2, 2, 2, 0.35]].forEach(([dx, dy, w, al]) => {
+    ctx.save(); ctx.translate(dx, dy); dingBody(ctx); ctx.strokeStyle = `rgba(30,34,30,${al})`; ctx.lineWidth = w; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore();
+  });
+  // lèvre épaisse
+  ctx.beginPath(); ctx.moveTo(-312, -170); ctx.lineTo(312, -170); ctx.strokeStyle = 'rgba(30,34,30,0.9)'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.stroke();
   ctx.restore();
 };
 // plastron de tortue à l'encre, chauffé (point rouge), qui se fend (fissures en 卜)
@@ -407,7 +440,7 @@ const Opening: React.FC = () => {
         <Label x={980} y={300} zh="羊" text="le mouton" color={GOM} a={win(tf, mt + 0.6, dico - 0.3, 0.4)} />
         <Caption text="Xu Shen 許慎 · Shuowen jiezi, vers 100" a={win(tf, dico, haut - 0.2, 0.5)} y={960} size={42} />
         <Label x={980} y={720} zh="大" text="grand" color={AZ} a={win(tf, grand, song - 0.6, 0.4)} />
-        <Caption text="Xu Xuan 徐鉉, 986" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} />
+        <Caption text="Xu Xuan 徐鉉 · note à son édition du Shuowen, 986" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} />
         <EraTag {...cartouche('han', "vers l'an 100")} a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
         <EraTag {...cartouche('song', 'Xe–XIIIe siècle')} a={win(tf, song, FREEZE + 0.2, 0.6)} />
       </>}
@@ -517,6 +550,51 @@ const drawMorph = (ctx: CanvasRenderingContext2D, E: any, k: number, gx: { x: nu
 };
 // fusion d'encre entre deux formes (couleurs gardées) : les deux dessins se mêlent flous, puis on ne garde que le
 // cœur de l'encre (seuil sur l'opacité) — les traits coulent d'une écriture à l'autre au lieu d'un fondu
+// après la cassure, sur « Remontons à l'origine… » : une goutte d'encre tombe sur le papier nu et s'épanouit en lavis
+// (lobes irréguliers, cœur plus sombre, anneau d'eau), puis s'efface quand les nuages ouvrent sur la danse
+const INK_LOBES = (() => { let v = 11; const r = () => ((v = (v * 16807) % 2147483647) / 2147483647); return Array.from({ length: 14 }, () => [r() * 7, 0.55 + 0.4 * r(), 0.25 + 0.35 * r()]); })();
+const InkDrop: React.FC = () => {
+  const t0 = SHATTER + 1.1, t1 = CLIP0 - 0.4;
+  return (
+    <Draw draw={(ctx, tt) => {
+      if (tt < t0 || tt > t1 + 0.8) return;
+      const fall = clamp((tt - t0) / 0.35), u = clamp((tt - t0 - 0.35) / (t1 - t0 - 0.35)), out = 1 - seg(tt, t1 - 0.4, t1 + 0.6);
+      ctx.save(); ctx.globalAlpha = out;
+      if (fall < 1) {
+        // la goutte, qui s'allonge en tombant
+        const y = 540 - 420 * (1 - fall * fall);
+        ctx.fillStyle = rgb(INK, 0.9); ctx.beginPath(); ctx.ellipse(960, y, 9, 9 + 16 * fall, 0, 0, 7); ctx.fill();
+      } else {
+        // la tache : contour irrégulier qui avance par à-coups (fibres du papier), lavis plus clair au centre, liseré
+        // plus sombre au bord (l'encre se dépose où l'eau s'arrête), grain du papier par-dessus
+        const R = 26 + 400 * (1 - Math.pow(1 - u, 2.2));
+        const shape = (k0 = 1) => {
+          ctx.beginPath();
+          for (let k = 0; k <= 120; k++) {
+            const th = (k / 120) * Math.PI * 2;
+            const n = 1 + 0.09 * Math.sin(3 * th + 0.7) + 0.05 * Math.sin(5 * th + 2.1 + 0.6 * u) + 0.025 * Math.sin(9 * th + 4.2);
+            const x = 960 + Math.cos(th) * R * n * k0, y = 540 + Math.sin(th) * R * n * 0.84 * k0;
+            if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+          }
+          ctx.closePath();
+        };
+        // lavis : bord doux qui boit le papier, centre plus clair, cœur sombre décentré
+        ctx.save(); ctx.filter = 'blur(9px)'; shape();
+        const g = ctx.createRadialGradient(948, 532, 0, 960, 540, R * 1.05);
+        g.addColorStop(0, 'rgba(24,20,18,0.7)'); g.addColorStop(0.15, 'rgba(36,32,28,0.4)'); g.addColorStop(0.7, 'rgba(48,44,40,0.26)'); g.addColorStop(1, 'rgba(34,30,28,0.42)');
+        ctx.fillStyle = g; ctx.fill(); ctx.restore();
+        // liseré : l'encre se dépose où l'eau s'arrête
+        ctx.save(); ctx.filter = 'blur(4px)'; shape(0.985); ctx.strokeStyle = 'rgba(28,24,22,0.22)'; ctx.lineWidth = 9; ctx.stroke(); ctx.restore();
+        // grain du papier dans la tache
+        if (IMG.papier) { ctx.save(); shape(); ctx.clip(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = out * 0.5; ctx.drawImage(IMG.papier, 0, 0, 1920, 1080); ctx.restore(); }
+        // auréole d'eau claire qui précède l'encre
+        ctx.save(); ctx.filter = 'blur(10px)'; ctx.strokeStyle = `rgba(110,100,90,${0.14 * (1 - u)})`; ctx.lineWidth = 18;
+        ctx.beginPath(); ctx.ellipse(960, 540, R * 1.1, R * 0.93, 0, 0, 7); ctx.stroke(); ctx.restore();
+      }
+      ctx.restore();
+    }} />
+  );
+};
 const DanseIntro: React.FC = () => {
   const { fps } = useVideoConfig();
   return (
@@ -584,10 +662,9 @@ const danse = (u: number, D: number) => {
 const Shang: React.FC = () => {
   const t = useT();
   const A3 = A('b03'), A4 = A('b04'), sig = at('b04', 'signe'), corps = at('b04', 'corps'), pluie = at('b04', 'pluie'), os = at('b04', 'os'), hom = at('b04', 'homme'), coif = at('b04', 'coiffe'), br = at('b04', 'branches'), mt = at('b04', 'mouton'), mus = at('b04', 'museau'), rien = at('b04', 'rien'), pare = at('b04', 'pare'), plumes = at('b04', 'plumes'), terre = at('b04', 'terre'), jam = at('b04', 'jamais');
-  void pare; void plumes;
   return (
     <AbsoluteFill>
-      <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [GLYEND, 960, 540, 1, 0.4], [os + 0.4, 960, 520, 1.06, 1.4], [coif - 0.3, 960, 330, 1.3, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [rien, 960, 520, 1.06, 1.0], [terre, 960, 560, 1.02, 1.0]]}
+      <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [GLYEND, 960, 540, 1, 0.4], [os + 0.4, 960, 520, 1.06, 1.4], [hom - 0.2, 900, 560, 1.12, 1.6], [corps, 960, 650, 1.22, 1.4], [coif - 0.3, 960, 330, 1.3, 1.0], [mt - 0.4, 1060, 520, 1.04, 1.0], [rien, 960, 520, 1.06, 1.0], [pare, 1020, 500, 1.14, 1.6], [plumes, 960, 380, 1.24, 1.2], [terre, 960, 560, 1.02, 1.0]]}
         punch={[sig + 0.2, corps, coif + 0.3, rien + 0.2]} calm={[[PL.debut, GLYEND + 0.3]]}>
         <Paper />
         <Landscape seed={14} from={GLYEND - 0.6} to={A('b05') + 0.5} move="pan" mood="aube" faint={0.85} />
@@ -649,15 +726,26 @@ const Shang: React.FC = () => {
                 ctx.beginPath(); ctx.moveTo(1290, 760); ctx.lineTo(1290 + 380 * k, 760 - 440 * k); ctx.stroke(); ctx.restore();
               }
             }
-            // 1899 : l'os s'enfonce sous la terre (lavis brun qui monte)
+            // 1899 : l'os s'enfonce sous la terre — trois couches de lavis d'encre brune au bord irrégulier, qui montent
+            // l'une après l'autre (strates de terre peintes, pas un voile uni)
             const ter = seg(tt, terre - 0.2, terre + 2.2);
             if (ter > 0) {
-              const g = ctx.createLinearGradient(0, 1080 - 900 * ter, 0, 1080);
-              g.addColorStop(0, 'rgba(120,96,70,0)'); g.addColorStop(0.2, 'rgba(120,96,70,0.55)'); g.addColorStop(1, 'rgba(90,70,52,0.8)');
-              ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1080);
+              [[0, 0.22, 0.0], [1, 0.3, 0.25], [2, 0.38, 0.5]].forEach(([i, al, d]) => {
+                const k = ease(clamp((ter - d) / (1 - d)));
+                if (k <= 0) return;
+                const top = 1080 - (520 - 140 * i) * k;
+                ctx.save(); ctx.beginPath(); ctx.moveTo(0, 1080);
+                for (let x = 0; x <= 1920; x += 24) ctx.lineTo(x, top + 22 * Math.sin(x / 140 + i * 2.1) + 11 * Math.sin(x / 53 + i * 5.3) + 6 * Math.sin(x / 17 + i));
+                ctx.lineTo(1920, 1080); ctx.closePath();
+                const g = ctx.createLinearGradient(0, top - 30, 0, 1080);
+                g.addColorStop(0, `rgba(104,84,64,${al * 0.6})`); g.addColorStop(0.12, `rgba(96,78,60,${al})`); g.addColorStop(1, `rgba(70,56,44,${al + 0.15})`);
+                ctx.fillStyle = g; ctx.filter = 'blur(3px)'; ctx.fill(); ctx.restore();
+              });
             }
           }} />
       </Cam>
+      {/* « un homme paré » : lecture majoritaire, pas une certitude */}
+      <Caption text="lecture la plus répandue · d'autres y voient des cornes" a={win(t, pare - 0.1, terre - 0.3, 0.4)} size={44} />
       <EraTag {...cartouche('shang', 'Anyang · v. 1200 av. J.-C.')} a={seg(t, CLIP0 + 1.0, CLIP0 + 1.8) * (1 - seg(t, A('b05') - 0.6, A('b05')))} />
     </AbsoluteFill>
   );
@@ -854,6 +942,31 @@ const QinHan: React.FC = () => {
 const FLIP0 = at('b10', 'dico') + 0.5, FLIP1 = FLIP0 + 1.5;
 const FLIPS = ['人部', '口部', '土部', '女部', '心部', '手部', '木部', '水部', '火部', '牛部', '犬部'];
 const FLIPC = '你他們吃喝唱地城場好媽姐想情愛打拿找林樹森河海湖燈熱燒牛物特狗狼猫';
+// dictionnaire ouvert : couverture de toile indigo, tranche de pages, papier xuan (texture), pages qui se creusent vers
+// le dos (ombre de pli), filets vermillon des colonnes (朱絲欄), signet rouge
+const drawBook = (ctx: CanvasRenderingContext2D, a: number) => {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.save(); ctx.filter = 'blur(22px)'; ctx.fillStyle = 'rgba(50,40,30,0.35)'; ctx.fillRect(330, 170, 1260, 820); ctx.restore();
+  ctx.fillStyle = '#2f3c52'; ctx.beginPath(); ctx.moveTo(318, 132); ctx.lineTo(1602, 132); ctx.lineTo(1602, 978); ctx.lineTo(318, 978); ctx.closePath(); ctx.fill();
+  // tranche : feuillets empilés
+  for (let i = 0; i < 6; i++) { ctx.strokeStyle = `rgba(214,204,186,${0.9 - i * 0.1})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(336 - i * 2, 150 + i * 3); ctx.lineTo(336 - i * 2, 962 - i * 2); ctx.moveTo(1584 + i * 2, 150 + i * 3); ctx.lineTo(1584 + i * 2, 962 - i * 2); ctx.stroke(); }
+  [[340, 620], [960, 620]].forEach(([x0, w], side) => {
+    ctx.save(); ctx.beginPath(); ctx.moveTo(x0, 146); ctx.quadraticCurveTo(x0 + w / 2, 136, x0 + w, 146); ctx.lineTo(x0 + w, 964); ctx.quadraticCurveTo(x0 + w / 2, 954, x0, 964); ctx.closePath(); ctx.clip();
+    ctx.fillStyle = '#f6f0e3'; ctx.fillRect(x0, 130, w, 840);
+    if (IMG.papier) { ctx.globalAlpha = a * 0.55; ctx.drawImage(IMG.papier, x0, 130, w, 840); ctx.globalAlpha = a; }
+    // pli : la page se creuse vers le dos
+    const gx = side ? ctx.createLinearGradient(x0, 0, x0 + 90, 0) : ctx.createLinearGradient(x0 + w, 0, x0 + w - 90, 0);
+    gx.addColorStop(0, 'rgba(70,56,40,0.32)'); gx.addColorStop(1, 'rgba(70,56,40,0)'); ctx.fillStyle = gx; ctx.fillRect(x0, 130, w, 840);
+    ctx.restore();
+  });
+  // filets des colonnes, page de droite
+  ctx.strokeStyle = rgb(VER, 0.22); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.rect(1000, 260, 550, 660); for (let y = 410; y < 900; y += 150) { ctx.moveTo(1000, y - 75); ctx.lineTo(1550, y - 75); } ctx.stroke();
+  // signet
+  ctx.fillStyle = rgb(VER, 0.85); ctx.beginPath(); ctx.moveTo(1490, 132); ctx.lineTo(1512, 132); ctx.lineTo(1512, 1010); ctx.lineTo(1501, 996); ctx.lineTo(1490, 1010); ctx.closePath(); ctx.fill();
+  ctx.restore();
+};
 const KEYS = ['一', '丨', '丶', '人', '口', '土', '大', '女', '子', '心', '手', '木', '水', '火', '羊', '羽'];
 const ENTRIES: [string, string, string][] = [['羊', 'yáng', 'mouton'], ['美', 'měi', 'beau'], ['羔', 'gāo', 'agneau'], ['群', 'qún', 'troupeau']];
 const Dico: React.FC = () => {
@@ -869,11 +982,7 @@ const Dico: React.FC = () => {
           const a = seg(tt, A10 - 0.3, A10 + 0.6) * (1 - seg(tt, mg - 0.2, mg + 0.4));
           if (a <= 0) return;
           // livre ouvert : page de gauche (index des clés), page de droite (羊部)
-          ctx.save(); ctx.globalAlpha = a;
-          ctx.fillStyle = 'rgba(60,46,34,0.18)'; E.roundRect(ctx, 330, 150, 1260, 820, 18); ctx.fill();
-          ctx.fillStyle = '#f8f3e8'; E.roundRect(ctx, 340, 140, 610, 820, 12); ctx.fill(); E.roundRect(ctx, 970, 140, 610, 820, 12); ctx.fill();
-          ctx.strokeStyle = 'rgba(80,64,50,0.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(960, 150); ctx.lineTo(960, 960); ctx.stroke();
-          ctx.restore();
+          drawBook(ctx, a);
           E.text(ctx, '部首檢字表', 645, 200, { font: 'ShuimoKai', size: 44, color: '#5b4f44', alpha: a });
           // index des clés : le doigt d'encre descend jusqu'à 羊 sur « la clé du mouton »
           const k = Math.min(KEYS.length - 2, Math.floor(ease(seg(tt, cle - 1.6, cle + 0.3)) * (KEYS.length - 2)));
@@ -925,7 +1034,7 @@ const Dico: React.FC = () => {
         </div>
         <div style={{ height: 150, position: 'relative', width: 1400, fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 52, color: '#5b4f44', textAlign: 'center' }}>
           <div style={{ position: 'absolute', inset: 0, opacity: win(t, bp, enf + 0.6, 0.35) }}>美 beau · 国 pays</div>
-          <div style={{ position: 'absolute', inset: 0, opacity: win(t, ame - 0.9, ms - 0.2, 0.35) }}>A<b style={{ color: rgb(VER) }}>mé</b>rique → 亚<b style={{ color: rgb(VER) }}>美</b>利加 → <b style={{ color: rgb(VER) }}>美</b>国</div>
+          <div style={{ position: 'absolute', inset: 0, opacity: win(t, ame - 0.9, ms - 0.2, 0.35) }}>A<b style={{ color: rgb(VER) }}>meri</b>can → <b style={{ color: rgb(VER) }}>美</b>利坚 Měilìjiān → <b style={{ color: rgb(VER) }}>美</b>国</div>
           <div style={{ position: 'absolute', inset: 0, opacity: win(t, pdu - 0.1, B('b10'), 0.35), color: rgb(mixc(INK, GOM, 0.8)), fontFamily: 'ShuimoKai', fontSize: 72 }}>羊</div>
         </div>
       </div>
@@ -1005,8 +1114,8 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
     ctx.save(); ctx.globalAlpha = appear;
     if (key.startsWith('real:')) E.drawRealGlyph(ctx, key.slice(5), { x, y: yy, size: s, color, alpha, glow: hi === 'sceau' ? (isSc ? 20 : 0) : glow, glowColor: rgb(isSc && hi === 'sceau' ? OCRE : gc, 0.8) });
     else E.drawStrokes(ctx, key.slice(4), { x, y: yy, size: s * 0.9, brush: false, color, alpha, glow, glowColor: rgb(gc, 0.8) });
-    E.text(ctx, zh, x, y + 160, { font: 'Kai', size: 56, color: inkCss, alpha: appear * (1 - 0.6 * dimAll) });
-    E.text(ctx, fr, x, y + 218, { font: 'Cormorant', size: 38, weight: 700, color: '#5b4f44', alpha: appear * (1 - 0.6 * dimAll) });
+    E.text(ctx, zh, x, y + 160, { font: 'Kai', size: 60, color: inkCss, alpha: appear * (1 - 0.6 * dimAll) });
+    E.text(ctx, fr, x, y + 222, { font: 'Cormorant', size: 46, weight: 700, color: '#5b4f44', alpha: appear * (1 - 0.6 * dimAll) });
     ctx.restore();
     // l'accident : 羊 au-dessus de la forme du petit sceau, barré sur « …et le mouton reste »
     if (isSc && hi === 'sceau') {
@@ -1050,7 +1159,7 @@ const Finale: React.FC = () => {
           const syn = win(tt, fo - 0.8, ml - 0.4, 0.6);
           if (syn > 0) drawBand(ctx, E, tt, syn);
           // avant et après le bandeau : 美 en couleur
-          const main = (1 - seg(tt, fo - 1.2, fo - 0.6)) * seg(tt, A8 - 0.4, A8 + 0.4) + win(tt, ml - 0.5, A9 + 0.3, 0.5);
+          const main = (1 - seg(tt, fo - 1.2, fo - 0.6)) * seg(tt, A8 - 0.4, A8 + 0.4) + win(tt, ml - 0.5, A('b10') - 0.1, 0.5);
           if (main > 0) {
             ctx.save(); ctx.globalAlpha = Math.min(1, main);
             E.drawStrokes(ctx, 'mei_regulier', { x: 960, y: 440, size: 520, brush: false, color: (c: string) => rgb(P[c] ?? INK) });
@@ -1081,25 +1190,38 @@ const Finale: React.FC = () => {
       </div>
       {/* se parer pour parler au ciel, puis le nom */}
       <Caption text="se parer · pour parler au ciel" a={win(t, par8 - 0.1, nait - 0.1, 0.4)} y={930} size={48} />
-      <Caption text="美 · měi · le beau" a={win(t, beau8 - 0.2, A9 - 0.3, 0.4)} y={930} size={56} />
+      <Caption text="美 · měi · le beau" a={win(t, beau8 - 0.2, A('b10') - 0.3, 0.4)} y={930} size={56} />
       {/* fiche : 美, pinyin, nombre de traits */}
       <div style={{ position: 'absolute', left: 230, top: 280, opacity: win(t, A9 - 0.2, dn + 3.0, 0.6) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 280, color: inkCss, lineHeight: 1 }}>美</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 96, fontWeight: 600, color: inkCss }}>měi</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: rgb(VER) }}>9 traits</div>
       </div>
-      <Caption text="老 · lǎo · vieux" a={win(t, tb + 1.4, END + 0.2, 0.4)} y={920} size={44} />
+      <Caption text="老 · lǎo · vieux" a={win(t, tb + 1.4, END + 0.2, 0.4)} y={880} size={60} />
     </AbsoluteFill>
   );
 };
 
-const EndCard: React.FC = () => (
-  <AbsoluteFill style={{ background: '#1d1915', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24 }}>
-    <div style={{ width: 120, height: 120, background: rgb(VER, 0.95), borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 52, color: '#f6eee0', writingMode: 'vertical-rl' }}>墨道</div>
-    <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, letterSpacing: 8, color: '#efe6d6' }}>LA VOIE DE L'ENCRE</div>
-    <div style={{ fontFamily: 'ShuimoLatin', fontSize: 34, color: '#b9ab98' }}>prochain caractère : 老 · vieux</div>
-  </AbsoluteFill>
-);
+// écran de fin (≈ 10 s) sur papier : la marque et le prochain caractère dans le tiers gauche ; les deux tiers droits
+// restent libres pour les éléments de fin YouTube (vidéo suggérée, abonnement)
+const EndCard: React.FC = () => {
+  const t = useT(), a = seg(t, END, END + 0.8);
+  return (
+    <AbsoluteFill style={{ opacity: a }}>
+      <Paper />
+      <Landscape seed={30} from={END - 1} to={MEI_SECONDS + 1} move="still" mood="aube" faint={0.35} />
+      <div style={{ position: 'absolute', left: 120, top: 150, width: 520, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 22 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 26 }}>
+          <div style={{ width: 104, height: 104, background: rgb(VER, 0.95), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 46, color: '#f6eee0', writingMode: 'vertical-rl', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>墨道</div>
+          <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss, lineHeight: 1.15 }}>LA VOIE<br />DE L'ENCRE</div>
+        </div>
+        <div style={{ marginTop: 70, fontFamily: 'ShuimoLatin', fontSize: 46, color: '#5e5044', opacity: seg(t, END + 0.8, END + 1.6) }}>Prochain caractère</div>
+        <div style={{ fontFamily: 'ShuimoKai', fontSize: 260, lineHeight: 1, color: inkCss, opacity: seg(t, END + 1.2, END + 2.2) }}>老</div>
+        <div style={{ fontFamily: 'ShuimoLatin', fontSize: 60, fontWeight: 600, color: '#3b322b', opacity: seg(t, END + 1.6, END + 2.6) }}>lǎo · vieux</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
 
 const Win: React.FC<{ from: number; to: number; children: React.ReactNode }> = ({ from, to, children }) => {
   const t = useT();
@@ -1131,11 +1253,14 @@ export const MeiV1: React.FC = () => {
         <Win from={A('b03') - 0.25} to={A('b05') - 0.3}><Shang /></Win>
         <Win from={A('b05') - 0.3} to={R2 + 0.6}><Zhou /></Win>
         <Win from={R2 + 0.6} to={A('b07') - 0.3}><Chu /></Win>
-        <Win from={A('b07') - 0.3} to={A('b10') - 0.3}><QinHan /></Win>
-        <Win from={A('b10') - 0.3} to={A('b11') - 0.3}><Dico /></Win>
+        {/* fin : révélation → les traits → récapitulatif → « l'erreur dure encore » (dictionnaire, 美国, 美食) → chute */}
+        <Win from={A('b07') - 0.3} to={A('b11') - 0.3}><QinHan /></Win>
         <Win from={A('b11') - 0.3} to={A('b08') - 0.3}><Traits /></Win>
-        <Win from={A('b08') - 0.3} to={END}><Finale /></Win>
+        <Win from={A('b08') - 0.3} to={A('b10') - 0.3}><Finale /></Win>
+        <Win from={A('b10') - 0.3} to={A('b09') - 0.3}><Dico /></Win>
+        <Win from={A('b09') - 0.3} to={END + 0.8}><Finale /></Win>
         <Win from={END} to={MEI_SECONDS + 1}><EndCard /></Win>
+        <InkDrop />
         <DanseIntro />
         <SealStamps />
       </Shake>}

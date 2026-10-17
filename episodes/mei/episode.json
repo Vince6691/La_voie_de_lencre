@@ -60,15 +60,15 @@
    }
   },
   {
-   "clip": "b10",
-   "apres": 1.0
-  },
-  {
    "clip": "b11",
    "apres": 1.0
   },
   {
    "clip": "b08",
+   "apres": 1.0
+  },
+  {
+   "clip": "b10",
    "apres": 1.2
   },
   {
@@ -76,7 +76,7 @@
    "apres": 0.3
   }
  ],
- "queue": 3.2,
+ "queue": 10.0,
  "reperes_cles": {
   "b01": {
    "beau": "beau",
@@ -404,8 +404,8 @@
    "tonnerre",
    "b12",
    null,
-   -0.25,
-   0.6
+   -1.3,
+   0.42
   ],
   [
    "tambour",
