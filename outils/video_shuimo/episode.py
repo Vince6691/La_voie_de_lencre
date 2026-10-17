@@ -9,6 +9,7 @@ episode.json (chemins relatifs au fichier) :
                                 {"clip": "b07", "pause": {"repere": "reponse", "decalage": -0.12, "duree": 1.7}, "apres": 0.8}
                                 {"rouleau": 5, "apres": 0.3}
                                 {"rouleau3d": "complet", "apres": 0.3}   (ou "court" ; skill rouleau-3d)
+                                {"clip": "b07", "pause": {"repere": "xushen", "decalage": -0.15, "rouleau3d": "court"}}
                « apres » = silence avant l'élément suivant ; « pause » = silence inséré dans le clip juste avant un repère
   queue        durée de l'écran de fin après le dernier clip (s)
   reperes_cles {clip: {nom: "expression de la voix"}} : le repère tombe au début du premier mot de l'expression
@@ -41,11 +42,14 @@ def ligne_de_temps(cfg, durees, reperes=None):
             t += durees[c]
             if p:
                 coupe = reperes[c][p['repere']] + p.get('decalage', 0)
-                clips[c]['pause'] = {'coupe': round(coupe, 3), 'duree': p['duree']}
-                pauses.append([round(clips[c]['debut'] + coupe, 3), p['duree']])
-                if p.get('rouleau'):  # rouleau du temps joué pendant la pause (mêmes sons et même creux musical)
-                    rouleaux.append({'debut': round(clips[c]['debut'] + coupe, 3), 'duree': p['duree']})
-                t += p['duree']
+                d = ROULEAU3D[p['rouleau3d']] if p.get('rouleau3d') else p['duree']  # rouleau 3D : sa durée propre
+                clips[c]['pause'] = {'coupe': round(coupe, 3), 'duree': d}
+                pauses.append([round(clips[c]['debut'] + coupe, 3), d])
+                if p.get('rouleau3d'):  # rouleau 3D joué pendant la pause (skill rouleau-3d)
+                    rouleaux.append({'debut': round(clips[c]['debut'] + coupe, 3), 'duree': d, 'modele': f"3d-{p['rouleau3d']}"})
+                elif p.get('rouleau'):  # rouleau du temps joué pendant la pause (mêmes sons et même creux musical)
+                    rouleaux.append({'debut': round(clips[c]['debut'] + coupe, 3), 'duree': d})
+                t += d
         elif 'plage' in el:  # plage sans voix réservée à un clip (son du clip éventuel : son, son_decalage, son_volume)
             plages[el['nom']] = {'debut': round(t, 3), 'duree': el['plage'], **{k: el[k] for k in ('son', 'son_decalage', 'son_volume', 'son_duree') if k in el}}
             t += el['plage']

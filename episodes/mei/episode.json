@@ -38,7 +38,7 @@
    "apres": 0.4
   },
   {
-   "rouleau": 3.5,
+   "rouleau3d": "complet",
    "apres": 0.3
   },
   {
@@ -52,7 +52,12 @@
   },
   {
    "clip": "b07",
-   "apres": 0.6
+   "apres": 0.6,
+   "pause": {
+    "repere": "xushen",
+    "decalage": -0.15,
+    "rouleau3d": "court"
+   }
   },
   {
    "clip": "b10",

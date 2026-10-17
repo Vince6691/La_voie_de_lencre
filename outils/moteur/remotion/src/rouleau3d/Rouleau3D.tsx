@@ -569,7 +569,9 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
       });
   }, [cfg, h]);
   const sealUrl = useMemo(() => (A ? (A.seal.image as HTMLCanvasElement).toDataURL() : ''), [A]);
-  if (!A || s < -0.4 || s > v.seal.fade[1] + 0.1) return null;
+  // le son reste monté du début à la fin de la cloche, même quand l'image du rouleau a disparu
+  const sound = <Sequence from={Math.round(cfg.at * fps)} durationInFrames={Math.round((v.len + 2.5) * fps)} layout="none"><Audio src={staticFile(v.sound)} volume={0.8} playbackRate={v.len / dur(cfg)} /></Sequence>;
+  if (!A || s < -0.4 || s > v.seal.fade[1] + 0.1) return sound;
   const year = lerp(yearsOf(cfg)[0], yearsOf(cfg)[1], v.travel(s));
   const ya = sm(seg(s, v.year[0], v.year[1])) * (1 - sm(seg(s, v.year[2], v.year[3])));
   // sceau volant : de sa place dans le plan d'arrivée (vue verticale) au cartouche
@@ -586,8 +588,7 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
       {s >= v.seal.show && s < v.seal.fade[1] + 0.03 && (
         <img src={sealUrl} style={{ position: 'absolute', left: fx - fsz / 2, top: fy - fsz / 2, width: fsz, height: fsz, transform: `rotate(${fa}rad) scaleY(${fq})`, opacity: seg(s, v.seal.show - 0.001, v.seal.appear) * (1 - seg(s, v.seal.fade[0], v.seal.fade[1])), filter: `drop-shadow(0 ${10 * Math.sin(Math.PI * fk)}px ${16 * Math.sin(Math.PI * fk)}px rgba(60,20,10,0.35))` }} />
       )}
-      {/* souffle du rouleau, impact du sceau à 4 s, cloche quand le sceau s'envole (rouleau/rouleau3d.wav, calé sur 5,3 s) */}
-      <Sequence from={Math.round(cfg.at * fps)} layout="none"><Audio src={staticFile(v.sound)} volume={0.8} playbackRate={v.len / dur(cfg)} /></Sequence>
+      {sound}
     </AbsoluteFill>
   );
 };

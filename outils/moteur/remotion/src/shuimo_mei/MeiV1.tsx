@@ -14,7 +14,7 @@ import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
-import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, tagIn } from '../rouleau/TimeScroll';
+import { Rouleau3DConfig, Rouleau3DStage, r3Seconds, r3TagIn } from '../rouleau3d/Rouleau3D';
 import { cartouche } from '../periodes';
 import { CloudReveal } from '../video_encre/CloudReveal';
 import { Rig, drawGlyphDance } from '../danse/GlyphDance';
@@ -38,15 +38,30 @@ const at = (k: Clip, n: string) => {
 export const MEI_SECONDS = Math.ceil(L.total * 10) / 10;
 const END = L.fin;
 
-// époques du 美 (sceaux de la frise des rouleaux)
-const ERAS: Era[] = [
-  { zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '戰', date: '−300' }, { zh: '秦', date: '−221' },
-  { zh: '漢', date: '100' }, { zh: '宋', date: '986' },
-];
+// rouleaux du temps en 3D (skill rouleau-3d) : Zhou → Royaumes combattants (version complète), puis Qin → Han
+// (version courte, sceau rouge) ; vers inscrits sur les rouleaux : des vers où figure 美
 const R2 = L.rouleaux[0].debut;
-// rouleau : Zhou → Royaumes combattants (le retour aux Shang se fait par les nuages et le clip de la danse)
-const TR2: TimeScrollConfig = { at: R2, duration: L.rouleaux[0].duree, eras: ERAS, from: 1, to: 2, years: [-1046, -300] };
-const R2E = R2 + TR2.duration!;
+const R3A: Rouleau3DConfig = {
+  at: R2, de: 'zhou', vers: 'royaumes', annees: [-1046, -300], variant: 'complet', stone: 'miel',
+  fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' },
+  inscriptions: [
+    { x: 1600, y: 190, size: 68, font: 'ShuimoKai', cols: ['惟草木之零落兮', '恐美人之遲暮'], sig: '屈原離騷', seal: '遊心', ink: 0.85 },
+    { x: 5560, y: 170, size: 76, font: 'ShuimoKai', cols: ['自牧歸荑', '洵美且異', '匪女之為美', '美人之貽'], sig: '錄詩經靜女於墨道山房', seal: '墨道', ink: 0.92 },
+    { x: 6500, y: 160, size: 90, font: 'ShuimoCao', cols: ['千山鸟飞绝', '万径人踪灭', '孤舟蓑笠翁', '独钓寒江雪'], sig: '柳宗元江雪', seal: '雲水', ink: 0.95 },
+    { x: 10950, y: 200, size: 72, font: 'ShuimoKai', cols: ['行到水窮處', '坐看雲起時'], sig: '王維句', seal: '長樂', ink: 0.88 },
+  ],
+};
+const R2E = R2 + r3Seconds(R3A);
+const R3 = L.rouleaux[1].debut;
+const R3B: Rouleau3DConfig = {
+  at: R3, de: 'qin', vers: 'han', annees: [-221, 100], variant: 'court', stone: 'rouge',
+  fromLand: { seed: 3, mood: 'brume' }, toLand: { seed: 3, mood: 'brume' }, midSeeds: [17, 21],
+  inscriptions: [
+    { x: 1500, y: 200, size: 74, font: 'ShuimoKai', cols: ['里仁為美'], sig: '論語里仁', seal: '長樂', ink: 0.88 },
+    { x: 5500, y: 170, size: 90, font: 'ShuimoCao', cols: ['燕赵多佳人', '美者颜如玉'], sig: '古诗十九首', seal: '雲水', ink: 0.94 },
+    { x: 6600, y: 180, size: 72, font: 'ShuimoKai', cols: ['行到水窮處', '坐看雲起時'], sig: '王維句', seal: '遊心', ink: 0.85 },
+  ],
+};
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const seg = (t: number, a: number, b: number) => { const u = clamp((t - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -642,8 +657,8 @@ const Zhou: React.FC = () => {
   return (
     <AbsoluteFill>
       <Cam keys={[[A5 - 0.3, 960, 540, 1.02], [ep, 960, 560, 1.06, 1.0], [cf - 0.2, 960, 380, 1.25, 1.0], [R2 - 0.5, 960, 540, 1, 0.5]]} punch={[bz + 0.6, co + 0.2]} calm={[[R2 - 0.5, R2E + 0.3]]}>
-        <TimeScrollStage cfg={TR2} defaultCursor under={<Landscape seed={9} from={A5 - 1} to={A5 + 14} move="pan" mood="jour" faint={0.6} />}
-          fromLandscape={{ seed: 9, since: co - 1 }} toLandscape={{ seed: 26, until: A('b06') + 1.5, mood: 'brume' }}>
+        <Paper />
+        <Landscape seed={9} from={A5 - 1} to={R2 + 0.6} move="pan" mood="jour" faint={0.6} />
           <Draw draw={(ctx, tt, E) => {
             const a = win(tt, A5 - 0.2, R2 + 0.3, 0.5);
             if (a <= 0) return;
@@ -656,10 +671,9 @@ const Zhou: React.FC = () => {
             E.drawRealGlyph(ctx, 'mei_jinwen', { x: 960 + 240 * side, y: gy, size: gs, reveal: () => seg(tt, ins - 0.2, ins + 1.0), opacity: a * seg(tt, ins - 0.3, ins + 0.3), color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, c1), GOM, 0.55 * horn) : mixc(INK, AZ, seg(tt, ep, ep + 0.5))), glow: 24 * c1, glowColor: rgb(horn > 0.5 ? GOM : MAL, 0.6) });
             if (side > 0) E.drawRealGlyph(ctx, 'mei_jiaguwen', { x: 960 - 500 * side, y: 540, size: 440, opacity: a * side, color: meiCol(1, 1) });
           }} />
-        </TimeScrollStage>
       </Cam>
       <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={seg(t, A5 - 0.6, A5 + 0.2) * (1 - seg(t, R2, R2 + 0.4))} />
-      <EraTag {...cartouche('royaumes', 'Ve–IIIe siècle av. J.-C.')} a={tagIn(TR2, t) * (1 - seg(t, R2E + 2.5, R2E + 3.2))} />
+      <EraTag {...cartouche('royaumes', 'Ve–IIIe siècle av. J.-C.')} a={r3TagIn(R3A, t) * (1 - seg(t, R2E + 2.5, R2E + 3.2))} />
     </AbsoluteFill>
   );
 };
@@ -777,11 +791,11 @@ const QinHan: React.FC = () => {
         <Landscape seed={3} from={A7 - 1.5} to={B('b07') + 1} move="pan" mood="brume" faint={0.45} />
         <Draw draw={(ctx, tt, E) => {
           // le petit sceau tracé, la coiffe (malachite) qui passe à la gomme-gutte quand elle touche le 羊 du sceau
-          const s1 = seg(tt, sc - 0.4, sc + 1.4) * (1 - seg(tt, xs - 0.4, xs + 0.2));
+          const s1 = seg(tt, sc - 0.4, sc + 1.4) * (1 - seg(tt, R3 - 0.3, R3 + 0.1));
           const meet = seg(tt, mt + 1.0, mt + 2.0);
           if (s1 > 0) E.drawRealGlyph(ctx, 'mei_xiaozhuan', { x: 760, y: 520, size: 640, reveal: () => seg(tt, sc - 0.4, sc + 1.4), opacity: s1, color: (c: string) => rgb(c === 'coiffe' ? mixc(mixc(INK, MAL, seg(tt, sym - 0.2, sym + 0.4)), GOM, meet) : mixc(INK, AZ, 0.6)), glow: 22 * win(tt, sym, xs, 0.4), glowColor: rgb(meet > 0.5 ? GOM : MAL, 0.6) });
           // le mouton du petit sceau, posé à côté, puis il glisse sur la coiffe
-          const ya = seg(tt, mt - 0.2, mt + 0.4) * (1 - seg(tt, mt + 2.2, mt + 2.8)) * (1 - seg(tt, xs - 0.4, xs + 0.2));
+          const ya = seg(tt, mt - 0.2, mt + 0.4) * (1 - seg(tt, mt + 2.2, mt + 2.8)) * (1 - seg(tt, R3 - 0.3, R3 + 0.1));
           if (ya > 0) {
             const slide = ease(seg(tt, mt + 0.8, mt + 2.0));
             const [cx, cy] = E.realCenter('mei_xiaozhuan', 'coiffe', { x: 760, y: 520, size: 640 });
@@ -805,8 +819,8 @@ const QinHan: React.FC = () => {
       </Cam>
       <Caption text="221 av. J.-C. · le petit sceau 小篆" a={win(t, emp, ord - 0.1, 0.4)} y={960} size={44} />
       <Label x={1170} y={250} zh="羊" text="le mouton (petit sceau)" color={GOM} a={win(t, mt - 0.1, mt + 2.3, 0.4)} />
-      <EraTag {...cartouche('qin', '221 av. J.-C. · le petit sceau')} a={seg(t, A7 - 0.5, A7) * (1 - seg(t, xs - 0.5, xs))} />
-      <EraTag {...cartouche('han', "vers l'an 100 · Xu Shen")} a={seg(t, xs - 0.3, xs + 0.3) * (1 - seg(t, B('b07') - 0.2, B('b07') + 0.3))} />
+      <EraTag {...cartouche('qin', '221 av. J.-C. · le petit sceau')} a={seg(t, A7 - 0.5, A7) * (1 - seg(t, R3 - 0.3, R3 + 0.1))} />
+      <EraTag {...cartouche('han', "vers l'an 100 · Xu Shen")} a={r3TagIn(R3B, t) * (1 - seg(t, B('b07') - 0.2, B('b07') + 0.3))} />
     </AbsoluteFill>
   );
 };
@@ -1048,8 +1062,8 @@ export const MeiV1: React.FC = () => {
       {ready && <Shake>
         <Win from={0} to={A('b03') - 0.25}><Opening /></Win>
         <Win from={A('b03') - 0.25} to={A('b05') - 0.3}><Shang /></Win>
-        <Win from={A('b05') - 0.3} to={R2E + 0.05}><Zhou /></Win>
-        <Win from={R2E + 0.05} to={A('b07') - 0.3}><Chu /></Win>
+        <Win from={A('b05') - 0.3} to={R2 + 0.6}><Zhou /></Win>
+        <Win from={R2 + 0.6} to={A('b07') - 0.3}><Chu /></Win>
         <Win from={A('b07') - 0.3} to={A('b10') - 0.3}><QinHan /></Win>
         <Win from={A('b10') - 0.3} to={A('b11') - 0.3}><Dico /></Win>
         <Win from={A('b11') - 0.3} to={A('b08') - 0.3}><Traits /></Win>
@@ -1058,6 +1072,8 @@ export const MeiV1: React.FC = () => {
         <DanseIntro />
         <SealStamps />
       </Shake>}
+      {ready && <Rouleau3DStage cfg={R3A} />}
+      {ready && <Rouleau3DStage cfg={R3B} />}
       {ready && <GrainVignette />}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/mei/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
