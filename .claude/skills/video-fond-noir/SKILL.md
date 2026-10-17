@@ -14,7 +14,7 @@ Style de référence : `outils/moteur/remotion/src/Xue.tsx` (rendu `episodes/xue
 
 ## Principes
 - **Note artistique** (skill `note-artistique`) : à la fin du plan, de la voix, des images fixes et du rendu vidéo, proposer
-  la note des quatre experts (Technique, Artistique, Design, Storytelling, objectif 8/10) ; corrections après validation.
+  la note des cinq experts (Technique, Artistique, Historique, Design, Storytelling, objectif 8/10, très exigeante) ; corrections après validation.
 - **Proposer, pas imposer** : à chaque point de décision, 2 à 4 options concrètes avec une recommandation en premier
   (AskUserQuestion), puis avancer. Ne pas poser de question dont la réponse se déduit (sources, conventions déjà
   validées ci-dessous).

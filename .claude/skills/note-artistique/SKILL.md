@@ -1,16 +1,20 @@
 ---
 name: note-artistique
-description: « La note artistique » de la chaîne 墨道 (La voie de l'encre) — contrôle qualité à la fin de chaque grande étape d'une vidéo (plan, voix, rendu image, rendu vidéo) par quatre experts simulés qui notent sur 10 la Technique (niveau des animations, respect du style choisi : shuimo, fond noir…), l'Artistique (direction artistique et exactitude historique et paléographique), le Design (composition, typographie, lisibilité téléphone, habillage YouTube) et le Storytelling (accroche, tension, rythme, rétention). Les corrections proposées pour atteindre 8/10 partout ne sont jamais appliquées sans validation. Utiliser quand l'utilisateur demande « la note artistique », une note, un audit, une critique ou un contrôle qualité d'un plan, d'une voix, d'images fixes ou d'un rendu, et proposer de la lancer d'office à la fin de chaque grande étape d'un épisode (video-shuimo, video-fond-noir).
+description: « La note artistique » de la chaîne 墨道 (La voie de l'encre) — contrôle qualité à la fin de chaque grande étape d'une vidéo (plan, voix, rendu image, rendu vidéo) par cinq experts simulés, très exigeants, qui notent sur 10 la Technique (niveau des animations, respect du style choisi : shuimo, fond noir…), l'Artistique (direction artistique, beauté, univers), l'Historique (exactitude historique, paléographique et des sources), le Design (composition, typographie, lisibilité téléphone, habillage YouTube) et le Storytelling (accroche, tension, rythme, rétention). Les corrections proposées pour atteindre 8/10 partout ne sont jamais appliquées sans validation. Utiliser quand l'utilisateur demande « la note artistique », une note, un audit, une critique ou un contrôle qualité d'un plan, d'une voix, d'images fixes ou d'un rendu, et proposer de la lancer d'office à la fin de chaque grande étape d'un épisode (video-shuimo, video-fond-noir).
 ---
 
 # La note artistique (série 墨道)
 
-Quatre experts exigeants regardent l'étape qui vient de se terminer, la notent, et proposent le strict nécessaire pour
-atteindre **8/10 dans chaque domaine**. **Aucune correction sans validation de l'utilisateur** : on note, on propose, on
+Cinq experts regardent l'étape qui vient de se terminer, la notent, et proposent le strict nécessaire pour atteindre
+**8/10 dans chaque domaine**. **Aucune correction sans validation de l'utilisateur** : on note, on propose, on
 attend. C'est ce qui évite une boucle d'itérations coûteuse (rendus, crédits ElevenLabs).
 
-Toujours en français. Notes honnêtes : un 8 se mérite, et un 10 n'existe presque pas. Une note complaisante ne sert à
-rien ; une note sévère sans correction concrète non plus.
+Toujours en français. **Exigence maximale** (demande expresse de l'utilisateur : il veut de la grande qualité) : chaque
+expert juge comme pour les meilleures chaînes YouTube de vulgarisation et d'animation (niveau Kurzgesagt, Primer,
+Nerdwriter, documentaires Arte), pas « bien pour une chaîne indépendante ». **8 = du niveau d'une grande chaîne**, 9 =
+remarquable, 10 = presque jamais. Partir de 6 et ne monter que sur preuves. Chaque défaut vu est signalé, même petit ;
+ne jamais arrondir vers le haut, ne jamais excuser un défaut par le coût de sa correction (le coût sert à classer les
+corrections, pas à adoucir la note). Une note sévère doit toujours venir avec une correction concrète.
 
 ## Quand la lancer
 | Étape | Ce qu'on regarde | Matière à lire |
@@ -27,7 +31,7 @@ On ne note **que ce que l'étape permet de juger** : au plan, l'expert Technique
 animations prévues, pas leur rendu ; à la voix, le Design juge la place prévue pour les légendes et les noms chinois à
 l'écran ; etc. Le dire dans le commentaire.
 
-## Les quatre experts
+## Les cinq experts
 
 ### 1. Technique — l'animateur en chef
 Niveau des animations et **respect du style défini au départ** (shuimo : skill `video-shuimo` ; fond noir :
@@ -43,19 +47,31 @@ Niveau des animations et **respect du style défini au départ** (shuimo : skill
 - Repères : 8 = fluide, dans le style, sans défaut visible au téléphone ; 9 = un moment « signature » qu'on retient ;
   ≤ 6 = un défaut qui sort du film (clignotement, glyphe faux, rupture de style).
 
-### 2. Artistique — directeur artistique et historien de l'écriture
-Le beau **et** le vrai : la chaîne vit de sa crédibilité.
-- **Exactitude** : formes anciennes réelles et bien attribuées (époque, support, lieu) ; dates et dynasties conformes à
-  `outils/moteur/remotion/src/periodes.ts` (cartouches et rouleau disent la même chose) ; citations vérifiées
-  (caractères exacts, auteur, œuvre) ; étymologies présentées avec leur degré de certitude (thèse classique, débat,
-  hypothèse) ; chaque fait de la voix sourcé dans `SOURCES.md`.
-- **Cohérence d'univers** : le voyage (une époque = un lieu, un support, une lumière), pigments porteurs de sens
-  (homme, coiffe, mouton…) gardés d'un bout à l'autre, sceaux et cartouches au bon endroit.
-- **Émotion visuelle** : au moins un plan « tableau » par époque, une image qui pourrait servir de miniature.
-- Repères : 8 = rien de faux, univers tenu, quelques images marquantes ; ≤ 6 = une erreur factuelle ou une forme
-  inventée (correction **obligatoire**, quelle que soit la note des autres domaines).
+### 2. Artistique — directeur artistique
+Le beau, l'émotion et l'univers.
+- **Cohérence d'univers** : le voyage (une époque = un lieu, un support, une lumière, une ambiance sonore), pigments
+  porteurs de sens (homme, coiffe, mouton…) gardés d'un bout à l'autre, sceaux et cartouches au bon endroit.
+- **Émotion visuelle** : au moins un plan « tableau » par époque, des images qu'on voudrait mettre en fond d'écran, une
+  image qui pourrait servir de miniature ; variété des valeurs de plan et des lumières (pas dix plans identiques).
+- **Son et musique** : bruitages justes et non « cheap », musique qui accompagne sans couvrir, silences voulus.
+- **Goût** : rien de tape-à-l'œil ou de daté, effets au service du sens ; l'élégance avant l'effet.
+- Repères : 8 = un film qu'on a envie de regarder pour sa beauté seule ; ≤ 6 = des plans plats, interchangeables, ou un
+  effet qui casse l'univers.
 
-### 3. Design — designer graphique et habillage YouTube
+### 3. Historique — historien de l'écriture et paléographe
+La chaîne vit de sa crédibilité : le moindre faux la fait perdre.
+- **Formes** : anciennes réelles et bien attribuées (époque, support, lieu, pièce si possible) ; jamais une forme
+  reconstruite présentée comme attestée.
+- **Dates et noms** : conformes à `outils/moteur/remotion/src/periodes.ts` (cartouches et rouleau disent la même chose) ;
+  noms propres et titres d'œuvres justes (graphie, pinyin, traduction).
+- **Citations** : caractères exacts, auteur, œuvre, chapitre ; vérifiées à la source.
+- **Étymologies** : présentées avec leur degré de certitude (thèse classique, consensus actuel, débat, hypothèse) ; pas
+  de raccourci qui transforme une hypothèse en fait ; nuance quand les spécialistes divergent.
+- **Sources** : chaque fait de la voix et de l'écran consigné dans `SOURCES.md`.
+- Repères : 8 = rien de faux ni de trompeur, nuances présentes ; ≤ 6 = une erreur factuelle ou une forme inventée
+  (correction **obligatoire**, quelle que soit la note des autres domaines).
+
+### 4. Design — designer graphique et habillage YouTube
 - **Lisibilité téléphone** : légendes ≥ 40 px en 1080p, contraste sur voile de papier, jamais plus de deux textes à
   l'écran, temps de lecture suffisant (≈ 0,3 s par mot + 0,5 s) ; caractère étudié toujours identifiable.
 - **Composition** : règle des tiers, une seule zone d'intérêt à la fois, marges (cartouche en haut à gauche, sceau en
@@ -68,7 +84,7 @@ Le beau **et** le vrai : la chaîne vit de sa crédibilité.
   qui tombent sur des changements de tableau.
 - Repères : 8 = tout se lit au téléphone du premier coup, sans collision ; ≤ 6 = un texte illisible ou masqué.
 
-### 4. Storytelling — scénariste et spécialiste de la rétention
+### 5. Storytelling — scénariste et spécialiste de la rétention
 Règles de voix de la chaîne : skill `voix-off-modo` (ne pas les répéter, s'y référer).
 - **Accroche (0–30 s)** : une affirmation ou un mystère, une promesse claire, pas d'introduction de chaîne avant ;
   faux départ ou question qui donne envie de rester.
@@ -104,7 +120,8 @@ Règles de voix de la chaîne : skill `voix-off-modo` (ne pas les répéter, s'y
 | Domaine | Note | En bref |
 |---|---|---|
 | Technique | 8,5 | rouleaux 3D propres, pinceau vivant ; 1 clignotement à 3:12 |
-| Artistique | 7,5 | formes justes ; date du Shuowen à préciser à 0:14 |
+| Artistique | 7,5 | rouleaux superbes ; Royaumes combattants plats, trois plans identiques |
+| Historique | 7 | formes justes ; date du Shuowen à préciser à 0:14 |
 | Design | 7 | médaillon et étiquette se touchent à 0:11 ; légende 美食 trop petite |
 | Storytelling | 8 | accroche forte ; creux de 45 s dans les Royaumes combattants |
 
@@ -114,13 +131,13 @@ Règles de voix de la chaîne : skill `voix-off-modo` (ne pas les répéter, s'y
 
 ### Corrections proposées (pour atteindre 8 partout)
 1. [Design · léger] décaler le médaillon de 90 px vers la droite → Design 7 → 7,5
-2. [Artistique · léger] …
+2. [Historique · léger] …
 3. [Storytelling · lourd : nouvelle voix b06] …
 ```
 Puis la question de validation. Rester bref : le tableau et les corrections suffisent, pas de dissertation.
 
 ## Garde-fous
-- Les quatre experts sont indépendants : ne pas monter une note pour compenser une autre.
+- Les cinq experts sont indépendants : ne pas monter une note pour compenser une autre.
 - Ne jamais proposer une correction qui contredit un choix déjà validé par l'utilisateur (le noter dans le constat si
   on le trouve discutable, sans le corriger), ni une règle des skills de la chaîne.
 - Les corrections lourdes (nouvelles voix, rendu complet) sont regroupées et signalées : l'utilisateur doit voir le
