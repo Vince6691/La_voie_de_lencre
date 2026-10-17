@@ -14,3 +14,5 @@
 | Yang Xiong (−53 / 18), 方言, 27 ans, soldats de garde (衛卒) et lettrés venus à la capitale, notes sur soie (油素) | 答劉歆書 (lettre de Yang Xiong à Liu Xin) | à vérifier (chiffres et détails) |
 | Simplification 1956, 言 → 讠 (forme cursive) | 漢字簡化方案 1956 / 簡化字總表 1964 | fait |
 | 師 désignait d'abord une armée (二千五百人為師) | 說文 ; 甲骨文 𠂤 | à vérifier pour la passerelle |
+| 法國 : 法 transcrit la première syllabe de France (« Fa-lan-xi ») | usage courant | à confirmer (formulation de l'humour) |
+| Pékin / Canton peu intercompréhensibles | mandarin et cantonais (yue) | fait (formulation « pas toujours ») |
