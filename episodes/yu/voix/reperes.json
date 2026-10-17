@@ -2,11 +2,22 @@
  "b01": {
   "duration": 22.41,
   "cues": {
+   "dire": 0.23,
    "deux": 1.67,
+   "yu1": 3.35,
+   "yan1": 4.63,
    "precepte": 5.67,
+   "dit": 8.99,
+   "citation": 9.75,
    "table": 12.07,
+   "yu2": 12.95,
    "lit": 14.23,
+   "yan2": 14.95,
    "interdit": 16.35,
+   "ici": 17.19,
+   "autre": 17.79,
+   "difference": 18.95,
+   "p1": 20.43,
    "parler": 21.79
   }
  },

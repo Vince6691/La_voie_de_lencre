@@ -301,43 +301,140 @@ const inkBloom = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: numbe
   ctx.restore();
 };
 
-// ════════════════ 1. Accroche : 食不語，寢不言 → deux mots pour parler
+// ════════════════ 1. Accroche : « parler » se dédouble → deux gouttes d'encre donnent 語 et 言 → un rouleau suspendu
+// se déroule, le précepte 食不語，寢不言 s'écrit au pinceau → 語 puis 言 se détachent du rouleau (la nuit tombe sur « Au
+// lit ») → « On interdit l'un ici, l'autre là » : deux coups de pinceau vermillon les barrent → face à face, ils se parlent
 const PRECEPT = '食不語寢不言'.split('');
+const SCROLL = { x: 1580, top: 60, w: 230, h: 780 };
+// tache d'encre qui éclate à l'impact d'une goutte : cœur sombre, gouttelettes projetées, lavis qui boit le papier
+const splash = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number, tt: number, r0 = 150, seed = 1) => {
+  const u = tt - t0;
+  if (u < -0.35 || u > 2.2) return;
+  if (u < 0) { // la goutte tombe
+    const f = 1 + u / 0.35, yy = y - 380 * (1 - f * f);
+    ctx.fillStyle = rgb(INK, 0.9); ctx.beginPath(); ctx.ellipse(x, yy, 8, 8 + 14 * f, 0, 0, 7); ctx.fill(); return;
+  }
+  const k = 1 - Math.pow(1 - clamp(u / 0.5), 3), fade = 1 - seg(u, 0.9, 2.2), r = rng(seed);
+  ctx.save(); ctx.globalAlpha = fade;
+  ctx.filter = 'blur(10px)';
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r0 * k * 1.2); g.addColorStop(0, 'rgba(30,26,22,0.55)'); g.addColorStop(0.6, 'rgba(40,36,32,0.25)'); g.addColorStop(1, 'rgba(40,36,32,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r0 * k * 1.2, 0, 7); ctx.fill();
+  ctx.filter = 'none';
+  for (let i = 0; i < 16; i++) { const a = r() * 7, d = r0 * (0.5 + 0.9 * r()) * k, s = 2 + 7 * r(); ctx.fillStyle = rgb(INK, 0.75); ctx.beginPath(); ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d * 0.8, s * (1 - 0.4 * k), 0, 7); ctx.fill(); }
+  ctx.restore();
+};
+// coup de pinceau vermillon en diagonale (attaque, plein, sortie effilée), tracé avec la progression p
+const slash = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, p: number, a: number) => {
+  if (p <= 0 || a <= 0) return;
+  const x0 = x - s, y0 = y - s * 0.75, x1 = x + s, y1 = y + s * 0.75, n = 40, L = Math.round(n * p);
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = rgb(VER, 0.9);
+  const pts: number[][] = [];
+  for (let i = 0; i <= L; i++) { const f = i / n, w = 30 * Math.sin(Math.PI * Math.min(1, f * 1.15 + 0.08)) * (f < 0.1 ? 0.6 + 4 * f : 1); pts.push([x0 + (x1 - x0) * f, y0 + (y1 - y0) * f + 6 * Math.sin(f * 5), w]); }
+  const nx = -(y1 - y0), ny = x1 - x0, nl = Math.hypot(nx, ny);
+  ctx.beginPath();
+  pts.forEach(([px, py, w], i) => { const X = px + (nx / nl) * w, Y = py + (ny / nl) * w; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
+  [...pts].reverse().forEach(([px, py, w]) => ctx.lineTo(px - (nx / nl) * w, py - (ny / nl) * w));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+};
 const Opening: React.FC = () => {
   const t = useT();
-  const A1 = A('b01'), dx = at('b01', 'deux'), pr = at('b01', 'precepte'), tb = at('b01', 'table'), lt = at('b01', 'lit'), it = at('b01', 'interdit'), pa = at('b01', 'parler');
+  const di = at('b01', 'dire'), dx = at('b01', 'deux'), y1 = at('b01', 'yu1'), n1 = at('b01', 'yan1'), pr = at('b01', 'precepte'), ci = at('b01', 'citation');
+  const tb = at('b01', 'table'), y2 = at('b01', 'yu2'), lt = at('b01', 'lit'), n2 = at('b01', 'yan2'), it = at('b01', 'interdit'), au = at('b01', 'autre'), df = at('b01', 'difference'), p1 = at('b01', 'p1'), pa = at('b01', 'parler');
+  const qEnd = tb - 0.45; // fin de la citation chinoise
   const out = seg(t, B('b01') + 0.2, A('b02') - 0.1);
-  // « deux mots » : 語 et 言 côte à côte (avant le précepte, puis de nouveau sur « On interdit l'un ici, l'autre là »)
-  const pair = (tt: number) => win(tt, A1 - 0.1, pr + 0.2, 0.4) + seg(tt, it - 0.2, it + 0.4);
+  // les deux caractères : positions selon la phase (nés au centre ; sur le rouleau ; détachés ; face à face)
+  const charPos = (i: 0 | 1, tt: number) => {
+    const born = i === 0 ? { x: 640, y: 470 } : { x: 1280, y: 470 };
+    const onScroll = { x: SCROLL.x, y: SCROLL.top + 120 + (i === 0 ? 2 : 5) * 100 + (i === 1 ? 20 : 0) };
+    const lifted = i === 0 ? { x: 720, y: 450 } : { x: 1130, y: 450 };
+    const face = i === 0 ? { x: 700, y: 470 } : { x: 1220, y: 470 };
+    const k1 = ease(seg(tt, (i === 0 ? tb : lt) - 0.1, (i === 0 ? tb : lt) + 0.7)), k2 = ease(seg(tt, df - 0.2, df + 0.8));
+    const sz1 = 100;
+    let x = onScroll.x + (lifted.x - onScroll.x) * k1, y = onScroll.y + (lifted.y - onScroll.y) * k1, s = sz1 + (340 - sz1) * k1;
+    x += (face.x - x) * k2; y += (face.y - y) * k2; s += (380 - s) * k2;
+    return { x, y, s, born };
+  };
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[0, 960, 540, 1.02], [pr - 0.2, 1400, 540, 1.0, 1.0], [tb - 0.3, 1440, 440, 1.08, 1.2], [lt - 0.3, 1440, 600, 1.08, 1.0], [it - 0.3, 960, 540, 1.0, 1.2], [pa - 0.4, 960, 520, 1.06, 1.2]]} punch={[dx + 0.6, tb + 0.2, lt + 0.2, pa]}>
+      <Cam keys={[[0, 960, 540, 1.04], [dx, 960, 520, 1.0, 1.0], [pr + 0.2, 1440, 470, 1.06, 1.6], [ci - 0.1, 1500, 440, 1.1, 1.4], [tb - 0.2, 960, 500, 1.0, 1.0], [lt - 0.1, 1050, 500, 1.04, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
+        punch={[y1 + 0.05, n1 + 0.05, tb + 0.6, lt + 0.6, it + 0.25, au + 0.25, pa + 0.2]}>
         <Draw draw={(ctx, tt, E) => {
-          // le précepte en colonne, caractère par caractère ; 語 puis 言 en vermillon sur leur mot
-          const col = seg(tt, pr - 0.3, pr + 0.3) * (1 - seg(tt, it - 0.4, it + 0.3));
-          PRECEPT.forEach((c, i) => {
-            const t0 = pr + 0.5 + i * 0.32, k = seg(tt, t0, t0 + 0.4);
-            if (k <= 0 || col <= 0) return;
-            const isY = i === 2, isL = i === 5;
-            const hl = isY ? seg(tt, tb, tb + 0.4) : isL ? seg(tt, lt, lt + 0.4) : 0;
-            const y = 150 + i * 112 + (i > 2 ? 30 : 0);
-            E.text(ctx, c, 1480, y, { font: 'ShuimoKai', size: 116, color: rgb(mixc(INK, VER, hl)), alpha: k * col * (hl > 0 || tt < tb ? 1 : 0.55), glow: 20 * hl, glowColor: rgb(VER, 0.6) });
-          });
-          const two = pair(tt);
-          if (two > 0) {
-            const pg = seg(tt, it, it + 0.6);
-            E.drawStrokes(ctx, 'yu_kai', { x: 640, y: 470, size: 480, progress: 14 * seg(tt, dx - 0.2, dx + 1.6), brush: false, color: pig(pg), alpha: () => two });
-            E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 480, progress: 7 * seg(tt, dx + 0.8, dx + 2.0), brush: false, color: pig(pg), alpha: () => two });
+          // 1. « parler » s'écrit, puis se dédouble au mot « deux »
+          const pw = win(tt, di - 0.2, y1 + 0.2, 0.4), sp = ease(seg(tt, dx + 0.6, y1 - 0.2));
+          if (pw > 0) {
+            [-1, 1].forEach((sgn) => {
+              const a = sgn < 0 ? pw : pw * seg(tt, dx + 0.6, dx + 0.9);
+              E.text(ctx, 'parler', 960 + sgn * 320 * sp, 470, { font: 'Cormorant', size: 120, weight: 600, color: inkCss, alpha: a * (sgn > 0 ? 1 : 1) });
+            });
           }
+          // 2. une goutte d'encre tombe sur chaque « parler » : 語 et 言 en naissent
+          splash(ctx, 640, 470, y1, tt, 170, 3); splash(ctx, 1280, 470, n1, tt, 170, 5);
+          const pair = win(tt, y1 - 0.05, pr + 0.6, 0.3);
+          if (pair > 0) {
+            E.drawStrokes(ctx, 'yu_kai', { x: 640, y: 470, size: 460, progress: 14 * seg(tt, y1, y1 + 0.9), brush: false, color: pig(0), alpha: () => pair });
+            E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 460, progress: 7 * seg(tt, n1, n1 + 0.7), brush: false, color: pig(0), alpha: () => pair });
+          }
+          // 3. le rouleau suspendu se déroule ; le précepte s'écrit au pinceau, caractère par caractère (avec la voix)
+          const sa = seg(tt, pr - 0.1, pr + 0.4) * (1 - seg(tt, it - 0.3, it + 0.5));
+          if (sa > 0) {
+            const un = ease(seg(tt, pr, pr + 1.4)), H = 60 + (SCROLL.h - 60) * un;
+            ctx.save(); ctx.globalAlpha = sa;
+            ctx.shadowColor = 'rgba(40,30,20,0.35)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
+            ctx.fillStyle = '#5b6b5e'; ctx.fillRect(SCROLL.x - SCROLL.w / 2 - 22, SCROLL.top, SCROLL.w + 44, H); // montage de soie
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = '#f2ead9'; ctx.fillRect(SCROLL.x - SCROLL.w / 2, SCROLL.top + 40, SCROLL.w, Math.max(0, H - 70));
+            ctx.fillStyle = '#3a2a1e'; ctx.fillRect(SCROLL.x - SCROLL.w / 2 - 30, SCROLL.top - 10, SCROLL.w + 60, 16); // baguette du haut
+            ctx.fillRect(SCROLL.x - SCROLL.w / 2 - 44, SCROLL.top + H - 6, SCROLL.w + 88, 22); // bâton du bas
+            ctx.fillStyle = '#7a5a3c'; [-1, 1].forEach((s2) => { ctx.beginPath(); ctx.arc(SCROLL.x + s2 * (SCROLL.w / 2 + 50), SCROLL.top + H + 5, 14, 0, 7); ctx.fill(); });
+            ctx.restore();
+            PRECEPT.forEach((c, i) => {
+              if (i === 2 && tt > tb - 0.1 && tt < df + 1) return; // 語 détaché
+              if (i === 5 && tt > lt - 0.1 && tt < df + 1) return; // 言 détaché
+              const t0 = pr + 1.3 + i * 0.36, k = seg(tt, t0, t0 + 0.22);
+              if (k <= 0) return;
+              const y = SCROLL.top + 120 + i * 100 + (i > 2 ? 20 : 0);
+              if (y > SCROLL.top + H - 50) return;
+              const tr = ci + (i * (qEnd - ci)) / 6, rd = win(tt, tr, tr + 0.45, 0.12); // la voix le lit
+              const sc = 1 + 0.5 * (1 - k) + 0.12 * rd;
+              E.text(ctx, c, SCROLL.x, y, { font: 'ShuimoKai', size: 100 * sc, color: inkCss, alpha: sa * k, glow: 18 * rd, glowColor: 'rgba(120,100,70,0.5)' });
+              if (tt - t0 < 0.5) { ctx.save(); ctx.globalAlpha = sa * (1 - seg(tt, t0 + 0.1, t0 + 0.5)) * 0.5; ctx.filter = 'blur(8px)'; ctx.fillStyle = rgb(INK, 0.4); ctx.beginPath(); ctx.arc(SCROLL.x, y, 80, 0, 7); ctx.fill(); ctx.restore(); }
+            });
+            // sceau du rouleau
+            if (tt > qEnd) drawSeal(ctx, E, SCROLL.x + 72, SCROLL.top + SCROLL.h - 80, 50, '論', tt - qEnd);
+          }
+          // 4. la nuit tombe sur « Au lit » (lavis indigo, lune pâle), se lève sur « On interdit »
+          const night = seg(tt, lt - 0.2, lt + 0.8) * (1 - seg(tt, it - 0.2, it + 0.6));
+          if (night > 0) {
+            ctx.save(); ctx.globalAlpha = night;
+            const g = ctx.createLinearGradient(0, 0, 0, 1080); g.addColorStop(0, 'rgba(36,44,70,0.5)'); g.addColorStop(1, 'rgba(36,44,70,0.22)');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1080);
+            ctx.filter = 'blur(6px)'; ctx.fillStyle = 'rgba(246,241,226,0.85)'; ctx.beginPath(); ctx.arc(300, 220, 70, 0, 7); ctx.fill(); ctx.restore();
+          }
+          // 5. 語 et 言 détachés du rouleau, en vermillon ; barrés ; puis face à face, ils se répondent
+          ([0, 1] as const).forEach((i) => {
+            const t0 = i === 0 ? tb : lt;
+            if (tt < t0 - 0.1 || tt > B('b01') + 0.8) return;
+            const { x, y, s } = charPos(i, tt);
+            const hit = i === 0 ? y2 : n2, talk = i === 0 ? p1 : pa;
+            const pulse = 1 + 0.12 * win(tt, hit, hit + 0.5, 0.15) + 0.14 * win(tt, talk, talk + 0.6, 0.15);
+            const glow = 30 * win(tt, t0 + 0.3, t0 + 1.6, 0.4) + 26 * win(tt, talk, talk + 0.8, 0.2);
+            ctx.save(); ctx.globalAlpha = 1 - out;
+            E.drawStrokes(ctx, i === 0 ? 'yu_kai' : 'yu_yan_kai', { x, y, size: s * pulse, brush: false, color: () => rgb(mixc(INK, VER, seg(tt, t0, t0 + 0.6))), glow, glowColor: rgb(VER, 0.55) });
+            ctx.restore();
+            // « On interdit l'un ici, l'autre là »
+            const st = i === 0 ? it + 0.15 : au;
+            slash(ctx, x, y, s * 0.55, seg(tt, st, st + 0.35), 1 - seg(tt, df - 0.2, df + 0.4));
+          });
         }} />
       </Cam>
-      <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, tb - 0.3, it - 0.2, 0.5)} y={905} size={46} />
-      <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, pr - 0.2, tb - 0.4, 0.4)} y={905} size={44} />
-      <Label x={1170} y={300} zh="語" text="yǔ" color={VER} a={win(t, tb + 0.1, lt + 1.4, 0.3)} align="right" />
-      <Label x={1170} y={830} zh="言" text="yán" color={VER} a={win(t, lt + 0.1, it - 0.2, 0.3)} align="right" />
-      <Label x={640} y={830} zh="" text="yǔ" color={VER} a={Math.min(1, pair(t)) * seg(t, dx + 0.6, dx + 1.0) * (1 - out)} align="center" />
-      <Label x={1280} y={830} zh="" text="yán" color={VER} a={Math.min(1, pair(t)) * seg(t, dx + 1.4, dx + 1.8) * (1 - out)} align="center" />
+      <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, pr + 1.0, ci - 0.1, 0.4)} y={905} size={44} />
+      <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, ci + 0.3, it - 0.2, 0.5)} y={905} size={46} />
+      <Label x={640} y={830} zh="" text="yǔ" color={VER} a={win(t, y1 + 0.5, pr + 0.4, 0.3)} align="center" />
+      <Label x={1280} y={830} zh="" text="yán" color={VER} a={win(t, n1 + 0.5, pr + 0.4, 0.3)} align="center" />
+      <Label x={700} y={790} zh="" text="yǔ" color={VER} a={win(t, df + 0.6, B('b01') + 0.2, 0.3) * (1 - out)} align="center" />
+      <Label x={1220} y={790} zh="" text="yán" color={VER} a={win(t, df + 0.6, B('b01') + 0.2, 0.3) * (1 - out)} align="center" />
     </AbsoluteFill>
   );
 };

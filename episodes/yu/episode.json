@@ -71,11 +71,22 @@
  "queue": 10,
  "reperes_cles": {
   "b01": {
+   "dire": "dire",
    "deux": "le chinois a deux",
+   "yu1": "语",
+   "yan1": "言",
    "precepte": "Un vieux précepte",
+   "dit": "dit",
+   "citation": "食不语，寝不言",
    "table": "À table",
+   "yu2": "ne 语",
    "lit": "Au lit",
+   "yan2": "ne 言",
    "interdit": "On interdit",
+   "ici": "ici",
+   "autre": "l'autre",
+   "difference": "Quelle différence",
+   "p1": "entre parler",
    "parler": "et parler"
   },
   "b02": {

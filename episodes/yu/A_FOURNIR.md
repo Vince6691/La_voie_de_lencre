@@ -37,6 +37,19 @@ Nano Banana, 16:9, ≥ 1376 × 768. Tiers droit vide (食不語 y sera calligrap
 > on a dense black ink ground, details incised as fine lines, stone grain and uneven ink density, composition in a
 > single horizontal register with a carved border line at top and bottom.
 
+## 5. Médaillon de Yang Xiong en baimiao 白描 (bloc 7) — Nano Banana, 16:9, ≥ 1920 px
+Rien que du trait noir sur blanc pur : je l'anime trait par trait (`trace_baimiao.py`) dans un médaillon, avec la
+mention « portrait imaginé ».
+```
+Baimiao fine-line ink drawing, pure outline only: even, unbroken black ink lines in the "gossamer thread" manner, no wash, no shading, no color, no gradients. Pure white paper background, nothing else on the page.
+Half-length portrait of a thin, middle-aged scholar in three-quarter view facing left, centered, occupying the middle third of a 16:9 frame with wide empty space left and right.
+Long narrow face, short pointed beard and thin moustache, attentive eyes slightly narrowed as if listening closely, head tilted a little forward.
+Small black scholar's cap with a stiff front panel rising at an angle, tied under the chin with thin ribbons; plain cross-collar robe closed right over left, wide sleeves with soft rhythmic folds.
+He holds a small square of silk on a thin wooden board in one hand and a slender brush in the other, the brush tip raised, about to write.
+No ground line, no landscape, no seal, no text, no calligraphy.
+Clean, high-contrast line art suitable for vectorizing.
+```
+
 ## 4. Clips 3D Seedance (16:9, sans texte ni sous-titres)
 Image de départ Nano Banana conseillée (style Pixar, mêmes réglages que les clips du 學, du 教 et du 美).
 
