@@ -44,3 +44,15 @@ Clips A et B encore en attente (non notés). Aucune vidéo rendue.
 | Storytelling | 8 | voix validée, énigme posée / résolue, relances, chute au tambour de guerre |
 Corrections proposées (en attente de validation) : (1) passe collisions Design ; (2) exactitude bandeau / cloche / couleur ;
 (3) plastron Shang en vrai tableau (image à fournir) ; (4) balayage au pinceau en vraie encre ; (5) éviter la double cloche.
+**Retenues : (1), (2), (3)** · refusées : (4) balayage au pinceau en vraie encre, (5) double cloche (ne pas les reproposer telles quelles).
+Appliqué (contrôle : `apercus/planche_note_v1b.jpg`) :
+- (1) caméra de l'accroche moins serrée (×1,1), légende des Entretiens en haut après le dézoom ; cartouche caché sous
+  l'estampage de la cloche et sous le banquet ; légende du Shuowen en bas ; explication de 法 en haut (l'étiquette de la
+  mosaïque reste en bas) ; 汉语 posé sur la Chine ; légendes du 師 l'une après l'autre ; latte du 方言 raccourcie (titre
+  lisible, plus de collision avec la légende).
+- (2) « les pièces, avant 語 » au-dessus de la colonne 甲骨文 ; cloche nommée 余贎乘兒鐘 partout (graphie de 小學堂 ;
+  royaume de Xu toujours non vérifié, donc non affiché) ; 言 seul tout en vermillon au bloc 6.
+- (3) prompt du plastron en tableau (A_FOURNIR §7, avec la baguette incandescente : exactitude de la pyromancie) ; le
+  code prend `images/plastron_brasier.png` dès qu'il existe (chaleur, fissures et fumée à recaler sur l'image).
+Re-notes : Design 6,5 → **8,5** · Historique 7,5 → **8,5** · Technique et Artistique : 7 en attendant le plastron (visé 7,5) ;
+le balayage gris (refusé) les retient sous 8.

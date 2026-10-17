@@ -52,7 +52,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', plastron: 'episodes/yu/images/plastron_brasier.png' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -177,22 +177,27 @@ const rubbing = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
   ctx.restore();
 };
 // plastron de tortue à l'encre, chauffé sur un brasier : la chaleur rougit un point, la fumée monte en lavis, les
-// fissures courent (dont une en 卜)
+// fissures courent (dont une en 卜) ; avec l'image peinte (images/plastron_brasier.png, détourée), le plastron et le
+// brasier viennent de l'image, seuls la chaleur, les fissures et la fumée sont animés
 const plastron = (ctx: CanvasRenderingContext2D, x: number, y: number, a: number, heat: number, crack: number, tt: number) => {
   if (a <= 0) return;
   ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
   // brasier sous le plastron : braises vermillon, lueur
   const fire = heat * (0.85 + 0.15 * Math.sin(tt * 17) * Math.sin(tt * 5.3));
-  if (fire > 0) {
+  if (fire > 0 && !IMG.plastron) {
     const g = ctx.createRadialGradient(40, 420, 10, 40, 420, 300); g.addColorStop(0, `rgba(230,96,40,${0.55 * fire})`); g.addColorStop(1, 'rgba(230,96,40,0)');
     ctx.fillStyle = g; ctx.fillRect(-300, 120, 700, 500);
     const r = rng(3);
     for (let i = 0; i < 26; i++) { ctx.fillStyle = `rgba(${200 + 40 * r()},${60 + 50 * r()},30,${(0.5 + 0.4 * r()) * fire})`; ctx.beginPath(); ctx.ellipse(-120 + 320 * r(), 400 + 40 * r(), 10 + 18 * r(), 6 + 8 * r(), 0, 0, 7); ctx.fill(); }
   }
+  const im = IMG.plastron;
+  if (im) { const h = 900, w = (im.width / im.height) * h; ctx.drawImage(im, -w / 2, -h / 2 + 60, w, h); }
+  else {
   ctx.fillStyle = 'rgba(214,196,160,0.42)'; ctx.strokeStyle = inkCss; ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(0, -330); ctx.bezierCurveTo(190, -330, 230, -120, 215, 40); ctx.bezierCurveTo(205, 220, 120, 330, 0, 340); ctx.bezierCurveTo(-120, 330, -205, 220, -215, 40); ctx.bezierCurveTo(-230, -120, -190, -330, 0, -330); ctx.closePath(); ctx.fill(); ctx.stroke();
   ctx.lineWidth = 2.5; ctx.strokeStyle = rgb(INK, 0.5);
   ctx.beginPath(); ctx.moveTo(0, -330); ctx.lineTo(0, 340); for (const yy of [-180, -40, 110, 240]) { ctx.moveTo(-200, yy + 20); ctx.quadraticCurveTo(0, yy - 20, 200, yy + 20); } ctx.stroke();
+  }
   if (heat > 0) { const g = ctx.createRadialGradient(70, -40, 0, 70, -40, 70); g.addColorStop(0, `rgba(200,60,25,${0.8 * heat})`); g.addColorStop(1, 'rgba(200,60,25,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(70, -40, 70, 0, 7); ctx.fill(); }
   if (crack > 0) {
     ctx.strokeStyle = inkCss; ctx.lineCap = 'round';
@@ -427,7 +432,7 @@ const Opening: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Cam keys={[[0, 960, 540, 1.04], [dx, 960, 520, 1.0, 1.0], [pr - 0.1, 960, 470, 1.0, 1.0],
-        [qEnd + 0.05, 960, 460, 1.0, 1.7], [tb + 0.1, 510, 450, 1.25, 1.0], [lt + 0.1, 1410, 450, 1.25, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
+        [qEnd + 0.05, 960, 460, 1.0, 1.7], [tb + 0.1, 820, 450, 1.1, 1.0], [lt + 0.1, 1100, 450, 1.1, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
         punch={[y1 + 0.05, n1 + 0.05, tb + 0.6, lt + 0.6, it + 0.25, au + 0.25, pa + 0.2]}>
         <Draw draw={(ctx, tt, E) => {
           // 1. « parler » s'écrit, puis se dédouble au mot « deux »
@@ -527,7 +532,7 @@ const Opening: React.FC = () => {
           });
         }} />
       </Cam>
-      <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, pr + 1.0, ci - 0.1, 0.4)} y={905} size={44} />
+      <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, wEnd + 1.0, it - 0.2, 0.4)} y={110} size={44} />
       <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, ci + 0.3, it - 0.2, 0.5)} y={905} size={46} />
       <Label x={640} y={830} zh="" text="yǔ" color={VER} a={win(t, y1 + 0.5, pr + 0.4, 0.3)} align="center" />
       <Label x={1280} y={830} zh="" text="yán" color={VER} a={win(t, n1 + 0.5, pr + 0.4, 0.3)} align="center" />
@@ -662,11 +667,11 @@ const Cloche: React.FC = () => {
         }} />
       </Cam>
       <Placeholder title="Clip A · le carillon de bronze" sub="Seedance, 10 s (prompt : A_FOURNIR.md) — entrée par la mer de nuages" a={win(t, PL.debut + 0.2, fl - 0.1, 0.5)} />
-      <Caption text="cloche de 余贎逐兒 · fin des Printemps et Automnes" a={win(t, fl + 0.4, ga - 0.3, 0.4)} y={940} size={44} />
+      <Caption text="cloche 余贎乘兒鐘 · fin des Printemps et Automnes" a={win(t, fl + 0.4, ga - 0.3, 0.4)} y={940} size={44} />
       <Label x={240} y={300} zh="言" text="la parole" color={VER} a={win(t, ga, re + 0.6, 0.3)} align="center" />
       <Label x={240} y={760} zh="口" text="la bouche" color={AZ} a={win(t, de, re + 0.6, 0.3)} align="center" />
       <Label x={1600} y={520} zh="五" text="le cinq" color={MAL} a={win(t, co, re + 0.6, 0.3)} align="center" />
-      <EraTag {...cartouche('zhou', 'fin des Printemps et Automnes')} a={r3TagIn(R3A, t) * (1 - seg(t, B('b04'), B('b04') + 0.5))} />
+      <EraTag {...cartouche('zhou', 'fin des Printemps et Automnes')} a={r3TagIn(R3A, t) * (1 - win(t, fl - 0.4, fl + 2.6, 0.3)) * (1 - seg(t, B('b04'), B('b04') + 0.5))} />
     </AbsoluteFill>
   );
 };
@@ -776,7 +781,7 @@ const Han: React.FC = () => {
           // la réponse : 言, une bouche tournée vers le vide ; 語, deux bouches et la parole qui fait l'aller-retour
           const ra = seg(tt, rp - 0.2, rp + 0.4) * (1 - seg(tt, tb - 0.4, tb));
           if (ra > 0) {
-            E.drawRealGlyph(ctx, 'yu_yan_jiaguwen', { x: 560, y: 470, size: 520, opacity: ra, color: pig(1) });
+            E.drawRealGlyph(ctx, 'yu_yan_jiaguwen', { x: 560, y: 470, size: 520, opacity: ra, color: () => rgb(VER) });
             // la parole part tout droit, dans le vide
             const sh = (tt - rp) % 1.6 / 1.6;
             ctx.save(); ctx.globalAlpha = ra * (1 - sh); ctx.strokeStyle = rgb(VER, 0.8); ctx.lineWidth = 6; ctx.setLineDash([16, 14]);
@@ -793,7 +798,7 @@ const Han: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="Shuowen jiezi 說文解字 · Xu Shen, vers l'an 100" a={win(t, di, q0 + 0.6, 0.4)} y={150} size={44} />
+      <Caption text="Shuowen jiezi 說文解字 · Xu Shen, vers l'an 100" a={win(t, di, q0 + 0.6, 0.4)} y={955} size={44} />
       <Caption text="« Parler tout droit : 言. Discuter, répliquer : 語. »" a={win(t, p0 + 0.2, rp + 0.2, 0.4)} y={940} size={46} />
       <Label x={560} y={880} zh="言" text="yán" color={VER} a={win(t, rp, tb - 0.4, 0.4)} align="center" />
       <Label x={1320} y={880} zh="語" text="yǔ" color={VER} a={win(t, dc, tb - 0.4, 0.4)} align="center" />
@@ -805,7 +810,7 @@ const Han: React.FC = () => {
         ctx.save(); ctx.globalAlpha = a; ctx.shadowColor = 'rgba(30,20,10,0.4)'; ctx.shadowBlur = 40; ctx.drawImage(im, 1010 - w / 2, 520 - h / 2, w, h); ctx.restore();
       }} />
       <Caption text="banquet · estampage d'un relief de pierre (image recomposée)" a={win(t, tb + 0.4, B('b06') + 0.3, 0.4)} y={940} size={44} />
-      <EraTag {...cartouche('han', "vers l'an 100 · le dictionnaire")} a={seg(t, A6 - 0.5, A6 + 0.3) * (1 - seg(t, B('b06'), B('b06') + 0.5))} />
+      <EraTag {...cartouche('han', "vers l'an 100 · le dictionnaire")} a={seg(t, A6 - 0.5, A6 + 0.3) * (1 - seg(t, tb - 0.3, tb + 0.2))} />
       {void li}
     </AbsoluteFill>
   );
@@ -829,11 +834,11 @@ const YangXiong: React.FC = () => {
           // le livre : titre complet en colonne, 語 en vermillon ; 方言 grossit
           const ba = seg(tt, lv - 0.3, lv + 0.4) * (1 - seg(tt, R2 - 0.4, R2));
           if (ba <= 0) return;
-          slip(ctx, 1120, 60, 960, ba);
+          slip(ctx, 1120, 60, 800, ba);
           BOOK.forEach((c, i) => {
             const k = seg(tt, lv - 0.2 + i * 0.05, lv + 0.2 + i * 0.05);
             const big = c === '方' || c === '言' ? seg(tt, lv + 0.8, lv + 1.4) : 0;
-            E.text(ctx, c, 1120, 110 + i * 72, { font: 'ShuimoKai', size: 62, color: c === '語' ? rgb(VER) : inkCss, alpha: ba * k });
+            E.text(ctx, c, 1120, 108 + i * 64, { font: 'ShuimoKai', size: 56, color: c === '語' ? rgb(VER) : inkCss, alpha: ba * k });
             void big;
           });
           E.text(ctx, '方言', 620, 470, { font: 'ShuimoKai', size: 260, color: inkCss, alpha: ba * seg(tt, lv + 0.6, lv + 1.2) });
@@ -920,7 +925,7 @@ const Today: React.FC = () => {
       </Cam>
       <Sequence from={Math.round(MOS0 * fps)} durationInFrames={Math.round((mosEnd - MOS0) * fps)}><MosaicTransition cfg={MOS} /></Sequence>
       <Caption text="1956 · 言 → 讠, emprunté à l'écriture cursive" a={win(t, tr - 0.2, pa - 0.6, 0.4)} y={940} size={46} />
-      <Caption text="法 fǎ : la loi… et le « Fa » de France 法蘭西" a={win(t, li + 0.2, ri + 1.8, 0.4)} y={955} size={44} />
+      <Caption text="法 fǎ : la loi… et le « Fa » de France 法蘭西" a={win(t, li + 0.2, ri + 1.8, 0.4)} y={110} size={44} />
       <MapPanel from={mosEnd - 0.4} to={B('b08') + 0.6} draw={(ctx, u, E, tt) => {
         const v = { lon: 112.0, lat: 30.0, k: 40 };
         E.mapLayer(ctx, v, v, 120, 'yu_dial', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
@@ -937,7 +942,7 @@ const Today: React.FC = () => {
         });
         E.marker(ctx, tt, v, [116.4, 39.9], 'Pékin', '', seg(tt, ec, ec + 0.4), '#c0392b', 1);
         E.marker(ctx, tt, v, [113.3, 23.1], 'Canton', '', seg(tt, ca - 0.3, ca + 0.1), '#c0392b', -1);
-        E.text(ctx, '汉语', 1660, 160, { font: 'ShuimoKai', size: 110, color: inkCss, alpha: seg(tt, mosEnd, mosEnd + 0.5) });
+        E.text(ctx, '汉语', 470, 200, { font: 'ShuimoKai', size: 110, color: inkCss, alpha: seg(tt, mosEnd, mosEnd + 0.5) });
         void u;
       }} />
       <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={r3TagIn(R3B, t) * (1 - seg(t, pa - 0.6, pa - 0.1))} />
@@ -985,6 +990,7 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
       // les pièces de l'os, côte à côte (avant que 語 existe)
       E.drawRealGlyph(ctx, keys[0].slice(5), { x: x - 46, y, size: sz * 0.78, color, alpha, glow, glowColor: rgb(gc, 0.8) });
       E.drawRealGlyph(ctx, keys[1].slice(5), { x: x + 46, y, size: sz * 0.78, color, alpha, glow, glowColor: rgb(gc, 0.8) });
+      E.text(ctx, 'les pièces, avant 語', x, y - 130, { font: 'Cormorant', size: 38, weight: 700, color: rgb(VER), alpha: appear });
     } else if (keys[0].startsWith('real:')) E.drawRealGlyph(ctx, keys[0].slice(5), { x, y, size: sz, color, alpha, glow, glowColor: rgb(gc, 0.8) });
     else E.drawStrokes(ctx, keys[0].slice(4), { x, y, size: sz * 0.9, brush: false, color, alpha, glow, glowColor: rgb(gc, 0.8) });
     E.text(ctx, zh, x, y + 150, { font: 'ShuimoKai', size: 54, color: inkCss, alpha: appear });
@@ -1064,7 +1070,7 @@ const Chute: React.FC = () => {
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 90, fontWeight: 600, color: inkCss }}>yǔ</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: rgb(VER) }}>14 traits · 语 9 traits</div>
       </div>
-      <Caption text="師 · shī · le maître" a={win(t, ma + 0.3, END + 0.2, 0.4)} y={880} size={58} />
+      <Caption text="師 · shī · le maître" a={win(t, ma + 0.3, ar, 0.4)} y={880} size={58} />
       <Caption text="à l'origine : une troupe en campagne (二千五百人為師)" a={win(t, ar + 0.2, END + 0.2, 0.4)} y={955} size={44} />
     </AbsoluteFill>
   );
