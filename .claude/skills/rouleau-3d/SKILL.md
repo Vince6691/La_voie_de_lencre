@@ -13,8 +13,8 @@ tenue sur le sceau après l'impact, glissando de guzheng discret, inscriptions r
   `r3Seconds(cfg)`, `r3TagIn(cfg, t)`, `INSCRIPTIONS`, `COLLECT` (valeurs par défaut).
 - Démos : compositions `Rouleau3DDemo` (complète, sceau miel) et `Rouleau3DCourtDemo` (courte, sceau rouge),
   `src/rouleau3d/Rouleau3DDemo.tsx` (plan Zhou 2D → rouleau → plan des Royaumes combattants 2D, cartouches).
-- **Périodes** : `outils/moteur/remotion/src/periodes.ts` — table unique de toutes les périodes, du Xia à
-  aujourd'hui (sceau, nom chinois, nom du cartouche, dates). Le rouleau en tire ses sceaux, sa frise et les noms du
+- **Périodes** : `outils/moteur/remotion/src/periodes.ts` — table unique et volontairement courte (sceau, nom
+  chinois, nom du cartouche, dates). Le rouleau en tire ses sceaux, sa frise et les noms du
   compteur ; les cartouches de la vidéo **doivent** en tirer les leurs (`cartouche(id, précision?)`), pour que le
   rouleau et le papier disent la même chose.
 - Sons : `outils/moteur/assets/rouleau/rouleau3d.wav` (complète) et `rouleau3d_court.wav` (courte, cloche une quarte
@@ -30,7 +30,7 @@ import { Rouleau3DConfig, Rouleau3DStage, r3Seconds, r3TagIn } from '../rouleau3
 import { cartouche } from '../periodes';
 const R3: Rouleau3DConfig = {
   at: L.rouleaux[0].debut,                        // début (ligne de temps de l'épisode)
-  de: 'zhou_occ', vers: 'royaumes',               // périodes (identifiants de periodes.ts)
+  de: 'zhou', vers: 'royaumes',                   // périodes (identifiants de periodes.ts)
   annees: [-1046, -300],                          // facultatif : années du compteur (défaut : début de chaque période)
   variant: 'complet',                             // 'complet' 5,3 s | 'court' 3,6 s
   stone: 'miel',                                  // pierre du sceau : 'miel' (Shoushan) | 'rouge' (sang de poulet)
@@ -60,13 +60,15 @@ const R3: Rouleau3DConfig = {
   `pyftsubset ChongxiSeal.otf --text="…tous les caractères…" --output-file=ChongxiSeal-sceaux.otf` (dans `assets/fonts`).
 
 ## Périodes : règles
-- Cartouches et rouleau : toujours `cartouche(id)` / `de` / `vers` de `periodes.ts`, jamais un nom écrit à la main.
+- La table ne garde que les époques des **changements d'écriture** et les grandes dynasties suivantes, sans
+  subdivisions (choix de l'utilisateur) : 商 DYNASTIE SHANG, 周 DYNASTIE ZHOU, 戰 ROYAUMES COMBATTANTS, 秦 DYNASTIE QIN,
+  漢 DYNASTIE HAN, 唐 DYNASTIE TANG, 宋 DYNASTIE SONG, 元 DYNASTIE YUAN, 明 DYNASTIE MING, 清 DYNASTIE QING, 今 AUJOURD'HUI.
+  Pas de Han occidentaux / orientaux, de Zhou occidentaux, etc.
+- Cartouches et rouleau : toujours `cartouche(id)` / `de` / `vers`, jamais un nom écrit à la main.
   `cartouche(id, 'précision')` garde le nom et le sceau mais remplace la ligne des dates (« Anyang · v. 1200 av. J.-C. »).
-- Niveau « fin » (séquence principale : 西周, 春秋, 戰國, 秦, 西漢, 新, 東漢, 三國, 西晉, 東晉, 南北朝, 隋, 唐, 五代十國, 北宋,
-  南宋, 元, 明, 清, 中華民國, 中華人民共和國) : c'est ce que le compteur nomme en défilant. Niveau « groupe » (周, 東周, 漢, 晉,
-  宋, 今) pour un cartouche général ; si `de` est un groupe, le compteur part de son nom. Niveau « parallèle » (十六國, 遼,
-  西夏, 金) : jamais parcouru par le rouleau, seulement en cartouche.
-- Ajouter une période ou un nom : dans `periodes.ts` seulement (le rouleau, le compteur et les cartouches suivent).
+- Le compteur d'années nomme la période de départ, puis chaque période de la table qui commence avant l'arrivée.
+- Une époque manque (ex. royaume de Lu, Printemps et Automnes pour un épisode précis) : l'ajouter à la table, avec
+  l'accord de l'utilisateur, plutôt que d'écrire un cartouche à part.
 
 ## Règles d'usage (validées avec l'utilisateur)
 - **Une fois par vidéo** en version complète, sur le plus grand saut ou le tournant du récit. Deux au plus : la

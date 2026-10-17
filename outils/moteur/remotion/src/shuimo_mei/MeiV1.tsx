@@ -380,7 +380,7 @@ const Opening: React.FC = () => {
         <Caption text="Xu Shen 許慎 · Shuowen jiezi, vers 100" a={win(tf, dico, haut - 0.2, 0.5)} y={960} size={42} />
         <Label x={980} y={720} zh="大" text="grand" color={AZ} a={win(tf, grand, song - 0.6, 0.4)} />
         <Caption text="Xu Xuan 徐鉉, 986" a={win(tf, at('b01', 'marbre') - 0.2, maxime + 0.2, 0.5)} y={960} size={44} />
-        <EraTag {...cartouche('han_or', "vers l'an 100")} a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
+        <EraTag {...cartouche('han', "vers l'an 100")} a={win(tf, dico - 0.2, song - 0.2, 0.6)} />
         <EraTag {...cartouche('song', 'Xe–XIIIe siècle')} a={win(tf, song, FREEZE + 0.2, 0.6)} />
       </>}
     </AbsoluteFill>
@@ -658,7 +658,7 @@ const Zhou: React.FC = () => {
           }} />
         </TimeScrollStage>
       </Cam>
-      <EraTag {...cartouche('zhou_occ', 'XIe siècle av. J.-C.')} a={seg(t, A5 - 0.6, A5 + 0.2) * (1 - seg(t, R2, R2 + 0.4))} />
+      <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={seg(t, A5 - 0.6, A5 + 0.2) * (1 - seg(t, R2, R2 + 0.4))} />
       <EraTag {...cartouche('royaumes', 'Ve–IIIe siècle av. J.-C.')} a={tagIn(TR2, t) * (1 - seg(t, R2E + 2.5, R2E + 3.2))} />
     </AbsoluteFill>
   );
@@ -806,7 +806,7 @@ const QinHan: React.FC = () => {
       <Caption text="221 av. J.-C. · le petit sceau 小篆" a={win(t, emp, ord - 0.1, 0.4)} y={960} size={44} />
       <Label x={1170} y={250} zh="羊" text="le mouton (petit sceau)" color={GOM} a={win(t, mt - 0.1, mt + 2.3, 0.4)} />
       <EraTag {...cartouche('qin', '221 av. J.-C. · le petit sceau')} a={seg(t, A7 - 0.5, A7) * (1 - seg(t, xs - 0.5, xs))} />
-      <EraTag {...cartouche('han_or', "vers l'an 100 · Xu Shen")} a={seg(t, xs - 0.3, xs + 0.3) * (1 - seg(t, B('b07') - 0.2, B('b07') + 0.3))} />
+      <EraTag {...cartouche('han', "vers l'an 100 · Xu Shen")} a={seg(t, xs - 0.3, xs + 0.3) * (1 - seg(t, B('b07') - 0.2, B('b07') + 0.3))} />
     </AbsoluteFill>
   );
 };

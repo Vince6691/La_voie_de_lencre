@@ -8,7 +8,7 @@ import { Rouleau3DConfig, Rouleau3DStage, r3Seconds, r3TagIn } from './Rouleau3D
 import { cartouche } from '../periodes';
 
 const BASE: Rouleau3DConfig = {
-  at: 1.2, de: 'zhou_occ', vers: 'royaumes',
+  at: 1.2, de: 'zhou', vers: 'royaumes',
   fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' },
 };
 const clamp = (v: number) => Math.min(1, Math.max(0, v));

@@ -6,7 +6,7 @@
 // le sceau s'envole vers le cartouche d'époque.
 //
 // Utilisation (skill rouleau-3d) :
-//   const C: Rouleau3DConfig = { at: 105.2, de: 'zhou_occ', vers: 'royaumes', fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' } };
+//   const C: Rouleau3DConfig = { at: 105.2, de: 'zhou', vers: 'royaumes', fromLand: { seed: 9, mood: 'jour' }, toLand: { seed: 26, mood: 'brume' } };
 //   <Rouleau3DStage cfg={C} />   (plein cadre, de at − 0,3 à at + r3Seconds(C) ; à l'appelant les plans 2D avant et après)
 //   r3TagIn(C, t) : opacité du cartouche d'arrivée (le sceau volant s'y pose en (156, 136), 92 px) ;
 //   cartouches : cartouche(C.de) / cartouche(C.vers) (src/periodes.ts) — mêmes sceaux et mêmes noms que le rouleau.
@@ -23,7 +23,7 @@ import { periode, periodesEntre } from '../periodes';
 
 export type Rouleau3DConfig = {
   at: number; duration?: number; // 5,8 s par défaut (le son est calé dessus)
-  de: string; vers: string; // périodes de départ et d'arrivée (identifiants de src/periodes.ts : 'shang', 'zhou_occ', 'royaumes'…)
+  de: string; vers: string; // périodes de départ et d'arrivée (identifiants de src/periodes.ts : 'shang', 'zhou', 'royaumes', 'qin', 'han'…)
   annees?: [number, number]; // années du compteur (par défaut : début de chaque période)
   fromLand: { seed: number; mood: Mood }; toLand: { seed: number; mood: Mood };
   midSeeds?: number[]; // paysages traversés (2), puis 2 marges

@@ -39,7 +39,7 @@ const CFG: TimeScrollConfig = { at: 22.4, from: 0, to: 1, years: [-1250, -1046] 
 - **Cartouche d'époque** : le sceau volant se pose au centre (156, 136), 92 px (`cfg.tag` pour changer) ; afficher
   le cartouche avec l'opacité `tagIn(CFG, t)`, sans translation (sinon saut).
 - **Époques** : sceaux et noms tirés de `src/periodes.ts` (même table que les cartouches et le rouleau 3D : ex.
-  `eras: ['shang', 'zhou_occ'].map((id) => ({ zh: periode(id).sceau, date: yearFmt(periode(id).debut) }))`) ; `eras` (sceau + date affichée), `from` / `to` (indices, non adjacents possibles), `years` (signés,
+  `eras: ['shang', 'zhou'].map((id) => ({ zh: periode(id).sceau, date: yearFmt(periode(id).debut) }))`) ; `eras` (sceau + date affichée), `from` / `to` (indices, non adjacents possibles), `years` (signés,
   négatif = av. J.-C.). Échelle régulière (même place pour chaque époque), les vraies dates sous les sceaux.
 - **Durée** : 5 s par défaut (`duration`, 3 à 5 s pour bien comprendre) ; le son suit (`playbackRate`).
 
