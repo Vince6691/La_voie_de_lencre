@@ -524,10 +524,14 @@ const Pieces: React.FC = () => {
             const sep = ease(seg(tt, ga - 0.4, ga + 0.6)) * (1 - ease(seg(tt, je - 0.2, je + 0.8)));
             const pv = seg(tt, ga, ga + 0.4), cw = seg(tt, dr, dr + 0.4);
             const dim = win(tt, en, je + 0.4, 0.4); // l'énigme : 吾 seul allumé, 言 pâlit
-            if (sep < 0.02) E.drawStrokes(ctx, 'yu_kai', { x: 960, y: 500, size: 560, brush: false, color: pig((c) => (c === 'parole' ? pv : cw)), alpha: () => a });
-            else {
-              E.drawStrokes(ctx, 'yu_yan_kai', { x: 960 - 260 * sep, y: 500, size: 560, brush: false, color: pig(pv), alpha: () => a * (1 - 0.6 * dim) });
-              E.drawStrokes(ctx, 'yu_wu_kai', { x: 960 + 260 * sep, y: 500, size: 560, brush: false, color: pig(cw), alpha: () => a, glow: 26 * dim, glowColor: rgb(AZ, 0.6) });
+            // les pièces partent de leur place dans 語 (言 étroit à gauche, 吾 à droite), grandissent et s'écartent ;
+            // 語 s'efface pendant qu'elles s'en détachent (plus de glyphe superposé)
+            const xf = ease(clamp(sep / 0.25)), wa = 1 - xf;
+            if (wa > 0) E.drawStrokes(ctx, 'yu_kai', { x: 960, y: 500, size: 560, brush: false, color: pig((c) => (c === 'parole' ? pv : cw)), alpha: () => a * wa });
+            if (sep > 0) {
+              const ps = 560 * (0.62 + 0.38 * sep);
+              E.drawStrokes(ctx, 'yu_yan_kai', { x: 960 - 118 - 142 * sep, y: 500 + 4 * (1 - sep), size: ps * (0.78 + 0.22 * sep), brush: false, color: pig(pv), alpha: () => a * xf * (1 - 0.6 * dim) });
+              E.drawStrokes(ctx, 'yu_wu_kai', { x: 960 + 86 + 174 * sep, y: 500, size: ps, brush: false, color: pig(cw), alpha: () => a * xf, glow: 26 * dim, glowColor: rgb(AZ, 0.6) });
             }
           }
           inkBloom(ctx, 960, 540, os + 0.3, A('b03') - 0.3, tt);
@@ -554,9 +558,9 @@ const Shang: React.FC = () => {
         punch={[sg + 0.3, bo + 0.2, cr + 0.3, po + 0.8]} calm={[[R1 - 0.6, R1 + 3.6]]}>
         <Draw draw={(ctx, tt, E) => {
           // plan « tableau » : Anyang vue du ciel (lavis), la caméra plonge vers la grande salle, l'estampage s'y pose
-          const im = IMG.anyang, ia = seg(tt, A3 - 0.3, A3 + 0.6) * (1 - seg(tt, dv + 0.1, dv + 0.9));
+          const im = IMG.anyang, ia = 1 - seg(tt, dv + 0.1, dv + 0.9);
           if (im && ia > 0) {
-            const k = ease(seg(tt, A3 - 0.3, dv + 0.9)), z = 1 + 1.3 * k;
+            const k = ease(seg(tt, A3 - 1.1, dv + 0.9)), z = 1 + 1.3 * k;
             const cov = Math.max(1920 / im.width, 1080 / im.height), w = im.width * cov, h = im.height * cov;
             const fx = (ANYANG_HALL[0] - 0.5) * w * k, fy = (ANYANG_HALL[1] - 0.5) * h * k;
             // la grande salle finit là où se pose l'estampage (700, 520)
@@ -564,7 +568,7 @@ const Shang: React.FC = () => {
             ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore();
           }
           // le lavis de la fin du bloc 2 se dissipe sur Anyang
-          const wsh = WASH * (1 - seg(tt, A3 - 0.3, A3 + 0.9));
+          const wsh = WASH * (1 - seg(tt, A3 - 1.1, A3 + 0.6));
           if (wsh > 0) { ctx.fillStyle = `rgba(52,48,44,${wsh})`; ctx.fillRect(-200, -200, 2320, 1480); }
           // 言 de l'os : l'estampage se pose sur « le devin grave », le signe s'y révèle en blanc, puis passe à l'encre ; bouche, langue, son (vermillon) chacun sur son mot
           const ya = seg(tt, dv - 0.2, dv + 0.8) * (1 - seg(tt, R1 - 0.5, R1));
@@ -1095,9 +1099,10 @@ const EndCard: React.FC = () => {
   );
 };
 
-const Win: React.FC<{ from: number; to: number; children: React.ReactNode }> = ({ from, to, children }) => {
+const Win: React.FC<{ from: number; to: number; fade?: number; children: React.ReactNode }> = ({ from, to, fade = 0, children }) => {
   const t = useT();
-  return t >= from && t < to ? <>{children}</> : null;
+  if (t < from - fade || t >= to) return null;
+  return fade > 0 ? <AbsoluteFill style={{ opacity: ease(seg(t, from - fade, from)) }}>{children}</AbsoluteFill> : <>{children}</>;
 };
 const SFX = (L.bruitages ?? []) as [string, number, number][];
 
@@ -1120,15 +1125,15 @@ export const YuV1: React.FC = () => {
     <AbsoluteFill style={{ background: '#f3eee4' }}>
       {ready && <Shake>
         <Win from={0} to={A('b02') - 0.1}><Opening /></Win>
-        <Win from={A('b02') - 0.1} to={A('b03') - 0.3}><Pieces /></Win>
-        <Win from={A('b03') - 0.3} to={R1 + 0.6}><Shang /></Win>
+        <Win fade={0.8} from={A('b02') - 0.1} to={A('b03') - 0.3}><Pieces /></Win>
+        <Win fade={0.8} from={A('b03') - 0.3} to={R1 + 0.6}><Shang /></Win>
         <Win from={R1 + 0.6} to={A('b05') - 0.3}><Cloche /></Win>
-        <Win from={A('b05') - 0.3} to={PB.debut + PB.duree}><Royaumes /></Win>
-        <Win from={PB.debut + PB.duree} to={A('b07') - 0.3}><Han /></Win>
-        <Win from={A('b07') - 0.3} to={R2 + 0.6}><YangXiong /></Win>
+        <Win fade={0.8} from={A('b05') - 0.3} to={PB.debut + PB.duree}><Royaumes /></Win>
+        <Win fade={0.8} from={PB.debut + PB.duree} to={A('b07') - 0.3}><Han /></Win>
+        <Win fade={0.8} from={A('b07') - 0.3} to={R2 + 0.6}><YangXiong /></Win>
         <Win from={R2 + 0.6} to={A('b09') - 0.3}><Today /></Win>
-        <Win from={A('b09') - 0.3} to={A('b10') - 0.3}><Recap /></Win>
-        <Win from={A('b10') - 0.3} to={END + 0.8}><Chute /></Win>
+        <Win fade={0.8} from={A('b09') - 0.3} to={A('b10') - 0.3}><Recap /></Win>
+        <Win fade={0.8} from={A('b10') - 0.3} to={END + 0.8}><Chute /></Win>
         <Win from={END} to={YU_SECONDS + 1}><EndCard /></Win>
         <BrushSweep />
         <SealStamps />
