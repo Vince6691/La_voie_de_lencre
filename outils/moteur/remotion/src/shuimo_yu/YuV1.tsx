@@ -714,13 +714,13 @@ const Royaumes: React.FC = () => {
 };
 // transition sans rouleau : de larges coups de pinceau gris balaient le paysage vers le papier nu
 const BrushSweep: React.FC = () => {
-  const PB = L.plages.pinceau;
+  const PB = L.plages.pinceau, t = useT();
+  const out = 1 - ease(seg(t, PB.debut + PB.duree - 0.1, PB.debut + PB.duree + 0.9));
+  if (t < PB.debut || out <= 0) return null;
   return (
-    <Draw draw={(ctx, tt) => {
+    <AbsoluteFill style={{ opacity: out }}><Draw draw={(ctx, tt) => {
       const u = (tt - PB.debut) / (PB.duree + 0.3);
-      if (u < 0 || u > 1.4) return;
-      const out = 1 - seg(tt, PB.debut + PB.duree + 0.2, PB.debut + PB.duree + 0.9);
-      ctx.save(); ctx.globalAlpha = out;
+      ctx.save();
       [[260, 0], [560, 0.12], [840, 0.24]].forEach(([y, d]) => {
         const k = ease(clamp((u - d) / 0.55));
         if (k <= 0) return;
@@ -736,7 +736,7 @@ const BrushSweep: React.FC = () => {
         ctx.restore();
       });
       ctx.restore();
-    }} />
+    }} /></AbsoluteFill>
   );
 };
 
@@ -901,7 +901,7 @@ const MOS: MosaicConfig = {
     { word: '法语', at: at('b08', 'francais') - MOS0, label: '法语 · le français' },
   ],
   zoomOut: at('b08', 'rien') - MOS0 + 0.4, hold: at('b08', 'rien') - MOS0 + 2.6, out: at('b08', 'ecriture') - MOS0 - 0.6,
-  outro: 'condense', outroTo: { x: 960, y: 520, size: 300 }, title: '语 · yǔ', accent: VER,
+  outro: 'condense', outroTo: { x: 385, y: 400, size: 110 }, title: '语 · yǔ', accent: VER,
 };
 const Today: React.FC = () => {
   const t = useT();
@@ -921,10 +921,10 @@ const Today: React.FC = () => {
           E.drawStrokes(ctx, 'yu_simp', { x: 960, y: 500, size: 600, brush: false, color: pig((c) => (c === 'parole' ? 1 : 0.35)), alpha: () => a * s, glow: 24 * win(tt, tr + 0.4, pa - 0.6, 0.4), glowColor: rgb(VER, 0.5) });
         }} />
       </Cam>
-      <Sequence from={Math.round(MOS0 * fps)} durationInFrames={Math.round((mosEnd - MOS0) * fps)}><MosaicTransition cfg={MOS} /></Sequence>
+      <Sequence from={Math.round(MOS0 * fps)} durationInFrames={Math.round((mosEnd - MOS0) * fps)}><AbsoluteFill style={{ opacity: ease(seg(t, MOS0, MOS0 + 0.7)) }}><MosaicTransition cfg={MOS} /></AbsoluteFill></Sequence>
       <Caption text="1956 · 言 → 讠, emprunté à l'écriture cursive" a={win(t, tr - 0.2, pa - 0.6, 0.4)} y={940} size={46} />
       <Caption text="法 fǎ : la loi… et le « Fa » de France 法蘭西" a={win(t, li + 0.2, ri + 0.3, 0.4)} y={110} size={44} />
-      <MapPanel from={mosEnd - 0.4} to={B('b08') + 0.6} draw={(ctx, u, E, tt) => {
+      <MapPanel from={mosEnd - 0.6} to={B('b08') + 0.6} draw={(ctx, u, E, tt) => {
         const v = { lon: 112.0, lat: 30.0, k: 40 };
         E.mapLayer(ctx, v, v, 120, 'yu_dial', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
         E.mapDeco(ctx, { paper: true });
@@ -940,7 +940,7 @@ const Today: React.FC = () => {
         });
         E.marker(ctx, tt, v, [116.4, 39.9], 'Pékin', '', seg(tt, ec, ec + 0.4), '#c0392b', 1);
         E.marker(ctx, tt, v, [113.3, 23.1], 'Canton', '', seg(tt, ca - 0.3, ca + 0.1), '#c0392b', -1);
-        E.text(ctx, '汉语', 330, 400, { font: 'ShuimoKai', size: 110, color: inkCss, alpha: seg(tt, mosEnd, mosEnd + 0.5) });
+        E.text(ctx, '汉语', 330, 400, { font: 'ShuimoKai', size: 110, color: inkCss, alpha: seg(tt, mosEnd - 0.5, mosEnd) });
         void u;
       }} />
       <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={r3TagIn(R3B, t) * (1 - seg(t, pa - 0.6, pa - 0.1))} />
