@@ -216,3 +216,31 @@ fondu à l'arrivée pour que l'image reste nette quand on s'approche de Pékin. 
 ```
 This is a close-up of the Beijing plain: paint the mountain ranges larger and more detailed (west and north of the centre), the Bohai gulf on the right with finer wave lines; keep the plain at the centre calm and empty (a seal will be stamped there).
 ```
+
+## 12. Éléments en découpe pour le travelling à fleur de carte (Han → Qing) — à fournir
+Trois planches Nano Banana 16:9, fond magenta (détourées par `outils/moteur/tools/detourer_magenta.py`, puis rangées
+dans la bibliothèque de cartes). Montagnes dressées sur les reliefs ; monuments qui se lèvent quand le compteur atteint
+leur époque (Grande Pagode de l'oie sauvage ~650, Pagode de fer 1049, pont Lugou 1192, Grande Muraille de Badaling 1505) ;
+nuages traversés par la caméra.
+1. `carte_montagnes.png`
+```
+A sheet of twelve separate mountain peaks for a cut-out animation, painted in the "blue-green landscape" manner of a Song dynasty map on silk: each peak a tall rocky ink silhouette with fine texture strokes (cun), malachite green and azurite blue washes fading to pale ochre at the foot, a few small pine trees on the ridges; varied shapes — single needle peaks, double peaks, a long ridge of three summits, rounded hills; all seen from the front at eye level, each one isolated with a wide gap around it, the base of each peak cut flat and horizontal.
+Background: perfectly flat uniform pure magenta (#FF00FF), no ground, no shadow on the background, no mist, no clouds.
+No text, no seals, no people, no buildings, no frame.
+```
+2. `carte_monuments.png`
+```
+A sheet of four separate monuments for a cut-out animation, painted like the small architectural vignettes of an antique Chinese map on silk: precise fine ink outlines, soft blue-green and ochre washes, slight silk texture; each one isolated with a wide gap around it, seen from the front, slightly from above, its base cut flat and horizontal:
+1. the Big Wild Goose Pagoda of Xi'an: a square seven-storey brick pagoda, tapering, plain grey-ochre brick with thin eaves at each storey and a small finial;
+2. the Iron Pagoda of Kaifeng: a slender octagonal thirteen-storey pagoda clad in dark brown glazed tiles that look like iron, small eaves at every storey;
+3. the Lugou Bridge: a long flat stone bridge on eleven arches over a strip of water, carved stone balustrades with tiny lions on the posts;
+4. a section of the Great Wall at Badaling: a crenellated grey brick wall snaking over two rocky ridges, with two square watchtowers.
+Background: perfectly flat uniform pure magenta (#FF00FF), no ground, no shadow on the background, no landscape, no mist.
+No text, no inscriptions, no seals, no people, no frame.
+```
+3. `carte_nuages.png`
+```
+A sheet of six separate auspicious clouds (xiangyun) for a cut-out animation, painted in the manner of Song dynasty court painting (as the clouds of Emperor Huizong's "Auspicious Cranes"): soft cream-white and very pale azurite cloud bands with delicate fine ink outlines, spiralling scroll-shaped ends, gentle wash shading; different sizes and lengths, from a small curl to a long horizontal band; each one isolated with a wide gap around it.
+Background: perfectly flat uniform pure magenta (#FF00FF), no gradient, no sky, no landscape, no shadow.
+No text, no seals, no birds, no frame.
+```
