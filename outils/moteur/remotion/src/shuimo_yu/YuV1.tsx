@@ -64,9 +64,10 @@ const useSetup = () => {
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load(),
       // police des légendes (texte imprimé) ; absente → repli sur le kai
+      new FontFace('ShuimoPinceau', `url(${staticFile('fonts/MaShanZheng-Regular.ttf')})`).load(),
       new FontFace('ShuimoLegende', `url(${staticFile('fonts/ZhuqueFangsong-Regular.ttf')})`).load().catch(() => new FontFace('ShuimoLegende', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load()),
       ...Object.entries(IMGSRC).map(([k, src]) => new Promise<void>((res) => { const im = new Image(); im.onload = () => { IMG[k as keyof typeof IMGSRC] = im; res(); }; im.onerror = () => res(); im.src = staticFile(src); })),
-    ]).then((fs) => { fs.slice(0, 3).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
+    ]).then((fs) => { fs.slice(0, 4).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
   }, [h]);
   return ready;
 };
@@ -376,6 +377,17 @@ const splash = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number,
   for (let i = 0; i < 16; i++) { const a = r() * 7, d = r0 * (0.5 + 0.9 * r()) * k, s = 2 + 7 * r(); ctx.fillStyle = rgb(INK, 0.75); ctx.beginPath(); ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d * 0.8, s * (1 - 0.4 * k), 0, 7); ctx.fill(); }
   ctx.restore();
 };
+// caractère au pinceau (police ShuimoPinceau) qui naît d'une tache d'encre : révélé depuis le centre, flou qui se résorbe
+const brushChar = (ctx: CanvasRenderingContext2D, ch: string, x: number, y: number, size: number, t0: number, tt: number, a: number) => {
+  const u = seg(tt, t0, t0 + 0.7);
+  if (u <= 0 || a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.beginPath(); ctx.arc(x, y, size * 0.85 * (1 - Math.pow(1 - u, 3)), 0, 7); ctx.clip();
+  ctx.filter = `blur(${(6 * (1 - u)).toFixed(1)}px)`;
+  ctx.font = `${size}px ShuimoPinceau`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = inkCss;
+  ctx.fillText(ch, x, y + size * 0.04);
+  ctx.restore();
+};
 // coup de pinceau vermillon en diagonale (attaque, plein, sortie effilée), tracé avec la progression p
 const slash = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, p: number, a: number) => {
   if (p <= 0 || a <= 0) return;
@@ -426,13 +438,11 @@ const Opening: React.FC = () => {
               E.text(ctx, 'parler', 960 + sgn * 320 * sp, 470, { font: 'Cormorant', size: 120, weight: 600, color: inkCss, alpha: a * (sgn > 0 ? 1 : 1) });
             });
           }
-          // 2. une goutte d'encre tombe sur chaque « parler » : 語 et 言 en naissent
+          // 2. une goutte d'encre tombe sur chaque « parler » : 语 et 言 en naissent, au pinceau (Ma Shan Zheng ; forme
+          // simplifiée d'aujourd'hui, celle que la vidéo retrouve à la fin)
           splash(ctx, 640, 470, y1, tt, 170, 3); splash(ctx, 1280, 470, n1, tt, 170, 5);
           const pair = win(tt, y1 - 0.05, pr + 0.6, 0.3);
-          if (pair > 0) {
-            E.drawStrokes(ctx, 'yu_kai', { x: 640, y: 470, size: 460, progress: 14 * seg(tt, y1, y1 + 0.9), brush: false, color: pig(0), alpha: () => pair });
-            E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 460, progress: 7 * seg(tt, n1, n1 + 0.7), brush: false, color: pig(0), alpha: () => pair });
-          }
+          if (pair > 0) { brushChar(ctx, '语', 640, 470, 400, y1, tt, pair); brushChar(ctx, '言', 1280, 470, 400, n1, tt, pair); }
           // 3. le diptyque se révèle (lavis depuis le centre) ; le précepte s'écrit trait par trait. Caméra en trois temps :
           // gros plan fixe sur le panneau du jour (食不語), travelling rapide vers la nuit (寢不言), puis recul sur la phrase
           const w0m = pr + 0.5, SL0 = charSlots(w0m, wEnd), tN = SL0[3][0];

@@ -79,3 +79,10 @@ de Yinxu, protégé par un fossé ; la ville voisine de Huanbei, elle, était mu
   entrent ; les conseillers restent jusqu'aux sceaux de Jin ; médaillon de Yang Xiong dès l'entrée de la scène.
 Re-notes : Design 8 → **8,5** · Storytelling 7,5 → **8** · Artistique 7,5 → **8** · Technique 7,5 → **8** (fantôme corrigé ;
 le balayage gris refusé reste le seul défaut connu) · Historique **8,5**. À re-juger sur le rendu 720p avec les clips A et B.
+
+## 2026-10-18 · Polices
+- Légendes (texte « imprimé » : légendes, étiquettes, lattes, livre 方言, 語言 / 成語, 自言自語) : **Zhuque Fangsong 朱雀仿宋**
+  (choisi parmi WenKai Regular, Neo ZhiSong, I.Ming, Fangsong ; planches `apercus/polices_*.jpg`).
+- Ouverture : **语 / 言 au pinceau, Ma Shan Zheng 马善政**, en forme **simplifiée** (la police n'a pas 語 ; choix de
+  l'utilisateur : l'intro montre la forme d'aujourd'hui, celle sur laquelle la vidéo se termine). Le traditionnel reste partout
+  où l'histoire l'exige (précepte, décomposition 言 + 吾, formes anciennes, bandeau).

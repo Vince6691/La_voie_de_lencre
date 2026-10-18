@@ -1,7 +1,8 @@
 // 語 — deux essais d'ouverture en 3D (5 premières secondes), calés sur la voix du bloc 1 :
-//   YuIntroEncre : « parler » à l'encre se soulève du papier, éclate en gouttelettes qui se reforment en 語 puis 言
+//   YuIntroEncre : « parler » à l'encre se soulève du papier, éclate en gouttelettes qui se reforment en 语 puis 言
 //   YuIntroLaque : PARLER incrusté d'or dans une plaque de laque ; la plaque se fend en deux, 語 et 言 en sortent
-// Contours des glyphes : intro3d_glyphs.json (Cormorant pour le latin, LXGW WenKai TC pour le chinois, unités de police).
+// Contours des glyphes : intro3d_glyphs.json (Cormorant pour le latin, Ma Shan Zheng au pinceau pour 语 et 言 —
+// forme simplifiée d'aujourd'hui, celle de la fin de la vidéo —, unités de police).
 import React, { useEffect, useMemo, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
@@ -226,7 +227,7 @@ const OMB = { yu: [0.33, 0.23], yan: [0.68, 0.23], flame: [0.5, 0.735] }; // pos
 export const YuIntroOmbres: React.FC = () => {
   const t = useT();
   const [h] = useState(() => delayRender('polices'));
-  useEffect(() => { Promise.all([new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(), new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700', style: 'italic' }).load()]).then((fs) => { fs.forEach((f) => document.fonts.add(f)); continueRender(h); }); }, [h]);
+  useEffect(() => { Promise.all([new FontFace('ShuimoPinceau', `url(${staticFile('fonts/MaShanZheng-Regular.ttf')})`).load(), new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700', style: 'italic' }).load()]).then((fs) => { fs.forEach((f) => document.fonts.add(f)); continueRender(h); }); }, [h]);
   const light = ease(seg(t, 0.05, 0.75));
   const flick = 1 + 0.035 * Math.sin(t * 23) * Math.sin(t * 7.3) + 0.02 * Math.sin(t * 41);
   const push = 1.0 + 0.07 * ease(seg(t, 0, INTRO_SECONDS));
@@ -246,9 +247,9 @@ export const YuIntroOmbres: React.FC = () => {
         {word > 0 && ['par', 'ler'].map((s, i) => (
           <div key={s} style={{ ...shadowText, left: `${(50 + (i ? 1 : -1) * (4.3 + 13 * split)) * 1}%`, top: `${17 - 2 * split}%`, fontFamily: 'ShuimoLatin', fontStyle: 'italic', fontWeight: 600, fontSize: 150, opacity: word * light, marginLeft: sway, textAlign: i ? 'left' : 'right' }}>{s}</div>
         ))}
-        {[['語', OMB.yu, T.yu], ['言', OMB.yan, T.yan]].map(([c, p, at]) => {
+        {[['语', OMB.yu, T.yu], ['言', OMB.yan, T.yan]].map(([c, p, at]) => {
           const k = glyph(at as number);
-          return k > 0 ? <div key={c as string} style={{ ...shadowText, left: `${(p as number[])[0] * 100}%`, top: `${((p as number[])[1] + 0.04 * (1 - k)) * 100}%`, fontFamily: 'ShuimoKai', fontSize: 230 + 40 * k, opacity: k * light * 0.95, marginLeft: sh(sway * 1.4) }}>{c as string}</div> : null;
+          return k > 0 ? <div key={c as string} style={{ ...shadowText, left: `${(p as number[])[0] * 100}%`, top: `${((p as number[])[1] + 0.04 * (1 - k)) * 100}%`, fontFamily: 'ShuimoPinceau', fontSize: 230 + 40 * k, opacity: k * light * 0.95, marginLeft: sh(sway * 1.4) }}>{c as string}</div> : null;
         })}
       </AbsoluteFill>
       <Voice />
