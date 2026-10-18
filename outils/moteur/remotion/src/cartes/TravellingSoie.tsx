@@ -21,7 +21,7 @@ const CA = P(108.9, 34.3), BJ = P(116.4, 39.9);
 const VER = '#c0392b';
 
 // ─── trame de soie : fils de chaîne et de trame croisés, épaisseurs irrégulières ; R = relief, G = brillance
-const trame = () => {
+export const trame = () => {
   const N = 512, F = 48, cv = document.createElement('canvas'); cv.width = cv.height = N;
   const c = cv.getContext('2d')!, img = c.createImageData(N, N);
   let s = 12345; const r = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
@@ -38,7 +38,7 @@ const trame = () => {
   return t;
 };
 
-const VERT = /* glsl */ `
+export const VERT = /* glsl */ `
   uniform float uOnde;
   varying vec2 vUv; varying vec3 vPos; varying vec3 vN;
   float h(vec2 p) { return uOnde * (sin(p.x * 0.55 + 1.3) * sin(p.y * 0.8 + 0.4) + 0.45 * sin(p.x * 1.7 + p.y * 1.1)); }
@@ -49,8 +49,8 @@ const VERT = /* glsl */ `
     vec4 w = modelMatrix * vec4(p, 1.); vPos = w.xyz; vN = normalize(mat3(modelMatrix) * n);
     gl_Position = projectionMatrix * viewMatrix * w;
   }`;
-const FRAG = /* glsl */ `
-  uniform sampler2D uMap; uniform sampler2D uTrame; uniform vec2 uRep; uniform float uA; uniform vec3 uL;
+export const FRAG = /* glsl */ `
+  uniform sampler2D uMap; uniform sampler2D uTrame; uniform vec2 uRep; uniform float uA; uniform vec3 uL; uniform vec3 uFogC; uniform vec2 uFog;
   varying vec2 vUv; varying vec3 vPos; varying vec3 vN;
   void main() {
     vec4 c = texture2D(uMap, vUv);
@@ -60,16 +60,17 @@ const FRAG = /* glsl */ `
     col *= 0.9 + 0.12 * max(dot(vN, L), 0.);                   // ondulations éclairées
     float spec = pow(max(dot(vN, H), 0.), 18.) * (0.25 + 0.9 * tr.g); // reflet de soie, plus vif sur les fils de chaîne
     col += spec * 0.16 * vec3(1., 0.96, 0.86);
+    col = mix(col, uFogC, smoothstep(uFog.x, uFog.y, length(cameraPosition - vPos)));
     gl_FragColor = vec4(col, c.a * uA);
     #include <colorspace_fragment>
   }`;
-const soie = (map: THREE.Texture, tr: THREE.Texture, rep: [number, number], a = 1) => new THREE.ShaderMaterial({
-  uniforms: { uMap: { value: map }, uTrame: { value: tr }, uRep: { value: new THREE.Vector2(...rep) }, uA: { value: a }, uL: { value: new THREE.Vector3(-0.4, 0.6, 0.7) }, uOnde: { value: 0.035 } },
+export const soie = (map: THREE.Texture, tr: THREE.Texture, rep: [number, number], a = 1) => new THREE.ShaderMaterial({
+  uniforms: { uMap: { value: map }, uTrame: { value: tr }, uRep: { value: new THREE.Vector2(...rep) }, uA: { value: a }, uL: { value: new THREE.Vector3(-0.4, 0.6, 0.7) }, uOnde: { value: 0.035 }, uFogC: { value: new THREE.Color('#e9dfc9').convertSRGBToLinear() }, uFog: { value: new THREE.Vector2(500, 600) } },
   vertexShader: VERT, fragmentShader: FRAG, transparent: a < 1,
 });
 
 // empreinte de sceau (texture) : carré vermillon, double filet, caractères en petit sceau en colonne
-const empreinte = (txt: string) => {
+export const empreinte = (txt: string) => {
   const S = 512, cv = document.createElement('canvas'); cv.width = cv.height = S;
   const c = cv.getContext('2d')!;
   c.fillStyle = VER; c.fillRect(24, 24, S - 48, S - 48);
