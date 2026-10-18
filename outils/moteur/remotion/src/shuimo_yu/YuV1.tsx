@@ -63,8 +63,10 @@ const useSetup = () => {
     Promise.all([
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load(),
+      // police des légendes (texte imprimé) ; absente → repli sur le kai
+      new FontFace('ShuimoLegende', `url(${staticFile('fonts/legende.ttf')})`).load().catch(() => new FontFace('ShuimoLegende', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load()),
       ...Object.entries(IMGSRC).map(([k, src]) => new Promise<void>((res) => { const im = new Image(); im.onload = () => { IMG[k as keyof typeof IMGSRC] = im; res(); }; im.onerror = () => res(); im.src = staticFile(src); })),
-    ]).then((fs) => { fs.slice(0, 2).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
+    ]).then((fs) => { fs.slice(0, 3).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
   }, [h]);
   return ready;
 };
@@ -121,12 +123,12 @@ const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number }> =
 const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: number[]; a: number; align?: 'left' | 'right' | 'center' }> = ({ x, y, zh, text, color, a, align = 'left' }) => (
   <div style={{ position: 'absolute', top: y - 50, ...(align === 'center' ? { left: x - 400, width: 800, justifyContent: 'center' } : align === 'left' ? { left: x } : { right: 1920 - x }), opacity: a, display: 'flex', alignItems: 'baseline', gap: 14, flexDirection: align === 'right' ? 'row-reverse' : 'row' }}>
     <span style={{ fontFamily: 'ShuimoKai', fontSize: 100, color: rgb(color) }}>{zh}</span>
-    <span style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 66, fontWeight: 600, color: '#3b322b', textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{text}</span>
+    <span style={{ fontFamily: 'ShuimoLatin, ShuimoLegende', fontSize: 66, fontWeight: 600, color: '#3b322b', textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{text}</span>
   </div>
 );
 const Caption: React.FC<{ text: React.ReactNode; a: number; y?: number; size?: number; left?: number; width?: number }> = ({ text, a, y = 900, size = 44, left = 0, width = 1920 }) => (
   <div style={{ position: 'absolute', left, width, top: Math.min(y, 975 - 1.7 * Math.max(size, 44)), textAlign: 'center', opacity: a }}>
-    <span style={{ display: 'inline-block', padding: '4px 22px', borderRadius: 14, background: 'rgba(246,241,231,0.8)', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: Math.max(size, 44), color: '#4b4038', textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</span>
+    <span style={{ display: 'inline-block', padding: '4px 22px', borderRadius: 14, background: 'rgba(246,241,231,0.8)', fontFamily: 'ShuimoLatin, ShuimoLegende', fontSize: Math.max(size, 44), color: '#4b4038', textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</span>
   </div>
 );
 // emplacement d'un élément à fournir (clip Seedance, image) : papier, cadre en pointillé, intitulé ; remplacé au montage
@@ -1030,7 +1032,7 @@ const Recap: React.FC = () => {
         ))}
       </div>
       <div style={{ position: 'absolute', width: '100%', top: 900, textAlign: 'center', opacity: win(t, ch + 1.2, B('b09') + 0.6, 0.5) }}>
-        <span style={{ fontFamily: 'ShuimoKai', fontSize: 64, color: inkCss }}>自<span style={{ color: rgb(VER) }}>言</span>自<span style={{ color: rgb(VER) }}>語</span></span>
+        <span style={{ fontFamily: 'ShuimoLegende', fontSize: 64, color: inkCss }}>自<span style={{ color: rgb(VER) }}>言</span>自<span style={{ color: rgb(VER) }}>語</span></span>
         <span style={{ fontFamily: 'ShuimoLatin', fontSize: 46, fontWeight: 600, color: '#4b4038', marginLeft: 26 }}>zì yán zì yǔ · « parler tout seul »</span>
       </div>
     </AbsoluteFill>
