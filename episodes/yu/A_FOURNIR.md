@@ -246,8 +246,9 @@ No text, no seals, no birds, no frame.
 ```
 
 ## 13. La carte traverse les âges (transition Han → Qing, 5–7 s, vue de dessus) — à fournir
-Remplace les essais à fleur de carte. Même géographie, quatre styles de cartes chinoises réelles ; le quadrillage du
-*Yuji tu* et les méridiens de Kangxi sont dessinés par le moteur (exacts, animés). Nano Banana, mode édition, guide
+Remplace les essais à fleur de carte. Même géographie, quatre styles de cartes chinoises réelles, sans retournement ; les méridiens de
+Kangxi sont dessinés par le moteur (exacts, animés). Transitions : encre qui gagne la soie, feuille imprimée qui se
+soulève, couleur qui se répand depuis les fleuves, gravure des parallèles, puis sceau 京師. Nano Banana, mode édition, guide
 `outils/moteur/assets/cartes/guides/chine_centre_nord.jpg`, 16:9. Les cartes rejoignent la bibliothèque
 (`peintes/`, nouveaux types). Chaque prompt commence par :
 ```
@@ -257,9 +258,9 @@ Repaint this map exactly, keeping every coastline, island, lake and river at the
 ```
 Style: a Han dynasty topographic map painted on silk, like the map excavated at Mawangdui (168 BC): faded brownish-beige silk, worn and slightly torn along old fold lines; rivers as bold dark ink lines that clearly widen downstream; mountain areas drawn as closed wavy ink outlines filled with fine parallel hatching like fish scales; very flat and diagrammatic, no shading, no perspective; sparse touches of faded red ochre and indigo; the sea as a flat pale area with a simple ink coastline.
 ```
-2. `chine_centre_nord_yuji.jpg` (Song, 禹跡圖, 1136)
+2. `chine_centre_nord_zhizhang.jpg` (Song, 歷代地理指掌圖, atlas imprimé, v. 1100 — remplace l'estampage du 禹跡圖)
 ```
-Style: an ink rubbing (estampage) taken from an engraved stone stele, like the Yuji tu of 1136: thin paper covered with deep, uneven black ink applied by tamping, with the soft mottled texture of the dauber; every coastline, lake and river appears as a crisp, slightly irregular white engraved line; land and sea are both black, distinguished only by the white lines; no mountain symbols; a few cracks and chips of the stone show as white flecks; faint creases of the paper.
+Style: a page from a Northern Song woodblock-printed atlas, like the Lidai dili zhizhang tu (around 1100): black ink printed from a carved wooden block on thin, slightly yellowed mulberry paper; coastlines and rivers as firm black lines, the larger rivers drawn as double lines; mountain ranges as neat rows of small pointed peaks; the sea filled with regular engraved wave lines; slight ink spread and the faint grain of the wood block in the solid areas; no colour.
 ```
 3. `chine_centre_nord_hunyi.jpg` (Ming, 大明混一圖, 1389)
 ```
