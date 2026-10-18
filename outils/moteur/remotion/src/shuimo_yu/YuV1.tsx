@@ -53,7 +53,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', anyang: 'episodes/yu/images/anyang_ciel.jpg' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', anyang: 'episodes/yu/images/anyang_ciel.jpg', ombres: 'episodes/yu/images/ombres_conseillers.jpg' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -402,6 +402,59 @@ const slash = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, p
   ctx.closePath(); ctx.fill();
   ctx.restore();
 };
+// ════════ ouverture « deux ombres » (images/ombres_conseillers.jpg) : dans le noir la lampe s'allume ; dolly lent vers le
+// mur ; « parler » se projette en ombre et se scinde sur « deux mots » ; chaque ombre « prononce » son caractère (语, 言 au
+// pinceau, forme d'aujourd'hui) qui se met au point comme une projection ; puis le mur s'efface sur le précepte
+const OMBRES = true;
+const OMB = { yu: [0.33, 0.265], yan: [0.68, 0.265], flame: [0.5, 0.735] };
+const OmbresIntro: React.FC = () => {
+  const t = useT();
+  const di = at('b01', 'dire'), dx = at('b01', 'deux'), y1 = at('b01', 'yu1'), n1 = at('b01', 'yan1'), pr = at('b01', 'precepte');
+  const out = ease(seg(t, pr + 0.3, pr + 1.2));
+  if (out >= 1) return null;
+  const light = ease(seg(t, 0.1, 0.9)), ign = Math.exp(-Math.max(0, t - 0.15) * 5) * seg(t, 0.1, 0.2);
+  const flick = 1 + 0.035 * Math.sin(t * 23) * Math.sin(t * 7.3) + 0.02 * Math.sin(t * 41);
+  const dolly = ease(seg(t, 0, pr + 0.5)), sc = 1 + 0.075 * dolly, tx = -18 * dolly, ty = -10 * dolly;
+  const sway = 3 * Math.sin(t * 5.1) * Math.sin(t * 1.7);
+  const word = seg(t, di - 0.15, di + 0.45) * (1 - seg(t, dx + 0.5, dx + 1.1)), split = ease(seg(t, dx - 0.05, dx + 0.9));
+  const proj = (at0: number) => ease(seg(t, at0 - 0.25, at0 + 0.55));
+  const shadowText: React.CSSProperties = { position: 'absolute', color: 'rgba(38,28,20,0.62)', whiteSpace: 'nowrap', transform: 'translate(-50%, -50%)' };
+  const im = IMGSRC.ombres;
+  return (
+    <AbsoluteFill style={{ background: '#000', opacity: 1 - out, overflow: 'hidden' }}>
+      <AbsoluteFill style={{ transform: `translate(${tx}px, ${ty}px) scale(${sc})`, transformOrigin: '50% 60%' }}>
+        <img src={staticFile(im)} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: `brightness(${(0.06 + 0.94 * light) * flick + 0.25 * ign})` }} />
+        <div style={{ position: 'absolute', left: `${OMB.flame[0] * 100}%`, top: `${OMB.flame[1] * 100}%`, width: 560, height: 560, transform: 'translate(-50%, -60%)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,190,110,0.38), rgba(255,190,110,0) 70%)', opacity: (light + 1.5 * ign) * flick, mixBlendMode: 'screen' }} />
+        <Draw draw={(ctx, tt) => {
+          // poussières dans la lumière de la lampe
+          const r = rng(4);
+          for (let i = 0; i < 70; i++) {
+            const x0 = 700 + 520 * r(), y0 = 380 + 480 * r(), sp0 = 0.2 + 0.5 * r(), ph = r() * 7;
+            const x = x0 + 30 * Math.sin(tt * sp0 + ph), y = y0 - ((tt * 14 * sp0 + ph * 40) % 420) + 140;
+            const d = Math.hypot(x - 960, y - 790) / 520;
+            ctx.fillStyle = `rgba(255,220,170,${(0.5 * light * Math.max(0, 1 - d) * (0.4 + 0.6 * r())).toFixed(3)})`;
+            ctx.beginPath(); ctx.arc(x, y, 1 + 1.8 * r(), 0, 7); ctx.fill();
+          }
+        }} />
+        {word > 0 && ['par', 'ler'].map((s, i) => (
+          <div key={s} style={{ ...shadowText, left: `${50 + (i ? 1 : -1) * (4.3 + 13 * split)}%`, top: `${17 - 2 * split}%`, fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 150, opacity: word * light, filter: 'blur(5px)', marginLeft: sway }}>{s}</div>
+        ))}
+        {([['语', 'yǔ', OMB.yu, y1], ['言', 'yán', OMB.yan, n1]] as [string, string, number[], number][]).map(([c, py, p, at0]) => {
+          const k = proj(at0);
+          if (k <= 0) return null;
+          return (
+            <React.Fragment key={c}>
+              <div style={{ ...shadowText, left: `${p[0] * 100}%`, top: `${p[1] * 100}%`, fontFamily: 'ShuimoPinceau', fontSize: 270, opacity: k * light * 0.95, filter: `blur(${(5 + 12 * (1 - k)).toFixed(1)}px)`, transform: `translate(-50%, -50%) scale(${1.18 - 0.18 * k})`, marginLeft: sway * 1.4 }}>{c}</div>
+              <div style={{ ...shadowText, left: `${(p[0] + (c === '语' ? -0.1 : 0.1)) * 100}%`, top: `${(p[1] + 0.03) * 100}%`, fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 64, opacity: seg(t, at0 + 0.3, at0 + 0.8) * light * 0.9, filter: 'blur(2.5px)' }}>{py}</div>
+            </React.Fragment>
+          );
+        })}
+      </AbsoluteFill>
+      {/* vignette */}
+      <AbsoluteFill style={{ background: 'radial-gradient(ellipse at 50% 55%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%)' }} />
+    </AbsoluteFill>
+  );
+};
 const Opening: React.FC = () => {
   const t = useT();
   const di = at('b01', 'dire'), dx = at('b01', 'deux'), y1 = at('b01', 'yu1'), n1 = at('b01', 'yan1'), pr = at('b01', 'precepte'), ci = at('b01', 'citation');
@@ -428,10 +481,9 @@ const Opening: React.FC = () => {
         [qEnd + 0.05, 960, 460, 1.0, 1.7], [tb + 0.1, 820, 450, 1.1, 1.0], [lt + 0.1, 1100, 450, 1.1, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
         punch={[y1 + 0.05, n1 + 0.05, tb + 0.6, lt + 0.6, it + 0.25, au + 0.25, pa + 0.2]}>
         <Draw draw={(ctx, tt, E) => {
-          // 0. dès la première image : une goutte tombe au centre et éclate ; « parler » naît de la tache
-          splash(ctx, 960, 470, 0.38, tt, 230, 9);
-          // 1. « parler » s'écrit, puis se dédouble au mot « deux »
-          const pw = win(tt, di - 0.2, y1 + 0.2, 0.4), sp = ease(seg(tt, dx + 0.6, y1 - 0.2));
+          // 0–2 : l'entrée « deux ombres » (OmbresIntro, par-dessus) remplace la goutte, « parler » et 语 / 言 nés de la tache
+          if (!OMBRES) splash(ctx, 960, 470, 0.38, tt, 230, 9);
+          const pw = OMBRES ? 0 : win(tt, di - 0.2, y1 + 0.2, 0.4), sp = ease(seg(tt, dx + 0.6, y1 - 0.2));
           if (pw > 0) {
             [-1, 1].forEach((sgn) => {
               const a = sgn < 0 ? pw : pw * seg(tt, dx + 0.6, dx + 0.9);
@@ -440,8 +492,8 @@ const Opening: React.FC = () => {
           }
           // 2. une goutte d'encre tombe sur chaque « parler » : 语 et 言 en naissent, au pinceau (Ma Shan Zheng ; forme
           // simplifiée d'aujourd'hui, celle que la vidéo retrouve à la fin)
-          splash(ctx, 640, 470, y1, tt, 170, 3); splash(ctx, 1280, 470, n1, tt, 170, 5);
-          const pair = win(tt, y1 - 0.05, pr + 0.6, 0.3);
+          if (!OMBRES) { splash(ctx, 640, 470, y1, tt, 170, 3); splash(ctx, 1280, 470, n1, tt, 170, 5); }
+          const pair = OMBRES ? 0 : win(tt, y1 - 0.05, pr + 0.6, 0.3);
           if (pair > 0) { brushChar(ctx, '语', 640, 470, 400, y1, tt, pair); brushChar(ctx, '言', 1280, 470, 400, n1, tt, pair); }
           // 3. le diptyque se révèle (lavis depuis le centre) ; le précepte s'écrit trait par trait. Caméra en trois temps :
           // gros plan fixe sur le panneau du jour (食不語), travelling rapide vers la nuit (寢不言), puis recul sur la phrase
@@ -508,8 +560,9 @@ const Opening: React.FC = () => {
       </Cam>
       <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, wEnd + 1.0, it - 0.2, 0.4)} y={110} size={44} />
       <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, ci + 0.3, it - 0.2, 0.5)} y={905} size={46} />
-      <Label x={640} y={830} zh="" text="yǔ" color={VER} a={win(t, y1 + 0.5, pr + 0.4, 0.3)} align="center" />
-      <Label x={1280} y={830} zh="" text="yán" color={VER} a={win(t, n1 + 0.5, pr + 0.4, 0.3)} align="center" />
+      {!OMBRES && <Label x={640} y={830} zh="" text="yǔ" color={VER} a={win(t, y1 + 0.5, pr + 0.4, 0.3)} align="center" />}
+      {!OMBRES && <Label x={1280} y={830} zh="" text="yán" color={VER} a={win(t, n1 + 0.5, pr + 0.4, 0.3)} align="center" />}
+      {OMBRES && <OmbresIntro />}
       <Label x={700} y={790} zh="" text="yǔ" color={VER} a={win(t, df + 0.6, B('b01') + 0.2, 0.3) * (1 - out)} align="center" />
       <Label x={1220} y={790} zh="" text="yán" color={VER} a={win(t, df + 0.6, B('b01') + 0.2, 0.3) * (1 - out)} align="center" />
     </AbsoluteFill>
@@ -766,7 +819,7 @@ const Han: React.FC = () => {
             const t0 = q0 + (i * (q1 - q0)) / QUOTE.length, k = seg(tt, t0, t0 + 0.3);
             const x = i < 4 ? 960 : 820, y = 230 + (i % 4) * 190;
             const hl = c === '言' && i === 1 ? 0 : c === '語' ? seg(tt, p0, p0 + 0.6) : 0;
-            E.text(ctx, c, x, y, { font: 'ShuimoLegende', size: 120, color: rgb(mixc(INK, VER, hl)), alpha: sa * k });
+            E.text(ctx, c, x, y, { font: 'Zhuan', size: 124, color: rgb(mixc(INK, VER, hl)), alpha: sa * k });
           });
           // cascade frappée pendant le silence : bronze, sceau de Jin, petit sceau, un coup chacun
           const cas = 1 - seg(tt, rp + 0.4, rp + 0.9);
@@ -843,7 +896,7 @@ const YangXiong: React.FC = () => {
           BOOK.forEach((c, i) => {
             const k = seg(tt, lv - 0.2 + i * 0.05, lv + 0.2 + i * 0.05);
             const big = c === '方' || c === '言' ? seg(tt, lv + 0.8, lv + 1.4) : 0;
-            E.text(ctx, c, 1120, 108 + i * 64, { font: 'ShuimoLegende', size: 56, color: c === '語' ? rgb(VER) : inkCss, alpha: ba * k });
+            E.text(ctx, c, 1120, 108 + i * 64, { font: 'Zhuan', size: 58, color: c === '語' ? rgb(VER) : inkCss, alpha: ba * k });
             void big;
           });
           E.text(ctx, '方言', 620, 470, { font: 'ShuimoLegende', size: 260, color: inkCss, alpha: ba * seg(tt, lv + 0.6, lv + 1.2) });

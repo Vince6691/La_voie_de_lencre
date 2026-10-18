@@ -215,19 +215,19 @@
   "total": 264.44,
   "bruitages": [
    [
-    "goutte",
-    0.38,
+    "allumage",
+    0.1,
     0.5
    ],
    [
-    "goutte",
-    3.9,
-    0.45
+    "souffle",
+    3.65,
+    0.35
    ],
    [
-    "goutte",
-    5.18,
-    0.45
+    "souffle",
+    4.93,
+    0.35
    ],
    [
     "pinceau",
