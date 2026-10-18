@@ -244,3 +244,28 @@ A sheet of six separate auspicious clouds (xiangyun) for a cut-out animation, pa
 Background: perfectly flat uniform pure magenta (#FF00FF), no gradient, no sky, no landscape, no shadow.
 No text, no seals, no birds, no frame.
 ```
+
+## 13. La carte traverse les âges (transition Han → Qing, 5–7 s, vue de dessus) — à fournir
+Remplace les essais à fleur de carte. Même géographie, quatre styles de cartes chinoises réelles ; le quadrillage du
+*Yuji tu* et les méridiens de Kangxi sont dessinés par le moteur (exacts, animés). Nano Banana, mode édition, guide
+`outils/moteur/assets/cartes/guides/chine_centre_nord.jpg`, 16:9. Les cartes rejoignent la bibliothèque
+(`peintes/`, nouveaux types). Chaque prompt commence par :
+```
+Repaint this map exactly, keeping every coastline, island, lake and river at the same position and the same shape, the same framing and the same north-up orientation (it is a geographic guide; do not move, add or remove land or water). No text, no labels, no characters, no grid, no graticule, no compass, no frame, no seals.
+```
+1. `chine_centre_nord_mawangdui.jpg` (Han, Mawangdui, 168 av. J.-C.)
+```
+Style: a Han dynasty topographic map painted on silk, like the map excavated at Mawangdui (168 BC): faded brownish-beige silk, worn and slightly torn along old fold lines; rivers as bold dark ink lines that clearly widen downstream; mountain areas drawn as closed wavy ink outlines filled with fine parallel hatching like fish scales; very flat and diagrammatic, no shading, no perspective; sparse touches of faded red ochre and indigo; the sea as a flat pale area with a simple ink coastline.
+```
+2. `chine_centre_nord_yuji.jpg` (Song, 禹跡圖, 1136)
+```
+Style: an ink rubbing (estampage) taken from an engraved stone stele, like the Yuji tu of 1136: thin paper covered with deep, uneven black ink applied by tamping, with the soft mottled texture of the dauber; every coastline, lake and river appears as a crisp, slightly irregular white engraved line; land and sea are both black, distinguished only by the white lines; no mountain symbols; a few cracks and chips of the stone show as white flecks; faint creases of the paper.
+```
+3. `chine_centre_nord_hunyi.jpg` (Ming, 大明混一圖, 1389)
+```
+Style: a large Ming court map painted on silk, like the Da Ming hunyi tu of 1389: warm ochre-yellow silk ground, the land in pale beige, rivers as thick dark green-blue lines, the sea painted green with regular stylised fish-scale waves, mountain ranges as rows of small blue-green peaks with white highlights, bright mineral colours slightly faded with age.
+```
+4. `chine_centre_nord_kangxi.jpg` (Qing, 皇輿全覽圖, 1718)
+```
+Style: a copperplate engraving from the Kangxi atlas of 1718, surveyed by Jesuit cartographers: fine black engraved lines on cream laid paper; coastlines outlined with fine horizontal hatching offshore; rivers as thin single or double lines; mountains as small engraved hachured hills seen in profile, grouped along the ranges; very light hand-coloured washes of pale green along the coasts and pale ochre on the land.
+```
