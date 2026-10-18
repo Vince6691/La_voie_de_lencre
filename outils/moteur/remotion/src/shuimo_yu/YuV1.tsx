@@ -140,17 +140,35 @@ const Placeholder: React.FC<{ title: string; sub: string; a: number }> = ({ titl
 
 // ── caméra : poussées et panoramiques lents (clés [t, cx, cy, échelle, durée]), respiration permanente, punch
 type K = [number, number, number, number, number?];
+// caméra : une seule trajectoire continue (spline de Hermite monotone à travers les clés : vitesse continue, pas d'arrêt
+// à chaque clé ni de dépassement), dolly lent permanent ; les « punch » sont des respirations douces (1,4 s), pas des à-coups.
+// clé [t, x, y, zoom, d] : position atteinte à t + d (d = durée du mouvement vers cette clé, 1,2 s par défaut, au moins 1,6 s)
+const hermite = (ts: number[], vs: number[], t: number) => {
+  const n = ts.length;
+  if (t <= ts[0]) return vs[0];
+  if (t >= ts[n - 1]) return vs[n - 1];
+  let i = 0; while (t > ts[i + 1]) i++;
+  const sl = (a: number) => (vs[a + 1] - vs[a]) / (ts[a + 1] - ts[a]);
+  const tan = (k: number) => {
+    if (k === 0 || k === n - 1) return 0;
+    const a = sl(k - 1), b = sl(k);
+    return a * b <= 0 ? 0 : (2 * a * b) / (a + b); // monotone : ralentit sans repartir en arrière
+  };
+  const h = ts[i + 1] - ts[i], u = (t - ts[i]) / h, u2 = u * u, u3 = u2 * u;
+  return (2 * u3 - 3 * u2 + 1) * vs[i] + (u3 - 2 * u2 + u) * h * tan(i) + (-2 * u3 + 3 * u2) * vs[i + 1] + (u3 - u2) * h * tan(i + 1);
+};
 const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; children: React.ReactNode }> = ({ keys, punch = [], calm = [], children }) => {
   const t = useT();
-  let [, cx, cy, s] = keys[0];
-  for (const [kt, x, y, z, d = 1.2] of keys.slice(1)) {
-    if (t <= kt) break;
-    const u = ease((t - kt) / d);
-    cx += (x - cx) * u; cy += (y - cy) * u; s += (z - s) * u;
-  }
-  s *= 1 + 0.014 * (0.5 - 0.5 * Math.cos((t * 2 * Math.PI) / 11));
-  cx += 10 * Math.sin((t * 2 * Math.PI) / 14); cy += 6 * Math.sin((t * 2 * Math.PI) / 17);
-  for (const p of punch) s *= 1 + 0.035 * seg(t, p, p + 0.12) * (1 - seg(t, p + 0.15, p + 0.65));
+  const ts: number[] = [], xs: number[] = [], ys: number[] = [], zs: number[] = [];
+  keys.forEach(([kt, x, y, z, d = 1.2], k) => {
+    const at = k === 0 ? kt : Math.max(kt + Math.max(d, 1.6), ts[ts.length - 1] + 0.4);
+    ts.push(at); xs.push(x); ys.push(y); zs.push(z);
+  });
+  let cx = hermite(ts, xs, t), cy = hermite(ts, ys, t), s = hermite(ts, zs, t);
+  // dolly lent et dérive, très amples dans le temps : le plan vit sans jamais saccader
+  s *= 1 + 0.018 * (0.5 - 0.5 * Math.cos((t * 2 * Math.PI) / 16));
+  cx += 12 * Math.sin((t * 2 * Math.PI) / 19); cy += 7 * Math.sin((t * 2 * Math.PI) / 23);
+  for (const p of punch) { const u = seg(t, p - 0.2, p + 1.2); s *= 1 + 0.022 * Math.sin(Math.PI * u) ** 2; }
   const amp = 1 - Math.max(0, ...calm.map(([a, b]) => win(t, a, b, 0.6)));
   s = 1 + (s - 1) * amp;
   cx = Math.min(1920 - 960 / s, Math.max(960 / s, cx)); cy = Math.min(1080 - 540 / s, Math.max(540 / s, cy));
@@ -252,21 +270,24 @@ const GrainVignette: React.FC = () => {
 };
 // goutte d'encre qui tombe et s'épanouit en lavis (jamais plus de 2 s de papier vide entre deux tableaux)
 const inkBloom = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number, t1: number, tt: number) => {
-  if (tt < t0 || tt > t1 + 0.8) return;
-  const fall = clamp((tt - t0) / 0.35), u = clamp((tt - t0 - 0.35) / (t1 - t0 - 0.35)), out = 1 - seg(tt, t1 - 0.4, t1 + 0.6);
-  ctx.save(); ctx.globalAlpha = out;
-  if (fall < 1) { const yy = y - 420 * (1 - fall * fall); ctx.fillStyle = rgb(INK, 0.9); ctx.beginPath(); ctx.ellipse(x, yy, 9, 9 + 16 * fall, 0, 0, 7); ctx.fill(); }
-  else {
-    const Rr = 26 + 420 * (1 - Math.pow(1 - u, 2.2));
-    ctx.filter = 'blur(9px)'; ctx.beginPath();
-    for (let k = 0; k <= 120; k++) { const th = (k / 120) * Math.PI * 2, n = 1 + 0.09 * Math.sin(3 * th + 0.7) + 0.05 * Math.sin(5 * th + 2.1 + 0.6 * u); const px = x + Math.cos(th) * Rr * n, py = y + Math.sin(th) * Rr * n * 0.84; k ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
-    ctx.closePath();
-    const g = ctx.createRadialGradient(x - 12, y - 8, 0, x, y, Rr * 1.05);
-    g.addColorStop(0, 'rgba(24,20,18,0.7)'); g.addColorStop(0.15, 'rgba(36,32,28,0.4)'); g.addColorStop(0.7, 'rgba(48,44,40,0.26)'); g.addColorStop(1, 'rgba(34,30,28,0.42)');
-    ctx.fillStyle = g; ctx.fill();
+  // une goutte tombe, l'encre se dilue et gagne tout le cadre (cœur sombre qui pâlit, plusieurs lobes, bords flous) ;
+  // à t1 le cadre est couvert d'un lavis gris uniforme (WASH), que la scène suivante reprend et dissipe
+  if (tt < t0 || tt > t1) return;
+  const fall = clamp((tt - t0) / 0.35);
+  if (fall < 1) { const yy = y - 420 * (1 - fall * fall); ctx.fillStyle = rgb(INK, 0.9); ctx.beginPath(); ctx.ellipse(x, yy, 9, 9 + 16 * fall, 0, 0, 7); ctx.fill(); return; }
+  const u = clamp((tt - t0 - 0.35) / (t1 - t0 - 0.35)), e = 1 - Math.pow(1 - u, 2.4), r = rng(17);
+  ctx.save(); ctx.filter = 'blur(14px)';
+  for (let k = 0; k < 7; k++) {
+    const a = r() * 6.28, d = (k ? 0.18 + 0.2 * r() : 0) * 1500 * e, R = (40 + 1500 * e) * (k ? 0.55 + 0.35 * r() : 1);
+    const cx = x + Math.cos(a) * d, cy = y + Math.sin(a) * d * 0.7;
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+    const core = (k ? 0.07 : 0.42) * (1 - u) + WASH * (k ? 0.3 : 1);
+    g.addColorStop(0, `rgba(40,36,32,${core})`); g.addColorStop(0.75, `rgba(52,48,44,${WASH * (k ? 0.5 : 1)})`); g.addColorStop(1, 'rgba(52,48,44,0)');
+    ctx.fillStyle = g; ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
   }
   ctx.restore();
 };
+const WASH = 0.13;
 
 // un baimiao qui se trace (trace_baimiao.py : R = instant d'arrivée, A = encre), dessiné dans le rectangle (x, y, w, h)
 let bmCache: { data: Uint8ClampedArray; cv: HTMLCanvasElement; last: number } | null = null;
@@ -393,6 +414,8 @@ const Opening: React.FC = () => {
         [qEnd + 0.05, 960, 460, 1.0, 1.7], [tb + 0.1, 820, 450, 1.1, 1.0], [lt + 0.1, 1100, 450, 1.1, 1.0], [it - 0.3, 960, 500, 1.0, 1.0], [df - 0.2, 960, 500, 1.02, 1.2], [pa - 0.3, 960, 490, 1.08, 1.0]]}
         punch={[y1 + 0.05, n1 + 0.05, tb + 0.6, lt + 0.6, it + 0.25, au + 0.25, pa + 0.2]}>
         <Draw draw={(ctx, tt, E) => {
+          // 0. dès la première image : une goutte tombe au centre et éclate ; « parler » naît de la tache
+          splash(ctx, 960, 470, 0.38, tt, 230, 9);
           // 1. « parler » s'écrit, puis se dédouble au mot « deux »
           const pw = win(tt, di - 0.2, y1 + 0.2, 0.4), sp = ease(seg(tt, dx + 0.6, y1 - 0.2));
           if (pw > 0) {
@@ -411,17 +434,17 @@ const Opening: React.FC = () => {
           // 3. le diptyque se révèle (lavis depuis le centre) ; le pinceau écrit le précepte, caméra collée à la pointe
           // vue macro (dans le dessin, nette) : on plonge sur la pointe du pinceau, on la suit, puis grand dézoom sur la phrase
           const w0m = pr + 0.5;
-          const zin = ease(seg(tt, w0m - 0.5, w0m + 0.1)), zout = ease(seg(tt, wEnd - 0.05, wEnd + 1.3));
+          const zin = ease(seg(tt, w0m - 0.9, w0m + 0.2)), zout = ease(seg(tt, wEnd - 0.2, wEnd + 1.6));
           const Z = 1 + (MACRO - 1) * zin * (1 - zout);
           let mc = [960, 460];
           if (Z > 1.001) {
-            const pts = [0.3, 0.2, 0.1, 0].map((d) => brushAt(E, Math.min(Math.max(tt - d, w0m + 0.01), wEnd - 0.02), w0m, wEnd)?.tip).filter(Boolean) as number[][];
+            const pts = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0].map((d) => brushAt(E, Math.min(Math.max(tt - d, w0m + 0.01), wEnd - 0.02), w0m, wEnd)?.tip).filter(Boolean) as number[][];
             const c0 = pts.length ? [pts.reduce((s, q) => s + q[0], 0) / pts.length, pts.reduce((s, q) => s + q[1], 0) / pts.length - 20] : [PCHAR(0).x, PCHAR(0).y];
             const k = zin * (1 - zout);
             mc = [960 + (c0[0] - 960) * k, 460 + (c0[1] - 460) * k];
           }
           ctx.save(); ctx.translate(960, 540); ctx.scale(Z, Z); ctx.translate(-mc[0], -mc[1] + 0 * 80);
-          const da = seg(tt, pr - 0.1, pr + 0.9) * (1 - seg(tt, it - 0.3, it + 0.5));
+          const da = seg(tt, pr - 0.1, pr + 0.9) * (1 - seg(tt, it - 0.3, it + 0.5)) * (1 - 0.55 * seg(tt, tb - 0.1, tb + 0.7));
           if (da > 0) {
             PANELS.forEach((pn, k) => {
               const rv = ease(seg(tt, pr + 0.1 * k, pr + 1.1 + 0.1 * k));
@@ -447,21 +470,7 @@ const Opening: React.FC = () => {
               const tr = ci + (i * (qEnd - ci)) / 6, rd = win(tt, tr, tr + 0.45, 0.12); // la voix le lit
               E.drawStrokes(ctx, key, { ...O, progress: pg, brush: false, color: () => (i < 3 ? inkCss : 'rgb(238,232,214)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
             });
-            const bt = brushAt(E, tt, w0, wEnd), brush = bt?.tip ?? null, lifted = bt?.lifted ?? 0;
-            // la main et le pinceau (image détourée, pointe en bas au centre) ; levé entre deux traits
-            const ba = seg(tt, w0 - 0.4, w0) * (1 - seg(tt, wEnd, wEnd + 0.5));
-            if (brush && ba > 0) {
-              const hand = IMG.pinceau, tipIm = IMG.pointe, hA = 1 - seg(Z, 2.0, 3.4), pA = seg(Z, 2.0, 3.4);
-              ctx.save(); ctx.translate(brush[0] + 10 * lifted / Z, brush[1] - 22 * lifted / Z);
-              if (hand && hA > 0) { // main détourée : pointe du pinceau en (159, 1457) sur 1661 × 1460
-                const w = 520, s2 = w / hand.width; ctx.globalAlpha = ba * hA; ctx.drawImage(hand, -159 * s2, -1457 * s2, w, hand.height * s2);
-              }
-              if (tipIm && pA > 0) { // gros plan de la pointe : (86, 715) sur 180 × 719, ≈ 760 px de haut à l'écran
-                const h = 760 / Z, s2 = h / tipIm.height; ctx.globalAlpha = ba * pA; ctx.drawImage(tipIm, -86 * s2, -715 * s2, tipIm.width * s2, h);
-              }
-              if (!hand && !tipIm) { ctx.globalAlpha = ba; ctx.strokeStyle = '#5a4030'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, -420); ctx.stroke(); }
-              ctx.restore();
-            }
+                        // la main et le pinceau (image détourée, pointe en bas au centre) ; levé entre deux traits
             if (tt > qEnd - 0.3) drawSeal(ctx, E, 1800, 650, 48, '論', tt - qEnd + 0.3);
           }
           ctx.restore();
@@ -469,9 +478,9 @@ const Opening: React.FC = () => {
           const night = seg(tt, lt - 0.2, lt + 0.8) * (1 - seg(tt, it - 0.2, it + 0.6));
           if (night > 0) {
             ctx.save(); ctx.globalAlpha = night;
-            const g = ctx.createLinearGradient(0, 0, 0, 1080); g.addColorStop(0, 'rgba(36,44,70,0.5)'); g.addColorStop(1, 'rgba(36,44,70,0.22)');
+            const g = ctx.createLinearGradient(0, 0, 0, 1080); g.addColorStop(0, 'rgba(36,44,70,0.34)'); g.addColorStop(1, 'rgba(36,44,70,0.14)');
             ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1080);
-            ctx.filter = 'blur(6px)'; ctx.fillStyle = 'rgba(246,241,226,0.85)'; ctx.beginPath(); ctx.arc(300, 220, 70, 0, 7); ctx.fill(); ctx.restore();
+            ctx.restore();
           }
           // 5. 語 et 言 détachés du rouleau, en vermillon ; barrés ; puis face à face, ils se répondent
           ([0, 1] as const).forEach((i) => {
@@ -521,7 +530,7 @@ const Pieces: React.FC = () => {
               E.drawStrokes(ctx, 'yu_wu_kai', { x: 960 + 260 * sep, y: 500, size: 560, brush: false, color: pig(cw), alpha: () => a, glow: 26 * dim, glowColor: rgb(AZ, 0.6) });
             }
           }
-          inkBloom(ctx, 960, 540, os + 0.3, B('b02') + 1.0, tt);
+          inkBloom(ctx, 960, 540, os + 0.3, A('b03') - 0.3, tt);
         }} />
       </Cam>
       <Label x={560} y={880} zh="言" text="la parole" color={VER} a={win(t, ga + 0.2, je, 0.4)} align="center" />
@@ -541,11 +550,11 @@ const Shang: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Landscape seed={14} from={A3 - 1.5} to={R1 + 0.6} move="pan" mood="aube" faint={0.55} />
-      <Cam keys={[[A3 - 0.3, 960, 560, 1.0], [dv, 960, 540, 1.0, 2.4], [sg - 0.3, 960, 540, 1.0, 1.0], [bo - 0.2, 700, 700, 1.25, 0.9], [la - 0.1, 700, 560, 1.25, 0.9], [so - 0.1, 700, 300, 1.25, 1.0], [ci - 0.3, 960, 540, 1.0, 1.0], [tr - 0.2, 1240, 540, 1.12, 1.0], [po - 0.3, 1240, 560, 1.06, 1.2], [pq - 0.2, 960, 540, 1.0, 1.0]]}
+      <Cam keys={[[A3 - 0.3, 960, 560, 1.0], [dv, 960, 540, 1.0, 2.4], [sg - 0.3, 960, 540, 1.0, 1.0], [bo - 0.2, 720, 620, 1.12, 0.9], [la - 0.1, 720, 540, 1.12, 0.9], [so - 0.1, 720, 440, 1.12, 1.0], [ci - 0.3, 960, 540, 1.0, 1.0], [tr - 0.2, 1240, 540, 1.12, 1.0], [po - 0.3, 1240, 560, 1.06, 1.2], [pq - 0.2, 960, 540, 1.0, 1.0]]}
         punch={[sg + 0.3, bo + 0.2, cr + 0.3, po + 0.8]} calm={[[R1 - 0.6, R1 + 3.6]]}>
         <Draw draw={(ctx, tt, E) => {
           // plan « tableau » : Anyang vue du ciel (lavis), la caméra plonge vers la grande salle, l'estampage s'y pose
-          const im = IMG.anyang, ia = seg(tt, A3 - 0.3, A3 + 0.5) * (1 - seg(tt, dv + 0.1, dv + 0.9));
+          const im = IMG.anyang, ia = seg(tt, A3 - 0.3, A3 + 0.6) * (1 - seg(tt, dv + 0.1, dv + 0.9));
           if (im && ia > 0) {
             const k = ease(seg(tt, A3 - 0.3, dv + 0.9)), z = 1 + 1.3 * k;
             const cov = Math.max(1920 / im.width, 1080 / im.height), w = im.width * cov, h = im.height * cov;
@@ -554,6 +563,9 @@ const Shang: React.FC = () => {
             ctx.save(); ctx.globalAlpha = ia; ctx.translate(960 - 260 * k, 540 - 20 * k); ctx.scale(z, z); ctx.translate(-fx, -fy);
             ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore();
           }
+          // le lavis de la fin du bloc 2 se dissipe sur Anyang
+          const wsh = WASH * (1 - seg(tt, A3 - 0.3, A3 + 0.9));
+          if (wsh > 0) { ctx.fillStyle = `rgba(52,48,44,${wsh})`; ctx.fillRect(-200, -200, 2320, 1480); }
           // 言 de l'os : l'estampage se pose sur « le devin grave », le signe s'y révèle en blanc, puis passe à l'encre ; bouche, langue, son (vermillon) chacun sur son mot
           const ya = seg(tt, dv - 0.2, dv + 0.8) * (1 - seg(tt, R1 - 0.5, R1));
           const side = ease(seg(tt, ci - 0.2, ci + 0.8));
@@ -622,13 +634,13 @@ const Cloche: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Landscape seed={9} from={PL.debut - 0.5} to={B('b04') + 1} move="push" mood="jour" faint={0.5} />
-      <Cam keys={[[PL.debut, 960, 540, 1.0], [fl - 0.2, 960, 540, 1.0, 0.6], [ga - 0.3, 760, 400, 1.14, 1.0], [de - 0.2, 760, 660, 1.14, 1.0], [co - 0.2, 1120, 520, 1.12, 1.0], [re - 0.3, 960, 540, 1.02, 1.0]]} punch={[fl + 0.8, re + 0.2]} calm={[[R1 - 0.5, fl]]}>
+      <Cam keys={[[PL.debut, 960, 540, 1.0], [fl - 0.2, 960, 540, 1.0, 0.6], [ga - 0.3, 860, 470, 1.1, 1.0], [de - 0.2, 760, 660, 1.14, 1.0], [co - 0.2, 1120, 520, 1.12, 1.0], [re - 0.3, 960, 540, 1.02, 1.0]]} punch={[fl + 0.8, re + 0.2]} calm={[[R1 - 0.5, fl]]}>
         <Draw draw={(ctx, tt, E) => {
           const a = seg(tt, fl - 0.4, fl + 0.4) * (1 - seg(tt, B('b04') + 0.3, B('b04') + 0.9));
           if (a <= 0) return;
           // estampage de l'inscription, le signe révélé en blanc, puis passé à l'encre et aux pigments
           const ink = seg(tt, fl + 1.6, fl + 2.6);
-          rubbing(ctx, 960, 520, 820, 820, a * (1 - ink), 23);
+          rubbing(ctx, 960, 500, 780, 760, a * (1 - ink), 23);
           const pv = seg(tt, ga - 0.1, ga + 0.4), bw = seg(tt, de - 0.1, de + 0.4), cw = seg(tt, co - 0.1, co + 0.4);
           E.drawRealGlyph(ctx, 'yu_jinwen', { x: 960, y: 520, size: 700, reveal: () => seg(tt, fl, fl + 1.2), opacity: a,
             color: (c: string) => rgb(mixc(mixc([240, 233, 219], INK, ink), P[c], c === 'parole' ? pv : c === 'bouche' ? bw : cw)), glow: 26 * win(tt, re - 0.1, re + 1.2, 0.3), glowColor: 'rgba(246,241,231,0.9)' });
@@ -737,7 +749,7 @@ const Han: React.FC = () => {
       <Cam keys={[[A6 - 0.3, 960, 540, 1.0], [q0 - 0.2, 760, 540, 1.06, 1.0], [rp - 0.3, 600, 520, 1.1, 1.0], [dc - 0.2, 1200, 520, 1.1, 1.2], [tb - 0.3, 960, 540, 1.0, 1.0]]} punch={[rp + 0.2, dc + 0.3, pl + 0.6]}>
         <Draw draw={(ctx, tt, E) => {
           // deux lattes du Shuowen ; la phrase s'écrit caractère par caractère pendant la citation
-          const sa = seg(tt, di - 0.3, di + 0.5) * (1 - seg(tt, rp - 0.3, rp + 0.3));
+          const sa = seg(tt, A6 - 0.2, A6 + 0.8) * (1 - seg(tt, rp - 0.3, rp + 0.3));
           slip(ctx, 820, 110, 760, sa); slip(ctx, 960, 110, 760, sa);
           QUOTE.forEach((c, i) => {
             const t0 = q0 + (i * (q1 - q0)) / QUOTE.length, k = seg(tt, t0, t0 + 0.3);
@@ -765,11 +777,14 @@ const Han: React.FC = () => {
             const da = seg(tt, dc - 0.2, dc + 0.4);
             if (da > 0) {
               E.drawRealGlyph(ctx, 'yu_xiaozhuan', { x: 1320, y: 470, size: 520, opacity: ra * da, color: pig(1) });
-              // aller-retour entre les deux bouches (la parole et « moi »)
-              const ph = (tt - dc) / 1.1, f = 0.5 - 0.5 * Math.cos(ph * Math.PI);
-              const xa = 1210, xb = 1440, yy = 600;
-              ctx.save(); ctx.globalAlpha = ra * da; ctx.fillStyle = rgb(Math.floor(ph) % 2 ? AZ : VER);
-              ctx.beginPath(); ctx.arc(xa + (xb - xa) * f, yy - 70 * Math.sin(f * Math.PI), 13, 0, 7); ctx.fill(); ctx.restore();
+              // la parole fait l'aller-retour entre les deux bouches : une traînée qui passe sous le signe, vermillon à
+              // l'aller (言 → 吾), azurite au retour
+              const ph = Math.max(0, tt - dc) / 1.3, dir = Math.floor(ph) % 2, xa = 1190, xb = 1450, yy = 740;
+              for (let k = 0; k < 9; k++) {
+                const fk = 0.5 - 0.5 * Math.cos(clamp((ph % 1) * 1.15 - k * 0.025) * Math.PI), f = dir ? 1 - fk : fk;
+                ctx.save(); ctx.globalAlpha = ra * da * (1 - k / 9) * Math.sin(Math.PI * clamp((ph % 1) * 1.15)) ** 0.5; ctx.fillStyle = rgb(dir ? AZ : VER);
+                ctx.beginPath(); ctx.arc(xa + (xb - xa) * f, yy + 60 * Math.sin(f * Math.PI), 15 * (1 - k / 11), 0, 7); ctx.fill(); ctx.restore();
+              }
             }
           }
         }} />
@@ -780,12 +795,15 @@ const Han: React.FC = () => {
       <Label x={1320} y={880} zh="語" text="yǔ" color={VER} a={win(t, dc, tb - 0.4, 0.4)} align="center" />
       {/* le banquet silencieux : estampage (image recomposée), révélé sur « Voilà pourquoi on ne 語 pas à table » */}
       <Draw draw={(ctx, tt) => {
-        const a = win(tt, tb - 0.2, B('b06') + 0.4, 0.6), im = IMG.banquet;
-        if (a <= 0 || !im) return;
-        const z = 1 + 0.05 * seg(tt, tb, B('b06') + 0.4), w = 1320 * z, h = (im.height / im.width) * w;
-        ctx.save(); ctx.globalAlpha = a; ctx.shadowColor = 'rgba(30,20,10,0.4)'; ctx.shadowBlur = 40; ctx.drawImage(im, 1010 - w / 2, 520 - h / 2, w, h); ctx.restore();
+        const li = at('b06', 'lit');
+        ([[IMG.banquet, win(tt, tb - 0.2, li + 0.2, 0.6), tb, 1010, 1320], [IMG.nuit, win(tt, li - 0.2, B('b06') + 0.4, 0.6), li - 0.2, 960, 1180]] as [HTMLImageElement | undefined, number, number, number, number][]).forEach(([im, a, t0, x0, W]) => {
+          if (a <= 0 || !im) return;
+          const k = ease(seg(tt, t0, t0 + 6)), z = 1 + 0.1 * k, w = W * z, h = (im.height / im.width) * w;
+          ctx.save(); ctx.globalAlpha = a; ctx.shadowColor = 'rgba(30,20,10,0.4)'; ctx.shadowBlur = 40; ctx.drawImage(im, x0 - 30 * k - w / 2, 520 - h / 2, w, h); ctx.restore();
+        });
       }} />
-      <Caption text="banquet · estampage d'un relief de pierre (image recomposée)" a={win(t, tb + 0.4, B('b06') + 0.3, 0.4)} y={940} size={44} />
+      <Caption text="banquet · estampage d'un relief de pierre (image recomposée)" a={win(t, tb + 0.4, at('b06', 'lit'), 0.4)} y={940} size={44} />
+      <Caption text="寢不言 · « au lit, on ne parle pas »" a={win(t, at('b06', 'lit') + 0.2, B('b06') + 0.3, 0.4)} y={940} size={46} />
       <EraTag {...cartouche('han', "vers l'an 100 · le dictionnaire")} a={seg(t, A6 - 0.5, A6 + 0.3) * (1 - seg(t, tb - 0.3, tb + 0.2))} />
       {void li}
     </AbsoluteFill>
@@ -907,7 +925,7 @@ const Today: React.FC = () => {
         E.mapLayer(ctx, v, v, 120, 'yu_dial', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
         E.mapDeco(ctx, { paper: true });
         // grandes familles de dialectes (zones simplifiées, lavis doux), Pékin et Canton
-        const fam: [string, string, number[], [number, number], number][] = [['官話', 'mandarin', [120, 100, 80], [113, 36.5], 300], ['吳', 'wu', [52, 132, 98], [120.3, 30.6], 120], ['贛', 'gan', [176, 112, 52], [115.8, 27.9], 100], ['湘', 'xiang', [140, 90, 140], [111.8, 27.4], 100], ['客家', 'hakka', [90, 120, 160], [115.9, 24.6], 100], ['閩', 'min', [60, 110, 150], [118.4, 25.6], 120], ['粵', 'yue', [184, 52, 36], [112.8, 22.9], 130]];
+        const fam: [string, string, number[], [number, number], number][] = [['官話', 'mandarin', [120, 100, 80], [113, 36.5], 300], ['吳', 'wu', [52, 132, 98], [120.3, 30.6], 120], ['贛', 'gan', [176, 112, 52], [115.8, 27.9], 100], ['湘', 'xiang', [140, 90, 140], [111.8, 27.4], 100], ['客家', 'hakka', [90, 120, 160], [115.9, 24.6], 100], ['閩', 'min', [60, 110, 150], [118.4, 25.6], 120], ['粵', 'yue', [184, 52, 36], [110.4, 22.8], 130]];
         fam.forEach(([zh, fr, col, p, r], i) => {
           const a = seg(tt, mosEnd + i * 0.18, mosEnd + 0.5 + i * 0.18);
           if (a <= 0) return;
@@ -918,7 +936,7 @@ const Today: React.FC = () => {
         });
         E.marker(ctx, tt, v, [116.4, 39.9], 'Pékin', '', seg(tt, ec, ec + 0.4), '#c0392b', 1);
         E.marker(ctx, tt, v, [113.3, 23.1], 'Canton', '', seg(tt, ca - 0.3, ca + 0.1), '#c0392b', -1);
-        E.text(ctx, '汉语', 470, 200, { font: 'ShuimoKai', size: 110, color: inkCss, alpha: seg(tt, mosEnd, mosEnd + 0.5) });
+        E.text(ctx, '汉语', 330, 400, { font: 'ShuimoKai', size: 110, color: inkCss, alpha: seg(tt, mosEnd, mosEnd + 0.5) });
         void u;
       }} />
       <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={r3TagIn(R3B, t) * (1 - seg(t, pa - 0.6, pa - 0.1))} />
@@ -995,9 +1013,9 @@ const Recap: React.FC = () => {
       <Landscape seed={30} from={A9 - 1.5} to={END + 0.5} move="pan" mood="aube" faint={0.4} />
       <Cam keys={[[A9 - 0.3, 960, 540, 1.02], [fo - 0.4, 960, 520, 1.0, 1.0], [fa - 0.2, 960, 440, 1.06, 1.0], [mo - 0.4, 960, 540, 1.0, 1.0]]} punch={[at('b09', 'parole'), at('b09', 'cinq'), at('b09', 'bouche'), fa + 0.3, na]}>
         <Draw draw={(ctx, tt, E) => {
-          const syn = win(tt, A9 - 0.4, mo - 0.2, 0.6);
+          const syn = win(tt, A9 - 0.4, mo + 0.3, 0.6);
           if (syn > 0) drawBand(ctx, E, tt, syn);
-          const wa = seg(tt, mo - 0.2, mo + 0.4) * (1 - seg(tt, B('b09') + 0.3, B('b09') + 0.9));
+          const wa = seg(tt, mo - 0.5, mo + 0.2) * (1 - seg(tt, B('b09') + 0.3, B('b09') + 0.9));
           if (wa > 0) {
             E.drawStrokes(ctx, 'yu_kai', { x: 960, y: 380, size: 420, brush: false, color: pig(1), alpha: () => wa });
           }
@@ -1011,6 +1029,10 @@ const Recap: React.FC = () => {
             <div style={{ fontFamily: 'ShuimoLatin', fontSize: 48, fontWeight: 600, color: '#4b4038' }}>{fr}</div>
           </div>
         ))}
+      </div>
+      <div style={{ position: 'absolute', width: '100%', top: 900, textAlign: 'center', opacity: win(t, ch + 1.2, B('b09') + 0.6, 0.5) }}>
+        <span style={{ fontFamily: 'ShuimoKai', fontSize: 64, color: inkCss }}>自<span style={{ color: rgb(VER) }}>言</span>自<span style={{ color: rgb(VER) }}>語</span></span>
+        <span style={{ fontFamily: 'ShuimoLatin', fontSize: 46, fontWeight: 600, color: '#4b4038', marginLeft: 26 }}>zì yán zì yǔ · « parler tout seul »</span>
       </div>
     </AbsoluteFill>
   );
@@ -1044,7 +1066,7 @@ const Chute: React.FC = () => {
       <div style={{ position: 'absolute', left: 180, top: 260, opacity: win(t, A10 - 0.2, ma + 0.2, 0.6) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 240, color: inkCss, lineHeight: 1 }}>語</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 90, fontWeight: 600, color: inkCss }}>yǔ</div>
-        <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: rgb(VER) }}>14 traits · 语 9 traits</div>
+        <div style={{ fontFamily: 'ShuimoLatin', fontSize: 54, fontWeight: 600, color: rgb(VER) }}>14 traits · 语 9 traits</div>
       </div>
       <Caption text="師 · shī · le maître" a={win(t, ma + 0.3, ar, 0.4)} y={880} size={58} />
       <Caption text="à l'origine : une troupe en campagne (二千五百人為師)" a={win(t, ar + 0.2, END + 0.2, 0.4)} y={955} size={44} />

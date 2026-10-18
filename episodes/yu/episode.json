@@ -178,6 +178,7 @@
   }
  },
  "bruitages": [
+    ["goutte", "b01", null, -0.22, 0.5],
     ["goutte", "b01", "yu1", -0.05, 0.45],
     ["goutte", "b01", "yan1", -0.05, 0.45],
     ["pinceau", "b01", "precepte", 0.5, 0.3],
