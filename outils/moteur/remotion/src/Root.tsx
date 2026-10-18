@@ -11,7 +11,7 @@ import { INTRO_SECONDS, YuIntroEncre, YuIntroLaque, YuIntroOmbres } from './shui
 import { CARTES_GUIDES, CartesGuides } from './cartes/CartesGuides';
 import { EssaiPekin3D, PEKIN3D_SECONDS } from './cartes/Pekin3D';
 import { EssaiPekinPlat, PEKINPLAT_SECONDS } from './cartes/PekinPlat';
-import { EssaiTravelling, TRAVELLING_SECONDS } from './cartes/TravellingRelief';
+import { EssaiTravelling, TRAVELLING_SECONDS } from './cartes/TravellingSommets';
 import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
