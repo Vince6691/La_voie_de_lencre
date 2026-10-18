@@ -6,7 +6,7 @@
 //   → carte peinte Ming (大明混一圖) : la couleur se répand depuis les fleuves ;
 //   → atlas de Kangxi (Qing) : gravure au burin, puis le méridien de Pékin (中, méridien zéro de l'atlas) se grave en
 //     vermillon, les autres méridiens et parallèles en partent, et 京師 s'incise à leur croisement.
-// La caméra se recadre en douceur : Chang'an → Kaifeng → nord → Pékin.
+// La caméra zoome lentement vers Pékin, au rythme du compteur.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AbsoluteFill, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { carte } from './CartePeinte';
@@ -38,18 +38,17 @@ const T = {
 };
 const CARTES = { soie: 'chine_centre_nord', han: 'chine_centre_nord_mawangdui', song: 'chine_centre_nord_zhizhang', ming: 'chine_centre_nord_hunyi', qing: 'chine_centre_nord_kangxi' };
 
-// caméra : centre (px de carte) et zoom en fonction du chemin parcouru F, par une courbe d'Hermite monotone (pas
-// d'arrêt aux points de passage) ; après l'arrivée, très lente poussée
-const CAMK: [number, number, number, number][] = [[0, 960, 540, 1.0], [0.12, 900, 530, 1.1], [0.55, KF[0], 495, 1.4], [0.8, 1120, 360, 1.6], [1, BJ[0], 262, 2.0]];
-const hermite = (k: number, col: 1 | 2 | 3) => {
-  const xs = CAMK.map((r) => r[0]), ys = CAMK.map((r) => r[col]), n = xs.length;
-  const d = xs.slice(0, -1).map((x, i) => (ys[i + 1] - ys[i]) / (xs[i + 1] - x));
-  const m = ys.map((_, i) => (i === 0 ? d[0] : i === n - 1 ? d[n - 2] : d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2));
-  let i = 0; while (i < n - 2 && k > xs[i + 1]) i++;
-  const h = xs[i + 1] - xs[i], u = clamp((k - xs[i]) / h), u2 = u * u, u3 = u2 * u;
-  return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
+// caméra : un seul zoom lent vers Pékin, au rythme du compteur (F). On zoome « autour » de Pékin : son point à l'écran
+// glisse de sa place sur la carte entière vers le centre, pendant que le zoom passe de 1 à 2 ; après l'arrivée, très
+// lente poussée.
+const Z_FIN = 2.0, S_FIN: [number, number] = [960, 372]; // Pékin un peu au-dessus du centre : le haut de la carte reste dans le cadre
+const camera = (t: number) => {
+  const k = F(t), apres = ease(seg(t, ARRIVEE, AGES_SECONDS));
+  const z = lerp(1, Z_FIN, k) + 0.08 * apres;
+  const sx = lerp(BJ[0], S_FIN[0], k), sy = lerp(BJ[1], S_FIN[1], k) - 6 * apres;
+  // centre tel que Pékin tombe en (sx, sy) : sx = 960 + (BJ - cx) z
+  return { cx: BJ[0] - (sx - 960) / z, cy: BJ[1] - (sy - 540) / z, z };
 };
-const camera = (t: number) => { const k = F(t), apres = ease(seg(t, ARRIVEE, AGES_SECONDS)); return { cx: hermite(k, 1), cy: hermite(k, 2) - 8 * apres, z: hermite(k, 3) + 0.08 * apres }; };
 
 // légendes des cartes (cartouche en bas à gauche)
 const LEGENDES: [number, number, string, string][] = [
