@@ -53,7 +53,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', anyang: 'episodes/yu/images/anyang_ciel.jpg', ombres: 'episodes/yu/images/ombres_conseillers.jpg' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', anyang: 'episodes/yu/images/anyang_ciel.jpg', ombres: 'episodes/yu/images/ombres_conseillers.jpg', dial: 'episodes/yu/images/carte_dialectes_peinte.jpg' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -1021,8 +1021,12 @@ const Today: React.FC = () => {
       <Caption text="法 fǎ : la loi… et le « Fa » de France 法蘭西" a={win(t, li + 0.2, ri + 0.3, 0.4)} y={110} size={44} />
       <MapPanel from={mosEnd - 0.6} to={B('b08') + 0.6} draw={(ctx, u, E, tt) => {
         const v = { lon: 112.0, lat: 30.0, k: 40 };
-        E.mapLayer(ctx, v, v, 120, 'yu_dial', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
-        E.mapDeco(ctx, { paper: true });
+        // carte peinte sur soie (images/carte_dialectes_peinte.jpg, repeinte sur l'image-guide au même cadrage) ; lente avancée
+        // qui emporte aussi les lavis des dialectes, les noms et les repères
+        const z = 1 + 0.06 * ease(seg(tt, mosEnd - 0.6, B('b08') + 0.6));
+        ctx.translate(960, 560); ctx.scale(z, z); ctx.translate(-960, -560);
+        if (IMG.dial) { ctx.drawImage(IMG.dial, 0, 0, 1920, 1080); E.text(ctx, 'carte peinte d’après Natural Earth', 1880, 1046, { font: 'Cormorant', size: 22, weight: 600, color: 'rgba(60,48,36,0.7)', align: 'right' }); }
+        else { E.mapLayer(ctx, v, v, 120, 'yu_dial', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false })); E.mapDeco(ctx, { paper: true }); }
         // grandes familles de dialectes (zones simplifiées, lavis doux), Pékin et Canton
         const fam: [string, string, number[], [number, number], number][] = [['官話', 'mandarin', [120, 100, 80], [113, 36.5], 300], ['吳', 'wu', [52, 132, 98], [120.3, 30.6], 120], ['贛', 'gan', [176, 112, 52], [115.8, 27.9], 100], ['湘', 'xiang', [140, 90, 140], [111.8, 27.4], 100], ['客家', 'hakka', [90, 120, 160], [115.9, 24.6], 100], ['閩', 'min', [60, 110, 150], [118.4, 25.6], 120], ['粵', 'yue', [184, 52, 36], [110.4, 22.8], 130]];
         fam.forEach(([zh, fr, col, p, r], i) => {
