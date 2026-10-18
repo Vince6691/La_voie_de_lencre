@@ -45,6 +45,7 @@ const mixc = (a: number[], b: number[], k: number) => a.map((v, i) => Math.round
 const inkCss = rgb(INK);
 // pigments constants : la parole en vermillon, le cinq en malachite, la bouche de 吾 en azurite
 const VER = PIGMENT.hand, MAL = PIGMENT.roof, AZ = PIGMENT.child;
+const GOLD = [184, 140, 58]; // halo d'or de l'accroche (語 et 言 détachés, « interdits »)
 const GREY = [168, 160, 150], OCRE = [176, 112, 52];
 const P: Record<string, number[]> = { parole: VER, trait: VER, langue: VER, cinq: MAL, bouche: AZ };
 // couleur d'une composante : k = 0 encre, 1 pigment
@@ -356,7 +357,6 @@ const brushAt = (E: any, tt: number, w0: number, qEnd: number): { tip: number[];
   return null;
 };
 // grossissement de la vue macro (on ne voit qu'un fragment de caractère)
-const MACRO = 6;
 // tache d'encre qui éclate à l'impact d'une goutte : cœur sombre, gouttelettes projetées, lavis qui boit le papier
 const splash = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number, tt: number, r0 = 150, seed = 1) => {
   const u = tt - t0;
@@ -378,7 +378,7 @@ const splash = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number,
 const slash = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, p: number, a: number) => {
   if (p <= 0 || a <= 0) return;
   const x0 = x - s, y0 = y - s * 0.75, x1 = x + s, y1 = y + s * 0.75, n = 40, L = Math.round(n * p);
-  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = rgb(VER, 0.9);
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = rgb(INK, 0.82); ctx.shadowColor = rgb(GOLD, 0.6); ctx.shadowBlur = 18;
   const pts: number[][] = [];
   for (let i = 0; i <= L; i++) { const f = i / n, w = 30 * Math.sin(Math.PI * Math.min(1, f * 1.15 + 0.08)) * (f < 0.1 ? 0.6 + 4 * f : 1); pts.push([x0 + (x1 - x0) * f, y0 + (y1 - y0) * f + 6 * Math.sin(f * 5), w]); }
   const nx = -(y1 - y0), ny = x1 - x0, nl = Math.hypot(nx, ny);
@@ -431,19 +431,14 @@ const Opening: React.FC = () => {
             E.drawStrokes(ctx, 'yu_kai', { x: 640, y: 470, size: 460, progress: 14 * seg(tt, y1, y1 + 0.9), brush: false, color: pig(0), alpha: () => pair });
             E.drawStrokes(ctx, 'yu_yan_kai', { x: 1280, y: 470, size: 460, progress: 7 * seg(tt, n1, n1 + 0.7), brush: false, color: pig(0), alpha: () => pair });
           }
-          // 3. le diptyque se révèle (lavis depuis le centre) ; le pinceau écrit le précepte, caméra collée à la pointe
-          // vue macro (dans le dessin, nette) : on plonge sur la pointe du pinceau, on la suit, puis grand dézoom sur la phrase
-          const w0m = pr + 0.5;
-          const zin = ease(seg(tt, w0m - 0.9, w0m + 0.2)), zout = ease(seg(tt, wEnd - 0.2, wEnd + 1.6));
-          const Z = 1 + (MACRO - 1) * zin * (1 - zout);
-          let mc = [960, 460];
-          if (Z > 1.001) {
-            const pts = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0].map((d) => brushAt(E, Math.min(Math.max(tt - d, w0m + 0.01), wEnd - 0.02), w0m, wEnd)?.tip).filter(Boolean) as number[][];
-            const c0 = pts.length ? [pts.reduce((s, q) => s + q[0], 0) / pts.length, pts.reduce((s, q) => s + q[1], 0) / pts.length - 20] : [PCHAR(0).x, PCHAR(0).y];
-            const k = zin * (1 - zout);
-            mc = [960 + (c0[0] - 960) * k, 460 + (c0[1] - 460) * k];
-          }
-          ctx.save(); ctx.translate(960, 540); ctx.scale(Z, Z); ctx.translate(-mc[0], -mc[1] + 0 * 80);
+          // 3. le diptyque se révèle (lavis depuis le centre) ; le précepte s'écrit trait par trait. Caméra en trois temps :
+          // gros plan fixe sur le panneau du jour (食不語), travelling rapide vers la nuit (寢不言), puis recul sur la phrase
+          const w0m = pr + 0.5, SL0 = charSlots(w0m, wEnd), tN = SL0[3][0];
+          const zi = ease(seg(tt, w0m - 0.7, w0m)), zo = ease(seg(tt, wEnd, wEnd + 1.3)), tv = ease(seg(tt, tN - 0.3, tN + 0.25));
+          const Z = 1 + 0.9 * zi * (1 - zo);
+          const fx = 640 + (1400 - 640) * tv, fy = 447 + 8 * seg(tt, w0m, wEnd);
+          const mc = [960 + (fx - 960) * zi * (1 - zo), 460 + (fy - 460) * zi * (1 - zo)];
+          ctx.save(); ctx.translate(960, 540); ctx.scale(Z, Z); ctx.translate(-mc[0], -mc[1]);
           const da = seg(tt, pr - 0.1, pr + 0.9) * (1 - seg(tt, it - 0.3, it + 0.5)) * (1 - 0.55 * seg(tt, tb - 0.1, tb + 0.7));
           if (da > 0) {
             PANELS.forEach((pn, k) => {
@@ -491,7 +486,7 @@ const Opening: React.FC = () => {
             const pulse = 1 + 0.12 * win(tt, hit, hit + 0.5, 0.15) + 0.14 * win(tt, talk, talk + 0.6, 0.15);
             const glow = 30 * win(tt, t0 + 0.3, t0 + 1.6, 0.4) + 26 * win(tt, talk, talk + 0.8, 0.2);
             ctx.save(); ctx.globalAlpha = 1 - out;
-            E.drawStrokes(ctx, i === 0 ? 'yu_kai' : 'yu_yan_kai', { x, y, size: s * pulse, brush: false, color: () => rgb(mixc(INK, VER, seg(tt, t0, t0 + 0.6))), glow, glowColor: rgb(VER, 0.55) });
+            E.drawStrokes(ctx, i === 0 ? 'yu_kai' : 'yu_yan_kai', { x, y, size: s * pulse, brush: false, color: () => inkCss, glow: glow * 1.3, glowColor: rgb(GOLD, 0.75) });
             ctx.restore();
             // « On interdit l'un ici, l'autre là »
             const st = i === 0 ? it + 0.15 : au;
