@@ -1,0 +1,41 @@
+{
+  "types": {
+    "soie_song": {
+      "nom": "Carte peinte sur soie, manière Song",
+      "description": "Fond de carte sans texte, repeint par Nano Banana sur une image-guide (côtes, lacs, fleuves Natural Earth) au cadrage exact de la vue : soie ocre, mer en lavis bleu-gris avec vagues stylisées, montagnes en petits pics bleu-vert, fleuves à l'indigo. Les noms, cachets, routes et régions sont dessinés par-dessus dans Remotion, à la même projection.",
+      "prompt": "Repaint this map exactly, keeping every coastline, island, lake and river at the same position and the same shape, and the same framing (it is a geographic guide; do not move, add or remove land or water).\nStyle: an antique Chinese map painted on aged silk, in the manner of a Song dynasty scroll: the land in warm pale ochre and cream silk with fine fibres and soft creases; the sea as broad blue-grey ink washes with delicate stylised wave lines (fine parallel brush curves) near the coasts; mountain ranges painted as small rows of grey-green ink peaks in the traditional \"blue-green landscape\" manner with light azurite and malachite touches, following the darker relief areas of the guide; rivers as thin flowing lines of indigo ink, slightly darker where they are wide; lakes as small blue washes. Light vignette, gentle stains of age at the edges, a few faded old collector's seals in the extreme corners only.\nNo text, no labels, no characters, no modern borders, no grid, no compass, no frame. Keep the centre of the land calm and readable (labels will be added on top)."
+    }
+  },
+  "cartes": [
+    {
+      "id": "chine_centre_nord",
+      "type": "soie_song",
+      "titre": "Chine du Nord et plaine centrale",
+      "legende": "Le bassin du fleuve Jaune et la plaine centrale, du lac Qinghai à la péninsule coréenne, du coude de l'Ordos au cours moyen du Yangzi. Cœur des royaumes Shang, Zhou, des Royaumes combattants et des Han (Chang'an, Luoyang, Linzi, Handan, Anyang au centre du cadre).",
+      "vue": { "lon": 112.5, "lat": 34.2, "k": 52 },
+      "emprise": { "ouest": 94.0, "est": 131.0, "sud": 25.4, "nord": 43.0 },
+      "peinte": "peintes/chine_centre_nord.jpg",
+      "guide": "guides/chine_centre_nord.jpg",
+      "taille": [2752, 1536],
+      "contenu": "côtes, îles, lacs, fleuve Jaune (cours actuel, vers le golfe du Bohai), Wei, Fen, Han, Yangzi moyen, reliefs (Qinling, Taihang, Yinshan) ; aucune frontière",
+      "credit": "carte peinte d’après Natural Earth",
+      "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
+      "episodes": [{ "episode": "yu", "usage": "bloc 7 : les parlers cités par Yang Xiong (方言) convergent vers Chang'an" }]
+    },
+    {
+      "id": "chine_centre_sud",
+      "type": "soie_song",
+      "titre": "Chine centrale et méridionale",
+      "legende": "La Chine des fleuves, du fleuve Jaune à l'île de Hainan, du plateau tibétain à Taïwan et au sud du Japon. Cadrage des dialectes chinois (mandarin, wu, gan, xiang, hakka, min, yue), de Pékin à Canton.",
+      "vue": { "lon": 112.0, "lat": 30.0, "k": 40 },
+      "emprise": { "ouest": 88.0, "est": 136.0, "sud": 18.6, "nord": 41.4 },
+      "peinte": "peintes/chine_centre_sud.jpg",
+      "guide": "guides/chine_centre_sud.jpg",
+      "taille": [2752, 1536],
+      "contenu": "côtes, îles (Taïwan, Hainan), lacs (Dongting, Poyang, Tai), fleuve Jaune, Yangzi, rivière des Perles, reliefs ; aucune frontière",
+      "credit": "carte peinte d’après Natural Earth",
+      "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
+      "episodes": [{ "episode": "yu", "usage": "bloc 8 : familles de dialectes d'aujourd'hui, Pékin et Canton" }]
+    }
+  ]
+}

@@ -1,18 +1,19 @@
-// 語 — images-guides des deux cartes (pour la carte premium peinte) : côtes et fleuves seuls, exactement au cadrage des
-// cartes de la vidéo. Image 0 : les parlers Han (YangXiong) ; image 1 : les dialectes d'aujourd'hui (Today).
+// Images-guides des cartes peintes (skill carte-peinte) : côtes, lacs et fleuves seuls, au cadrage exact de chaque vue du
+// catalogue (assets/cartes/cartes.json). Image n = carte n du catalogue ; à joindre à Nano Banana avec le prompt du type.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AbsoluteFill, continueRender, delayRender, useCurrentFrame } from 'remotion';
 import { loadLegacy, W } from '../legacy';
+import catalogue from '../data/cartes.json';
 
-const VUES = [{ lon: 112.5, lat: 34.2, k: 52 }, { lon: 112.0, lat: 30.0, k: 40 }];
-export const YuCarteGuide: React.FC = () => {
+export const CARTES_GUIDES = catalogue.cartes.length;
+export const CartesGuides: React.FC = () => {
   const f = useCurrentFrame(), ref = useRef<HTMLCanvasElement>(null);
   const [h] = useState(() => delayRender('moteur'));
   const [ready, setReady] = useState(false);
   useEffect(() => { loadLegacy({ three: false, captions: false }).then(() => { setReady(true); continueRender(h); }); }, [h]);
   useLayoutEffect(() => {
     if (!ready || !ref.current) return;
-    const ctx = ref.current.getContext('2d')!, E = W().E, v = VUES[Math.min(f, 1)];
+    const ctx = ref.current.getContext('2d')!, E = W().E, v = catalogue.cartes[Math.min(f, CARTES_GUIDES - 1)].vue;
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 1920, 1080);
     E.drawMap(ctx, 0, v, { paper: false, rivers: 1, deco: false });
   });

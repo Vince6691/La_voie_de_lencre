@@ -26,7 +26,7 @@ ligne de temps `_ligne` du fichier de repères au lieu de recalculer les temps),
 déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce schéma dès leur arrivée. (Le 學, épisode
 pilote, est maintenant rangé de la même façon dans `episodes/xue/`.)
 
-Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `rouleau-3d` (rouleau 3D signature, une fois par vidéo ; cartouches d'époque toujours tirés de `src/periodes.ts`), `mosaique-de-mots` (transition : les mots qui dessinent le caractère), `coup-de-pinceau`, `encre-3d`,
+Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `rouleau-3d` (rouleau 3D signature, une fois par vidéo ; cartouches d'époque toujours tirés de `src/periodes.ts`), `mosaique-de-mots` (transition : les mots qui dessinent le caractère), `carte-peinte` (cartes premium peintes, bibliothèque partagée : chercher d'abord une carte existante), `coup-de-pinceau`, `encre-3d`,
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
 
 ## Principes
@@ -167,7 +167,7 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
 
 ## Pièges techniques rencontrés
 - Rendu complet : une tâche de fond est coupée à 2 h → `outils/video_shuimo/rendu_morceaux.sh` (bundle, morceaux de 3000 images ≈ 45 min chacun, puis assembler : bande son par ffmpeg via bande_son.py, sans rendu). Bruitages : liste `bruitages` d'episode.json (une seule source pour la composition et le mixage).
-- Cartes : ne jamais appeler `E.drawMap` à chaque image (5–6 s/image en rendu logiciel). Utiliser `E.mapLayer(ctx, v, vb, kmax, clé, dessin, alpha)` (fond dessiné une fois, puis agrandi) + `E.mapDeco` ; régions dans une couche à part dont on anime `alpha` ; modèle : cartes de `JiaoV1`.
+- Cartes : ne jamais appeler `E.drawMap` à chaque image (5–6 s/image en rendu logiciel). Utiliser `E.mapLayer(ctx, v, vb, kmax, clé, dessin, alpha)` (fond dessiné une fois, puis agrandi) + `E.mapDeco` ; régions dans une couche à part dont on anime `alpha` ; modèle : cartes de `JiaoV1`. Version premium : skill `carte-peinte` (fond peint de la bibliothèque `assets/cartes`, noms en fangsong).
 - Moteur Canvas (`loadLegacy`) : ne rendre les composants qu'une fois chargé (`ready`), dessiner en
   `useLayoutEffect` ; `drawStrokes` respecte l'opacité de l'appelant (`ctx.globalAlpha`).
 - Vidéo dans un canvas (`onVideoFrame`) : retenir la capture jusqu'au premier dessin (`delayRender`), sinon images

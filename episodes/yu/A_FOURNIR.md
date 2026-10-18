@@ -172,10 +172,10 @@ Cinematic still, 16:9. Two traditional Chinese red paper-cut (jianzhi) silhouett
 No text, no calligraphy, no seal, no signature, no frame.
 ```
 
-## 9. Carte premium (cartes des blocs 7 et 8) — dialectes FAIT (`images/carte_dialectes_peinte.jpg`) ; Han FAIT (`images/carte_han_peinte.jpg`)
+## 9. Carte premium (cartes des blocs 7 et 8) — FAIT, rangées dans la bibliothèque partagée `outils/moteur/assets/cartes/` (`chine_centre_sud`, `chine_centre_nord` ; skill `carte-peinte`)
 Une carte **peinte**, posée sous les marqueurs, régions et routes (projetés au même cadrage). Pour que la géographie
 reste exacte, **joindre l'image-guide** à Nano Banana (mode édition / image de référence), une génération par carte :
-`images/guides/guide_carte_han.jpg` puis `images/guides/guide_carte_dialectes.jpg`. 16:9, ≥ 1920 × 1080.
+`outils/moteur/assets/cartes/guides/chine_centre_nord.jpg` puis `.../chine_centre_sud.jpg`. 16:9, ≥ 1920 × 1080.
 ```
 Repaint this map exactly, keeping every coastline, island, lake and river at the same position and the same shape, and the same framing (it is a geographic guide; do not move, add or remove land or water).
 Style: an antique Chinese map painted on aged silk, in the manner of a Song dynasty scroll: the land in warm pale ochre and cream silk with fine fibres and soft creases; the sea as broad blue-grey ink washes with delicate stylised wave lines (fine parallel brush curves) near the coasts; mountain ranges painted as small rows of grey-green ink peaks in the traditional "blue-green landscape" manner with light azurite and malachite touches, following the darker relief areas of the guide; rivers as thin flowing lines of indigo ink, slightly darker where they are wide; lakes as small blue washes. Light vignette, gentle stains of age at the edges, a few faded old collector's seals in the extreme corners only.
