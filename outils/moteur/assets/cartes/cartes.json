@@ -4,6 +4,21 @@
       "nom": "Carte peinte sur soie, manière Song",
       "description": "Fond de carte sans texte, repeint par Nano Banana sur une image-guide (côtes, lacs, fleuves Natural Earth) au cadrage exact de la vue : soie ocre, mer en lavis bleu-gris avec vagues stylisées, montagnes en petits pics bleu-vert, fleuves à l'indigo. Les noms, cachets, routes et régions sont dessinés par-dessus dans Remotion, à la même projection.",
       "prompt": "Repaint this map exactly, keeping every coastline, island, lake and river at the same position and the same shape, and the same framing (it is a geographic guide; do not move, add or remove land or water).\nStyle: an antique Chinese map painted on aged silk, in the manner of a Song dynasty scroll: the land in warm pale ochre and cream silk with fine fibres and soft creases; the sea as broad blue-grey ink washes with delicate stylised wave lines (fine parallel brush curves) near the coasts; mountain ranges painted as small rows of grey-green ink peaks in the traditional \"blue-green landscape\" manner with light azurite and malachite touches, following the darker relief areas of the guide; rivers as thin flowing lines of indigo ink, slightly darker where they are wide; lakes as small blue washes. Light vignette, gentle stains of age at the edges, a few faded old collector's seals in the extreme corners only.\nNo text, no labels, no characters, no modern borders, no grid, no compass, no frame. Keep the centre of the land calm and readable (labels will be added on top)."
+    },
+    "soie_han": {
+      "nom": "Carte Han sur soie (Mawangdui)",
+      "description": "D'après la carte topographique de Mawangdui (168 av. J.-C.) : soie brune usée aux plis, fleuves à l'encre qui s'épaississent vers l'aval, montagnes en contours ondulés hachurés « en écailles », touches d'ocre rouge et d'indigo.",
+      "prompt": "Style: a Han dynasty topographic map painted on silk, like the map excavated at Mawangdui (168 BC): faded brownish-beige silk, worn and slightly torn along old fold lines; rivers as bold dark ink lines that clearly widen downstream; mountain areas drawn as closed wavy ink outlines filled with fine parallel hatching like fish scales; very flat and diagrammatic, no shading, no perspective; sparse touches of faded red ochre and indigo; the sea as a flat pale area with a simple ink coastline."
+    },
+    "xylographie_song": {
+      "nom": "Atlas Song imprimé (歷代地理指掌圖)",
+      "description": "D'après le plus ancien atlas imprimé connu (v. 1100) : encre noire imprimée d'une planche de bois sur papier de mûrier jauni, fleuves à double trait, rangées de petits pics, mer couverte de vagues gravées.",
+      "prompt": "Style: a page from a Northern Song woodblock-printed atlas, like the Lidai dili zhizhang tu (around 1100): black ink printed from a carved wooden block on thin, slightly yellowed mulberry paper; coastlines and rivers as firm black lines, the larger rivers drawn as double lines; mountain ranges as neat rows of small pointed peaks; the sea filled with regular engraved wave lines; slight ink spread and the faint grain of the wood block in the solid areas; no colour."
+    },
+    "cuivre_qing": {
+      "nom": "Atlas de Kangxi gravé sur cuivre (皇輿全覽圖)",
+      "description": "D'après l'atlas levé par les jésuites (1718) : gravure fine sur papier vergé crème, côtes soulignées de hachures horizontales, petites collines hachurées, lavis pâles. Méridiens et parallèles dessinés par le moteur (méridien zéro de l'atlas : Pékin).",
+      "prompt": "Style: a copperplate engraving from the Kangxi atlas of 1718, surveyed by Jesuit cartographers: fine black engraved lines on cream laid paper; coastlines outlined with fine horizontal hatching offshore; rivers as thin single or double lines; mountains as small engraved hachured hills seen in profile, grouped along the ranges; very light hand-coloured washes of pale green along the coasts and pale ochre on the land."
     }
   },
   "cartes": [
@@ -12,47 +27,194 @@
       "type": "soie_song",
       "titre": "Chine du Nord et plaine centrale",
       "legende": "Le bassin du fleuve Jaune et la plaine centrale, du lac Qinghai à la péninsule coréenne, du coude de l'Ordos au cours moyen du Yangzi. Cœur des royaumes Shang, Zhou, des Royaumes combattants et des Han (Chang'an, Luoyang, Linzi, Handan, Anyang au centre du cadre).",
-      "vue": { "lon": 112.5, "lat": 34.2, "k": 52 },
-      "emprise": { "ouest": 94.0, "est": 131.0, "sud": 25.4, "nord": 43.0 },
+      "vue": {
+        "lon": 112.5,
+        "lat": 34.2,
+        "k": 52
+      },
+      "emprise": {
+        "ouest": 94.0,
+        "est": 131.0,
+        "sud": 25.4,
+        "nord": 43.0
+      },
       "peinte": "peintes/chine_centre_nord.jpg",
       "guide": "guides/chine_centre_nord.jpg",
       "sommets": "sommets/chine_centre_nord.json",
-      "taille": [2752, 1536],
+      "taille": [
+        2752,
+        1536
+      ],
       "contenu": "côtes, îles, lacs, fleuve Jaune (cours actuel, vers le golfe du Bohai), Wei, Fen, Han, Yangzi moyen, reliefs (Qinling, Taihang, Yinshan) ; aucune frontière",
       "credit": "carte peinte d’après Natural Earth",
       "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
-      "episodes": [{ "episode": "yu", "usage": "bloc 7 : les parlers cités par Yang Xiong (方言) convergent vers Chang'an" }]
+      "episodes": [
+        {
+          "episode": "yu",
+          "usage": "bloc 7 : les parlers cités par Yang Xiong (方言) convergent vers Chang'an"
+        }
+      ]
     },
     {
       "id": "chine_centre_sud",
       "type": "soie_song",
       "titre": "Chine centrale et méridionale",
       "legende": "La Chine des fleuves, du fleuve Jaune à l'île de Hainan, du plateau tibétain à Taïwan et au sud du Japon. Cadrage des dialectes chinois (mandarin, wu, gan, xiang, hakka, min, yue), de Pékin à Canton.",
-      "vue": { "lon": 112.0, "lat": 30.0, "k": 40 },
-      "emprise": { "ouest": 88.0, "est": 136.0, "sud": 18.6, "nord": 41.4 },
+      "vue": {
+        "lon": 112.0,
+        "lat": 30.0,
+        "k": 40
+      },
+      "emprise": {
+        "ouest": 88.0,
+        "est": 136.0,
+        "sud": 18.6,
+        "nord": 41.4
+      },
       "peinte": "peintes/chine_centre_sud.jpg",
       "guide": "guides/chine_centre_sud.jpg",
       "sommets": "sommets/chine_centre_sud.json",
-      "taille": [2752, 1536],
+      "taille": [
+        2752,
+        1536
+      ],
       "contenu": "côtes, îles (Taïwan, Hainan), lacs (Dongting, Poyang, Tai), fleuve Jaune, Yangzi, rivière des Perles, reliefs ; aucune frontière",
       "credit": "carte peinte d’après Natural Earth",
       "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
-      "episodes": [{ "episode": "yu", "usage": "bloc 8 : familles de dialectes d'aujourd'hui, Pékin et Canton" }]
+      "episodes": [
+        {
+          "episode": "yu",
+          "usage": "bloc 8 : familles de dialectes d'aujourd'hui, Pékin et Canton"
+        }
+      ]
     },
     {
       "id": "pekin_detail",
       "type": "soie_song",
       "titre": "Pékin et le golfe du Bohai (carte de détail)",
       "legende": "Carte de détail, trois fois plus grande que chine_centre_nord : la plaine de Pékin entre les monts Yan au nord et les Taihang à l'ouest, le golfe du Bohai, le nord du Shandong. Sert d'arrivée nette aux travellings vers Pékin (fondu depuis chine_centre_nord, même projection).",
-      "vue": { "lon": 116.6, "lat": 39.6, "k": 156 },
-      "emprise": { "ouest": 110.45, "est": 122.75, "sud": 36.67, "nord": 42.53 },
+      "vue": {
+        "lon": 116.6,
+        "lat": 39.6,
+        "k": 156
+      },
+      "emprise": {
+        "ouest": 110.45,
+        "est": 122.75,
+        "sud": 36.67,
+        "nord": 42.53
+      },
       "peinte": "peintes/pekin_detail.jpg",
       "guide": "guides/pekin_detail.jpg",
-      "taille": [2752, 1536],
+      "taille": [
+        2752,
+        1536
+      ],
       "contenu": "côtes du Bohai, fleuve Jaune (cours actuel), Yongding, Hai he, Grand Canal (tracé schématique), monts Yan et Taihang ; aucune frontière",
       "credit": "carte peinte d’après Natural Earth",
       "sources": "Natural Earth 10m/50m (domaine public) ; à repeindre par Nano Banana",
-      "episodes": [{ "episode": "yu", "usage": "transition Han → Qing : arrivée du travelling à Pékin, sceau 京師" }]
+      "episodes": [
+        {
+          "episode": "yu",
+          "usage": "transition Han → Qing : arrivée du travelling à Pékin, sceau 京師"
+        }
+      ]
+    },
+    {
+      "id": "chine_centre_nord_mawangdui",
+      "type": "soie_han",
+      "titre": "Chine du Nord — carte Han (Mawangdui)",
+      "legende": "Le bassin du fleuve Jaune et la plaine centrale, du lac Qinghai à la péninsule coréenne, du coude de l'Ordos au cours moyen du Yangzi. Cœur des royaumes Shang, Zhou, des Royaumes combattants et des Han (Chang'an, Luoyang, Linzi, Handan, Anyang au centre du cadre).",
+      "vue": {
+        "lon": 112.5,
+        "lat": 34.2,
+        "k": 52
+      },
+      "emprise": {
+        "ouest": 94.0,
+        "est": 131.0,
+        "sud": 25.4,
+        "nord": 43.0
+      },
+      "peinte": "peintes/chine_centre_nord_mawangdui.jpg",
+      "guide": "guides/chine_centre_nord.jpg",
+      "taille": [
+        2752,
+        1536
+      ],
+      "contenu": "côtes, îles, lacs, fleuve Jaune (cours actuel, vers le golfe du Bohai), Wei, Fen, Han, Yangzi moyen, reliefs (Qinling, Taihang, Yinshan) ; aucune frontière",
+      "credit": "carte peinte d’après Natural Earth",
+      "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
+      "episodes": [
+        {
+          "episode": "yu",
+          "usage": "transition Han → Qing : la carte traverse les âges"
+        }
+      ]
+    },
+    {
+      "id": "chine_centre_nord_zhizhang",
+      "type": "xylographie_song",
+      "titre": "Chine du Nord — atlas Song imprimé",
+      "legende": "Le bassin du fleuve Jaune et la plaine centrale, du lac Qinghai à la péninsule coréenne, du coude de l'Ordos au cours moyen du Yangzi. Cœur des royaumes Shang, Zhou, des Royaumes combattants et des Han (Chang'an, Luoyang, Linzi, Handan, Anyang au centre du cadre).",
+      "vue": {
+        "lon": 112.5,
+        "lat": 34.2,
+        "k": 52
+      },
+      "emprise": {
+        "ouest": 94.0,
+        "est": 131.0,
+        "sud": 25.4,
+        "nord": 43.0
+      },
+      "peinte": "peintes/chine_centre_nord_zhizhang.jpg",
+      "guide": "guides/chine_centre_nord.jpg",
+      "taille": [
+        2752,
+        1536
+      ],
+      "contenu": "côtes, îles, lacs, fleuve Jaune (cours actuel, vers le golfe du Bohai), Wei, Fen, Han, Yangzi moyen, reliefs (Qinling, Taihang, Yinshan) ; aucune frontière",
+      "credit": "carte peinte d’après Natural Earth",
+      "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
+      "episodes": [
+        {
+          "episode": "yu",
+          "usage": "transition Han → Qing : la carte traverse les âges"
+        }
+      ]
+    },
+    {
+      "id": "chine_centre_nord_kangxi",
+      "type": "cuivre_qing",
+      "titre": "Chine du Nord — atlas de Kangxi",
+      "legende": "Le bassin du fleuve Jaune et la plaine centrale, du lac Qinghai à la péninsule coréenne, du coude de l'Ordos au cours moyen du Yangzi. Cœur des royaumes Shang, Zhou, des Royaumes combattants et des Han (Chang'an, Luoyang, Linzi, Handan, Anyang au centre du cadre).",
+      "vue": {
+        "lon": 112.5,
+        "lat": 34.2,
+        "k": 52
+      },
+      "emprise": {
+        "ouest": 94.0,
+        "est": 131.0,
+        "sud": 25.4,
+        "nord": 43.0
+      },
+      "peinte": "peintes/chine_centre_nord_kangxi.jpg",
+      "guide": "guides/chine_centre_nord.jpg",
+      "taille": [
+        2752,
+        1536
+      ],
+      "contenu": "côtes, îles, lacs, fleuve Jaune (cours actuel, vers le golfe du Bohai), Wei, Fen, Han, Yangzi moyen, reliefs (Qinling, Taihang, Yinshan) ; aucune frontière",
+      "credit": "carte peinte d’après Natural Earth",
+      "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
+      "episodes": [
+        {
+          "episode": "yu",
+          "usage": "transition Han → Qing : la carte traverse les âges"
+        }
+      ]
     }
   ]
 }
