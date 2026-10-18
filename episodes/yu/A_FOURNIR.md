@@ -181,3 +181,29 @@ Repaint this map exactly, keeping every coastline, island, lake and river at the
 Style: an antique Chinese map painted on aged silk, in the manner of a Song dynasty scroll: the land in warm pale ochre and cream silk with fine fibres and soft creases; the sea as broad blue-grey ink washes with delicate stylised wave lines (fine parallel brush curves) near the coasts; mountain ranges painted as small rows of grey-green ink peaks in the traditional "blue-green landscape" manner with light azurite and malachite touches, following the darker relief areas of the guide; rivers as thin flowing lines of indigo ink, slightly darker where they are wide; lakes as small blue washes. Light vignette, gentle stains of age at the edges, a few faded old collector's seals in the extreme corners only.
 No text, no labels, no characters, no modern borders, no grid, no compass, no frame. Keep the centre of the land calm and readable (labels will be added on top).
 ```
+
+## 10. Pékin sur la carte (transition Han → Qing) — essai « images plates », à fournir
+Quatre éléments peints, posés debout sur la carte en perspective : la muraille sort de terre, les tours et la salle
+tombent du ciel. Nano Banana, une image par élément, **fond magenta uni** (je le détoure ; aucune couleur de ce type dans
+l'architecture). À déposer dans `images/` sous les noms indiqués. Même bloc de style pour les quatre :
+```
+Style: Qing court "ruled-line" architectural painting (jiehua), as in the Kangxi Southern Inspection Tour scroll: precise fine ink outlines drawn with a ruler, flat mineral colours on aged silk (grey-blue brick, vermilion columns, malachite and azurite under the eaves, glazed roof tiles), soft ink wash shading, slight silk texture inside the building only. Seen from slightly above (about 20 degrees), in a gentle three-quarter view from the south-east, the whole building inside the frame with a generous margin.
+Background: perfectly flat, uniform pure magenta (#FF00FF), no gradient, no ground, no cast shadow on the background, no landscape, no clouds, no mist. Crisp clean silhouette edges.
+No text, no inscriptions, no plaques with characters, no people, no animals, no seals, no frame.
+```
+1. `pekin_muraille.png` (16:9) — un pan de rempart, à répéter bout à bout :
+```
+A straight section of the Beijing inner city wall seen almost from the front: a massive battered wall of grey brick about twelve metres high, regular horizontal brick courses, a crenellated parapet with evenly spaced merlons along the top, one rectangular bastion (mazhan) projecting slightly in the middle, no gate. The section runs from the left edge to the right edge of the frame so it can be tiled horizontally. [style]
+```
+2. `pekin_zhengyangmen.png` (1:1) — la porte du Midi de la ville intérieure (正陽門, tour de porte) :
+```
+The gate tower of Zhengyangmen, the main southern gate of the Beijing inner city: a massive grey brick gate platform with a single tall arched passage, crenellated parapet, and on top a two-storey timber gate tower with vermilion columns and lattice windows, a double-eaved hip-and-gable roof (xieshan) covered with grey tiles and green glazed ridges, upturned eave corners, small ridge beasts. Show a short piece of the city wall continuing on both sides of the platform. [style]
+```
+3. `pekin_jiaolou.png` (1:1) — tour d'angle de la ville intérieure :
+```
+The south-east corner watchtower of the Beijing inner city wall: a huge L-shaped brick tower rising above the corner of the crenellated grey wall, its two faces pierced by many rows of small square arrow windows, crowned by a double-eaved hip-and-gable roof of grey tiles with green glazed ridges and upturned corners. Show the two wall sections meeting at the corner. [style]
+```
+4. `pekin_taihedian.png` (16:9) — salle de l'Harmonie suprême (太和殿), Cité interdite, reconstruite en 1695–1697 :
+```
+The Hall of Supreme Harmony of the Forbidden City: a long eleven-bay hall with vermilion walls, columns and lattice doors, a double-eaved hip roof (wudian) covered with bright imperial yellow glazed tiles, ridge beasts at the corners and large dragon-head finials at the ends of the main ridge, colourful blue-green painted brackets under the eaves; standing on a three-tier white marble terrace with carved balustrades and a wide central staircase with a carved ramp. [style]
+```
