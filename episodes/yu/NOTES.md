@@ -63,3 +63,19 @@ qui parle) ; image à fournir (A_FOURNIR §7), plongée vers la grande salle (`A
 Image `anyang_ciel.jpg` reçue : plongée de ×2,3 vers la grande salle (72 %, 49 %), qui finit sous l'estampage ; légende
 « Anyang · vue imaginée » (le rempart de l'image est une licence : aucun rempart n'a été retrouvé autour du site du palais
 de Yinxu, protégé par un fossé ; la ville voisine de Huanbei, elle, était murée). Contrôle : `apercus/planche_note_v1d.jpg`.
+
+## 2026-10-18 · Étape 4 · brouillon 360p (`apercus/yu_brouillon_360.mp4`, 4:24 ; clips A et B encore en attente)
+| Domaine | Note | Constats |
+|---|---|---|
+| Technique | 7,5 | rouleaux 3D, macro du pinceau, plongée sur Anyang fluides ; 0:59–1:01 un 言 fantôme à droite (bogue du moteur : Chrome reposait le glyphe précédent quand la révélation est à 0 → **corrigé** dans `engine.js`) ; 2:07 balayage gris (refusé) |
+| Artistique | 7,5 | tableaux forts (diptyque, Anyang, papier découpé, banquet, baimiao) ; trois paysages vides (1:49, 2:01, 2:33) |
+| Historique | 8,5 | rien de faux ; nuances à l'écran (vue imaginée, Baxter-Sagart, lettre attribuée) |
+| Design | 8 | collisions restantes : 0:57 hypothèse sous le 言 zoomé ; 1:17 sceau 商 sur la légende Baxter-Sagart ; 2:17 lattes sous la légende ; 3:21 explication de 法 sur la mosaïque qui recule |
+| Storytelling | 7,5 | accroche et énigme tiennent ; temps morts sur « Sept États » (1:49) et après le banquet (2:33) |
+**Retenues : (1) collisions, (2) Sept États.** Appliqué (contrôle : `apercus/planche_note_v2b.jpg`) :
+- (1) légende de l'hypothèse à droite du 言 ; sceaux d'époque déplacés (1810, 860) ; lattes du Shuowen raccourcies ;
+  explication de 法 retirée avant le recul de la mosaïque.
+- (2) sept sceaux vermillon (秦 楚 齊 燕 韓 趙 魏) en arc sur « Sept États » (3 coups de sceau), puis les conseillers
+  entrent ; les conseillers restent jusqu'aux sceaux de Jin ; médaillon de Yang Xiong dès l'entrée de la scène.
+Re-notes : Design 8 → **8,5** · Storytelling 7,5 → **8** · Artistique 7,5 → **8** · Technique 7,5 → **8** (fantôme corrigé ;
+le balayage gris refusé reste le seul défaut connu) · Historique **8,5**. À re-juger sur le rendu 720p avec les clips A et B.

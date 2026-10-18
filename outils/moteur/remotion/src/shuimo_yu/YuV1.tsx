@@ -123,8 +123,8 @@ const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: n
     <span style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 66, fontWeight: 600, color: '#3b322b', textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{text}</span>
   </div>
 );
-const Caption: React.FC<{ text: React.ReactNode; a: number; y?: number; size?: number }> = ({ text, a, y = 900, size = 44 }) => (
-  <div style={{ position: 'absolute', width: '100%', top: Math.min(y, 975 - 1.7 * Math.max(size, 44)), textAlign: 'center', opacity: a }}>
+const Caption: React.FC<{ text: React.ReactNode; a: number; y?: number; size?: number; left?: number; width?: number }> = ({ text, a, y = 900, size = 44, left = 0, width = 1920 }) => (
+  <div style={{ position: 'absolute', left, width, top: Math.min(y, 975 - 1.7 * Math.max(size, 44)), textAlign: 'center', opacity: a }}>
     <span style={{ display: 'inline-block', padding: '4px 22px', borderRadius: 14, background: 'rgba(246,241,231,0.8)', fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: Math.max(size, 44), color: '#4b4038', textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</span>
   </div>
 );
@@ -227,7 +227,7 @@ const Shake: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const t = useT();
   return <AbsoluteFill style={{ transform: `translate(0px, ${shakeAt(t).toFixed(2)}px)` }}>{children}</AbsoluteFill>;
 };
-const SealStamps: React.FC = () => <Draw draw={(ctx, tt, E) => { for (const s of SEALS()) drawSeal(ctx, E, 1700, 900, 128, s.zh, tt - s.t); }} />;
+const SealStamps: React.FC = () => <Draw draw={(ctx, tt, E) => { for (const s of SEALS()) drawSeal(ctx, E, 1810, 860, 128, s.zh, tt - s.t); }} />;
 let grainTiles: HTMLCanvasElement[] | null = null;
 const GrainVignette: React.FC = () => {
   const f = useCurrentFrame();
@@ -582,7 +582,7 @@ const Shang: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="lecture la plus répandue · autre hypothèse : un instrument à vent" a={win(t, so - 0.1, ci - 0.2, 0.4)} y={940} size={44} />
+      <Caption text="lecture la plus répandue · autre hypothèse : un instrument à vent" a={win(t, so - 0.1, ci - 0.2, 0.4)} y={860} size={44} left={1060} width={780} />
       <Label x={1240} y={180} zh="五" text="cinq" color={MAL} a={win(t, ci + 0.2, po, 0.4)} align="center" />
       <Label x={1240} y={180} zh="吾" text="« moi »" color={AZ} a={win(t, po + 0.9, pq + 0.2, 0.4)} align="center" />
       <Caption text="吾 = « moi » : sens attesté plus tard, sous les Zhou" a={win(t, po + 1.6, pq - 0.2, 0.4)} y={940} size={44} />
@@ -645,6 +645,7 @@ const Cloche: React.FC = () => {
 };
 
 // ════════════════ 5. Les Royaumes combattants : on se dispute ; sur les sceaux, les deux bouches l'une sur l'autre
+const STATES = ['秦', '楚', '齊', '燕', '韓', '趙', '魏'];
 const Royaumes: React.FC = () => {
   const t = useT();
   const A5 = A('b05'), co = at('b05', 'conseillers'), ar = at('b05', 'argumente'), he = at('b05', 'hesite'), sc = at('b05', 'sceaux'), em = at('b05', 'empile');
@@ -655,6 +656,13 @@ const Royaumes: React.FC = () => {
       <Landscape seed={26} from={A5 - 1} to={PB.debut + 0.8} move="pan" mood="brume" faint={0.6} />
       <Cam keys={[[A5 - 0.3, 960, 540, 1.0], [sc - 0.3, 760, 540, 1.06, 1.0], [em - 0.2, 830, 520, 1.2, 1.0]]} punch={[sc + 0.3, sc + 1.1, em + 0.3]}>
         <Draw draw={(ctx, tt, E) => {
+          // « Sept États » : sept sceaux vermillon se posent l'un après l'autre en arc, puis s'effacent devant les conseillers
+          const st = at('b05', 'sept'), so = 1 - seg(tt, co - 0.3, co + 0.2);
+          if (so > 0) STATES.forEach((zh, i) => {
+            const u = tt - (st + 0.12 * i), x = 360 + i * 200, y = 560 - 70 * Math.sin((Math.PI * i) / 6);
+            if (u < 0) return;
+            ctx.save(); ctx.globalAlpha = so; drawSeal(ctx, E, x, y, 132, zh, u); ctx.restore();
+          });
           // deux empreintes de sceau (璽彙 2774, 3193) : carré vermillon, le signe en réserve (papier)
           [[760, 'yu_xi', sc], [1300, 'yu_xi2', sc + 0.8]].forEach(([x, key, t0]) => {
             const u = tt - (t0 as number), a = clamp(u / 0.08) * (1 - seg(tt, PB.debut, PB.debut + 0.6));
@@ -669,11 +677,11 @@ const Royaumes: React.FC = () => {
       </Cam>
       {/* deux conseillers en papier découpé, face à face : ils se renvoient la parole (un balancement chacun son tour) */}
       <Draw draw={(ctx, tt) => {
-        const a = win(tt, co - 0.4, sc - 0.3, 0.6);
+        const a = win(tt, co, sc + 0.3, 0.5);
         if (a <= 0 || !IMG.ca || !IMG.cb) return;
         const turn = Math.floor(Math.max(0, tt - ar) / 0.8) % 2, ph = ((Math.max(0, tt - ar)) % 0.8) / 0.8, act = seg(tt, ar - 0.2, ar + 0.2);
         ([[IMG.ca, 620, 1, 0], [IMG.cb, 1300, -1, 1]] as [HTMLImageElement, number, number, number][]).forEach(([im, x, dir, who], k) => {
-          const enter = ease(seg(tt, co - 0.4 + 0.3 * k, co + 0.6 + 0.3 * k)), H = 620, W2 = (im.width / im.height) * H;
+          const enter = ease(seg(tt, co + 0.1 + 0.3 * k, co + 1.0 + 0.3 * k)), H = 620, W2 = (im.width / im.height) * H;
           const lean = act * (turn === who ? 0.07 * Math.sin(Math.PI * ph) : 0) * dir;
           ctx.save(); ctx.globalAlpha = a; ctx.translate(x - dir * 260 * (1 - enter), 900); ctx.rotate(lean);
           ctx.shadowColor = 'rgba(80,20,10,0.25)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 6;
@@ -730,7 +738,7 @@ const Han: React.FC = () => {
         <Draw draw={(ctx, tt, E) => {
           // deux lattes du Shuowen ; la phrase s'écrit caractère par caractère pendant la citation
           const sa = seg(tt, di - 0.3, di + 0.5) * (1 - seg(tt, rp - 0.3, rp + 0.3));
-          slip(ctx, 820, 110, 860, sa); slip(ctx, 960, 110, 860, sa);
+          slip(ctx, 820, 110, 760, sa); slip(ctx, 960, 110, 760, sa);
           QUOTE.forEach((c, i) => {
             const t0 = q0 + (i * (q1 - q0)) / QUOTE.length, k = seg(tt, t0, t0 + 0.3);
             const x = i < 4 ? 960 : 820, y = 230 + (i % 4) * 190;
@@ -814,7 +822,7 @@ const YangXiong: React.FC = () => {
       </Cam>
       {/* médaillon au trait de Yang Xiong, qui se trace dès qu'il est nommé */}
       <Draw draw={(ctx, tt) => {
-        const m = win(tt, A7 + 0.3, mapFrom + 0.3, 0.5);
+        const m = win(tt, A7 - 0.3, mapFrom + 0.3, 0.5);
         if (m <= 0) return;
         ctx.save(); ctx.globalAlpha = m;
         ctx.shadowColor = 'rgba(40,30,20,0.28)'; ctx.shadowBlur = 34; ctx.fillStyle = '#f6f0e4'; ctx.beginPath(); ctx.ellipse(1300, 470, 300, 360, 0, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
@@ -893,7 +901,7 @@ const Today: React.FC = () => {
       </Cam>
       <Sequence from={Math.round(MOS0 * fps)} durationInFrames={Math.round((mosEnd - MOS0) * fps)}><MosaicTransition cfg={MOS} /></Sequence>
       <Caption text="1956 · 言 → 讠, emprunté à l'écriture cursive" a={win(t, tr - 0.2, pa - 0.6, 0.4)} y={940} size={46} />
-      <Caption text="法 fǎ : la loi… et le « Fa » de France 法蘭西" a={win(t, li + 0.2, ri + 1.8, 0.4)} y={110} size={44} />
+      <Caption text="法 fǎ : la loi… et le « Fa » de France 法蘭西" a={win(t, li + 0.2, ri + 0.3, 0.4)} y={110} size={44} />
       <MapPanel from={mosEnd - 0.4} to={B('b08') + 0.6} draw={(ctx, u, E, tt) => {
         const v = { lon: 112.0, lat: 30.0, k: 40 };
         E.mapLayer(ctx, v, v, 120, 'yu_dial', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
