@@ -38,6 +38,21 @@
       "credit": "carte peinte d’après Natural Earth",
       "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
       "episodes": [{ "episode": "yu", "usage": "bloc 8 : familles de dialectes d'aujourd'hui, Pékin et Canton" }]
+    },
+    {
+      "id": "pekin_detail",
+      "type": "soie_song",
+      "titre": "Pékin et le golfe du Bohai (carte de détail)",
+      "legende": "Carte de détail, trois fois plus grande que chine_centre_nord : la plaine de Pékin entre les monts Yan au nord et les Taihang à l'ouest, le golfe du Bohai, le nord du Shandong. Sert d'arrivée nette aux travellings vers Pékin (fondu depuis chine_centre_nord, même projection).",
+      "vue": { "lon": 116.6, "lat": 39.6, "k": 156 },
+      "emprise": { "ouest": 110.45, "est": 122.75, "sud": 36.67, "nord": 42.53 },
+      "peinte": "peintes/pekin_detail.jpg",
+      "guide": "guides/pekin_detail.jpg",
+      "taille": [2752, 1536],
+      "contenu": "côtes du Bohai, fleuve Jaune (cours actuel), Yongding, Hai he, Grand Canal (tracé schématique), monts Yan et Taihang ; aucune frontière",
+      "credit": "carte peinte d’après Natural Earth",
+      "sources": "Natural Earth 10m/50m (domaine public) ; à repeindre par Nano Banana",
+      "episodes": [{ "episode": "yu", "usage": "transition Han → Qing : arrivée du travelling à Pékin, sceau 京師" }]
     }
   ]
 }

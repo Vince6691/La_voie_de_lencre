@@ -545,6 +545,37 @@ const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number }> = (
   );
 };
 
+// sceau de pierre seul (même pierre, pommeau, cordon et gland), réutilisable hors du rouleau ; axe y vers le haut,
+// face gravée à y = -0.28
+export const SceauPierre: React.FC<{ red?: boolean; sway?: number; squash?: number }> = ({ red = false, sway = 0, squash = 0 }) => {
+  const g = useMemo(() => {
+    const stone = new THREE.CanvasTexture(stoneCanvas(red)); stone.colorSpace = THREE.SRGBColorSpace;
+    const knob = new THREE.LatheGeometry([[0.2, 0], [0.205, 0.015], [0.17, 0.035], [0.12, 0.06], [0.11, 0.08], [0.14, 0.12], [0.155, 0.17], [0.14, 0.22], [0.1, 0.26], [0.05, 0.285], [0.015, 0.295], [0, 0.297]].map(([r, y]) => new THREE.Vector2(r, y)), 48);
+    const cord = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.02, 0.43, 0), V3(0.12, 0.47, 0.05), V3(0.25, 0.36, 0.12), V3(0.28, 0.18, 0.15), V3(0.29, 0.02, 0.16)]), 40, 0.014, 8);
+    return { stone, knob, cord, box: new RoundedBoxGeometry(0.46, 0.56, 0.46, 4, 0.035) };
+  }, [red]);
+  const pierre = <meshPhysicalMaterial map={g.stone} roughness={0.3} clearcoat={1} clearcoatRoughness={0.06} emissive={red ? '#5a0606' : '#6a3208'} emissiveIntensity={red ? 0.18 : 0.12} />;
+  return (
+    <group scale={[1 + squash * 0.5, 1 - squash, 1 + squash * 0.5]}>
+      <mesh geometry={g.box} castShadow>{pierre}</mesh>
+      <mesh geometry={g.knob} position={[0, 0.28, 0]} castShadow>{pierre}</mesh>
+      <mesh position={[0, -0.279, 0]}><boxGeometry args={[0.43, 0.004, 0.43]} /><meshStandardMaterial color="#a8241c" roughness={0.75} /></mesh>
+      <group position={[0, 0.43, 0]} rotation={[0, 0, sway]}>
+        <group position={[0, -0.43, 0]}>
+          <mesh geometry={g.cord} castShadow><meshPhysicalMaterial color="#9a1714" roughness={0.55} sheen={1} sheenColor="#ff7a6a" /></mesh>
+          <mesh position={[0.29, 0.02, 0.16]}><sphereGeometry args={[0.034, 16, 12]} /><meshPhysicalMaterial color="#8c1310" roughness={0.5} sheen={1} sheenColor="#ff7a6a" /></mesh>
+          <mesh position={[0.29, -0.1, 0.16]} castShadow><cylinderGeometry args={[0.022, 0.05, 0.22, 20, 1, true]} /><meshPhysicalMaterial color="#9a1714" roughness={0.6} sheen={1} sheenColor="#ff8a7a" side={THREE.DoubleSide} /></mesh>
+        </group>
+      </group>
+    </group>
+  );
+};
+
+// compteur seul, réutilisable hors du rouleau (travelling sur carte…) : polices ShuimoKai et ShuimoCaps à charger
+export const CompteurAnnees: React.FC<{ de: string; annees: [number, number]; year: number; a: number }> = ({ de, annees, year, a }) => (
+  <YearPlate cfg={{ de, vers: de, annees } as unknown as Rouleau3DConfig} year={year} a={a} />
+);
+
 // ── la scène complète : 3D, compteur d'années, sceau volant, son ──
 export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
   const { fps, width, height } = useVideoConfig();

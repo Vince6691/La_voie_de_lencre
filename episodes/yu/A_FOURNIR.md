@@ -207,3 +207,12 @@ The south-east corner watchtower of the Beijing inner city wall: a huge L-shaped
 ```
 The Hall of Supreme Harmony of the Forbidden City: a long eleven-bay hall with vermilion walls, columns and lattice doors, a double-eaved hip roof (wudian) covered with bright imperial yellow glazed tiles, ridge beasts at the corners and large dragon-head finials at the ends of the main ridge, colourful blue-green painted brackets under the eaves; standing on a three-tier white marble terrace with carved balustrades and a wide central staircase with a carved ramp. [style]
 ```
+
+## 11. Carte de détail de Pékin (arrivée du travelling Han → Qing) — à fournir
+Même procédé que §9 : joindre l'image-guide `outils/moteur/assets/cartes/guides/pekin_detail.jpg` à Nano Banana
+(mode édition), 16:9, ≥ 1920 × 1080, et le **même prompt que §9** (soie, manière Song). La carte rejoint la
+bibliothèque (`peintes/pekin_detail.jpg`) : trois fois plus grande que `chine_centre_nord`, elle prend le relais en
+fondu à l'arrivée pour que l'image reste nette quand on s'approche de Pékin. Ajouter à la fin du prompt :
+```
+This is a close-up of the Beijing plain: paint the mountain ranges larger and more detailed (west and north of the centre), the Bohai gulf on the right with finer wave lines; keep the plain at the centre calm and empty (a seal will be stamped there).
+```
