@@ -10,6 +10,7 @@ import { YU_SECONDS, YuV1 } from './shuimo_yu/YuV1';
 import { INTRO_SECONDS, YuIntroEncre, YuIntroLaque, YuIntroOmbres } from './shuimo_yu/IntroTests';
 import { CARTES_GUIDES, CartesGuides } from './cartes/CartesGuides';
 import { EssaiPekin3D, PEKIN3D_SECONDS } from './cartes/Pekin3D';
+import { EssaiPekinPlat, PEKINPLAT_SECONDS } from './cartes/PekinPlat';
 import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
@@ -53,6 +54,7 @@ export const RemotionRoot: React.FC = () => (
   <Composition id="YuIntroEncre" component={YuIntroEncre} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuIntroOmbres" component={YuIntroOmbres} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="EssaiPekin3D" component={EssaiPekin3D} durationInFrames={Math.round(PEKIN3D_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="EssaiPekinPlat" component={EssaiPekinPlat} durationInFrames={Math.round(PEKINPLAT_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="CartesGuides" component={CartesGuides} durationInFrames={CARTES_GUIDES} fps={FPS} width={1920} height={1080} />
   <Composition id="YuIntroLaque" component={YuIntroLaque} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenV1" component={WenV1} durationInFrames={Math.round(WEN_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />

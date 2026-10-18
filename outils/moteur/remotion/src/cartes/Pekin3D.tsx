@@ -10,25 +10,25 @@ import * as THREE from 'three';
 import { carte } from './CartePeinte';
 
 export const PEKIN3D_SECONDS = 8;
-const clamp = (x: number) => Math.max(0, Math.min(1, x));
-const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
-const ease = (u: number) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
-const out3 = (u: number) => 1 - Math.pow(1 - u, 3);
-const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
+export const clamp = (x: number) => Math.max(0, Math.min(1, x));
+export const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
+export const ease = (u: number) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+export const out3 = (u: number) => 1 - Math.pow(1 - u, 3);
+export const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
 // lieu de la carte → unités de la scène
-const CARTE = 'chine_centre_nord';
-const P = (lon: number, lat: number): [number, number] => {
+export const CARTE = 'chine_centre_nord';
+export const P = (lon: number, lat: number): [number, number] => {
   const v = carte(CARTE).vue;
   return [((lon - v.lon) * v.k) / 120, ((lat - v.lat) * v.k * 1.18) / 120];
 };
-const BJ = P(116.4, 39.9), CA = P(108.9, 34.3);
+export const BJ = P(116.4, 39.9), CA = P(108.9, 34.3);
 
 // temps de l'essai
 const T = { bascule: 1.0, arrivee: 3.8, murs: 3.5, porte: 4.7, coins: 5.1, salle: 5.7 };
 
-const COUL = { encre: '#2b2119', mur: '#7f776a', murHaut: '#9c9383', colonne: '#a4473a', tuileGris: '#56645c', tuileJaune: '#d4a23e', terrasse: '#ebe3cf', sol: '#e9dfc9' };
-const ECH = 0.6; // échelle de la ville sur la carte (déjà très exagérée)
+export const COUL = { encre: '#2b2119', mur: '#7f776a', murHaut: '#9c9383', colonne: '#a4473a', tuileGris: '#56645c', tuileJaune: '#d4a23e', terrasse: '#ebe3cf', sol: '#e9dfc9' };
+export const ECH = 0.6; // échelle de la ville sur la carte (déjà très exagérée)
 
 // ─── géométries
 // toit à quatre pentes (庑殿) incurvé, coins relevés ; w × d à l'égout, faîtage (w - d), hauteur h ; tMax < 1 : auvent
@@ -100,12 +100,12 @@ const Batiment: React.FC<{ w: number; d: number; h: number; toitMat: THREE.Mater
 };
 
 // chute : tombe en accélérant, s'écrase légèrement, se redresse ; anneau d'encre au sol
-const chute = (t: number, at: number) => {
+export const chute = (t: number, at: number) => {
   const f = seg(t, at - 0.55, at), z = 5 * (1 - f * f);
   const k = seg(t, at, at + 0.35), sq = Math.sin(k * Math.PI) * (1 - k) * 0.35;
   return { z: f < 1 ? z : 0, sx: 1 + sq * 0.5, sz: 1 - sq, vis: t > at - 0.55, onde: seg(t, at, at + 0.9) };
 };
-const Onde: React.FC<{ k: number; r: number; p: [number, number] }> = ({ k, r, p }) => k > 0 && k < 1 ? (
+export const Onde: React.FC<{ k: number; r: number; p: [number, number] }> = ({ k, r, p }) => k > 0 && k < 1 ? (
   <mesh position={[p[0], p[1], 0.004]} scale={[r * (0.4 + 1.6 * out3(k)), r * (0.4 + 1.6 * out3(k)), 1]}>
     <ringGeometry args={[0.9, 1, 64]} /><meshBasicMaterial color={COUL.encre} transparent opacity={0.28 * (1 - k)} depthWrite={false} />
   </mesh>
@@ -201,7 +201,7 @@ const Scene: React.FC<{ t: number; tex: THREE.Texture; paper: THREE.Texture }> =
     </>
   );
 };
-const CamRig: React.FC<{ pos: THREE.Vector3; look: THREE.Vector3 }> = ({ pos, look }) => {
+export const CamRig: React.FC<{ pos: THREE.Vector3; look: THREE.Vector3 }> = ({ pos, look }) => {
   const { camera } = useThree();
   camera.up.set(0, 0, 1); camera.position.copy(pos); camera.lookAt(look); camera.updateProjectionMatrix();
   return null;
