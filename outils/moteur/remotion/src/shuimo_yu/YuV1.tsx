@@ -18,6 +18,7 @@ import { Rouleau3DConfig, Rouleau3DStage, r3Seconds, r3TagIn } from '../rouleau3
 import { MosaicConfig, MosaicTransition, mosaicSeconds } from '../mosaique/MosaicTransition';
 import { cartouche } from '../periodes';
 import { loadLegacy, W } from '../legacy';
+import { AGES_SECONDS, EssaiCarteAges } from '../cartes/CarteAges';
 import { capitale, carte, chargerCartes, creditCarte, fondCarte, lieu, routePinceau } from '../cartes/CartePeinte';
 import rep from '../data/episodes/yu.json';
 
@@ -706,24 +707,14 @@ const Shang: React.FC = () => {
   );
 };
 
-// rouleaux du temps en 3D : court (Shang → Zhou), complet (Han → aujourd'hui) ; vers où figure 語 ou 言
-const R1 = L.rouleaux[0].debut, R2 = L.rouleaux[1].debut;
+// rouleau du temps en 3D (Shang → Zhou, version complète) ; Han → Qing : la carte traverse les âges (cartes/CarteAges)
+const R1 = L.rouleaux[0].debut, R2 = (L.plages as any).carte_ages.debut;
 const R3A: Rouleau3DConfig = {
-  at: R1, de: 'shang', vers: 'zhou', annees: [-1200, -550], variant: 'court', stone: 'rouge',
+  at: R1, de: 'shang', vers: 'zhou', annees: [-1200, -550], variant: 'complet', stone: 'rouge',
   fromLand: { seed: 14, mood: 'aube' }, toLand: { seed: 9, mood: 'jour' }, midSeeds: [17, 21],
   inscriptions: [
     { x: 1500, y: 200, size: 74, font: 'ShuimoKai', cols: ['食不語', '寢不言'], sig: '論語鄉黨', seal: '長樂', ink: 0.88 },
     { x: 5500, y: 170, size: 80, font: 'ShuimoKai', cols: ['言之無文', '行而不遠'], sig: '左傳', seal: '雲水', ink: 0.92 },
-  ],
-};
-const R3B: Rouleau3DConfig = {
-  at: R2, de: 'han', vers: 'aujourdhui', annees: [1, 1956], variant: 'complet', stone: 'miel',
-  fromLand: { seed: 3, mood: 'brume' }, toLand: { seed: 30, mood: 'aube' },
-  inscriptions: [
-    { x: 1600, y: 190, size: 70, font: 'ShuimoKai', cols: ['直言曰言', '論難曰語'], sig: '說文解字', seal: '遊心', ink: 0.86 },
-    { x: 5560, y: 170, size: 76, font: 'ShuimoKai', cols: ['言者所以在意', '得意而忘言'], sig: '莊子外物', seal: '墨道', ink: 0.92 },
-    { x: 6500, y: 160, size: 90, font: 'ShuimoCao', cols: ['千山鸟飞绝', '万径人踪灭', '孤舟蓑笠翁', '独钓寒江雪'], sig: '柳宗元江雪', seal: '雲水', ink: 0.95 },
-    { x: 10950, y: 200, size: 72, font: 'ShuimoKai', cols: ['此中有真意', '欲辨已忘言'], sig: '陶淵明飲酒', seal: '長樂', ink: 0.88 },
   ],
 };
 
@@ -985,7 +976,7 @@ const YangXiong: React.FC = () => {
 };
 
 // ════════════════ 8. Aujourd'hui : 言 → 讠, la mosaïque des mots en 语, la carte des dialectes
-const R2E = R2 + r3Seconds(R3B);
+const R2E = R2 + AGES_SECONDS;
 const MOS0 = at('b08', 'partout') - 0.3;
 const MOS: MosaicConfig = {
   glyph: '语',
@@ -1043,7 +1034,7 @@ const Today: React.FC = () => {
         creditCarte(ctx, E, 'chine_centre_sud');
         void u;
       }} />
-      <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={r3TagIn(R3B, t) * (1 - seg(t, pa - 0.6, pa - 0.1))} />
+      <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={seg(t, R2E - 0.2, R2E + 0.6) * (1 - seg(t, pa - 0.6, pa - 0.1))} />
     </AbsoluteFill>
   );
 };
@@ -1209,6 +1200,7 @@ const SFX = (L.bruitages ?? []) as [string, number, number][];
 export const YuV1: React.FC = () => {
   const ready = useSetup();
   const { fps } = useVideoConfig();
+  const t = useT();
   const clips: Clip[] = ['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b08', 'b09', 'b10'];
   const voice = (k: Clip) => {
     const c = L.clips[k];
@@ -1231,7 +1223,7 @@ export const YuV1: React.FC = () => {
         <Win fade={0.8} from={A('b05') - 0.3} to={PB.debut + PB.duree}><Royaumes /></Win>
         <Win fade={0.8} from={PB.debut + PB.duree} to={A('b07') - 0.3}><Han /></Win>
         <Win fade={0.8} from={A('b07') - 0.3} to={R2 + 0.6}><YangXiong /></Win>
-        <Win from={R2 + 0.6} to={A('b09') - 0.3}><Today /></Win>
+        <Win from={R2E - 0.8} to={A('b09') - 0.3}><Today /></Win>
         <Win fade={0.8} from={A('b09') - 0.3} to={A('b10') - 0.3}><Recap /></Win>
         <Win fade={0.8} from={A('b10') - 0.3} to={END + 0.8}><Chute /></Win>
         <Win from={END} to={YU_SECONDS + 1}><EndCard /></Win>
@@ -1239,7 +1231,12 @@ export const YuV1: React.FC = () => {
         <SealStamps />
       </Shake>}
       {ready && <Win from={R1 - 1.5} to={R1 + r3Seconds(R3A) + 3.5}><Rouleau3DStage cfg={R3A} /></Win>}
-      {ready && <Win from={R2 - 1.5} to={R2 + r3Seconds(R3B) + 3.5}><Rouleau3DStage cfg={R3B} /></Win>}
+      {/* Han → Qing : la carte traverse les âges ; fondu d'entrée sur Yang Xiong, fondu de sortie sur 1956 */}
+      {ready && <Win fade={0.5} from={R2 - 0.1} to={R2E + 0.7}>
+        <AbsoluteFill style={{ opacity: 1 - seg(t, R2E - 0.1, R2E + 0.7) }}>
+          <Sequence from={Math.round(R2 * fps)} durationInFrames={Math.round((AGES_SECONDS + 1) * fps)}><EssaiCarteAges /></Sequence>
+        </AbsoluteFill>
+      </Win>}
       {ready && <GrainVignette />}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/yu/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
