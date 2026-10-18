@@ -19,6 +19,11 @@
       "nom": "Atlas de Kangxi gravé sur cuivre (皇輿全覽圖)",
       "description": "D'après l'atlas levé par les jésuites (1718) : gravure fine sur papier vergé crème, côtes soulignées de hachures horizontales, petites collines hachurées, lavis pâles. Méridiens et parallèles dessinés par le moteur (méridien zéro de l'atlas : Pékin).",
       "prompt": "Style: a copperplate engraving from the Kangxi atlas of 1718, surveyed by Jesuit cartographers: fine black engraved lines on cream laid paper; coastlines outlined with fine horizontal hatching offshore; rivers as thin single or double lines; mountains as small engraved hachured hills seen in profile, grouped along the ranges; very light hand-coloured washes of pale green along the coasts and pale ochre on the land."
+    },
+    "soie_ming": {
+      "nom": "Carte peinte Ming (大明混一圖)",
+      "description": "D'après le Da Ming hunyi tu (1389) : soie ocre-jaune, terres beige pâle, fleuves épais vert-bleu, mer verte en écailles régulières, montagnes en rangées de petits pics bleu-vert rehaussés de blanc.",
+      "prompt": "Style: a large Ming court map painted on silk, like the Da Ming hunyi tu of 1389: warm ochre-yellow silk ground, the land in pale beige, rivers as thick dark green-blue lines, the sea painted green with regular stylised fish-scale waves, mountain ranges as rows of small blue-green peaks with white highlights, bright mineral colours slightly faded with age."
     }
   },
   "cartes": [
@@ -201,6 +206,38 @@
         "nord": 43.0
       },
       "peinte": "peintes/chine_centre_nord_kangxi.jpg",
+      "guide": "guides/chine_centre_nord.jpg",
+      "taille": [
+        2752,
+        1536
+      ],
+      "contenu": "côtes, îles, lacs, fleuve Jaune (cours actuel, vers le golfe du Bohai), Wei, Fen, Han, Yangzi moyen, reliefs (Qinling, Taihang, Yinshan) ; aucune frontière",
+      "credit": "carte peinte d’après Natural Earth",
+      "sources": "Natural Earth 10m/50m (domaine public) ; repeinte par Nano Banana le 18/10/2026",
+      "episodes": [
+        {
+          "episode": "yu",
+          "usage": "transition Han → Qing : la carte traverse les âges"
+        }
+      ]
+    },
+    {
+      "id": "chine_centre_nord_hunyi",
+      "type": "soie_ming",
+      "titre": "Chine du Nord — carte peinte Ming (Da Ming hunyi tu)",
+      "legende": "Le bassin du fleuve Jaune et la plaine centrale, du lac Qinghai à la péninsule coréenne, du coude de l'Ordos au cours moyen du Yangzi. Cœur des royaumes Shang, Zhou, des Royaumes combattants et des Han (Chang'an, Luoyang, Linzi, Handan, Anyang au centre du cadre).",
+      "vue": {
+        "lon": 112.5,
+        "lat": 34.2,
+        "k": 52
+      },
+      "emprise": {
+        "ouest": 94.0,
+        "est": 131.0,
+        "sud": 25.4,
+        "nord": 43.0
+      },
+      "peinte": "peintes/chine_centre_nord_hunyi.jpg",
       "guide": "guides/chine_centre_nord.jpg",
       "taille": [
         2752,

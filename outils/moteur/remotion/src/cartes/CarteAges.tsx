@@ -3,7 +3,7 @@
 // défile ; chaque passage reprend le geste de sa technique :
 //   soie (Yang Xiong) → Mawangdui, Han : l'encre gagne la soie depuis Chang'an ;
 //   → atlas imprimé Song (歷代地理指掌圖) : la feuille imprimée se soulève depuis le coin, verso en transparence ;
-//   → carte peinte (Ming) : la couleur se répand depuis les fleuves ;
+//   → carte peinte Ming (大明混一圖) : la couleur se répand depuis les fleuves ;
 //   → atlas de Kangxi (Qing) : gravure au burin, puis le méridien de Pékin (中, méridien zéro de l'atlas) se grave en
 //     vermillon, les autres méridiens et parallèles en partent, et 京師 s'incise à leur croisement.
 // La caméra se recadre en douceur : Chang'an → Kaifeng → nord → Pékin.
@@ -23,7 +23,7 @@ const VUE = carte('chine_centre_nord').vue;
 const PX = (lon: number, lat: number): [number, number] => [960 + (lon - VUE.lon) * VUE.k, 540 - (lat - VUE.lat) * VUE.k * 1.18];
 const CA = PX(108.9, 34.3), KF = PX(114.3, 34.8), BJ = PX(116.4, 39.9);
 const T = { encre: [0.25, 1.2], feuille: [1.45, 2.4], couleur: [2.85, 3.75], burin: [4.2, 5.0], meridien: [5.0, 5.6], grille: [5.3, 6.2], ville: [5.75, 6.7] };
-const CARTES = { soie: 'chine_centre_nord', han: 'chine_centre_nord_mawangdui', song: 'chine_centre_nord_zhizhang', ming: 'chine_centre_nord', qing: 'chine_centre_nord_kangxi' };
+const CARTES = { soie: 'chine_centre_nord', han: 'chine_centre_nord_mawangdui', song: 'chine_centre_nord_zhizhang', ming: 'chine_centre_nord_hunyi', qing: 'chine_centre_nord_kangxi' };
 
 // caméra : (instant, centre en px de carte, zoom) ; interpolation douce (Hermite monotone simplifiée)
 const CAM: [number, [number, number], number][] = [[0, [960, 540], 1.0], [1.4, [880, 528], 1.12], [2.9, [KF[0], 500], 1.42], [4.3, [1120, 360], 1.55], [5.8, [BJ[0], 262], 2.0], [7.5, [BJ[0], 252], 2.08]];
@@ -40,7 +40,7 @@ const annee = (t: number) => { if (t <= ANS[0][0]) return 1; for (let i = 0; i <
 const LEGENDES: [number, number, string, string][] = [
   [0.6, 1.45, '馬王堆地形圖', 'carte de Mawangdui · soie, 168 av. J.-C.'],
   [1.9, 2.85, '歷代地理指掌圖', 'premier atlas imprimé · Song, v. 1100'],
-  [3.3, 4.2, '明 · 輿圖', 'carte peinte de la cour · Ming'],
+  [3.3, 4.2, '大明混一圖', 'carte peinte sur soie · Ming, 1389'],
   [4.7, 7.5, '皇輿全覽圖', 'atlas de Kangxi · gravé sur cuivre, 1718'],
 ];
 
