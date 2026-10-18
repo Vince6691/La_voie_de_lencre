@@ -22,26 +22,41 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const VUE = carte('chine_centre_nord').vue;
 const PX = (lon: number, lat: number): [number, number] => [960 + (lon - VUE.lon) * VUE.k, 540 - (lat - VUE.lat) * VUE.k * 1.18];
 const CA = PX(108.9, 34.3), KF = PX(114.3, 34.8), BJ = PX(116.4, 39.9);
-const T = { encre: [0.25, 1.2], feuille: [1.45, 2.4], couleur: [2.85, 3.75], burin: [4.2, 5.0], meridien: [5.0, 5.6], grille: [5.3, 6.2], ville: [5.75, 6.7] };
+// ── un seul profil de vitesse pour le compteur ET la caméra : départ en douceur, vitesse de croisière, long
+// ralentissement jusqu'à Pékin (1728 à ARRIVEE), puis tenue. F(t) ∈ [0, 1] = chemin parcouru.
+const ARRIVEE = 6.3;
+const vitesse = (t: number) => sm(0.15, 1.15, t) * (1 - sm(4.0, ARRIVEE, t));
+const TAB = (() => { const n = 800, out = new Float32Array(n + 1); let acc = 0; for (let i = 1; i <= n; i++) { const t = (i / n) * ARRIVEE; acc += vitesse(t) * (ARRIVEE / n); out[i] = acc; } for (let i = 0; i <= n; i++) out[i] /= acc; return out; })();
+const F = (t: number) => { if (t >= ARRIVEE) return 1; if (t <= 0) return 0; const x = (t / ARRIVEE) * 800, i = Math.floor(x); return lerp(TAB[i], TAB[i + 1], x - i); };
+const annee = (t: number) => Math.max(1, Math.round(1 + 1727 * F(t)));
+// instant où le compteur atteint une année (pour caler les changements de carte sur les dynasties)
+const tA = (y: number) => { let a = 0, b = ARRIVEE; for (let k = 0; k < 30; k++) { const m = (a + b) / 2; if (1 + 1727 * F(m) < y) a = m; else b = m; } return (a + b) / 2; };
+// chaque carte arrive pendant que le compteur entre dans sa dynastie ; transitions longues qui se chevauchent un peu
+const T = {
+  encre: [0.1, tA(160)], feuille: [tA(560), tA(1060)], couleur: [tA(1180), tA(1460)], burin: [tA(1520), tA(1700)],
+  meridien: [tA(1690), tA(1690) + 0.75], grille: [tA(1690) + 0.3, ARRIVEE + 0.3], ville: [ARRIVEE - 0.35, ARRIVEE + 0.75],
+};
 const CARTES = { soie: 'chine_centre_nord', han: 'chine_centre_nord_mawangdui', song: 'chine_centre_nord_zhizhang', ming: 'chine_centre_nord_hunyi', qing: 'chine_centre_nord_kangxi' };
 
-// caméra : (instant, centre en px de carte, zoom) ; interpolation douce (Hermite monotone simplifiée)
-const CAM: [number, [number, number], number][] = [[0, [960, 540], 1.0], [1.4, [880, 528], 1.12], [2.9, [KF[0], 500], 1.42], [4.3, [1120, 360], 1.55], [5.8, [BJ[0], 262], 2.0], [7.5, [BJ[0], 252], 2.08]];
-const camera = (t: number) => {
-  let i = 0; while (i < CAM.length - 2 && t > CAM[i + 1][0]) i++;
-  const [t0, c0, z0] = CAM[i], [t1, c1, z1] = CAM[i + 1], k = ease(seg(t, t0, t1));
-  return { cx: lerp(c0[0], c1[0], k), cy: lerp(c0[1], c1[1], k), z: lerp(z0, z1, k) };
+// caméra : centre (px de carte) et zoom en fonction du chemin parcouru F, par une courbe d'Hermite monotone (pas
+// d'arrêt aux points de passage) ; après l'arrivée, très lente poussée
+const CAMK: [number, number, number, number][] = [[0, 960, 540, 1.0], [0.12, 900, 530, 1.1], [0.55, KF[0], 495, 1.4], [0.8, 1120, 360, 1.6], [1, BJ[0], 262, 2.0]];
+const hermite = (k: number, col: 1 | 2 | 3) => {
+  const xs = CAMK.map((r) => r[0]), ys = CAMK.map((r) => r[col]), n = xs.length;
+  const d = xs.slice(0, -1).map((x, i) => (ys[i + 1] - ys[i]) / (xs[i + 1] - x));
+  const m = ys.map((_, i) => (i === 0 ? d[0] : i === n - 1 ? d[n - 2] : d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2));
+  let i = 0; while (i < n - 2 && k > xs[i + 1]) i++;
+  const h = xs[i + 1] - xs[i], u = clamp((k - xs[i]) / h), u2 = u * u, u3 = u2 * u;
+  return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
 };
-// compteur : années clés (la période affichée suit la carte à l'écran)
-const ANS: [number, number][] = [[0.3, 1], [1.35, 220], [1.9, 1000], [2.8, 1279], [3.4, 1420], [4.2, 1644], [5.0, 1700], [5.9, 1728]];
-const annee = (t: number) => { if (t <= ANS[0][0]) return 1; for (let i = 0; i < ANS.length - 1; i++) if (t <= ANS[i + 1][0]) return Math.round(lerp(ANS[i][1], ANS[i + 1][1], ease(seg(t, ANS[i][0], ANS[i + 1][0])))); return 1728; };
+const camera = (t: number) => { const k = F(t), apres = ease(seg(t, ARRIVEE, AGES_SECONDS)); return { cx: hermite(k, 1), cy: hermite(k, 2) - 8 * apres, z: hermite(k, 3) + 0.08 * apres }; };
 
 // légendes des cartes (cartouche en bas à gauche)
 const LEGENDES: [number, number, string, string][] = [
-  [0.6, 1.45, '馬王堆地形圖', 'carte de Mawangdui · soie, 168 av. J.-C.'],
-  [1.9, 2.85, '歷代地理指掌圖', 'premier atlas imprimé · Song, v. 1100'],
-  [3.3, 4.2, '大明混一圖', 'carte peinte sur soie · Ming, 1389'],
-  [4.7, 7.5, '皇輿全覽圖', 'atlas de Kangxi · gravé sur cuivre, 1718'],
+  [T.encre[1] - 0.4, T.feuille[0] + 0.2, '馬王堆地形圖', 'carte de Mawangdui · soie, 168 av. J.-C.'],
+  [T.feuille[1] - 0.2, T.couleur[0] + 0.15, '歷代地理指掌圖', 'premier atlas imprimé · Song, v. 1100'],
+  [T.couleur[1] - 0.15, T.burin[0] + 0.15, '大明混一圖', 'carte peinte sur soie · Ming, 1389'],
+  [T.burin[1] - 0.15, AGES_SECONDS, '皇輿全覽圖', 'atlas de Kangxi · gravé sur cuivre, 1718'],
 ];
 
 // fleuves (lon, lat) : départ de la couleur pour la carte Ming
@@ -132,11 +147,13 @@ export const EssaiCarteAges: React.FC = () => {
     // ── 3. Song → Ming : la couleur part des fleuves
     const k3 = ease(seg(t, T.couleur[0], T.couleur[1]));
     // ── 4. Ming → Kangxi : burin (hachures qui balaient l'écran puis se remplissent)
-    const k4 = seg(t, T.burin[0], T.burin[1]);
+    const k4 = ease(seg(t, T.burin[0], T.burin[1]));
 
     if (t < T.feuille[0]) {
       dessine(ctx, CARTES.soie);
-      if (k1 > 0) aTravers(CARTES.han, (sx, sy, i) => sm(k1 * 1.1 - 0.04, k1 * 1.1, 1.1 - champ1(sx, sy, i) - 0.0), { col: '#5a3e28', fn: (sx, sy, i) => { const v = 1.1 - champ1(sx, sy, i), e = k1 * 1.1; return 0.45 * sm(e - 0.07, e - 0.035, v) * (1 - sm(e - 0.01, e + 0.01, v)) * (k1 < 1 ? 1 : 0); } });
+      // seuil qui descend : les zones proches de Chang'an (v élevé) passent en premier ; frange d'encre au bord
+      const th = 1.1 - k1 * 1.3;
+      if (k1 > 0) aTravers(CARTES.han, (sx, sy, i) => sm(th, th + 0.14, 1.1 - champ1(sx, sy, i)), { col: '#5a3e28', fn: (sx, sy, i) => { const v = 1.1 - champ1(sx, sy, i); return 0.32 * sm(th - 0.1, th - 0.02, v) * (1 - sm(th + 0.02, th + 0.1, v)) * (k1 < 1 ? 1 : 0); } });
     } else if (t < T.couleur[0]) {
       // feuille : le dessous (Song) d'abord, puis la feuille Han rabattue le long du pli
       dessine(ctx, CARTES.song);
@@ -167,12 +184,12 @@ export const EssaiCarteAges: React.FC = () => {
       }
     } else if (t < T.burin[0]) {
       dessine(ctx, CARTES.song);
-      aTravers(CARTES.ming, (sx, sy, i) => { const [mx, my] = versCarte(sx, sy), j = Math.min(MH - 1, Math.max(0, Math.round(my / 4))) * MW + Math.min(MW - 1, Math.max(0, Math.round(mx / 4))); const v = 1 - (0.75 * Math.min(1, R.df[j] / 420) + 0.25 * R.n[i]); return sm(1 - k3 * 1.15, 1.06 - k3 * 1.15, v); },
-        { col: '#3f7f73', fn: (sx, sy, i) => { const [mx, my] = versCarte(sx, sy), j = Math.min(MH - 1, Math.max(0, Math.round(my / 4))) * MW + Math.min(MW - 1, Math.max(0, Math.round(mx / 4))); const v = 1 - (0.75 * Math.min(1, R.df[j] / 420) + 0.25 * R.n[i]), e = 1 - k3 * 1.15; return 0.35 * sm(e - 0.05, e, v) * (1 - sm(e + 0.02, e + 0.07, v)) * (k3 < 1 ? 1 : 0); } });
+      aTravers(CARTES.ming, (sx, sy, i) => { const [mx, my] = versCarte(sx, sy), j = Math.min(MH - 1, Math.max(0, Math.round(my / 4))) * MW + Math.min(MW - 1, Math.max(0, Math.round(mx / 4))); const v = 1 - (0.75 * Math.min(1, R.df[j] / 420) + 0.25 * R.n[i]); return sm(1.12 - k3 * 1.3, 1.26 - k3 * 1.3, v); },
+        { col: '#3f7f73', fn: (sx, sy, i) => { const [mx, my] = versCarte(sx, sy), j = Math.min(MH - 1, Math.max(0, Math.round(my / 4))) * MW + Math.min(MW - 1, Math.max(0, Math.round(mx / 4))); const v = 1 - (0.75 * Math.min(1, R.df[j] / 420) + 0.25 * R.n[i]), e = 1.12 - k3 * 1.3; return 0.28 * sm(e - 0.08, e, v) * (1 - sm(e + 0.04, e + 0.14, v)) * (k3 < 1 ? 1 : 0); } });
     } else {
       dessine(ctx, CARTES.ming);
       // burin : un front qui balaie de gauche à droite ; derrière lui, hachures fines qui s'épaississent jusqu'au plein
-      aTravers(CARTES.qing, (sx, sy, i) => { const front = k4 * 1.35 - sx / 1920 * 0.35 - 0.12 * R.n[i]; const plein = clamp(front * 2.2); const hach = ((sx + sy * 0.6) / 7) % 1; return front <= 0 ? 0 : sm(1 - plein - 0.05, 1 - plein + 0.05, hach) + plein * plein; });
+      aTravers(CARTES.qing, (sx, sy, i) => { const front = k4 * 1.45 - sx / 1920 * 0.35 - 0.12 * R.n[i]; const plein = clamp(front * 1.6); const hach = ((sx + sy * 0.6) / 7) % 1; return front <= 0 ? 0 : sm(0, 0.12, front) * Math.min(1, sm(1 - plein - 0.12, 1 - plein + 0.12, hach) + plein * plein); });
     }
 
     // ── 5. graticule de l'atlas : méridien de Pékin (中) en vermillon, puis méridiens et parallèles, 1° d'écart
