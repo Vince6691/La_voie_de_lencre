@@ -756,7 +756,7 @@ const Han: React.FC = () => {
             const t0 = q0 + (i * (q1 - q0)) / QUOTE.length, k = seg(tt, t0, t0 + 0.3);
             const x = i < 4 ? 960 : 820, y = 230 + (i % 4) * 190;
             const hl = c === '言' && i === 1 ? 0 : c === '語' ? seg(tt, p0, p0 + 0.6) : 0;
-            E.text(ctx, c, x, y, { font: 'ShuimoKai', size: 120, color: rgb(mixc(INK, VER, hl)), alpha: sa * k });
+            E.text(ctx, c, x, y, { font: 'ShuimoLegende', size: 120, color: rgb(mixc(INK, VER, hl)), alpha: sa * k });
           });
           // cascade frappée pendant le silence : bronze, sceau de Jin, petit sceau, un coup chacun
           const cas = 1 - seg(tt, rp + 0.4, rp + 0.9);
@@ -833,10 +833,10 @@ const YangXiong: React.FC = () => {
           BOOK.forEach((c, i) => {
             const k = seg(tt, lv - 0.2 + i * 0.05, lv + 0.2 + i * 0.05);
             const big = c === '方' || c === '言' ? seg(tt, lv + 0.8, lv + 1.4) : 0;
-            E.text(ctx, c, 1120, 108 + i * 64, { font: 'ShuimoKai', size: 56, color: c === '語' ? rgb(VER) : inkCss, alpha: ba * k });
+            E.text(ctx, c, 1120, 108 + i * 64, { font: 'ShuimoLegende', size: 56, color: c === '語' ? rgb(VER) : inkCss, alpha: ba * k });
             void big;
           });
-          E.text(ctx, '方言', 620, 470, { font: 'ShuimoKai', size: 260, color: inkCss, alpha: ba * seg(tt, lv + 0.6, lv + 1.2) });
+          E.text(ctx, '方言', 620, 470, { font: 'ShuimoLegende', size: 260, color: inkCss, alpha: ba * seg(tt, lv + 0.6, lv + 1.2) });
         }} />
       </Cam>
       {/* médaillon au trait de Yang Xiong, qui se trace dès qu'il est nommé */}
@@ -1026,7 +1026,7 @@ const Recap: React.FC = () => {
       <div style={{ position: 'absolute', width: '100%', top: 650, display: 'flex', justifyContent: 'center', gap: 220, opacity: seg(t, mo - 0.1, mo + 0.4) * (1 - seg(t, B('b09') + 0.3, B('b09') + 0.9)) }}>
         {[['語言', 'yǔyán · la langue', mo], ['成語', 'chéngyǔ · expression figée', ch]].map(([zh, fr, a0]) => (
           <div key={zh as string} style={{ textAlign: 'center', opacity: seg(t, (a0 as number) - 0.1, (a0 as number) + 0.4) }}>
-            <div style={{ fontFamily: 'ShuimoKai', fontSize: 130, color: inkCss, lineHeight: 1.1 }}>{zh}</div>
+            <div style={{ fontFamily: 'ShuimoLegende', fontSize: 130, color: inkCss, lineHeight: 1.1 }}>{zh}</div>
             <div style={{ fontFamily: 'ShuimoLatin', fontSize: 48, fontWeight: 600, color: '#4b4038' }}>{fr}</div>
           </div>
         ))}
