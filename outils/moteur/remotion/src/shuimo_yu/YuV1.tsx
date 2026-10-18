@@ -313,6 +313,41 @@ const drawBaimiao = (ctx: CanvasRenderingContext2D, p: number, x: number, y: num
 // 食不語 (jour) 寢不言 (nuit), la caméra collée à sa pointe → 語 puis 言 se détachent des panneaux → « On interdit
 // l'un ici, l'autre là » : deux coups de pinceau vermillon les barrent → face à face, ils se répondent
 const PRECEPT = '食不語寢不言'.split('');
+// le précepte au pinceau (Ma Shan Zheng, forme simplifiée comme dans la voix : 食不语，寝不言)
+const PRECEPT_PINCEAU = '食不语寝不言'.split('');
+// caractère au pinceau écrit trait par trait : la police est révélée à travers un masque qui suit l'ordre réel des traits
+// (médianes Make Me a Hanzi, traits épais) ; à la fin du créneau, le caractère est entier
+const brushGlyph = (ctx: CanvasRenderingContext2D, ch: string, medians: number[][][] | null, O: { x: number; y: number; size: number }, pg: number, color: string, a: number, glow: number, glowColor: string) => {
+  if (a <= 0 || pg <= 0) return;
+  const S = Math.ceil(O.size * 1.25), c = document.createElement('canvas'); c.width = c.height = S;
+  const g = c.getContext('2d')!;
+  g.font = `${O.size}px ShuimoPinceau`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = color;
+  g.fillText(ch, S / 2, S / 2 + O.size * 0.04);
+  if (medians && pg < medians.length) {
+    const m = document.createElement('canvas'); m.width = m.height = S; const mc = m.getContext('2d')!;
+    mc.strokeStyle = '#fff'; mc.lineCap = 'round'; mc.lineJoin = 'round'; mc.lineWidth = O.size * 0.17;
+    const P = (q: number[]) => [S / 2 - O.size / 2 + (q[0] / 1024) * O.size, S / 2 - O.size / 2 + ((900 - q[1]) / 1024) * O.size];
+    medians.forEach((med, k) => {
+      const f = clamp(pg - k);
+      if (f <= 0) return;
+      // longueur parcourue de la médiane
+      const L: number[] = [0]; for (let j = 1; j < med.length; j++) L.push(L[j - 1] + Math.hypot(med[j][0] - med[j - 1][0], med[j][1] - med[j - 1][1]));
+      const lim = L[L.length - 1] * f;
+      mc.beginPath(); const p0 = P(med[0]); mc.moveTo(p0[0], p0[1]);
+      for (let j = 1; j < med.length; j++) {
+        if (L[j] <= lim) { const p = P(med[j]); mc.lineTo(p[0], p[1]); continue; }
+        const r = (lim - L[j - 1]) / (L[j] - L[j - 1]), pa = P(med[j - 1]), pb = P(med[j]);
+        mc.lineTo(pa[0] + (pb[0] - pa[0]) * r, pa[1] + (pb[1] - pa[1]) * r); break;
+      }
+      mc.stroke();
+    });
+    g.globalCompositeOperation = 'destination-in'; g.drawImage(m, 0, 0);
+  }
+  ctx.save(); ctx.globalAlpha *= a;
+  if (glow > 0) { ctx.shadowColor = glowColor; ctx.shadowBlur = glow; }
+  ctx.drawImage(c, O.x - S / 2, O.y - S / 2);
+  ctx.restore();
+};
 const PKEYS = ['yu_p_shi', 'yu_p_bu', 'yu_kai', 'yu_p_qin', 'yu_p_bu', 'yu_yan_kai'];
 // panneaux 16:9 côte à côte ; le précepte s'écrit dans la moitié droite, laissée vide, de chacun
 const PANELS = [{ x: 70, y: 200, w: 880, h: 495 }, { x: 970, y: 200, w: 880, h: 495 }];
@@ -414,7 +449,7 @@ const OmbresIntro: React.FC = () => {
   if (out >= 1) return null;
   const light = ease(seg(t, 0.1, 0.9)), ign = Math.exp(-Math.max(0, t - 0.15) * 5) * seg(t, 0.1, 0.2);
   const flick = 1 + 0.035 * Math.sin(t * 23) * Math.sin(t * 7.3) + 0.02 * Math.sin(t * 41);
-  const dolly = ease(seg(t, 0, pr + 0.5)), sc = 1 + 0.075 * dolly, tx = -18 * dolly, ty = -10 * dolly;
+  const dolly = ease(seg(t, 0, pr + 1.0)), sc = 1 + 0.17 * dolly, tx = -30 * dolly, ty = -10 * dolly;
   const sway = 3 * Math.sin(t * 5.1) * Math.sin(t * 1.7);
   const word = seg(t, di - 0.15, di + 0.45) * (1 - seg(t, dx + 0.5, dx + 1.1)), split = ease(seg(t, dx - 0.05, dx + 0.9));
   const proj = (at0: number) => ease(seg(t, at0 - 0.25, at0 + 0.55));
@@ -527,7 +562,7 @@ const Opening: React.FC = () => {
               const { pr: pg, lift, gap } = writeSlot(tt, t0, t1, n);
               if (pg <= 0) return;
               const tr = ci + (i * (qEnd - ci)) / 6, rd = win(tt, tr, tr + 0.45, 0.12); // la voix le lit
-              E.drawStrokes(ctx, key, { ...O, progress: pg, brush: false, color: () => (i < 3 ? inkCss : 'rgb(238,232,214)'), alpha: () => da, glow: 16 * rd, glowColor: i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)' });
+              brushGlyph(ctx, PRECEPT_PINCEAU[i], D.medians, O, pg, i < 3 ? inkCss : 'rgb(238,232,214)', da, 16 * rd, i < 3 ? 'rgba(255,240,200,0.9)' : 'rgba(200,210,255,0.8)');
             });
                         // la main et le pinceau (image détourée, pointe en bas au centre) ; levé entre deux traits
             if (tt > qEnd - 0.3) drawSeal(ctx, E, 1800, 650, 48, '論', tt - qEnd + 0.3);
@@ -550,7 +585,7 @@ const Opening: React.FC = () => {
             const pulse = 1 + 0.12 * win(tt, hit, hit + 0.5, 0.15) + 0.14 * win(tt, talk, talk + 0.6, 0.15);
             const glow = 30 * win(tt, t0 + 0.3, t0 + 1.6, 0.4) + 26 * win(tt, talk, talk + 0.8, 0.2);
             ctx.save(); ctx.globalAlpha = 1 - out;
-            E.drawStrokes(ctx, i === 0 ? 'yu_kai' : 'yu_yan_kai', { x, y, size: s * pulse, brush: false, color: () => inkCss, glow: glow * 1.3, glowColor: rgb(GOLD, 0.75) });
+            brushGlyph(ctx, i === 0 ? '语' : '言', null, { x, y, size: s * pulse }, 99, inkCss, 1, glow * 1.3, rgb(GOLD, 0.75));
             ctx.restore();
             // « On interdit l'un ici, l'autre là »
             const st = i === 0 ? it + 0.15 : au;
