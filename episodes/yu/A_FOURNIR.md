@@ -165,7 +165,7 @@ Camera: locked-off, macro lens, very slow push-in, shallow depth of field.
 Constraints: no text, no characters, no hands, no bubbles, no foam, no splashes outside the water, no color tint.
 ```
 
-### Piste 4 — deux ombres qui se parlent (Nano Banana, 16:9) → `images/ombres_conseillers.png`
+### Piste 4 — deux ombres qui se parlent (Nano Banana, 16:9) — FAIT (`images/ombres_conseillers.jpg`, essai `YuIntroOmbres`)
 J'anime la flamme et les ombres, et j'écris 語 et 言 en ombre portée sur le mur, au-dessus de chaque silhouette.
 ```
 Cinematic still, 16:9. Two traditional Chinese red paper-cut (jianzhi) silhouettes of scholars in long cross-collar robes, seen in strict profile, facing each other with mouths slightly open as if in conversation, each standing on a small wooden stand on a dark lacquered table. A single small oil lamp with a warm flame sits on the table between them and slightly in front, casting their large, soft-edged shadows onto a pale lime-plastered wall behind them; the shadows are tall and lean toward each other. Above each shadow, a large calm empty area of wall. Warm amber light, deep shadows at the edges of the frame, fine texture of the plaster and of the cut paper.

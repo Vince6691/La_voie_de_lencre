@@ -2,8 +2,8 @@
 //   YuIntroEncre : « parler » à l'encre se soulève du papier, éclate en gouttelettes qui se reforment en 語 puis 言
 //   YuIntroLaque : PARLER incrusté d'or dans une plaque de laque ; la plaque se fend en deux, 語 et 言 en sortent
 // Contours des glyphes : intro3d_glyphs.json (Cormorant pour le latin, LXGW WenKai TC pour le chinois, unités de police).
-import React, { useMemo } from 'react';
-import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import React, { useEffect, useMemo, useState } from 'react';
+import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
@@ -214,6 +214,43 @@ export const YuIntroLaque: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: '#1d1714' }}>
       <ThreeCanvas width={width} height={height} shadows gl={{ antialias: true }} camera={{ fov: 34, position: [0, -4.2, 3.3], near: 0.05, far: 60 }}><LaqueScene t={t} /></ThreeCanvas>
+      <Voice />
+    </AbsoluteFill>
+  );
+};
+
+// ═══════════════════ Option 4 : deux ombres qui se parlent (image ombres_conseillers.jpg)
+// La lampe s'allume dans le noir ; « parler » apparaît en ombre portée sur le mur, se scinde sur « deux mots » ;
+// chaque ombre « prononce » son caractère, projeté sur le mur au-dessus d'elle (語 à gauche, 言 à droite).
+const OMB = { yu: [0.33, 0.23], yan: [0.68, 0.23], flame: [0.5, 0.735] }; // positions dans l'image (fractions)
+export const YuIntroOmbres: React.FC = () => {
+  const t = useT();
+  const [h] = useState(() => delayRender('polices'));
+  useEffect(() => { Promise.all([new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(), new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700', style: 'italic' }).load()]).then((fs) => { fs.forEach((f) => document.fonts.add(f)); continueRender(h); }); }, [h]);
+  const light = ease(seg(t, 0.05, 0.75));
+  const flick = 1 + 0.035 * Math.sin(t * 23) * Math.sin(t * 7.3) + 0.02 * Math.sin(t * 41);
+  const push = 1.0 + 0.07 * ease(seg(t, 0, INTRO_SECONDS));
+  const sh = (x: number) => x; // l'ombre suit la flamme : léger balancement
+  const sway = 3 * Math.sin(t * 5.1) * Math.sin(t * 1.7);
+  const word = seg(t, T.dire - 0.15, T.dire + 0.45) * (1 - seg(t, T.deux + 0.5, T.deux + 1.1));
+  const split = ease(seg(t, T.deux - 0.05, T.deux + 0.9));
+  const glyph = (at: number) => ease(seg(t, at - 0.2, at + 0.5));
+  const shadowText: React.CSSProperties = { position: 'absolute', color: 'rgba(38,28,20,0.62)', filter: 'blur(5px)', whiteSpace: 'nowrap', transform: 'translate(-50%, -50%)' };
+  return (
+    <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
+      <AbsoluteFill style={{ transform: `scale(${push})`, transformOrigin: '50% 62%' }}>
+        <img src={staticFile('episodes/yu/images/ombres_conseillers.jpg')} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: `brightness(${(0.08 + 0.92 * light) * flick})` }} />
+        {/* halo chaud de la flamme */}
+        <div style={{ position: 'absolute', left: `${OMB.flame[0] * 100}%`, top: `${OMB.flame[1] * 100}%`, width: 520, height: 520, transform: 'translate(-50%, -60%)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,190,110,0.35), rgba(255,190,110,0) 70%)', opacity: light * flick, mixBlendMode: 'screen' }} />
+        {/* « parler » en ombre portée, puis scindé en deux vers chaque silhouette */}
+        {word > 0 && ['par', 'ler'].map((s, i) => (
+          <div key={s} style={{ ...shadowText, left: `${(50 + (i ? 1 : -1) * (4.3 + 13 * split)) * 1}%`, top: `${17 - 2 * split}%`, fontFamily: 'ShuimoLatin', fontStyle: 'italic', fontWeight: 600, fontSize: 150, opacity: word * light, marginLeft: sway, textAlign: i ? 'left' : 'right' }}>{s}</div>
+        ))}
+        {[['語', OMB.yu, T.yu], ['言', OMB.yan, T.yan]].map(([c, p, at]) => {
+          const k = glyph(at as number);
+          return k > 0 ? <div key={c as string} style={{ ...shadowText, left: `${(p as number[])[0] * 100}%`, top: `${((p as number[])[1] + 0.04 * (1 - k)) * 100}%`, fontFamily: 'ShuimoKai', fontSize: 230 + 40 * k, opacity: k * light * 0.95, marginLeft: sh(sway * 1.4) }}>{c as string}</div> : null;
+        })}
+      </AbsoluteFill>
       <Voice />
     </AbsoluteFill>
   );

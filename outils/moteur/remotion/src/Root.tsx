@@ -7,7 +7,7 @@ import { TIYING_SECONDS, TiyingReveal } from './shuimo_wen/TiyingReveal';
 import { WEN_SECONDS, WenV1 } from './shuimo_wen/WenV1';
 import { MEI_SECONDS, MeiV1 } from './shuimo_mei/MeiV1';
 import { YU_SECONDS, YuV1 } from './shuimo_yu/YuV1';
-import { INTRO_SECONDS, YuIntroEncre, YuIntroLaque } from './shuimo_yu/IntroTests';
+import { INTRO_SECONDS, YuIntroEncre, YuIntroLaque, YuIntroOmbres } from './shuimo_yu/IntroTests';
 import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
@@ -49,6 +49,7 @@ export const RemotionRoot: React.FC = () => (
   <Composition id="MeiV1" component={MeiV1} durationInFrames={Math.round(MEI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuV1" component={YuV1} durationInFrames={Math.round(YU_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuIntroEncre" component={YuIntroEncre} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="YuIntroOmbres" component={YuIntroOmbres} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuIntroLaque" component={YuIntroLaque} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenV1" component={WenV1} durationInFrames={Math.round(WEN_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenTiying" component={TiyingReveal} durationInFrames={Math.round(TIYING_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
