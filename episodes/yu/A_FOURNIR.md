@@ -147,3 +147,27 @@ A great walled settlement on the south bank of a wide river that curves around i
 Far in the background to the left, the faint blue-grey ridges of distant mountains; morning mist lying on the river and between the halls.
 Top-left corner kept calm and pale (only mist). 16:9 composition, no people visible at this distance, no text, no calligraphy, no seal, no signature, no border.
 ```
+
+## 8. Ouverture (0–5 s) : pistes 1 et 4, en essai
+Pistes 2 (plaque de laque qui se fend) et 3 (« parler » à l'encre qui se lève en 3D) : faites en code, rien à fournir
+(`YuIntroLaque`, `YuIntroEncre`).
+
+### Piste 1 — encre dans l'eau (Seedance, 5 s, 16:9) → `clips/ouverture_encre.mp4`
+Je révèle 語 et 言 dans les deux nuages au montage (masques) ; le son du clip n'est pas gardé.
+```
+[Style]: photoreal macro cinematography, high-speed slow motion, ultra clean, warm off-white backlight like aged rice paper, pure black ink only, no other color.
+Duration: 5s, 16:9.
+
+[00:00-00:01] A single drop of black ink falls from the top of the frame into perfectly clear, still water in a glass tank; we only see the water and the warm off-white glowing background, no tank edges.
+[00:01-00:03] On impact the ink blooms in slow motion into silky curling plumes and fine threads, expanding toward the camera.
+[00:03-00:05] The ink cloud divides into two separate billowing masses that drift slowly apart, one to the left third, one to the right third, each gently spiraling on itself; the center of the frame clears to bright water.
+Camera: locked-off, macro lens, very slow push-in, shallow depth of field.
+Constraints: no text, no characters, no hands, no bubbles, no foam, no splashes outside the water, no color tint.
+```
+
+### Piste 4 — deux ombres qui se parlent (Nano Banana, 16:9) → `images/ombres_conseillers.png`
+J'anime la flamme et les ombres, et j'écris 語 et 言 en ombre portée sur le mur, au-dessus de chaque silhouette.
+```
+Cinematic still, 16:9. Two traditional Chinese red paper-cut (jianzhi) silhouettes of scholars in long cross-collar robes, seen in strict profile, facing each other with mouths slightly open as if in conversation, each standing on a small wooden stand on a dark lacquered table. A single small oil lamp with a warm flame sits on the table between them and slightly in front, casting their large, soft-edged shadows onto a pale lime-plastered wall behind them; the shadows are tall and lean toward each other. Above each shadow, a large calm empty area of wall. Warm amber light, deep shadows at the edges of the frame, fine texture of the plaster and of the cut paper.
+No text, no calligraphy, no seal, no signature, no frame.
+```
