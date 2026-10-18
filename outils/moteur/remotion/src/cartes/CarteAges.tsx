@@ -1,7 +1,7 @@
 // Essai : « la carte traverse les âges » (transition Han → Qing, 7 s, vue de dessus ; skill carte-peinte). La même
 // géographie (cadrage chine_centre_nord) passe par quatre cartes chinoises réelles pendant que le compteur du rouleau
 // défile ; chaque passage reprend le geste de sa technique :
-//   soie (Yang Xiong) → Mawangdui, Han : l'encre gagne la soie depuis Chang'an ;
+//   papier nu → Mawangdui, Han : l'encre gagne le papier depuis Chang'an ;
 //   → atlas imprimé Song (歷代地理指掌圖) : la feuille imprimée se soulève depuis le coin, verso en transparence ;
 //   → carte peinte Ming (大明混一圖) : la couleur se répand depuis les fleuves ;
 //   → atlas de Kangxi (Qing) : gravure au burin, puis le méridien de Pékin (中, méridien zéro de l'atlas) se grave en
@@ -36,7 +36,7 @@ const T = {
   encre: [0.1, tA(160)], feuille: [tA(560), tA(1060)], couleur: [tA(1180), tA(1460)], burin: [tA(1520), tA(1700)],
   meridien: [tA(1690), tA(1690) + 0.75], grille: [tA(1690) + 0.3, ARRIVEE + 0.3], ville: [ARRIVEE - 0.35, ARRIVEE + 0.75],
 };
-const CARTES = { soie: 'chine_centre_nord', han: 'chine_centre_nord_mawangdui', song: 'chine_centre_nord_zhizhang', ming: 'chine_centre_nord_hunyi', qing: 'chine_centre_nord_kangxi' };
+const CARTES = { han: 'chine_centre_nord_mawangdui', song: 'chine_centre_nord_zhizhang', ming: 'chine_centre_nord_hunyi', qing: 'chine_centre_nord_kangxi' };
 
 // caméra : un seul zoom lent vers Pékin, au rythme du compteur (F). On zoome « autour » de Pékin : son point à l'écran
 // glisse de sa place sur la carte entière vers le centre, pendant que le zoom passe de 1 à 2 ; après l'arrivée, très
@@ -149,7 +149,7 @@ export const EssaiCarteAges: React.FC = () => {
     const k4 = ease(seg(t, T.burin[0], T.burin[1]));
 
     if (t < T.feuille[0]) {
-      dessine(ctx, CARTES.soie);
+      // départ sur le papier nu : la carte Han naît de l'encre
       // seuil qui descend : les zones proches de Chang'an (v élevé) passent en premier ; frange d'encre au bord
       const th = 1.1 - k1 * 1.3;
       if (k1 > 0) aTravers(CARTES.han, (sx, sy, i) => sm(th, th + 0.14, 1.1 - champ1(sx, sy, i)), { col: '#5a3e28', fn: (sx, sy, i) => { const v = 1.1 - champ1(sx, sy, i); return 0.32 * sm(th - 0.1, th - 0.02, v) * (1 - sm(th + 0.02, th + 0.1, v)) * (k1 < 1 ? 1 : 0); } });
