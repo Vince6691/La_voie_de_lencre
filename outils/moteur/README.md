@@ -106,7 +106,7 @@ python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
   `eleven_multilingual_v2`, conservée pour comparaison.)
 - Musique et bruitages : synthèse procédurale (`tools/audio.py`) — bourdon, cordes,
   guzheng pentatonique, taiko, souffles, craquements d'os, gong de bronze.
-- Polices : LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant Garamond (licence OFL).
+- Polices : LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant Garamond, Zhuque Fangsong 朱雀仿宋 (TrionesType, v0.212, légendes du 語) (licence OFL).
 
 ## Sources des formes
 
