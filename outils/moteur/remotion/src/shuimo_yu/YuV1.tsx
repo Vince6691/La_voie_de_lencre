@@ -53,7 +53,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement provisoire tant qu'elles manquent)
-const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', anyang: 'episodes/yu/images/anyang_ciel.jpg', ombres: 'episodes/yu/images/ombres_conseillers.jpg', dial: 'episodes/yu/images/carte_dialectes_peinte.jpg' };
+const IMGSRC = { jour: 'episodes/yu/images/precepte_jour.jpg', nuit: 'episodes/yu/images/precepte_nuit.jpg', pinceau: 'episodes/yu/images/pinceau_main.png', pointe: 'episodes/yu/images/pinceau_pointe_macro.png', banquet: 'episodes/yu/images/banquet_estampage.jpg', ca: 'episodes/yu/images/conseiller_a.png', cb: 'episodes/yu/images/conseiller_b.png', yx: 'episodes/yu/images/yangxiong_trace.png', anyang: 'episodes/yu/images/anyang_ciel.jpg', ombres: 'episodes/yu/images/ombres_conseillers.jpg', dial: 'episodes/yu/images/carte_dialectes_peinte.jpg', hanmap: 'episodes/yu/images/carte_han_peinte.jpg' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 // ── polices, moteur Canvas
 const useSetup = () => {
@@ -912,7 +912,7 @@ const Han: React.FC = () => {
 // ════════════════ 7. Yang Xiong et les soldats : carte des parlers, clip B, le livre 方言
 const CHANGAN = [108.9, 34.3];
 // régions des parlers citées dans le 方言 (repères approximatifs) : d'où viennent les soldats
-const DIAL: [string, string, [number, number]][] = [['秦', 'Qin', [107.5, 35.4]], ['晉', 'Jin', [112.4, 37.6]], ['燕', 'Yan', [116.4, 39.9]], ['齊', 'Qi', [118.3, 36.4]], ['楚', 'Chu', [112.4, 30.4]], ['吳越', 'Wu-Yue', [120.2, 30.3]], ['蜀', 'Shu', [104.1, 30.7]]];
+const DIAL: [string, string, [number, number]][] = [['秦', 'Qin', [105.6, 36.4]], ['晉', 'Jin', [112.4, 37.6]], ['燕', 'Yan', [116.4, 39.9]], ['齊', 'Qi', [118.3, 36.4]], ['楚', 'Chu', [112.4, 30.4]], ['吳越', 'Wu-Yue', [120.2, 30.3]], ['蜀', 'Shu', [104.1, 30.7]]];
 const BOOK = '輶軒使者絕代語釋別國方言'.split('');
 const YangXiong: React.FC = () => {
   const t = useT();
@@ -951,27 +951,65 @@ const YangXiong: React.FC = () => {
       <Caption text="portrait imaginé" a={win(t, A7 + 1.2, mapFrom + 0.2, 0.4)} y={940} size={44} />
       <MapPanel from={mapFrom} to={mapTo} draw={(ctx, u, E, tt) => {
         const v = { lon: 112.5, lat: 34.2, k: 52 }, vb = v;
-        E.mapLayer(ctx, v, vb, 120, 'yu_han', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
-        E.mapLayer(ctx, v, vb, 120, 'yu_han_reg', (c: CanvasRenderingContext2D, w: any) => E.region(c, w, 'han', 'rgba(184,52,36,0.10)', 1), seg(tt, mapFrom + 0.3, mapFrom + 1.2));
-        E.mapDeco(ctx, { paper: true });
-        // les parlers : chaque région s'allume, puis une flèche d'encre part vers Chang'an sur « venus des confins »
         const ca = E.proj(v, CHANGAN);
+        // carte peinte (même projection que le guide) : lente poussée vers Chang'an
+        const z = 1 + 0.07 * ease(seg(tt, mapFrom, mapTo));
+        ctx.save(); ctx.translate(ca[0], ca[1]); ctx.scale(z, z); ctx.translate(-ca[0], -ca[1]);
+        if (IMG.hanmap) ctx.drawImage(IMG.hanmap, 0, 0, 1920, 1080);
+        else { E.mapLayer(ctx, v, vb, 120, 'yu_han', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false })); E.mapDeco(ctx, { paper: true }); }
+        // l'empire Han en lavis vermillon très doux
+        const ra = seg(tt, mapFrom + 0.3, mapFrom + 1.4);
+        if (ra > 0) { ctx.save(); E.mapLayer(ctx, v, vb, 120, 'yu_han_reg', (c: CanvasRenderingContext2D, w: any) => E.region(c, w, 'han', 'rgba(184,52,36,0.07)', 1), ra); ctx.restore(); }
+        // les parlers : cachet vermillon au lieu, nom en fangsong, transcription ; puis un trait de pinceau vers Chang'an
         DIAL.forEach(([zh, fr, p], i) => {
           const a = seg(tt, so - 0.4 + i * 0.12, so + 0.1 + i * 0.12);
           if (a <= 0) return;
           const q = E.proj(v, p);
-          E.text(ctx, zh, q[0], q[1] - 6, { font: 'ShuimoKai', size: 70, color: rgb(MAL), alpha: a });
-          E.text(ctx, fr, q[0], q[1] + 54, { font: 'Cormorant', size: 40, weight: 700, color: '#4b4038', alpha: a });
-          const k = ease(seg(tt, cf + i * 0.15, cf + 1.0 + i * 0.15));
-          if (k > 0 && zh !== '秦') {
-            ctx.save(); ctx.globalAlpha = a * 0.85; ctx.strokeStyle = rgb(INK, 0.75); ctx.lineWidth = 5; ctx.setLineDash([14, 10]); ctx.lineCap = 'round';
-            const mx = (q[0] + ca[0]) / 2, my = (q[1] + ca[1]) / 2 - 60;
-            ctx.beginPath(); ctx.moveTo(q[0], q[1] + 20);
-            for (let s = 1; s <= 24; s++) { const f = (s / 24) * k; const x = (1 - f) * (1 - f) * q[0] + 2 * (1 - f) * f * mx + f * f * ca[0], y = (1 - f) * (1 - f) * (q[1] + 20) + 2 * (1 - f) * f * my + f * f * ca[1]; ctx.lineTo(x, y); }
-            ctx.stroke(); ctx.restore();
+          const k = ease(seg(tt, cf + i * 0.15, cf + 1.1 + i * 0.15));
+          if (k > 0) {
+            const mx = (q[0] + ca[0]) / 2 + (q[1] - ca[1]) * 0.18, my = (q[1] + ca[1]) / 2 - (q[0] - ca[0]) * 0.18;
+            const pt = (f: number) => [(1 - f) * (1 - f) * q[0] + 2 * (1 - f) * f * mx + f * f * ca[0], (1 - f) * (1 - f) * q[1] + 2 * (1 - f) * f * my + f * f * ca[1]];
+            const r = rng(i * 7 + 3), N = 40, L: number[][] = [], Rr: number[][] = [], D = Math.hypot(q[0] - ca[0], q[1] - ca[1]), f0 = 26 / D, f1 = 1 - 62 / D;
+            for (let s = 0; s <= N; s++) {
+              const f = f0 + (s / N) * k * (f1 - f0), P = pt(f), P2 = pt(f + 0.01);
+              const dx = P2[0] - P[0], dy = P2[1] - P[1], d = Math.hypot(dx, dy) || 1;
+              const w = (7.5 - 5.5 * (s / N)) * (0.85 + 0.3 * r());
+              L.push([P[0] - (dy / d) * w, P[1] + (dx / d) * w]); Rr.push([P[0] + (dy / d) * w, P[1] - (dx / d) * w]);
+            }
+            ctx.save(); ctx.globalAlpha = a * 0.78; ctx.fillStyle = rgb(INK, 0.82);
+            ctx.beginPath(); L.forEach((P, j) => (j ? ctx.lineTo(P[0], P[1]) : ctx.moveTo(P[0], P[1]))); Rr.reverse().forEach((P) => ctx.lineTo(P[0], P[1])); ctx.closePath(); ctx.fill();
+            ctx.restore();
           }
+          // cachet au lieu
+          const sd = seg(tt, so - 0.4 + i * 0.12, so - 0.2 + i * 0.12), sz = 26 * (1 + 0.5 * (1 - sd));
+          ctx.save(); ctx.globalAlpha = a; ctx.translate(q[0], q[1]); ctx.rotate(-0.05 + 0.02 * (i % 4));
+          ctx.fillStyle = rgb(VER, 0.9); ctx.fillRect(-sz / 2, -sz / 2, sz, sz); ctx.strokeStyle = 'rgba(246,238,224,0.85)'; ctx.lineWidth = 2; ctx.strokeRect(-sz / 2 + 4, -sz / 2 + 4, sz - 8, sz - 8);
+          ctx.restore();
+          const lx = q[0] + (zh === '蜀' || zh === '秦' ? -24 : 24), al = zh === '蜀' || zh === '秦' ? 'right' : 'left';
+          E.text(ctx, zh, lx, q[1] - 8, { font: 'ShuimoLegende', size: 62, color: inkCss, alpha: a, align: al });
+          E.text(ctx, fr, lx, q[1] + 40, { font: 'Cormorant', size: 36, weight: 700, color: '#4b4038', alpha: a, align: al });
         });
-        E.marker(ctx, tt, v, CHANGAN, "Chang'an 長安", 'capitale des Han', seg(tt, mapFrom + 0.5, mapFrom + 1.0), '#c0392b', 1);
+        // Chang'an : grand cachet 長安 qui pulse quand les traits arrivent
+        const cA = seg(tt, mapFrom + 0.5, mapFrom + 1.0);
+        if (cA > 0) {
+          const arr = seg(tt, cf + 0.8, cf + 2.2), pulse = arr > 0 && arr < 1 ? Math.sin(arr * Math.PI) : 0;
+          ctx.save(); ctx.globalAlpha = cA * (0.5 * (1 - arr) + 0.15); ctx.strokeStyle = rgb(VER, 0.8); ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(ca[0], ca[1], 46 + 60 * arr, 0, 7); ctx.stroke(); ctx.restore();
+          const S = 74 * (1 + 0.5 * (1 - seg(tt, mapFrom + 0.5, mapFrom + 0.7))) * (1 + 0.06 * pulse);
+          ctx.save(); ctx.globalAlpha = cA; ctx.translate(ca[0], ca[1]); ctx.rotate(-0.04);
+          ctx.shadowColor = 'rgba(40,20,10,0.3)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 6;
+          ctx.fillStyle = rgb(VER, 0.94); ctx.fillRect(-S / 2, -S / 2, S, S); ctx.shadowColor = 'transparent';
+          ctx.strokeStyle = 'rgba(246,238,224,0.9)'; ctx.lineWidth = 2.5; ctx.strokeRect(-S / 2 + 5, -S / 2 + 5, S - 10, S - 10);
+          E.text(ctx, '長', 0, -S * 0.2, { font: 'Zhuan', size: S * 0.42, color: '#f6eee0' });
+          E.text(ctx, '安', 0, S * 0.22, { font: 'Zhuan', size: S * 0.42, color: '#f6eee0' });
+          ctx.restore();
+          ctx.save(); ctx.globalAlpha = cA * 0.88; ctx.fillStyle = '#efe3c8'; ctx.shadowColor = 'rgba(60,40,20,0.25)'; ctx.shadowBlur = 14;
+          ctx.beginPath(); ctx.roundRect(ca[0] - 150, ca[1] + 52, 300, 88, 10); ctx.fill(); ctx.restore();
+          E.text(ctx, "Chang'an", ca[0], ca[1] + 82, { font: 'Cormorant', size: 44, weight: 700, color: inkCss, alpha: cA });
+          E.text(ctx, '長安 · capitale des Han', ca[0], ca[1] + 122, { font: 'ShuimoLegende', size: 30, color: '#4b4038', alpha: cA });
+        }
+        ctx.restore();
+        if (IMG.hanmap) E.text(ctx, 'carte peinte d’après Natural Earth', 1880, 1046, { font: 'Cormorant', size: 22, weight: 600, color: 'rgba(60,48,36,0.7)', align: 'right' });
         void u;
       }} />
       <Caption text="selon une lettre qui lui est attribuée · d'autres parlers encore" a={win(t, so, mapTo, 0.4)} y={955} size={44} />
@@ -1034,12 +1072,12 @@ const Today: React.FC = () => {
           if (a <= 0) return;
           const q = E.proj(v, p);
           ctx.save(); ctx.globalAlpha = a; ctx.filter = 'blur(14px)'; ctx.fillStyle = rgb(col, 0.22); ctx.beginPath(); ctx.ellipse(q[0], q[1], r * 1.2, r, 0, 0, 7); ctx.fill(); ctx.restore();
-          E.text(ctx, zh, q[0], q[1] - 10, { font: 'ShuimoKai', size: 64, color: rgb(col), alpha: a });
+          E.text(ctx, zh, q[0], q[1] - 10, { font: 'ShuimoLegende', size: 66, color: rgb(col), alpha: a });
           E.text(ctx, fr, q[0], q[1] + 44, { font: 'Cormorant', size: 40, weight: 700, color: '#4b4038', alpha: a });
         });
         E.marker(ctx, tt, v, [116.4, 39.9], 'Pékin', '', seg(tt, ec, ec + 0.4), '#c0392b', 1);
         E.marker(ctx, tt, v, [113.3, 23.1], 'Canton', '', seg(tt, ca - 0.3, ca + 0.1), '#c0392b', -1);
-        E.text(ctx, '汉语', 330, 400, { font: 'ShuimoKai', size: 110, color: inkCss, alpha: seg(tt, mosEnd - 0.5, mosEnd) });
+        E.text(ctx, '汉语', 330, 400, { font: 'ShuimoLegende', size: 110, color: inkCss, alpha: seg(tt, mosEnd - 0.5, mosEnd) });
         void u;
       }} />
       <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={r3TagIn(R3B, t) * (1 - seg(t, pa - 0.6, pa - 0.1))} />

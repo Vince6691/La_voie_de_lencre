@@ -172,7 +172,7 @@ Cinematic still, 16:9. Two traditional Chinese red paper-cut (jianzhi) silhouett
 No text, no calligraphy, no seal, no signature, no frame.
 ```
 
-## 9. Carte premium (cartes des blocs 7 et 8) — dialectes FAIT (`images/carte_dialectes_peinte.jpg`) ; Han à fournir (`images/carte_han_peinte.jpg`)
+## 9. Carte premium (cartes des blocs 7 et 8) — dialectes FAIT (`images/carte_dialectes_peinte.jpg`) ; Han FAIT (`images/carte_han_peinte.jpg`)
 Une carte **peinte**, posée sous les marqueurs, régions et routes (projetés au même cadrage). Pour que la géographie
 reste exacte, **joindre l'image-guide** à Nano Banana (mode édition / image de référence), une génération par carte :
 `images/guides/guide_carte_han.jpg` puis `images/guides/guide_carte_dialectes.jpg`. 16:9, ≥ 1920 × 1080.
