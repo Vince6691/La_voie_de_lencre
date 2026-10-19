@@ -12,7 +12,7 @@ import { SHUIMO_DEMO_SECONDS, ShuimoDemo, ShuimoDemoProps } from './shuimo/Shuim
 import { MorphEncre, MorphProps } from './morph/MorphEncre';
 import { SHUIMO_XUE_SECONDS, ShuimoXue } from './shuimo_xue/ShuimoXue';
 import { JIEHUA_SECONDS, JiehuaDemo } from './jiehua/JiehuaDemo';
-import { JIEHUA3D_SECONDS, Jiehua3D } from './jiehua3d/Jiehua3D';
+import { JIEHUA3D_SECONDS, Jiehua3D, Jiehua3DProps } from './jiehua3d/Jiehua3D';
 import { ROULEAU_DEMO_SECONDS, RouleauDemo } from './rouleau/RouleauDemo';
 
 export const FPS = 30;
@@ -43,7 +43,10 @@ export const RemotionRoot: React.FC = () => (
   {/* dessin à la règle 界畫 : salle Song tracée trait par trait puis colorée au lavis, sur fond shuimo */}
   <Composition id="JiehuaDemo" component={JiehuaDemo} durationInFrames={JIEHUA_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   {/* 界畫 en volume : charpente modélisée, rendue en traits d'encre (ossature, fermeture, lavis), caméra en orbite */}
-  <Composition id="Jiehua3D" component={Jiehua3D} durationInFrames={JIEHUA3D_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
+  <Composition id="Jiehua3D" component={Jiehua3D} durationInFrames={JIEHUA3D_SECONDS * FPS} fps={FPS} width={1920} height={1080}
+    defaultProps={{ style: 'song' } satisfies Jiehua3DProps} />
+  <Composition id="Jiehua3DQing" component={Jiehua3D} durationInFrames={JIEHUA3D_SECONDS * FPS} fps={FPS} width={1920} height={1080}
+    defaultProps={{ style: 'qing' } satisfies Jiehua3DProps} />
   {/* rouleau du temps seul (src/rouleau) : 周 → 秦, curseur par défaut */}
   <Composition id="VideoEncreDemo" component={VideoEncreDemo} durationInFrames={VIDEO_ENCRE_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
  <Composition id="JiaoV1" component={JiaoV1} durationInFrames={Math.round(JIAO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
