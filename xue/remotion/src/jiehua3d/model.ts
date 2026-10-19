@@ -17,7 +17,8 @@ export type GroupDef = { mode: 'ruler' | 'free' | 'cascade'; t0: number; t1: num
 // pièce de l'assemblage : ses traits et ses volumes arrivent ensemble ; roof : la couverture (surface du toit)
 // path : 'side' (arrive de côté, juste au-dessus de sa place, puis descend), 'fall' (tombe à la verticale),
 // 'slide' (glisse à sa hauteur) ; w : part de temps que la pièce occupe dans l'assemblage
-export type Part = { lines: LineDef[]; solids: Solid[]; c: V3; roof?: boolean; path: 'side' | 'fall' | 'slide'; w: number };
+// deco : décor peint à la fin ('beam' : 彩畫 des pièces longues, 'column' : anneaux dorés) ; gold : arêtes filetées d'or
+export type Part = { lines: LineDef[]; solids: Solid[]; c: V3; roof?: boolean; path: 'side' | 'fall' | 'slide'; w: number; deco?: 'beam' | 'column'; gold?: boolean };
 // pièces pleines : masquent les traits cachés une fois le bâtiment refermé, puis reçoivent la couleur
 export type Paint = 'stone' | 'marble' | 'column' | 'door' | 'plaster' | 'wall' | 'green' | 'blue' | 'red' | 'roof' | 'ridge';
 export type Solid =
@@ -29,6 +30,8 @@ export type Solid =
 export type Cam = { az: number; el: number; zoom: number; target: V3 };
 export type Model = {
   groups: GroupDef[]; solids: Solid[]; parts: Part[]; roofY: (x: number, z: number) => number;
+  // façade pleine (murs, linteaux, remplissage entre consoles) : cache ce qui est derrière, vu de face ; fût des colonnes
+  facade: { y0: number; y1: number; x: number; z: number }; col: { y0: number; y1: number };
   X_E: number; Z_E: number; RIDGE_Y: number; CLOSE_T0: number; ROOF_T0: number; ROOF_T1: number; DRAW_END: number;
   close: Cam[]; wide: Cam;
 };
@@ -396,12 +399,12 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
   ];
   // ---- pièces de l'assemblage, dans l'ordre du chantier (la terrasse est déjà en place) ----
   const bx = (b: Box, w: 0 | 1 | 2 = 1) => ({ lines: boxEdges(b.c, b.s, w), solids: [{ kind: 'box', ...b } as Solid] });
-  const merge = (items: { lines: LineDef[]; solids: Solid[] }[], c: V3, path: Part['path'], w: number, roof = false): Part => ({ lines: items.flatMap((i) => i.lines), solids: items.flatMap((i) => i.solids), c, roof, path, w });
+  const merge = (items: { lines: LineDef[]; solids: Solid[] }[], c: V3, path: Part['path'], w: number, roof = false, o: { deco?: Part['deco']; gold?: boolean } = {}): Part => ({ lines: items.flatMap((i) => i.lines), solids: items.flatMap((i) => i.solids), c, roof, path, w, ...o });
   const parts: Part[] = [
-    ...COLS.map(([x, z]) => merge([bx(plinth(x, z)), { lines: colLines(x, z), solids: [{ kind: 'cyl', c: [x, (COL_Y0 + COL_Y1) / 2, z], r: COL_R, h: COL_Y1 - COL_Y0, paint: 'column' }] }], [x, (COL_Y0 + COL_Y1) / 2, z], 'side', 0.12)),
-    ...C.lintels.map((l) => merge(ring(l.y, l.h, l.t, l.paint, l.over ?? 0).map((b) => bx(b)), [0, l.y, 0], 'side', 0.3)),
-    ...frames.map((f) => merge(dougongSet(f).map((b) => bx(b, 0)), [f.x, Y_DG + s, f.z], 'side', 0.07)),
-    merge(upper.map((b) => bx(b)), [0, Y_ZT, 0], 'side', 0.3),
+    ...COLS.map(([x, z]) => merge([bx(plinth(x, z)), { lines: colLines(x, z), solids: [{ kind: 'cyl', c: [x, (COL_Y0 + COL_Y1) / 2, z], r: COL_R, h: COL_Y1 - COL_Y0, paint: 'column' }] }], [x, (COL_Y0 + COL_Y1) / 2, z], 'side', 0.12, false, { deco: 'column' })),
+    ...C.lintels.map((l) => merge(ring(l.y, l.h, l.t, l.paint, l.over ?? 0).map((b) => bx(b)), [0, l.y, 0], 'side', 0.3, false, { deco: 'beam', gold: true })),
+    ...frames.map((f) => merge(dougongSet(f).map((b) => bx(b, 0)), [f.x, Y_DG + s, f.z], 'side', 0.07, false, { gold: true })),
+    merge(upper.map((b) => bx(b)), [0, Y_ZT, 0], 'side', 0.3, false, { deco: 'beam', gold: true }),
     ...trussX.map((x) => merge([...truss.filter((b) => b.c[0] === x).map((b) => bx(b)), { lines: braces.filter((l) => (l.pts as V3[])[0][0] === x), solids: [] }], [x, T.upY, 0], 'fall', 0.18)),
     merge(purlins.map((b) => bx(b)), [0, T.midP, 0], 'fall', 0.25),
     merge([{ lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)], solids: [] }], [0, T.midP, 0], 'fall', 0.3),
@@ -411,6 +414,6 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
     merge([{ lines: [{ pts: eaveLoop(0), w: 2 }, { pts: eaveLoop(-0.32), w: 1 }, ...slopeLines(Q ? 0.36 : 0.42, 0.04, 0), ...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, 0.15).slice().reverse(), w: 2 as const })), ...corners.map(([sx, sz]) => ({ pts: gableRidge(sx, sz), w: 2 as const })), ...[-1, 1].map((sx) => seg([sx * X_G, Y_GABLE + 0.05, -(Z_E - E_G)], [sx * X_G, Y_GABLE + 0.05, Z_E - E_G], 1)), ...beasts.flatMap((b) => boxEdges(b.c, b.s, 0))], solids: [...beasts.map((b): Solid => ({ kind: 'box', ...b })), ...(Q ? [-1, 1].map((sx): Solid => ({ kind: 'poly', p: gablePoly(sx), plane: 'x', paint: 'wall' })) : [])] }], [0, 10, 0], 'fall', 0.5, true),
     merge([bx({ ...ridgeBox, paint: Q ? 'roof' : 'ridge' }), { lines: [{ pts: wen(-1), w: 2 }, { pts: wen(1), w: 2 }, ...(Q ? [sword(-1), sword(1)] : [])], solids: [-1, 1].map((sx): Solid => ({ kind: 'poly', p: wen(sx), plane: 'z', paint: Q ? 'roof' : 'ridge' })) }], [0, RIDGE_Y, 0], 'fall', 0.3),
   ];
-  return { groups, solids, parts, roofY, X_E, Z_E, RIDGE_Y, CLOSE_T0: 5.2, ROOF_T0: 5.55, ROOF_T1: 6.2, DRAW_END: 6.6, close: C.close, wide: C.wide };
+  return { groups, solids, parts, roofY, facade: { y0: COL_Y0, y1: Y_ZT, x: 8, z: 5 }, col: { y0: COL_Y0, y1: COL_Y1 }, X_E, Z_E, RIDGE_Y, CLOSE_T0: 5.2, ROOF_T0: 5.55, ROOF_T1: 6.2, DRAW_END: 6.6, close: C.close, wide: C.wide };
 }
 const lerp = (a: number, b: number, u: number) => a + (b - a) * u;

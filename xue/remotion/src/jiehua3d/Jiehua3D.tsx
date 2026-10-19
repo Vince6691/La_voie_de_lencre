@@ -117,7 +117,11 @@ export const PALETTE: Record<Style, Record<Paint, Pigment>> = { song: SONG, qing
 export const PAPER = new THREE.Color(0.965, 0.948, 0.91);
 const VERT = `varying vec3 vW; varying vec3 vN;
 void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`;
+// décors (uDeco > 0, peinture finale) : uKind 1 = 彩畫 des pièces longues (bandes 箍頭 contrastées, losange clair
+// 枋心, filets d'or), 2 = anneaux dorés des colonnes (hauteurs uRing), 3 = relief des rangs de tuiles ; plus une ombre
+// chaude sous les avant-toits
 const FRAG = `uniform vec3 uTint; uniform vec3 uPaper; uniform vec3 uSeed; uniform float uR; uniform float uReveal; uniform float uFill; uniform float uClipY;
+uniform float uDeco; uniform int uKind; uniform vec3 uTint2; uniform vec2 uRing;
 varying vec3 vW; varying vec3 vN;
 float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
 float vn(vec3 p){ vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -133,12 +137,37 @@ void main(){
   float shade = 0.82 + 0.18 * max(dot(normalize(vN), normalize(vec3(-0.35, 0.85, 0.45))), 0.0);
   float gran = 0.9 + 0.2 * fbm(vW * 3.1);
   vec3 tint = uTint * gran * shade * (1.0 - 0.12 * edge);
-  gl_FragColor = vec4(uPaper * mix(vec3(1.0), tint, a), uFill);
+  vec3 col = uPaper * mix(vec3(1.0), tint, a);
+  if (uDeco > 0.0) {
+    float b = smoothstep(0.0, 0.05, uDeco * 1.5 - d - 0.2 + (fbm(vW * 0.6 + 3.0) - 0.47) * 0.35);
+    vec3 gold = vec3(0.87, 0.67, 0.27), n = normalize(vN), dec = col;
+    if (uKind == 1 && abs(n.y) < 0.5) {
+      float along = abs(n.z) > 0.5 ? vW.x : vW.z, u = fract(along / 1.7);
+      if (u < 0.13) dec = uPaper * uTint2 * gran * shade;
+      float lz = abs(u - 0.57) * 2.2 + abs(fract(vW.y * 2.2) - 0.5) * 1.2;
+      if (lz < 0.32) dec = mix(dec, uPaper * gran, 0.5);
+      float gl = min(min(abs(u - 0.13), min(u, 1.0 - u)), abs(lz - 0.32) * 0.6);
+      dec = mix(dec, uPaper * gold * shade, 1.0 - smoothstep(0.006, 0.016, gl));
+    }
+    if (uKind == 2) {
+      float r = min(abs(vW.y - uRing.x), abs(vW.y - uRing.y));
+      dec = mix(dec, uPaper * gold * shade, 1.0 - smoothstep(0.05, 0.08, r));
+    }
+    if (uKind == 3) {
+      float along = abs(n.z) > abs(n.x) ? vW.x : vW.z;
+      dec = col * (0.86 + 0.2 * (0.5 + 0.5 * cos(6.2832 * along / 0.42)));
+    }
+    float ao = (abs(n.y) < 0.5 && uKind != 3) ? smoothstep(4.8, 8.4, vW.y) * 0.22 : 0.0;
+    dec *= mix(vec3(1.0), vec3(0.78, 0.68, 0.6), ao);
+    col = mix(col, dec, b);
+  }
+  gl_FragColor = vec4(col, uFill);
 }`;
 export const mkMat = (pg: Pigment, R: number) => new THREE.ShaderMaterial({
   vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: true, side: THREE.DoubleSide,
   polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2,
-  uniforms: { uTint: { value: new THREE.Color(...pg.tint) }, uPaper: { value: PAPER }, uSeed: { value: new THREE.Vector3(...pg.seed) }, uR: { value: R }, uReveal: { value: 0 }, uFill: { value: 0 }, uClipY: { value: 1e4 } },
+  uniforms: { uTint: { value: new THREE.Color(...pg.tint) }, uPaper: { value: PAPER }, uSeed: { value: new THREE.Vector3(...pg.seed) }, uR: { value: R }, uReveal: { value: 0 }, uFill: { value: 0 }, uClipY: { value: 1e4 },
+    uDeco: { value: 0 }, uKind: { value: 0 }, uTint2: { value: new THREE.Color(...pg.tint) }, uRing: { value: new THREE.Vector2(-99, -99) } },
 });
 
 export function solidGeo(s: Solid): THREE.BufferGeometry {
