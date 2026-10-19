@@ -1,12 +1,14 @@
-// 界畫 « de la feuille au volume » (style Song par défaut), 12 s :
+// 界畫 « de la feuille au volume » (style Song par défaut), 14 s :
 // 1. une feuille de papier montée, vue de face ; l'élévation de la salle s'y trace trait par trait : tous les traits
 //    du modèle vus de face, ramenés dans le plan de la feuille (les fuyantes, de longueur nulle, n'y paraissent pas) ;
-// 2. la caméra glisse latéralement et monte : on voit que c'est une feuille plate, posée dans l'espace ;
-// 3. le maître prolonge les traits : élément après élément (terrasse, colonnes, linteaux, consoles…), les fuyantes
-//    s'allongent depuis la feuille vers l'arrière et emportent chaque trait jusqu'à sa profondeur réelle ; la feuille
-//    s'efface et l'élévation devient la vue en volume ;
-// 4. les volumes s'ajoutent bloc par bloc dans l'ordre du chantier (les traits cachés pâlissent) ;
-// 5. la couleur gagne le bâtiment par lavis.
+// 2. la caméra glisse latéralement et plonge sur l'angle de la salle : on voit que c'est une feuille plate ;
+// 3. de tout près, le maître prolonge les traits : élément après élément (terrasse, colonnes, linteaux, consoles…),
+//    les fuyantes s'allongent depuis la feuille vers l'arrière et emportent chaque trait à sa profondeur réelle ;
+//    la caméra accompagne le mouvement vers le fond ; la feuille s'efface ;
+// 4. la caméra recule jusqu'à la vue d'ensemble ; les traits pâlissent en épure ;
+// 5. les pièces arrivent de l'extérieur du cadre, déjà dessinées, voyagent et se fixent sur l'épure dans l'ordre
+//    du chantier (les traits cachés pâlissent) ;
+// 6. la couleur gagne le bâtiment par lavis.
 import React, { useMemo } from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
@@ -22,27 +24,32 @@ import {
   roofGeo, solidGeo, timeLines, useFonts,
 } from './Jiehua3D';
 
-export const JIEHUA_FEUILLE_SECONDS = 12;
+export const JIEHUA_FEUILLE_SECONDS = 14;
 export type JiehuaFeuilleProps = { style: Style };
 const W = 1920, H = 1080;
 // calendrier (secondes)
 const DRAW0 = 0.6, DRAW1 = 3.3;               // élévation tracée sur la feuille
-const TURN0 = 3.4, TURN1 = 5.3;               // glissement latéral de la caméra
-const DEPTH0 = 5.2, DEPTH1 = 7.4;             // fuyantes prolongées, élément après élément
-const BLOCK0 = 7.4, BLOCK1 = 9.4;             // volumes ajoutés
-const COLOR_T0 = 9.5, WASH_DUR = 1.1, T_SEAL = 11.1;
+const TURN0 = 3.4, TURN1 = 5.2;               // glissement latéral et plongée sur l'angle
+const DEPTH0 = 5.2, DEPTH1 = 7.8;             // fuyantes prolongées, élément après élément (en plan rapproché)
+const BACK0 = 7.8, BACK1 = 9.0;               // recul ; les traits pâlissent en épure
+const LAND0 = 9.4, LAND1 = 11.6, FLIGHT = 1.0;  // pièces : instants d'emboîtement, durée du voyage
+const COLOR_T0 = 11.8, WASH_DUR = 1.1, T_SEAL = 13.2;
 const ZF = 11.5;                              // plan de la feuille : devant tout le bâtiment (marches comprises)
 const SHEET_Z = ZF - 0.05;
 
-// ---- caméra : de face sur la feuille, glissement latéral et montée, puis lente orbite ----
+// ---- caméra ----
 const FRONT: Cam = { az: 0, el: 0, zoom: 52, target: [0, 7.2, 0] };
 const FRONT2: Cam = { ...FRONT, zoom: 54 };
-const VIEW: Cam = { az: 0.56, el: 0.5, zoom: 46, target: [0, 6.0, 0] };
-const VIEW2: Cam = { az: 0.48, el: 0.46, zoom: 48, target: [0, 6.2, 0] };
+const NEAR_A: Cam = { az: 0.8, el: 0.26, zoom: 108, target: [6.8, 4.6, 7.5] };    // l'angle avant droit, contre la feuille
+const NEAR_B: Cam = { az: 0.72, el: 0.3, zoom: 118, target: [5.8, 6.4, -0.5] };   // on accompagne les traits vers le fond
+const WIDE: Cam = { az: 0.56, el: 0.5, zoom: 42, target: [0, 6.0, 0] };            // assez large pour voir les pièces arriver
+const WIDE2: Cam = { az: 0.5, el: 0.47, zoom: 46, target: [0, 6.2, 0] };
 const camAt = (t: number): Cam => {
   if (t < TURN0) return mix(FRONT, FRONT2, ease(t / TURN0));
-  if (t < TURN1) return mix(FRONT2, VIEW, ease((t - TURN0) / (TURN1 - TURN0)));
-  return mix(VIEW, VIEW2, ease((t - TURN1) / (COLOR_T0 - TURN1)));
+  if (t < TURN1) return mix(FRONT2, NEAR_A, ease((t - TURN0) / (TURN1 - TURN0)));
+  if (t < BACK0) return mix(NEAR_A, NEAR_B, ease((t - TURN1) / (BACK0 - TURN1)));
+  if (t < BACK1) return mix(NEAR_B, WIDE, ease((t - BACK0) / (BACK1 - BACK0)));
+  return mix(WIDE, WIDE2, ease((t - BACK1) / (COLOR_T0 - BACK1)));
 };
 
 // ---- feuille montée : papier fibreux sur un montage de soie ----
@@ -62,7 +69,7 @@ const sheetMat = (col: [number, number, number]) => new THREE.ShaderMaterial({
 });
 
 // ---- traits : élévation (tout ce qui se voit de face) et fuyantes (en profondeur) ----
-type Line = Timed & { depth: boolean; e0: number; e1: number };   // e0, e1 : prolongement de l'élément
+type Line = Timed & { depth: boolean; base: boolean; e0: number; e1: number };   // e0, e1 : prolongement de l'élément
 const lenXY = (p: V3[]) => p.slice(1).reduce((s, q, i) => s + Math.hypot(q[0] - p[i][0], q[1] - p[i][1]), 0);
 const len3 = (p: V3[]) => p.slice(1).reduce((s, q, i) => s + Math.hypot(q[0] - p[i][0], q[1] - p[i][1], q[2] - p[i][2]), 0);
 // fuyante : trait presque invisible de face ; on la trace de la façade vers l'arrière
@@ -78,14 +85,14 @@ const prep = (style: Style) => {
   if (!PREP.has(style)) {
     const m = buildModel(style);
     const span = m.DRAW_END - 0.3, map = (a: number, b: number) => (t: number) => a + ((t - 0.3) / span) * (b - a);
-    const toDraw = map(DRAW0, DRAW1), toDepth = map(DEPTH0, DEPTH1 - 0.5);
+    const toDraw = map(DRAW0, DRAW1), toDepth = map(DEPTH0, DEPTH1 - 0.6);
     const lines: Line[] = m.groups.flatMap((g) => {
       const elev = g.lines.filter((l) => !isDepth(l)), dep = g.lines.filter(isDepth).map(frontFirst);
-      const e0 = toDepth(g.t0), e1 = Math.max(e0 + 0.6, toDepth(g.t1));
+      const e0 = toDepth(g.t0), e1 = Math.max(e0 + 0.6, toDepth(g.t1)), base = !!g.base;
       return [
-        ...timeLines([{ ...g, lines: elev }]).map((l) => ({ ...l, t0: toDraw(l.t0), t1: toDraw(l.t1), depth: false, e0, e1 })),
+        ...timeLines([{ ...g, lines: elev }]).map((l) => ({ ...l, t0: toDraw(l.t0), t1: toDraw(l.t1), depth: false, base, e0, e1 })),
         // les fuyantes sont « posées » d'un coup : c'est le prolongement qui les fait grandir
-        ...dep.map((l) => ({ ...l, t0: e0 - 0.02, t1: e0, mode: 'cascade' as const, depth: true, e0, e1 })),
+        ...dep.map((l) => ({ ...l, t0: e0 - 0.02, t1: e0, mode: 'cascade' as const, depth: true, base, e0, e1 })),
       ];
     });
     PREP.set(style, { m, lines });
@@ -93,27 +100,33 @@ const prep = (style: Style) => {
   return PREP.get(style)!;
 };
 
-type Block = { meshes: { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; paint: Paint }[]; at: number };
-function buildBlocks(m: Model, pal: Record<Paint, Pigment>): Block[] {
-  const mk = (solids: Solid[], roof: boolean) => {
-    const by = new Map<Paint, THREE.BufferGeometry[]>();
-    const add = (paint: Paint, g: THREE.BufferGeometry) => { const a = by.get(paint) ?? []; a.push(g); by.set(paint, a); };
-    solids.forEach((s) => add(s.paint, solidGeo(s)));
-    if (roof) add('roof', roofGeo(m));
-    return [...by.entries()].map(([paint, gs]) => {
-      const g = mergeGeometries(gs.map((x) => { if (x.getAttribute('uv')) x.deleteAttribute('uv'); return x; }));
-      g.computeBoundingBox();
-      const b = g.boundingBox!, sd = pal[paint].seed;
-      let R = 1;
-      for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) R = Math.max(R, Math.hypot(x - sd[0], y - sd[1], z - sd[2]));
-      const mat = mkMat(pal[paint], R);
-      return { mesh: new THREE.Mesh(g, mat), mat, paint };
-    });
-  };
-  // la terrasse d'abord, puis les pièces dans l'ordre du chantier
-  const base = m.solids.filter((s) => (s.kind === 'box' && s.c[1] + s.s[1] / 2 <= 1.85 && s.s[0] > 2) || (s.kind === 'quad' && s.paint === 'marble'));
-  const items = [{ solids: base, roof: false }, ...m.parts.map((p) => ({ solids: p.solids, roof: !!p.roof }))];
-  return items.map((it, i) => ({ meshes: mk(it.solids, it.roof), at: lerp(BLOCK0, BLOCK1 - 0.35, i / (items.length - 1)) }));
+// ---- pièces : volumes et traits, arrivée depuis l'extérieur du cadre ----
+type MeshRt = { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; paint: Paint };
+type PartRt = { meshes: MeshRt[]; lines: LineDef[]; from: V3; land: number };
+const backOut = (u: number) => { const c = 1.1, v = clamp(u) - 1; return 1 + (c + 1) * v * v * v + c * v * v; };
+const meshesOf = (m: Model, pal: Record<Paint, Pigment>, solids: Solid[], roof: boolean): MeshRt[] => {
+  const by = new Map<Paint, THREE.BufferGeometry[]>();
+  const add = (paint: Paint, g: THREE.BufferGeometry) => { const a = by.get(paint) ?? []; a.push(g); by.set(paint, a); };
+  solids.forEach((s) => add(s.paint, solidGeo(s)));
+  if (roof) add('roof', roofGeo(m));
+  return [...by.entries()].map(([paint, gs]) => {
+    const g = mergeGeometries(gs.map((x) => { if (x.getAttribute('uv')) x.deleteAttribute('uv'); return x; }));
+    g.computeBoundingBox();
+    const b = g.boundingBox!, sd = pal[paint].seed;
+    let R = 1;
+    for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) R = Math.max(R, Math.hypot(x - sd[0], y - sd[1], z - sd[2]));
+    const mat = mkMat(pal[paint], R);
+    return { mesh: new THREE.Mesh(g, mat), mat, paint };
+  });
+};
+function buildParts(m: Model, pal: Record<Paint, Pigment>): PartRt[] {
+  const n = m.parts.length;
+  return m.parts.map((p, i) => {
+    // départ hors champ : à l'écart du bâtiment, dans la direction de la pièce, et en hauteur (le toit tombe du ciel)
+    const r = Math.hypot(p.c[0], p.c[2]), dx = r > 0.5 ? p.c[0] / r : 0.6, dz = r > 0.5 ? p.c[2] / r : 0.8;
+    const from: V3 = p.roof ? [0, 16, 0] : [dx * 24, 7 + p.c[1] * 0.4, dz * 24];
+    return { meshes: meshesOf(m, pal, p.solids, !!p.roof), lines: p.lines, from, land: lerp(LAND0, LAND1, n > 1 ? i / (n - 1) : 0) };
+  });
 }
 
 const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
@@ -122,7 +135,9 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
   const pal = PALETTE[style];
   const c = camAt(t);
   applyCam(camera as THREE.OrthographicCamera, c);
-  const blocks = useMemo(() => buildBlocks(m, pal), [m, pal]);
+  const parts = useMemo(() => buildParts(m, pal), [m, pal]);
+  // terrasse : le plan sur lequel les pièces se fixent
+  const base = useMemo(() => meshesOf(m, pal, m.solids.filter((s) => (s.kind === 'box' && s.c[1] + s.s[1] / 2 <= 1.85 && s.s[0] > 2) || (s.kind === 'quad' && s.paint === 'marble')), false), [m, pal]);
   const sheet = useMemo(() => {
     const mount = new THREE.Mesh(new THREE.PlaneGeometry(33.6, 19.4), sheetMat([0.78, 0.72, 0.6]));
     const paper = new THREE.Mesh(new THREE.PlaneGeometry(31, 17.2), sheetMat([0.985, 0.972, 0.94]));
@@ -131,34 +146,50 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
     return { mount, paper };
   }, []);
   const L = useMemo(() => ({
-    vis: WIDTHS.map((w) => mkLine('#1a1613', w, false)),
+    dark: WIDTHS.map((w) => mkLine('#1a1613', w, false)),
+    ghost: WIDTHS.map((w) => mkLine('#1a1613', w, false)),
     hid: WIDTHS.map((w) => mkLine('#1a1613', w, true)),
     axis: mkLine('#b8432f', 1.3, false),
   }), []);
+  const reveal = (paint: Paint) => easeOut((t - COLOR_T0 - pal[paint].at) / WASH_DUR);
 
   // la feuille s'efface pendant que les fuyantes se prolongent
-  const sheetOp = 1 - ease((t - DEPTH0 - 0.3) / 1.4);
+  const sheetOp = 1 - ease((t - DEPTH0 - 0.4) / 1.4);
   [sheet.mount, sheet.paper].forEach((s) => { s.visible = sheetOp > 0.005; (s.material as THREE.ShaderMaterial).uniforms.uOp.value = sheetOp; });
-  // volumes : chaque bloc se pose d'une petite hauteur et prend sa matière de papier
-  blocks.forEach((b) => {
-    const u = clamp((t - b.at) / 0.4), fill = ease(u), drop = 0.9 * (1 - easeOut(u));
-    b.meshes.forEach((me) => {
-      me.mesh.visible = fill > 0; me.mesh.position.set(0, drop, 0);
-      me.mat.uniforms.uFill.value = fill;
-      me.mat.uniforms.uReveal.value = easeOut((t - COLOR_T0 - pal[me.paint].at) / WASH_DUR);
-    });
+  base.forEach((b) => {
+    const f = clamp((t - BACK0) / 0.6);
+    b.mesh.visible = f > 0; b.mat.uniforms.uFill.value = f; b.mat.uniforms.uReveal.value = reveal(b.paint);
   });
-  // traits
-  const buf: number[][] = [[], [], []], ax: number[] = [];
+
+  // dessin et prolongement ; après le recul, tout ce qui n'est pas la terrasse pâlit en épure
+  const dark: number[][] = [[], [], []], ghost: number[][] = [[], [], []], ax: number[] = [];
   for (const l of lines) {
     const u = clamp((t - l.t0) / (l.t1 - l.t0));
     if (u <= 0) continue;
     // prolongement : tout point resté devant la règle qui recule est ramené sur elle (plan de la feuille au départ)
     const back = ZF - 24 * ease((t - l.e0) / (l.e1 - l.e0));
-    const p = partial(ptsOf(l, c.az), u).map(([x, y, z]) => [x, y, Math.max(z, back)] as V3), dst = l.axis ? ax : buf[l.w];
+    const p = partial(ptsOf(l, c.az), u).map(([x, y, z]) => [x, y, Math.max(z, back)] as V3);
+    const dst = l.axis ? ax : l.base ? dark[l.w] : ghost[l.w];
     for (let i = 1; i < p.length; i++) dst.push(...p[i - 1], ...p[i]);
   }
-  const hidOp = t < BLOCK0 ? 0 : 0.3 * (1 - ease((t - BLOCK1 + 0.4) / 0.9));
+  // pièces : elles voyagent depuis l'extérieur, déjà dessinées, puis se fixent sur l'épure
+  const pl: number[][] = [[], [], []];
+  parts.forEach((pr) => {
+    const u = (t - (pr.land - FLIGHT)) / FLIGHT;
+    if (u <= 0) { pr.meshes.forEach((me) => { me.mesh.visible = false; }); return; }
+    const k = backOut(u), off: V3 = [pr.from[0] * (1 - k), pr.from[1] * (1 - k), pr.from[2] * (1 - k)];
+    pr.meshes.forEach((me) => {
+      me.mesh.visible = true; me.mesh.position.set(...off);
+      me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = reveal(me.paint);
+    });
+    for (const l of pr.lines) {
+      const p = ptsOf(l, c.az);
+      for (let i = 1; i < p.length; i++) pl[l.w].push(p[i - 1][0] + off[0], p[i - 1][1] + off[1], p[i - 1][2] + off[2], p[i][0] + off[0], p[i][1] + off[1], p[i][2] + off[2]);
+    }
+  });
+
+  const ghostOp = t < BACK0 ? 0.92 : t < LAND1 ? lerp(0.92, 0.26, ease((t - BACK0) / (BACK1 - BACK0))) : 0.26 * (1 - ease((t - LAND1) / 0.6));
+  const hidOp = t < LAND0 - FLIGHT ? 0 : 0.3 * (1 - ease((t - LAND1) / 0.8));
   const dpr = viewport.dpr;
   const setL = (o: LineObj, arr: number[], op: number, w: number) => {
     o.obj.visible = arr.length > 0 && op > 0.005;
@@ -168,15 +199,20 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
     o.mat.linewidth = Math.max(1, w * dpr);
     o.mat.resolution.set(size.width * dpr, size.height * dpr);
   };
-  WIDTHS.forEach((w, i) => { setL(L.vis[i], buf[i], 0.92, w); setL(L.hid[i], buf[i], hidOp, w); });
-  setL(L.axis, ax, 0.55 - 0.4 * clamp((t - BLOCK0) / 1.5), 1.3);
+  WIDTHS.forEach((w, i) => {
+    setL(L.dark[i], [...dark[i], ...pl[i]], 0.92, w);
+    setL(L.ghost[i], ghost[i], ghostOp, w);
+    setL(L.hid[i], pl[i], hidOp, w);
+  });
+  setL(L.axis, ax, 0.55 - 0.4 * clamp((t - BACK0) / 1.5), 1.3);
 
   return (
     <>
       <primitive object={sheet.mount} />
       <primitive object={sheet.paper} />
-      {blocks.flatMap((b, i) => b.meshes.map((me, j) => <primitive key={`b${i}_${j}`} object={me.mesh} />))}
-      {[...L.vis, ...L.hid, L.axis].map((o, i) => <primitive key={`l${i}`} object={o.obj} />)}
+      {base.map((b, i) => <primitive key={`b${i}`} object={b.mesh} />)}
+      {parts.flatMap((pr, i) => pr.meshes.map((me, j) => <primitive key={`p${i}_${j}`} object={me.mesh} />))}
+      {[...L.dark, ...L.ghost, ...L.hid, L.axis].map((o, i) => <primitive key={`l${i}`} object={o.obj} />)}
     </>
   );
 };
