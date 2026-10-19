@@ -14,6 +14,7 @@ import { SHUIMO_XUE_SECONDS, ShuimoXue } from './shuimo_xue/ShuimoXue';
 import { JIEHUA_SECONDS, JiehuaDemo } from './jiehua/JiehuaDemo';
 import { JIEHUA3D_SECONDS, Jiehua3D, Jiehua3DProps } from './jiehua3d/Jiehua3D';
 import { JIEHUA_PLI_SECONDS, JiehuaPli, JiehuaPliProps } from './jiehua3d/JiehuaPli';
+import { JIEHUA_FEUILLE_SECONDS, JiehuaFeuille, JiehuaFeuilleProps } from './jiehua3d/JiehuaFeuille';
 import { ROULEAU_DEMO_SECONDS, RouleauDemo } from './rouleau/RouleauDemo';
 
 export const FPS = 30;
@@ -51,6 +52,9 @@ export const RemotionRoot: React.FC = () => (
   {/* du dessin au chantier : élévation tracée à plat, traits qui se soulèvent du papier, pièces qui s'assemblent */}
   <Composition id="JiehuaPli" component={JiehuaPli} durationInFrames={JIEHUA_PLI_SECONDS * FPS} fps={FPS} width={1920} height={1080}
     defaultProps={{ style: 'song' } satisfies JiehuaPliProps} />
+  {/* de la feuille au volume : élévation sur une feuille montée, glissement latéral, fuyantes prolongées, blocs, lavis */}
+  <Composition id="JiehuaFeuille" component={JiehuaFeuille} durationInFrames={JIEHUA_FEUILLE_SECONDS * FPS} fps={FPS} width={1920} height={1080}
+    defaultProps={{ style: 'song' } satisfies JiehuaFeuilleProps} />
   {/* rouleau du temps seul (src/rouleau) : 周 → 秦, curseur par défaut */}
   <Composition id="VideoEncreDemo" component={VideoEncreDemo} durationInFrames={VIDEO_ENCRE_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
  <Composition id="JiaoV1" component={JiaoV1} durationInFrames={Math.round(JIAO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
