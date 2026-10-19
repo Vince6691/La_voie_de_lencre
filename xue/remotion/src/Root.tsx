@@ -11,6 +11,7 @@ import timeline from './data/timeline.json';
 import { SHUIMO_DEMO_SECONDS, ShuimoDemo, ShuimoDemoProps } from './shuimo/ShuimoDemo';
 import { MorphEncre, MorphProps } from './morph/MorphEncre';
 import { SHUIMO_XUE_SECONDS, ShuimoXue } from './shuimo_xue/ShuimoXue';
+import { JIEHUA_SECONDS, JiehuaDemo } from './jiehua/JiehuaDemo';
 import { ROULEAU_DEMO_SECONDS, RouleauDemo } from './rouleau/RouleauDemo';
 
 export const FPS = 30;
@@ -38,6 +39,8 @@ export const RemotionRoot: React.FC = () => (
     defaultProps={{ name: 'vieil_homme', dir: 'fade', focus: [0.67, 0.45], end: 1 } satisfies MorphProps} />
   {/* essai « tout shuimo » : scènes Shang et Zhou du 學 sur papier, voix existante */}
   <Composition id="ShuimoXue" component={ShuimoXue} durationInFrames={Math.round(SHUIMO_XUE_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  {/* dessin à la règle 界畫 : salle Song tracée trait par trait puis colorée au lavis, sur fond shuimo */}
+  <Composition id="JiehuaDemo" component={JiehuaDemo} durationInFrames={JIEHUA_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   {/* rouleau du temps seul (src/rouleau) : 周 → 秦, curseur par défaut */}
   <Composition id="VideoEncreDemo" component={VideoEncreDemo} durationInFrames={VIDEO_ENCRE_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
  <Composition id="JiaoV1" component={JiaoV1} durationInFrames={Math.round(JIAO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
