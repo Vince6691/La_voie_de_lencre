@@ -1,8 +1,8 @@
 // 界畫 en volume : la salle modélisée dans model.ts est rendue uniquement en traits d'encre, en projection
-// parallèle (comme les dessins à la règle), sur le fond shuimo. La règle glisse et le pinceau suit son bord ;
-// on voit d'abord toute l'ossature, à travers ; puis le bâtiment se referme (murs, toit), les traits cachés
-// pâlissent et s'effacent ; enfin les couleurs minérales gagnent le dessin par lavis. La caméra tourne
-// lentement pendant la construction et s'arrête pour la couleur.
+// parallèle (comme les dessins à la règle), sur le fond shuimo. Les traits se tracent seuls, sans outil à
+// l'écran ; on voit d'abord toute l'ossature, à travers ; puis le bâtiment se referme (murs, toit), les traits cachés
+// pâlissent et s'effacent ; enfin les couleurs minérales gagnent le dessin par lavis. La caméra part en
+// plan rapproché sur l'angle, sort en recul jusqu'à la vue d'ensemble et s'arrête pour la couleur.
 import React, { useEffect, useMemo, useState } from 'react';
 import { AbsoluteFill, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
@@ -230,73 +230,6 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
-// ---- outils (en pixels écran) : règle le long des droites, pinceau sur le trait en cours ----
-type P2 = [number, number];
-type Tool = { pts: P2[]; len: number; t0: number; t1: number; mode: 'ruler' | 'free' };
-type Pose = { x: number; y: number; a: number };
-const RW = 24;
-const at2 = (p: P2[], len: number, u: number): P2 => {
-  let s = clamp(u) * len;
-  for (let i = 1; i < p.length; i++) {
-    const a = p[i - 1], b = p[i], d = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    if (s <= d || i === p.length - 1) { const k = d ? Math.min(1, s / d) : 0; return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]; }
-    s -= d;
-  }
-  return p[p.length - 1];
-};
-const poseOf = (l: Tool): Pose => {
-  const a = l.pts[0], b = l.pts[l.pts.length - 1], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
-  let ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L;
-  if (ux < 0) { ux = -ux; uy = -uy; }
-  let nx = -uy, ny = ux;
-  if (ny > 0) { nx = -nx; ny = -ny; }
-  return { x: (a[0] + b[0]) / 2 + nx * (RW / 2 + 2), y: (a[1] + b[1]) / 2 + ny * (RW / 2 + 2), a: (Math.atan2(uy, ux) * 180) / Math.PI };
-};
-function tools(tl: Tool[], t: number) {
-  let brush: { p: P2; lift: number } | null = null, ruler: Pose | null = null;
-  for (let i = 0; i < tl.length; i++) {
-    const l = tl[i];
-    if (t >= l.t0 && t <= l.t1) { brush = { p: at2(l.pts, l.len, (t - l.t0) / (l.t1 - l.t0)), lift: 0 }; if (l.mode === 'ruler') ruler = poseOf(l); break; }
-    const nx = tl[i + 1];
-    if (nx && t > l.t1 && t < nx.t0 && nx.t0 - l.t1 < 0.4) {
-      const u = ease((t - l.t1) / (nx.t0 - l.t1)), e = l.pts[l.pts.length - 1], s = nx.pts[0];
-      brush = { p: [lerp(e[0], s[0], u), lerp(e[1], s[1], u)], lift: Math.sin(Math.PI * u) };
-      if (l.mode === 'ruler' && nx.mode === 'ruler') { const A = poseOf(l), B = poseOf(nx); ruler = { x: lerp(A.x, B.x, u), y: lerp(A.y, B.y, u), a: lerp(A.a, B.a, u) }; }
-      else if (nx.mode === 'ruler') ruler = poseOf(nx);
-      else if (l.mode === 'ruler') ruler = poseOf(l);
-      break;
-    }
-  }
-  const dist = (l: Tool) => Math.max(l.t0 - t, t - l.t1, 0);
-  const near = (f: (l: Tool) => boolean) => tl.filter(f).reduce((v, l) => Math.max(v, clamp(1 - dist(l) / 0.2)), 0);
-  const nearest = (f: (l: Tool) => boolean) => tl.filter(f).sort((a, b) => dist(a) - dist(b))[0];
-  if (!ruler) { const l = nearest((x) => x.mode === 'ruler'); if (l) ruler = poseOf(l); }
-  if (!brush) { const l = nearest(() => true); if (l) brush = { p: t < l.t0 ? l.pts[0] : l.pts[l.pts.length - 1], lift: 1 }; }
-  return { ruler, rOp: near((l) => l.mode === 'ruler'), brush, bOp: near(() => true) };
-}
-
-const Ruler: React.FC<{ pose: Pose; op: number }> = ({ pose, op }) => (
-  <g transform={`translate(${pose.x} ${pose.y}) rotate(${pose.a})`} opacity={op}>
-    <rect x={-850 + 10} y={-RW / 2 + 12} width={1700} height={RW} rx={4} fill="#000" opacity={0.16} filter="url(#soft3d)" />
-    <rect x={-850} y={-RW / 2} width={1700} height={RW} rx={4} fill="url(#wood3d)" />
-    <rect x={-850} y={-RW / 2} width={1700} height={4} rx={2} fill="#fff" opacity={0.18} />
-    <rect x={-850} y={RW / 2 - 4} width={1700} height={4} fill="#2a170c" opacity={0.5} />
-  </g>
-);
-const Brush: React.FC<{ p: P2; lift: number; op: number }> = ({ p, lift, op }) => (
-  <g opacity={op}>
-    <g transform={`translate(${p[0] + 16 + 20 * lift} ${p[1] + 9 + 9 * lift}) rotate(24) scale(0.9)`} opacity={0.2}>
-      <path d="M0 0 C 6 -14, 9 -30, 8 -46 L 9 -340 L -9 -340 L -8 -46 C -9 -30, -6 -14, 0 0 Z" fill="#000" filter="url(#soft3d)" />
-    </g>
-    <g transform={`translate(${p[0]} ${p[1] - 14 * lift}) rotate(24) scale(0.9)`}>
-      <path d="M-9 -60 L -9 -340 Q 0 -348 9 -340 L 9 -60 Z" fill="url(#bamboo3d)" />
-      {[-140, -250].map((y) => <rect key={y} x={-9.5} y={y} width={19} height={3} fill="#5c4424" opacity={0.6} />)}
-      <path d="M-10 -46 L -10 -62 L 10 -62 L 10 -46 Z" fill="#3a2a1a" />
-      <path d="M0 0 C 7 -12, 10 -28, 9 -46 L -9 -46 C -10 -28, -7 -12, 0 0 Z" fill="#141210" />
-    </g>
-  </g>
-);
-
 const useFonts = () => {
   const [h] = useState(() => delayRender('polices'));
   useEffect(() => {
@@ -313,17 +246,6 @@ export const Jiehua3D: React.FC = () => {
     const s = compose(29, { move: 'push', mood: 'jour', duration: JIEHUA3D_SECONDS });
     return { ...s, pieces: s.pieces.filter((p) => p.el.family !== 'premier' && (p.el.family !== 'vie' || /vie_[ab][26]\.png/.test(p.el.file))) };
   }, []);
-  // projection des outils, avec la même caméra que la scène
-  const c = camAt(t);
-  const pc = useMemo(() => new THREE.OrthographicCamera(-W / 2, W / 2, H / 2, -H / 2, 1, 300), []);
-  applyCam(pc, c);
-  const v = new THREE.Vector3();
-  const proj = (p: V3): P2 => { v.set(...p).project(pc); return [((v.x + 1) / 2) * W, ((1 - v.y) / 2) * H]; };
-  const tl: Tool[] = LINES.filter((l) => l.mode !== 'cascade').map((l) => {
-    const pts = ptsOf(l, c.az).map(proj);
-    return { pts, len: pts.slice(1).reduce((s, q, i) => s + Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1]), 0), t0: l.t0, t1: l.t1, mode: l.mode as 'ruler' | 'free' };
-  });
-  const { ruler, rOp, brush, bOp } = tools(tl, t);
   const sealU = clamp((t - T_SEAL) / 0.35);
 
   return (
@@ -343,15 +265,6 @@ export const Jiehua3D: React.FC = () => {
           <Scene t={t} />
         </ThreeCanvas>
       </AbsoluteFill>
-      <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
-        <defs>
-          <filter id="soft3d" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation={6} /></filter>
-          <linearGradient id="wood3d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8a5a33" /><stop offset="0.5" stopColor="#6e4425" /><stop offset="1" stopColor="#4a2c16" /></linearGradient>
-          <linearGradient id="bamboo3d" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#8f7448" /><stop offset="0.45" stopColor="#c9ac74" /><stop offset="1" stopColor="#7a6038" /></linearGradient>
-        </defs>
-        {ruler && rOp > 0.01 && <Ruler pose={ruler} op={rOp * 0.9} />}
-        {brush && bOp > 0.01 && <Brush p={brush.p} lift={brush.lift} op={bOp} />}
-      </svg>
       {sealU > 0 && (
         <div style={{
           position: 'absolute', left: 1610, top: 880, width: 84, height: 84, background: '#b0281c', borderRadius: 6,
