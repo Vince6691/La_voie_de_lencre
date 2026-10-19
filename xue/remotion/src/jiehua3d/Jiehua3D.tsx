@@ -21,15 +21,15 @@ export type Jiehua3DProps = { style: Style };
 const W = 1920, H = 1080;
 const WASH_DUR = 1.3, T_SEAL = 9.0;
 
-const clamp = (u: number) => Math.min(1, Math.max(0, u));
-const ease = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(u));
-const easeOut = (u: number) => 1 - (1 - clamp(u)) ** 3;
-const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
+export const clamp = (u: number) => Math.min(1, Math.max(0, u));
+export const ease = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(u));
+export const easeOut = (u: number) => 1 - (1 - clamp(u)) ** 3;
+export const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
 
 // ---- caméra : plan rapproché sur l'angle avant droit (on suit la colonne d'angle qui monte, puis la console
 // d'angle), puis sortie : recul et montée jusqu'à la vue plongeante d'ensemble, où elle s'arrête pour la couleur ----
 const T_OUT = 3.5;
-const mix = (A: Cam, B: Cam, e: number): Cam => ({
+export const mix = (A: Cam, B: Cam, e: number): Cam => ({
   az: lerp(A.az, B.az, e), el: lerp(A.el, B.el, e), zoom: Math.exp(lerp(Math.log(A.zoom), Math.log(B.zoom), e)),
   target: [0, 1, 2].map((k) => lerp(A.target[k], B.target[k], e)) as V3,
 });
@@ -42,17 +42,17 @@ const camAt = (m: Model, t: number): Cam => {
   const u = clamp((t - T_OUT) / (m.DRAW_END - 0.1 - T_OUT));
   return mix(m.close[2], m.wide, u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2);
 };
-const camPos = (c: Cam): V3 => { const D = 80; return [c.target[0] + D * Math.sin(c.az) * Math.cos(c.el), c.target[1] + D * Math.sin(c.el), c.target[2] + D * Math.cos(c.az) * Math.cos(c.el)]; };
-const applyCam = (cam: THREE.OrthographicCamera, c: Cam) => {
+export const camPos = (c: Cam): V3 => { const D = 80; return [c.target[0] + D * Math.sin(c.az) * Math.cos(c.el), c.target[1] + D * Math.sin(c.el), c.target[2] + D * Math.cos(c.az) * Math.cos(c.el)]; };
+export const applyCam = (cam: THREE.OrthographicCamera, c: Cam) => {
   cam.position.set(...camPos(c)); cam.up.set(0, 1, 0); cam.zoom = c.zoom; cam.near = 1; cam.far = 300;
   cam.lookAt(...c.target); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
 };
 
 // ---- calendrier des traits ----
-type Timed = LineDef & { t0: number; t1: number; mode: 'ruler' | 'free' | 'cascade' };
+export type Timed = LineDef & { t0: number; t1: number; mode: 'ruler' | 'free' | 'cascade' };
 const len3 = (p: V3[]) => p.slice(1).reduce((s, q, i) => s + Math.hypot(q[0] - p[i][0], q[1] - p[i][1], q[2] - p[i][2]), 0);
-const ptsOf = (l: LineDef, az: number) => (typeof l.pts === 'function' ? l.pts(az) : l.pts);
-const timeLines = (groups: GroupDef[]): Timed[] => groups.flatMap((g) => {
+export const ptsOf = (l: LineDef, az: number) => (typeof l.pts === 'function' ? l.pts(az) : l.pts);
+export const timeLines = (groups: GroupDef[]): Timed[] => groups.flatMap((g) => {
   const n = g.lines.length, T = g.t1 - g.t0;
   if (g.mode === 'cascade') {
     const d = Math.min(0.28, T * 0.4);
@@ -70,7 +70,7 @@ const prep = (style: Style) => {
 };
 
 // partie tracée d'une polyligne (fraction u de sa longueur)
-const partial = (p: V3[], u: number): V3[] => {
+export const partial = (p: V3[], u: number): V3[] => {
   if (u >= 1) return p;
   let s = u * len3(p);
   const out: V3[] = [p[0]];
@@ -83,7 +83,7 @@ const partial = (p: V3[], u: number): V3[] => {
 };
 
 // ---- palette : teinte (posée en multiplication sur le papier), ordre d'arrivée, graine du lavis ----
-type Pigment = { tint: [number, number, number]; at: number; seed: V3 };
+export type Pigment = { tint: [number, number, number]; at: number; seed: V3 };
 const SONG: Record<Paint, Pigment> = {
   stone: { tint: [0.84, 0.8, 0.72], at: 0, seed: [-6, 1.4, 9] },
   marble: { tint: [0.84, 0.8, 0.72], at: 0, seed: [-6, 1.4, 9] },
@@ -111,10 +111,10 @@ const QING: Record<Paint, Pigment> = {
   roof: { tint: [0.98, 0.76, 0.24], at: 0.75, seed: [0, 11, 6] },
   ridge: { tint: [0.9, 0.65, 0.2], at: 1.0, seed: [0, 14, 0] },
 };
-const PALETTE: Record<Style, Record<Paint, Pigment>> = { song: SONG, qing: QING };
+export const PALETTE: Record<Style, Record<Paint, Pigment>> = { song: SONG, qing: QING };
 
 // ---- matériaux des pièces pleines : papier, puis lavis qui se répand depuis une graine ----
-const PAPER = new THREE.Color(0.965, 0.948, 0.91);
+export const PAPER = new THREE.Color(0.965, 0.948, 0.91);
 const VERT = `varying vec3 vW; varying vec3 vN;
 void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`;
 const FRAG = `uniform vec3 uTint; uniform vec3 uPaper; uniform vec3 uSeed; uniform float uR; uniform float uReveal; uniform float uFill; uniform float uClipY;
@@ -135,13 +135,13 @@ void main(){
   vec3 tint = uTint * gran * shade * (1.0 - 0.12 * edge);
   gl_FragColor = vec4(uPaper * mix(vec3(1.0), tint, a), uFill);
 }`;
-const mkMat = (pg: Pigment, R: number) => new THREE.ShaderMaterial({
+export const mkMat = (pg: Pigment, R: number) => new THREE.ShaderMaterial({
   vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: true, side: THREE.DoubleSide,
   polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2,
   uniforms: { uTint: { value: new THREE.Color(...pg.tint) }, uPaper: { value: PAPER }, uSeed: { value: new THREE.Vector3(...pg.seed) }, uR: { value: R }, uReveal: { value: 0 }, uFill: { value: 0 }, uClipY: { value: 1e4 } },
 });
 
-function solidGeo(s: Solid): THREE.BufferGeometry {
+export function solidGeo(s: Solid): THREE.BufferGeometry {
   let g: THREE.BufferGeometry;
   if (s.kind === 'box') { g = new THREE.BoxGeometry(...s.s); g.translate(...s.c); }
   else if (s.kind === 'cyl') { g = new THREE.CylinderGeometry(s.r, s.r, s.h, 24); g.translate(...s.c); }
@@ -155,7 +155,7 @@ function solidGeo(s: Solid): THREE.BufferGeometry {
   }
   return g.index ? g.toNonIndexed() : g;
 }
-function roofGeo(m: Model): THREE.BufferGeometry {
+export function roofGeo(m: Model): THREE.BufferGeometry {
   const nx = 152, nz = 112, pos: number[] = [];
   const P = (i: number, j: number): V3 => { const x = -m.X_E + (2 * m.X_E * i) / nx, z = -m.Z_E + (2 * m.Z_E * j) / nz; return [x, m.roofY(x, z), z]; };
   for (let i = 0; i < nx; i++) for (let j = 0; j < nz; j++) {
@@ -190,9 +190,9 @@ function buildMeshes(m: Model, pal: Record<Paint, Pigment>): Mesh[] {
 }
 
 // ---- traits : trois épaisseurs, plus le cordeau vermillon ; passe visible et passe « cachée » ----
-const WIDTHS = [1.1, 1.6, 2.4];
-type LineObj = { obj: LineSegments2; geo: LineSegmentsGeometry; mat: LineMaterial };
-const mkLine = (color: string, w: number, hidden: boolean): LineObj => {
+export const WIDTHS = [1.1, 1.6, 2.4];
+export type LineObj = { obj: LineSegments2; geo: LineSegmentsGeometry; mat: LineMaterial };
+export const mkLine = (color: string, w: number, hidden: boolean): LineObj => {
   const geo = new LineSegmentsGeometry();
   const mat = new LineMaterial({ color: new THREE.Color(color).getHex(), linewidth: w, transparent: true, depthWrite: false });
   if (hidden) mat.depthFunc = THREE.GreaterDepth;
@@ -254,7 +254,7 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
   );
 };
 
-const useFonts = () => {
+export const useFonts = () => {
   const [h] = useState(() => delayRender('polices'));
   useEffect(() => {
     new FontFace('Jiehua3dSeal', `url(${staticFile('fonts/NotoSerifTC-Bold.otf')})`).load().then((f) => { document.fonts.add(f); continueRender(h); });

@@ -11,7 +11,11 @@ export type V3 = [number, number, number];
 export type Style = 'song' | 'qing';
 // pts : polyligne fixe, ou fonction de l'azimut de la caméra (silhouette des colonnes)
 export type LineDef = { pts: V3[] | ((az: number) => V3[]); w: 0 | 1 | 2; axis?: boolean };
-export type GroupDef = { mode: 'ruler' | 'free' | 'cascade'; t0: number; t1: number; lines: LineDef[] };
+// flat : 'plan' (tracé à plat sur le papier à sa place, puis monte à sa hauteur), sinon élévation couchée sur le
+// papier ; base : terrasse, déjà en place avant l'assemblage (dessin à plat puis soulèvement, voir JiehuaPli)
+export type GroupDef = { mode: 'ruler' | 'free' | 'cascade'; t0: number; t1: number; lines: LineDef[]; flat?: 'plan'; base?: boolean };
+// pièce de l'assemblage : ses traits et ses volumes arrivent ensemble ; roof : la couverture (surface du toit)
+export type Part = { lines: LineDef[]; solids: Solid[]; c: V3; roof?: boolean };
 // pièces pleines : masquent les traits cachés une fois le bâtiment refermé, puis reçoivent la couleur
 export type Paint = 'stone' | 'marble' | 'column' | 'door' | 'plaster' | 'wall' | 'green' | 'blue' | 'red' | 'roof' | 'ridge';
 export type Solid =
@@ -22,7 +26,7 @@ export type Solid =
   | { kind: 'poly'; p: V3[]; plane: 'x' | 'z'; paint: Paint };
 export type Cam = { az: number; el: number; zoom: number; target: V3 };
 export type Model = {
-  groups: GroupDef[]; solids: Solid[]; roofY: (x: number, z: number) => number;
+  groups: GroupDef[]; solids: Solid[]; parts: Part[]; roofY: (x: number, z: number) => number;
   X_E: number; Z_E: number; RIDGE_Y: number; CLOSE_T0: number; ROOF_T0: number; ROOF_T1: number; DRAW_END: number;
   close: Cam[]; wide: Cam;
 };
@@ -42,7 +46,7 @@ const CFG: Record<Style, Cfg> = {
     lintels: [{ y: 5.85, h: 0.5, t: 0.3, paint: 'green' }, { y: 6.22, h: 0.25, t: 0.6, paint: 'red', over: 0.6 }],
     yDG: 6.35, dg: 1, arm: 1, front: [-8, -5.5, -3, 0, 3, 5.5, 8], side: [-5, -2.5, 0, 2.5, 5],
     prof: [[0, 8.6], [1.5, 9.05], [3.4, 9.6], [5.9, 10.8], [8.4, 12.3]], yGable: 10.3, upturn: 0.9, ridgeH: 0.5,
-    truss: { beamY: 8.6, beamH: 0.7, postY: 9.55, postH: 1.2, upY: 10.35, upH: 0.45, rpY: 11.3, rpH: 1.5, midP: 10.72, ridgeP: 12.1, colP: 9.35, braces: true },
+    truss: { beamY: 8.6, beamH: 0.7, postY: 9.55, postH: 1.2, upY: 10.35, upH: 0.45, rpY: 11.3, rpH: 1.5, midP: 10.58, ridgeP: 12.1, colP: 9.35, braces: true },
     qing: false,
     close: [
       { az: 0.8, el: 0.22, zoom: 140, target: [9.0, 2.4, 6.8] },     // pied de la colonne d'angle
@@ -192,7 +196,7 @@ export function buildModel(style: Style): Model {
   // la panne de rive s'arrête à l'angle de son anneau quand le toit est bas aux angles (Qing), sinon elle le perce
 const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 * s, 0.35, 0.35, 'green', Q ? 2 * O_E + 0.35 : 4.2, O_E)];
   // fermes : grande poutre, poinçons, entrait, poinçon de faîte (+ contrefiches 叉手 chez les Song)
-  const T = C.truss, trussX = [-X_G, -3, 3, X_G];
+  const T = C.truss, trussX = [-(X_G - 0.4), -3, 3, X_G - 0.4];   // fermes de pignon un peu en retrait du pignon
   const truss: Box[] = trussX.flatMap((x) => [
     { c: [x, T.beamY, 0], s: [0.45, T.beamH, 10.6], paint: 'green' },
     { c: [x, T.postY, 2.5], s: [0.35, T.postH, 0.35], paint: 'green' },
@@ -202,7 +206,8 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
   ] as Box[]);
   const braces: LineDef[] = T.braces ? trussX.flatMap((x) => [-1, 1].map((k) => seg([x, T.upY + 0.2, k * 2.6], [x, T.rpY + T.rpH / 2 - 0.1, k * 0.2], 2))) : [];
   const purlins: Box[] = [
-    { c: [0, T.midP, 2.5], s: [2 * X_G + 1.2, 0.3, 0.3], paint: 'green' }, { c: [0, T.midP, -2.5], s: [2 * X_G + 1.2, 0.3, 0.3], paint: 'green' },
+    // pannes intermédiaires arrêtées au pignon (au-delà, elles perceraient les croupes)
+    { c: [0, T.midP, 2.5], s: [2 * X_G - 0.3, 0.3, 0.3], paint: 'green' }, { c: [0, T.midP, -2.5], s: [2 * X_G - 0.3, 0.3, 0.3], paint: 'green' },
     ...ring(T.colP, 0.3, 0.3, 'green', Q ? 0.3 : 1),
   ];
   // arêtiers 角梁 : de l'angle de l'avant-toit au pied du pignon
@@ -338,13 +343,13 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
   const LB = C.lintels[0], LT = C.lintels[C.lintels.length - 1];
   const groups: GroupDef[] = [
     // terrasse : la règle trace l'arase, puis les moulures, l'escalier et la rampe
-    { mode: 'ruler', t0: 0.3, t1: 1.0, lines: [top(-PLAT.x, PLAT.z, PLAT.x, PLAT.z), top(PLAT.x, PLAT.z, PLAT.x, -PLAT.z), top(PLAT.x, -PLAT.z, -PLAT.x, -PLAT.z), top(-PLAT.x, -PLAT.z, -PLAT.x, PLAT.z)] },
-    { mode: 'cascade', t0: 0.8, t1: 1.3, lines: [
+    { mode: 'ruler', t0: 0.3, t1: 1.0, flat: 'plan', base: true, lines: [top(-PLAT.x, PLAT.z, PLAT.x, PLAT.z), top(PLAT.x, PLAT.z, PLAT.x, -PLAT.z), top(PLAT.x, -PLAT.z, -PLAT.x, -PLAT.z), top(-PLAT.x, -PLAT.z, -PLAT.x, PLAT.z)] },
+    { mode: 'cascade', t0: 0.8, t1: 1.3, base: true, lines: [
       ...platBoxes.slice().reverse().flatMap((b) => boxEdges(b.c, b.s, 2).slice(0, 8)), ...steps.flatMap((b) => boxEdges(b.c, b.s, 1)),
       ...(Q ? [closed(ramp, 1), closed([rampIn(-1, 0.08), rampIn(1, 0.08), rampIn(1, 0.92), rampIn(-1, 0.92)], 0), ...range(0.2, 0.8, 0.15).map((v) => ({ pts: range(-1, 1, 0.1).map((u) => { const p = rampIn(u * 0.8, v + 0.03 * Math.sin(u * 7)); return p; }), w: 0 as const }))] : []),
     ] },
     // trame des colonnes, au cordeau vermillon
-    { mode: 'cascade', t0: 1.0, t1: 1.4, lines: [...XS.map((x) => ax(seg([x, PLAT.h + 0.01, -7], [x, PLAT.h + 0.01, 7]))), ...ZS.map((z) => ax(seg([-10, PLAT.h + 0.01, z], [10, PLAT.h + 0.01, z])))] },
+    { mode: 'cascade', t0: 1.0, t1: 1.4, flat: 'plan', base: true, lines: [...XS.map((x) => ax(seg([x, PLAT.h + 0.01, -7], [x, PLAT.h + 0.01, 7]))), ...ZS.map((z) => ax(seg([-10, PLAT.h + 0.01, z], [10, PLAT.h + 0.01, z])))] },
     // bases et colonnes
     { mode: 'cascade', t0: 1.3, t1: 2.0, lines: COLS.flatMap(([x, z]) => { const b = plinth(x, z); return [...boxEdges(b.c, b.s, 1), ...colLines(x, z)]; }) },
     // linteau et sablière de façade à la règle, puis le reste du cadre (et les 雀替)
@@ -387,6 +392,23 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
     ...[-1, 1].map((sx): Solid => ({ kind: 'poly', p: wen(sx), plane: 'z', paint: Q ? 'roof' : 'ridge' })),
     ...(Q ? [-1, 1].map((sx): Solid => ({ kind: 'poly', p: gablePoly(sx), plane: 'x', paint: 'wall' })) : []),
   ];
-  return { groups, solids, roofY, X_E, Z_E, RIDGE_Y, CLOSE_T0: 5.2, ROOF_T0: 5.55, ROOF_T1: 6.2, DRAW_END: 6.6, close: C.close, wide: C.wide };
+  // ---- pièces de l'assemblage, dans l'ordre du chantier (la terrasse est déjà en place) ----
+  const bx = (b: Box, w: 0 | 1 | 2 = 1) => ({ lines: boxEdges(b.c, b.s, w), solids: [{ kind: 'box', ...b } as Solid] });
+  const merge = (items: { lines: LineDef[]; solids: Solid[] }[], c: V3, roof = false): Part => ({ lines: items.flatMap((i) => i.lines), solids: items.flatMap((i) => i.solids), c, roof });
+  const parts: Part[] = [
+    ...COLS.map(([x, z]) => merge([bx(plinth(x, z)), { lines: colLines(x, z), solids: [{ kind: 'cyl', c: [x, (COL_Y0 + COL_Y1) / 2, z], r: COL_R, h: COL_Y1 - COL_Y0, paint: 'column' }] }], [x, (COL_Y0 + COL_Y1) / 2, z])),
+    ...C.lintels.map((l) => merge(ring(l.y, l.h, l.t, l.paint, l.over ?? 0).map((b) => bx(b)), [0, l.y, 0])),
+    ...frames.map((f) => merge(dougongSet(f).map((b) => bx(b, 0)), [f.x, Y_DG + s, f.z])),
+    merge(upper.map((b) => bx(b)), [0, Y_ZT, 0]),
+    ...trussX.map((x) => merge([...truss.filter((b) => b.c[0] === x).map((b) => bx(b)), { lines: braces.filter((l) => (l.pts as V3[])[0][0] === x), solids: [] }], [x, T.upY, 0])),
+    merge(purlins.map((b) => bx(b)), [0, T.midP, 0]),
+    merge([{ lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)], solids: [] }], [0, T.midP, 0]),
+    merge([{ lines: facade, solids: walls.filter((w) => w.kind === 'quad' && w.p[0][2] === 5 && w.p[0][1] < Y_DG) }, { lines: queti.map((q) => closed(q.p, 1)), solids: queti.map((q): Solid => ({ kind: 'poly', p: q.p, plane: 'z', paint: 'blue' })) }], [0, 4, 5]),
+    merge([{ lines: sideWallLines, solids: walls.filter((w) => !(w.kind === 'quad' && w.p[0][2] === 5 && w.p[0][1] < Y_DG)) }], [0, 4, -2]),
+    merge([{ lines: balustrade, solids: Q ? [...slabs, ...postBoxes].map((b): Solid => ({ kind: 'box', ...b })) : [] }], [0, PLAT.h + 0.6, 0]),
+    merge([{ lines: [{ pts: eaveLoop(0), w: 2 }, { pts: eaveLoop(-0.32), w: 1 }, ...slopeLines(Q ? 0.36 : 0.42, 0.04, 0), ...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, 0.15).slice().reverse(), w: 2 as const })), ...corners.map(([sx, sz]) => ({ pts: gableRidge(sx, sz), w: 2 as const })), ...[-1, 1].map((sx) => seg([sx * X_G, Y_GABLE + 0.05, -(Z_E - E_G)], [sx * X_G, Y_GABLE + 0.05, Z_E - E_G], 1)), ...beasts.flatMap((b) => boxEdges(b.c, b.s, 0))], solids: [...beasts.map((b): Solid => ({ kind: 'box', ...b })), ...(Q ? [-1, 1].map((sx): Solid => ({ kind: 'poly', p: gablePoly(sx), plane: 'x', paint: 'wall' })) : [])] }], [0, 10, 0], true),
+    merge([bx({ ...ridgeBox, paint: Q ? 'roof' : 'ridge' }), { lines: [{ pts: wen(-1), w: 2 }, { pts: wen(1), w: 2 }, ...(Q ? [sword(-1), sword(1)] : [])], solids: [-1, 1].map((sx): Solid => ({ kind: 'poly', p: wen(sx), plane: 'z', paint: Q ? 'roof' : 'ridge' })) }], [0, RIDGE_Y, 0]),
+  ];
+  return { groups, solids, parts, roofY, X_E, Z_E, RIDGE_Y, CLOSE_T0: 5.2, ROOF_T0: 5.55, ROOF_T1: 6.2, DRAW_END: 6.6, close: C.close, wide: C.wide };
 }
 const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
