@@ -5,9 +5,11 @@
 // 3. de tout près, le maître prolonge les traits : élément après élément (terrasse, colonnes, linteaux, consoles…),
 //    les fuyantes s'allongent depuis la feuille vers l'arrière et emportent chaque trait à sa profondeur réelle ;
 //    la caméra accompagne le mouvement vers le fond ; la feuille s'efface ;
-// 4. la caméra recule jusqu'à la vue d'ensemble ; les traits pâlissent en épure ;
-// 5. les pièces arrivent de l'extérieur du cadre, déjà dessinées, voyagent et se fixent sur l'épure dans l'ordre
-//    du chantier (les traits cachés pâlissent) ;
+// 4. la caméra recule jusqu'à la vue d'ensemble ; les traits pâlissent en une épure à peine visible (le toit et
+//    la charpente haute presque effacés) ;
+// 5. les pièces arrivent de l'extérieur du cadre, déjà dessinées, du bas vers le haut et bien espacées : la structure
+//    de côté, juste au-dessus de sa place, puis descend ; la charpente, la balustrade et le toit tombent à la
+//    verticale ; façade et murs glissent à leur hauteur — aucune ne traverse une autre (les traits cachés pâlissent) ;
 // 6. la couleur gagne le bâtiment par lavis.
 import React, { useMemo } from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from 'remotion';
@@ -32,10 +34,12 @@ const DRAW0 = 0.6, DRAW1 = 3.3;               // élévation tracée sur la feui
 const TURN0 = 3.4, TURN1 = 5.2;               // glissement latéral et plongée sur l'angle
 const DEPTH0 = 5.2, DEPTH1 = 7.8;             // fuyantes prolongées, élément après élément (en plan rapproché)
 const BACK0 = 7.8, BACK1 = 9.0;               // recul ; les traits pâlissent en épure
-const LAND0 = 9.4, LAND1 = 11.6, FLIGHT = 1.0;  // pièces : instants d'emboîtement, durée du voyage
+const LAND0 = 9.5, LAND1 = 11.8, FLIGHT = 0.8;  // pièces : instants d'emboîtement, durée du voyage
 const COLOR_T0 = 11.8, WASH_DUR = 1.1, T_SEAL = 13.2;
 const ZF = 11.5;                              // plan de la feuille : devant tout le bâtiment (marches comprises)
 const SHEET_Z = ZF - 0.05;
+const HIGH_Y = 8.9;                           // au-dessus : toit et charpente haute
+const GHOST = 0.11, GHOST_HIGH = 0.035;      // opacité de l'épure
 
 // ---- caméra ----
 const FRONT: Cam = { az: 0, el: 0, zoom: 52, target: [0, 7.2, 0] };
@@ -69,7 +73,7 @@ const sheetMat = (col: [number, number, number]) => new THREE.ShaderMaterial({
 });
 
 // ---- traits : élévation (tout ce qui se voit de face) et fuyantes (en profondeur) ----
-type Line = Timed & { depth: boolean; base: boolean; e0: number; e1: number };   // e0, e1 : prolongement de l'élément
+type Line = Timed & { depth: boolean; base: boolean; high: boolean; e0: number; e1: number };   // e0, e1 : prolongement de l'élément
 const lenXY = (p: V3[]) => p.slice(1).reduce((s, q, i) => s + Math.hypot(q[0] - p[i][0], q[1] - p[i][1]), 0);
 const len3 = (p: V3[]) => p.slice(1).reduce((s, q, i) => s + Math.hypot(q[0] - p[i][0], q[1] - p[i][1], q[2] - p[i][2]), 0);
 // fuyante : trait presque invisible de face ; on la trace de la façade vers l'arrière
@@ -89,10 +93,12 @@ const prep = (style: Style) => {
     const lines: Line[] = m.groups.flatMap((g) => {
       const elev = g.lines.filter((l) => !isDepth(l)), dep = g.lines.filter(isDepth).map(frontFirst);
       const e0 = toDepth(g.t0), e1 = Math.max(e0 + 0.6, toDepth(g.t1)), base = !!g.base;
+      // trait « haut » : toit et charpente au-dessus des consoles, presque effacé dans l'épure
+      const high = (l: LineDef) => Math.min(...ptsOf(l, 0).map((q) => q[1])) > HIGH_Y;
       return [
-        ...timeLines([{ ...g, lines: elev }]).map((l) => ({ ...l, t0: toDraw(l.t0), t1: toDraw(l.t1), depth: false, base, e0, e1 })),
+        ...timeLines([{ ...g, lines: elev }]).map((l) => ({ ...l, t0: toDraw(l.t0), t1: toDraw(l.t1), depth: false, base, high: high(l), e0, e1 })),
         // les fuyantes sont « posées » d'un coup : c'est le prolongement qui les fait grandir
-        ...dep.map((l) => ({ ...l, t0: e0 - 0.02, t1: e0, mode: 'cascade' as const, depth: true, base, e0, e1 })),
+        ...dep.map((l) => ({ ...l, t0: e0 - 0.02, t1: e0, mode: 'cascade' as const, depth: true, base, high: high(l), e0, e1 })),
       ];
     });
     PREP.set(style, { m, lines });
@@ -102,7 +108,12 @@ const prep = (style: Style) => {
 
 // ---- pièces : volumes et traits, arrivée depuis l'extérieur du cadre ----
 type MeshRt = { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; paint: Paint };
-type PartRt = { meshes: MeshRt[]; lines: LineDef[]; from: V3; land: number };
+type PartRt = { meshes: MeshRt[]; lines: LineDef[]; from: V3; land: number; slide: boolean };
+// trajet : d'abord l'horizontale jusqu'à l'aplomb de sa place, puis la verticale (ou la seule glissade horizontale)
+const pathOff = (from: V3, u: number, slide: boolean): V3 => {
+  const h = slide ? 1 - backOut(clamp(u)) : 1 - easeOut(clamp(u / 0.6)), v = 1 - backOut(clamp((u - 0.45) / 0.55));
+  return [from[0] * h, from[1] * v, from[2] * h];
+};
 const backOut = (u: number) => { const c = 1.1, v = clamp(u) - 1; return 1 + (c + 1) * v * v * v + c * v * v; };
 const meshesOf = (m: Model, pal: Record<Paint, Pigment>, solids: Solid[], roof: boolean): MeshRt[] => {
   const by = new Map<Paint, THREE.BufferGeometry[]>();
@@ -120,12 +131,15 @@ const meshesOf = (m: Model, pal: Record<Paint, Pigment>, solids: Solid[], roof: 
   });
 };
 function buildParts(m: Model, pal: Record<Paint, Pigment>): PartRt[] {
-  const n = m.parts.length;
-  return m.parts.map((p, i) => {
-    // départ hors champ : à l'écart du bâtiment, dans la direction de la pièce, et en hauteur (le toit tombe du ciel)
+  // instants d'emboîtement : chaque pièce occupe sa part de temps (les consoles, nombreuses, s'enchaînent vite)
+  const tot = m.parts.reduce((a, p) => a + p.w, 0);
+  let acc = 0;
+  return m.parts.map((p) => {
+    acc += p.w;
     const r = Math.hypot(p.c[0], p.c[2]), dx = r > 0.5 ? p.c[0] / r : 0.6, dz = r > 0.5 ? p.c[2] / r : 0.8;
-    const from: V3 = p.roof ? [0, 16, 0] : [dx * 24, 7 + p.c[1] * 0.4, dz * 24];
-    return { meshes: meshesOf(m, pal, p.solids, !!p.roof), lines: p.lines, from, land: lerp(LAND0, LAND1, n > 1 ? i / (n - 1) : 0) };
+    // départ hors champ, du côté de la pièce : juste au-dessus de sa place, du ciel, ou à sa hauteur
+    const from: V3 = p.path === 'fall' ? [0, 16, 0] : p.path === 'slide' ? [dx * 26, 0, dz * 26] : [dx * 26, 3.2, dz * 26];
+    return { meshes: meshesOf(m, pal, p.solids, !!p.roof), lines: p.lines, from, land: lerp(LAND0, LAND1, acc / tot), slide: p.path === 'slide' };
   });
 }
 
@@ -148,6 +162,7 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
   const L = useMemo(() => ({
     dark: WIDTHS.map((w) => mkLine('#1a1613', w, false)),
     ghost: WIDTHS.map((w) => mkLine('#1a1613', w, false)),
+    ghostHi: WIDTHS.map((w) => mkLine('#1a1613', w, false)),
     hid: WIDTHS.map((w) => mkLine('#1a1613', w, true)),
     axis: mkLine('#b8432f', 1.3, false),
   }), []);
@@ -162,14 +177,14 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
   });
 
   // dessin et prolongement ; après le recul, tout ce qui n'est pas la terrasse pâlit en épure
-  const dark: number[][] = [[], [], []], ghost: number[][] = [[], [], []], ax: number[] = [];
+  const dark: number[][] = [[], [], []], ghost: number[][] = [[], [], []], ghostHi: number[][] = [[], [], []], ax: number[] = [];
   for (const l of lines) {
     const u = clamp((t - l.t0) / (l.t1 - l.t0));
     if (u <= 0) continue;
     // prolongement : tout point resté devant la règle qui recule est ramené sur elle (plan de la feuille au départ)
     const back = ZF - 24 * ease((t - l.e0) / (l.e1 - l.e0));
     const p = partial(ptsOf(l, c.az), u).map(([x, y, z]) => [x, y, Math.max(z, back)] as V3);
-    const dst = l.axis ? ax : l.base ? dark[l.w] : ghost[l.w];
+    const dst = l.axis ? ax : l.base ? dark[l.w] : l.high ? ghostHi[l.w] : ghost[l.w];
     for (let i = 1; i < p.length; i++) dst.push(...p[i - 1], ...p[i]);
   }
   // pièces : elles voyagent depuis l'extérieur, déjà dessinées, puis se fixent sur l'épure
@@ -177,7 +192,7 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
   parts.forEach((pr) => {
     const u = (t - (pr.land - FLIGHT)) / FLIGHT;
     if (u <= 0) { pr.meshes.forEach((me) => { me.mesh.visible = false; }); return; }
-    const k = backOut(u), off: V3 = [pr.from[0] * (1 - k), pr.from[1] * (1 - k), pr.from[2] * (1 - k)];
+    const off = pathOff(pr.from, u, pr.slide);
     pr.meshes.forEach((me) => {
       me.mesh.visible = true; me.mesh.position.set(...off);
       me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = reveal(me.paint);
@@ -188,7 +203,7 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
     }
   });
 
-  const ghostOp = t < BACK0 ? 0.92 : t < LAND1 ? lerp(0.92, 0.26, ease((t - BACK0) / (BACK1 - BACK0))) : 0.26 * (1 - ease((t - LAND1) / 0.6));
+  const fade = (g: number) => (t < BACK0 ? 0.92 : t < LAND1 ? lerp(0.92, g, ease((t - BACK0) / (BACK1 - BACK0))) : g * (1 - ease((t - LAND1) / 0.6)));
   const hidOp = t < LAND0 - FLIGHT ? 0 : 0.3 * (1 - ease((t - LAND1) / 0.8));
   const dpr = viewport.dpr;
   const setL = (o: LineObj, arr: number[], op: number, w: number) => {
@@ -201,7 +216,8 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
   };
   WIDTHS.forEach((w, i) => {
     setL(L.dark[i], [...dark[i], ...pl[i]], 0.92, w);
-    setL(L.ghost[i], ghost[i], ghostOp, w);
+    setL(L.ghost[i], ghost[i], fade(GHOST), w);
+    setL(L.ghostHi[i], ghostHi[i], fade(GHOST_HIGH), w);
     setL(L.hid[i], pl[i], hidOp, w);
   });
   setL(L.axis, ax, 0.55 - 0.4 * clamp((t - BACK0) / 1.5), 1.3);
@@ -212,7 +228,7 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
       <primitive object={sheet.paper} />
       {base.map((b, i) => <primitive key={`b${i}`} object={b.mesh} />)}
       {parts.flatMap((pr, i) => pr.meshes.map((me, j) => <primitive key={`p${i}_${j}`} object={me.mesh} />))}
-      {[...L.dark, ...L.ghost, ...L.hid, L.axis].map((o, i) => <primitive key={`l${i}`} object={o.obj} />)}
+      {[...L.dark, ...L.ghost, ...L.ghostHi, ...L.hid, L.axis].map((o, i) => <primitive key={`l${i}`} object={o.obj} />)}
     </>
   );
 };
