@@ -82,9 +82,14 @@ const dougongSet = (f: Frame) => {
 const frames: Frame[] = [];
 [5, -5].forEach((z) => [-8, -5.5, -3, 0, 3, 5.5, 8].forEach((x) => frames.push({ x, z, t: [1, 0], n: [0, Math.sign(z)] })));
 [8, -8].forEach((x) => [-5, -2.5, 0, 2.5, 5].forEach((z) => frames.push({ x, z, t: [0, 1], n: [Math.sign(x), 0] })));
-// de l'avant vers l'arrière, de gauche à droite : l'ordre où l'œil les découvre
-frames.sort((a, b) => b.z - a.z || a.x - b.x);
+// en partant de l'angle avant droit, où la caméra commence en plan rapproché
+const FOCUS: [number, number] = [8, 5];
+const fromFocus = (x: number, z: number) => Math.hypot(x - FOCUS[0], z - FOCUS[1]);
+frames.sort((a, b) => fromFocus(a.x, a.z) - fromFocus(b.x, b.z));
 const DOUGONG = frames.flatMap(dougongSet);
+// la console d'angle (deux faces) est montée seule, en plan rapproché ; les autres suivent pendant la sortie
+const CORNER_SET = frames.filter((f) => fromFocus(f.x, f.z) === 0).flatMap(dougongSet);
+const OTHER_SETS = frames.filter((f) => fromFocus(f.x, f.z) > 0).flatMap(dougongSet);
 
 // ---- charpente : linteaux, sablières, poutres, pannes ----
 const beams: { c: V3; s: V3; paint: Paint }[] = [
@@ -213,7 +218,7 @@ const ridgeBox = { c: [0, RIDGE_Y + 0.25, 0] as V3, s: [2 * X_G + 0.4, 0.5, 0.5]
 
 // ---- colonnes : silhouette selon la caméra (deux droites tangentes, comme au pinceau) ----
 const COLS: [number, number][] = XS.flatMap((x) => ZS.map((z) => [x, z] as [number, number])).filter(([x, z]) => !(Math.abs(x) === 3 && z === 0));
-COLS.sort((a, b) => b[1] - a[1] || a[0] - b[0]);
+COLS.sort((a, b) => fromFocus(...a) - fromFocus(...b));
 const colLines = (x: number, z: number): LineDef[] => [-1, 1].map((s) => ({
   w: 2,
   pts: (az: number) => { const px = Math.cos(az) * COL_R * s, pz = -Math.sin(az) * COL_R * s; return [[x + px, COL_Y0, z + pz], [x + px, COL_Y1, z + pz]]; },
@@ -225,35 +230,36 @@ const pl = platform;
 const top = (x0: number, z0: number, x1: number, z1: number) => seg([x0, PLAT.h, z0], [x1, PLAT.h, z1], 2);
 export const GROUPS: GroupDef[] = [
   // terrasse : la règle trace l'arase, puis les arêtes et l'escalier
-  { mode: 'ruler', t0: 0.3, t1: 1.05, lines: [top(-PLAT.x, PLAT.z, PLAT.x, PLAT.z), top(PLAT.x, PLAT.z, PLAT.x, -PLAT.z), top(PLAT.x, -PLAT.z, -PLAT.x, -PLAT.z), top(-PLAT.x, -PLAT.z, -PLAT.x, PLAT.z)] },
-  { mode: 'cascade', t0: 0.85, t1: 1.45, lines: [...boxEdges(pl.c, pl.s, 2).slice(0, 8), ...steps.flatMap((s) => boxEdges(s.c, s.s, 1))] },
+  { mode: 'ruler', t0: 0.3, t1: 1.0, lines: [top(-PLAT.x, PLAT.z, PLAT.x, PLAT.z), top(PLAT.x, PLAT.z, PLAT.x, -PLAT.z), top(PLAT.x, -PLAT.z, -PLAT.x, -PLAT.z), top(-PLAT.x, -PLAT.z, -PLAT.x, PLAT.z)] },
+  { mode: 'cascade', t0: 0.8, t1: 1.3, lines: [...boxEdges(pl.c, pl.s, 2).slice(0, 8), ...steps.flatMap((s) => boxEdges(s.c, s.s, 1))] },
   // trame des colonnes, au cordeau vermillon
-  { mode: 'cascade', t0: 1.15, t1: 1.6, lines: [...XS.map((x) => ax(seg([x, PLAT.h + 0.01, -7], [x, PLAT.h + 0.01, 7]))), ...ZS.map((z) => ax(seg([-10, PLAT.h + 0.01, z], [10, PLAT.h + 0.01, z])))] },
+  { mode: 'cascade', t0: 1.0, t1: 1.4, lines: [...XS.map((x) => ax(seg([x, PLAT.h + 0.01, -7], [x, PLAT.h + 0.01, 7]))), ...ZS.map((z) => ax(seg([-10, PLAT.h + 0.01, z], [10, PLAT.h + 0.01, z])))] },
   // bases et colonnes
-  { mode: 'cascade', t0: 1.45, t1: 2.15, lines: COLS.flatMap(([x, z]) => [...boxEdges([x, PLAT.h + 0.125, z], [1.1, 0.25, 1.1], 1), ...colLines(x, z)]) },
+  { mode: 'cascade', t0: 1.3, t1: 2.0, lines: COLS.flatMap(([x, z]) => [...boxEdges([x, PLAT.h + 0.125, z], [1.1, 0.25, 1.1], 1), ...colLines(x, z)]) },
   // linteau et sablière de façade à la règle, puis le reste du cadre
-  { mode: 'ruler', t0: 2.1, t1: 2.5, lines: [seg([-8, 5.6, 5.15], [8, 5.6, 5.15], 2), seg([8, 6.35, 5.3], [-8, 6.35, 5.3], 2)] },
-  { mode: 'cascade', t0: 2.3, t1: 2.7, lines: beams.flatMap((b) => boxEdges(b.c, b.s, 1)) },
+  { mode: 'ruler', t0: 1.95, t1: 2.35, lines: [seg([-8, 5.6, 5.15], [8, 5.6, 5.15], 2), seg([8, 6.35, 5.3], [-8, 6.35, 5.3], 2)] },
+  { mode: 'cascade', t0: 2.15, t1: 2.55, lines: beams.flatMap((b) => boxEdges(b.c, b.s, 1)) },
   // consoles, de l'avant vers l'arrière
-  { mode: 'cascade', t0: 2.6, t1: 3.55, lines: DOUGONG.flatMap((b) => boxEdges(b.c, b.s, 0)) },
-  { mode: 'cascade', t0: 3.4, t1: 3.75, lines: upper.flatMap((b) => boxEdges(b.c, b.s, 1)) },
+  { mode: 'cascade', t0: 2.45, t1: 3.6, lines: CORNER_SET.flatMap((b) => boxEdges(b.c, b.s, 1)) },
+  { mode: 'cascade', t0: 3.5, t1: 4.3, lines: OTHER_SETS.flatMap((b) => boxEdges(b.c, b.s, 0)) },
+  { mode: 'cascade', t0: 4.05, t1: 4.4, lines: upper.flatMap((b) => boxEdges(b.c, b.s, 1)) },
   // fermes et pannes ; la panne faîtière à la règle
-  { mode: 'cascade', t0: 3.65, t1: 4.2, lines: [...truss.flatMap((b) => boxEdges(b.c, b.s, 1)), ...braces, ...purlins.slice(1).flatMap((b) => boxEdges(b.c, b.s, 1))] },
-  { mode: 'ruler', t0: 4.1, t1: 4.35, lines: [seg([-X_G - 0.6, 12.25, 0.15], [X_G + 0.6, 12.25, 0.15], 2)] },
+  { mode: 'cascade', t0: 4.2, t1: 4.7, lines: [...truss.flatMap((b) => boxEdges(b.c, b.s, 1)), ...braces, ...purlins.slice(1).flatMap((b) => boxEdges(b.c, b.s, 1))] },
+  { mode: 'ruler', t0: 4.6, t1: 4.85, lines: [seg([-X_G - 0.6, 12.25, 0.15], [X_G + 0.6, 12.25, 0.15], 2)] },
   // arêtiers et chevrons
-  { mode: 'cascade', t0: 4.3, t1: 4.85, lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)] },
+  { mode: 'cascade', t0: 4.8, t1: 5.25, lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)] },
   // le bâtiment se referme : façade, murs, balustrade
-  { mode: 'cascade', t0: 4.8, t1: 5.45, lines: [...facade, ...sideWallLines] },
-  { mode: 'cascade', t0: 5.0, t1: 5.55, lines: balustrade },
+  { mode: 'cascade', t0: 5.2, t1: 5.7, lines: [...facade, ...sideWallLines] },
+  { mode: 'cascade', t0: 5.3, t1: 5.8, lines: balustrade },
   // avant-toit à main levée, couverture de tuiles, arêtiers, faîtage
-  { mode: 'free', t0: 5.25, t1: 5.75, lines: [{ pts: eaveLoop(0), w: 2 }, { pts: eaveLoop(-0.32), w: 1 }] },
-  { mode: 'cascade', t0: 5.35, t1: 6.05, lines: slopeLines(0.42, 0.04, 0) },
-  { mode: 'cascade', t0: 5.85, t1: 6.2, lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, 0.15).slice().reverse(), w: 2 as const })), ...corners.map(([sx, sz]) => ({ pts: gableRidge(sx, sz), w: 2 as const })), ...[-1, 1].map((sx) => seg([sx * X_G, Y_GABLE + 0.05, -(Z_E - E_G)], [sx * X_G, Y_GABLE + 0.05, Z_E - E_G], 1))] },
-  { mode: 'ruler', t0: 6.1, t1: 6.35, lines: [seg([-X_G - 0.2, RIDGE_Y + 0.5, 0.25], [X_G + 0.2, RIDGE_Y + 0.5, 0.25], 2)] },
-  { mode: 'cascade', t0: 6.2, t1: 6.45, lines: boxEdges(ridgeBox.c, ridgeBox.s, 1) },
-  { mode: 'free', t0: 6.3, t1: 6.55, lines: [{ pts: chiwen(-1), w: 2 }, { pts: chiwen(1), w: 2 }] },
+  { mode: 'free', t0: 5.5, t1: 5.9, lines: [{ pts: eaveLoop(0), w: 2 }, { pts: eaveLoop(-0.32), w: 1 }] },
+  { mode: 'cascade', t0: 5.6, t1: 6.2, lines: slopeLines(0.42, 0.04, 0) },
+  { mode: 'cascade', t0: 6.0, t1: 6.3, lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, 0.15).slice().reverse(), w: 2 as const })), ...corners.map(([sx, sz]) => ({ pts: gableRidge(sx, sz), w: 2 as const })), ...[-1, 1].map((sx) => seg([sx * X_G, Y_GABLE + 0.05, -(Z_E - E_G)], [sx * X_G, Y_GABLE + 0.05, Z_E - E_G], 1))] },
+  { mode: 'ruler', t0: 6.25, t1: 6.45, lines: [seg([-X_G - 0.2, RIDGE_Y + 0.5, 0.25], [X_G + 0.2, RIDGE_Y + 0.5, 0.25], 2)] },
+  { mode: 'cascade', t0: 6.3, t1: 6.5, lines: boxEdges(ridgeBox.c, ridgeBox.s, 1) },
+  { mode: 'free', t0: 6.4, t1: 6.6, lines: [{ pts: chiwen(-1), w: 2 }, { pts: chiwen(1), w: 2 }] },
 ];
-export const CLOSE_T0 = 4.8, ROOF_T0 = 5.3, ROOF_T1 = 6.1, DRAW_END = 6.55;
+export const CLOSE_T0 = 5.2, ROOF_T0 = 5.55, ROOF_T1 = 6.2, DRAW_END = 6.6;
 
 // ---- pièces pleines (occultation puis couleur) ----
 export const SOLIDS: Solid[] = [

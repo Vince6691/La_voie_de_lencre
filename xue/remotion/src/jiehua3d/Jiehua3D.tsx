@@ -18,7 +18,7 @@ import { CLOSE_T0, DRAW_END, GROUPS, LineDef, Paint, ROOF_T0, ROOF_T1, RIDGE_Y, 
 
 export const JIEHUA3D_SECONDS = 10;
 const W = 1920, H = 1080;
-const COLOR_T0 = DRAW_END - 0.1, WASH_DUR = 1.3, T_SEAL = 8.9;
+const COLOR_T0 = DRAW_END - 0.1, WASH_DUR = 1.3, T_SEAL = 9.0;
 
 const clamp = (u: number) => Math.min(1, Math.max(0, u));
 const ease = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(u));
@@ -27,9 +27,27 @@ const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
 
 // ---- caméra : orbite lente et recul pendant la construction, immobile pour la couleur ----
 type Cam = { az: number; el: number; zoom: number; target: V3 };
+// plan rapproché sur l'angle avant droit (on suit la colonne d'angle qui monte, puis les consoles), puis
+// la caméra sort : recul et montée jusqu'à la vue plongeante d'ensemble, où elle s'arrête pour la couleur
+const CLOSE = [
+  { az: 0.8, el: 0.22, zoom: 140, target: [9.0, 2.4, 6.8] as V3 },     // pied de la colonne d'angle
+  { az: 0.72, el: 0.24, zoom: 175, target: [8.3, 5.2, 5.6] as V3 },    // on monte le long de la colonne
+  { az: 0.66, el: 0.26, zoom: 250, target: [8.3, 7.4, 5.5] as V3 },    // la console d'angle se monte
+];
+const WIDE: Cam = { az: 0.56, el: 0.5, zoom: 46, target: [0, 6.0, 0] };
+const T_OUT = 3.5;
+const mix = (A: Cam, B: Cam, e: number): Cam => ({
+  az: lerp(A.az, B.az, e), el: lerp(A.el, B.el, e), zoom: Math.exp(lerp(Math.log(A.zoom), Math.log(B.zoom), e)),
+  target: [0, 1, 2].map((k) => lerp(A.target[k], B.target[k], e)) as V3,
+});
 const camAt = (t: number): Cam => {
-  const u = ease(t / (DRAW_END + 0.4));
-  return { az: lerp(0.98, 0.56, u), el: lerp(0.5, 0.42, u), zoom: lerp(66, 47, u), target: [lerp(2, 0, u), lerp(2.6, 6.6, u), lerp(2, 0, u)] };
+  if (t < T_OUT) {
+    const s = ease(t / T_OUT) * 2, i = Math.min(1, Math.floor(s));
+    return mix(CLOSE[i], CLOSE[i + 1], s - i);
+  }
+  // sortie : départ lent, élan, arrivée amortie
+  const u = clamp((t - T_OUT) / (DRAW_END - 0.1 - T_OUT));
+  return mix(CLOSE[2], WIDE, u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2);
 };
 const camPos = (c: Cam): V3 => { const D = 80; return [c.target[0] + D * Math.sin(c.az) * Math.cos(c.el), c.target[1] + D * Math.sin(c.el), c.target[2] + D * Math.cos(c.az) * Math.cos(c.el)]; };
 const applyCam = (cam: THREE.OrthographicCamera, c: Cam) => {
@@ -90,7 +108,7 @@ float fbm(vec3 p){ return 0.5 * vn(p) + 0.25 * vn(p * 2.03) + 0.125 * vn(p * 4.0
 void main(){
   if (vW.y > uClipY) discard;
   float d = distance(vW, uSeed) / uR;
-  float front = uReveal * 1.3 - d + (fbm(vW * 0.45) - 0.47) * 0.35;
+  float front = uReveal * 1.5 - d - 0.2 + (fbm(vW * 0.45) - 0.47) * 0.35;
   float a = smoothstep(0.0, 0.05, front);
   float edge = smoothstep(0.0, 0.02, front) * (1.0 - smoothstep(0.02, 0.1, front));   // bord du lavis plus chargé
   float shade = 0.82 + 0.18 * max(dot(normalize(vN), normalize(vec3(-0.35, 0.85, 0.45))), 0.0);
@@ -151,7 +169,7 @@ function buildMeshes(): Mesh[] {
 }
 
 // ---- traits : trois épaisseurs, plus le cordeau vermillon ; passe visible et passe « cachée » ----
-const WIDTHS = [0.9, 1.45, 2.3];
+const WIDTHS = [1.1, 1.6, 2.4];
 type LineObj = { obj: LineSegments2; geo: LineSegmentsGeometry; mat: LineMaterial };
 const mkLine = (color: string, w: number, hidden: boolean): LineObj => {
   const geo = new LineSegmentsGeometry();
@@ -194,9 +212,11 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
   const dpr = viewport.dpr;
   const setL = (o: LineObj, arr: number[], op: number, w: number) => {
     o.obj.visible = arr.length > 0 && op > 0.005;
-    if (o.obj.visible) o.geo.setPositions(arr);
+    // géométrie neuve à chaque image : three.js garde en cache le nombre d'instances d'une géométrie déjà
+    // dessinée, et n'afficherait qu'une partie des traits quand leur nombre grandit (clignotement)
+    if (o.obj.visible) { o.geo.dispose(); o.geo = new LineSegmentsGeometry(); o.geo.setPositions(arr); o.obj.geometry = o.geo; }
     o.mat.opacity = op;
-    o.mat.linewidth = w * dpr;
+    o.mat.linewidth = Math.max(1, w * dpr);
     o.mat.resolution.set(size.width * dpr, size.height * dpr);
   };
   WIDTHS.forEach((w, i) => { setL(lines.vis[i], buf[i], 0.92, w); setL(lines.hid[i], buf[i], ghost, w); });
