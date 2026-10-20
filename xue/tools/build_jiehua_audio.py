@@ -171,8 +171,9 @@ lands = EV['lands']; t_roof = next(L['t'] for L in lands if L['kind'] == 'roof')
 drone = sum(g * np.sin(2 * np.pi * f2(m) * t + 0.3 * np.sin(2 * np.pi * 0.07 * t + m)) for m, g in [(38, 0.5), (45, 0.32), (50, 0.2)])
 music += 0.14 * drone * (0.6 + 0.4 * np.clip((t - t_first) / 3, 0, 1)) * np.clip(t / 1.5, 0, 1)
 # guzheng : une note au départ des grandes étapes du dessin (lignes de fuite, colonnes, consoles, toit)
-for at, m in [(0.3, 69), (1.2, 74), (2.4, 71), (3.4, 76), (4.3, 78), (5.2, 81)]:
-    mput(pluck(f2(m)), at, 0.1)
+act_f = np.nonzero(np.array(EV['pencil']) > 0)[0] / EV['fps']   # fenêtre du dessin
+for k, m in enumerate([69, 74, 71, 76, 78, 81]):
+    mput(pluck(f2(m)), act_f[0] + k * (act_f[-1] - act_f[0]) / 6, 0.1)
 def pad(notes):
     s = np.zeros(N)
     for m in notes:

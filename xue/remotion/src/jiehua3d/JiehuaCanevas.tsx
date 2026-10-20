@@ -23,19 +23,19 @@ import { PALETTE, clamp, ease, easeOut, lerp, mix, partial, ptsOf, roofGeo, soli
 import { InkLines, pushPencil, pushStroke } from './inkline';
 import { buildParts, meshesOf, pathOff } from './JiehuaFeuille';
 
-export const JIEHUA_CANEVAS_SECONDS = 16.5;   // temps réel ; l'animation dure ANIM_SECONDS, ralenti du toit compris
-const ANIM_SECONDS = 16;
+export const JIEHUA_CANEVAS_SECONDS = 10;
+const ANIM_SECONDS = 10;
 export type JiehuaCanevasProps = { style: Style };
 const W = 1920, H = 1080, FOV = 34;
 // calendrier (secondes)
-const GUIDE0 = 0.3, GUIDE1 = 1.7;             // lignes de construction vers les points de fuite
-const SK0 = 1.1, SK1 = 5.8;                   // canevas au crayon
-const FADE0 = 5.8, FADE1 = 6.6;               // le dessin pâlit en épure ; la terrasse passe à l'encre
-const LAND0 = 7.1, LAND1 = 10.0, FLIGHT = 0.8;  // pièces
-const PAINT0 = 10.2, DECO_DUR = 1.2;          // décors
-const GOLD0 = 10.6, GOLD1 = 11.8;             // filets d'or
-const FAR0 = 12.0, FAR1 = 14.2;               // brume, recul dans le paysage
-const INSCR0 = 13.0, T_SEAL = 14.6;           // inscription, sceau
+const GUIDE0 = 0.15, GUIDE1 = 0.95;           // lignes de construction vers les points de fuite
+const SK0 = 0.5, SK1 = 3.6;                   // canevas au crayon
+const FADE0 = 3.6, FADE1 = 4.1;               // le dessin pâlit en épure ; la terrasse passe à l'encre
+const LAND0 = 4.6, LAND1 = 6.7, FLIGHT = 0.6;  // pièces
+const PAINT0 = 6.8, DECO_DUR = 0.9;           // décors
+const GOLD0 = 7.0, GOLD1 = 7.8;               // filets d'or
+const FAR0 = 7.9, FAR1 = 9.4;                 // brume au pied de la salle
+const INSCR0 = 8.1, T_SEAL = 9.4;             // inscription, sceau
 const HIGH_Y = 8.9;                           // au-dessus : toit et charpente haute
 const GHOST = 0.13, GHOST_HIGH = 0.045;       // opacité de l'épure
 const PENCIL = [0.95, 1.25, 1.6];             // largeur des traits de crayon (px en 1080p)
@@ -43,39 +43,24 @@ const INK = [0.95, 1.6, 2.6];                 // largeur des coups de pinceau
 const TITLE = '營造法式殿堂圖';
 
 // ---- caméra en perspective ; zoom = pixels par unité au point visé ----
-// Montage en plans (coupes franches), chaque plan avec sa rampe de vitesse (départ et arrêt marqués) :
-//  1. au ras de la terrasse, les lignes de fuite filent ;  2. forte plongée, tout près, pendant que colonnes et
-//  linteaux se tracent ;  3. contre-plongée sur la façade (consoles, murs), puis panoramique fouetté qui monte au
-//  toit et découvre tout le canevas ;  4. l'épure en trois quarts ;  5–6. contre-plongées d'un côté puis de l'autre
-//  pendant que les pièces arrivent ;  7. plan héroïque de face pour le toit (ralenti avant le contact, tremblement
-//  au contact) ;  8. poussée sur les consoles et les linteaux pendant la peinture ;  9. grue arrière dans le paysage.
-// Le temps de l'animation (t) se fige un peu autour du contact du toit (voir animOf) ; secousses de zoom sur les
-// grosses pièces (camFx), synchrones des taiko de la bande son.
-const io3 = (u: number) => (u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2);
-const io5 = (u: number) => (u < 0.5 ? 16 * u ** 5 : 1 - (-2 * u + 2) ** 5 / 2);
-const out3 = (u: number) => 1 - (1 - u) ** 3;
-type Shot = { t0: number; t1: number; a: Cam; b: Cam; e: (u: number) => number };
-const C = (az: number, el: number, zoom: number, target: V3): Cam => ({ az, el, zoom, target });
-const FAR = C(0.2, 0.38, 27, [-3.5, 7.5, 0]);
-const S3B = C(0.02, 0.16, 62, [0, 6.8, 5]), S8B = C(0.02, 0.1, 35, [0, 7.8, 3]), S9B = C(-0.08, 0.16, 68, [0, 7.2, 5]);
-const SHOTS: Shot[] = [
-  { t0: 0, t1: 1.7, a: C(1.05, 0.09, 115, [10.2, 1.5, 8.6]), b: C(0.93, 0.13, 92, [8.5, 2.0, 7.4]), e: out3 },
-  { t0: 1.7, t1: 3.1, a: C(0.5, 0.78, 52, [2, 2.6, 3]), b: C(0.78, 0.62, 56, [3.5, 4.2, 3]), e: io3 },
-  { t0: 3.1, t1: 4.3, a: C(0.22, 0.1, 66, [3, 5.8, 5]), b: S3B, e: io3 },
-  { t0: 4.3, t1: 5.8, a: S3B, b: C(0.55, 0.55, 39, [0, 7, 0]), e: io5 },
-  { t0: 5.8, t1: 6.85, a: C(0.68, 0.4, 36, [0, 6, 0]), b: C(0.56, 0.42, 39, [0, 6, 0]), e: io3 },
-  { t0: 6.85, t1: 8.2, a: C(1.0, 0.09, 46, [3, 5.2, 2]), b: C(0.78, 0.13, 50, [2, 6.4, 2]), e: io3 },
-  { t0: 8.2, t1: 9.25, a: C(-0.8, 0.11, 46, [-2, 7, 1]), b: C(-0.58, 0.17, 44, [-1, 7.3, 0]), e: io3 },
-  { t0: 9.25, t1: 10.3, a: C(0.12, 0.07, 37, [0, 7.6, 3]), b: S8B, e: out3 },
-  { t0: 10.3, t1: 12.0, a: S8B, b: S9B, e: io5 },
-  { t0: 12.0, t1: 14.2, a: S9B, b: FAR, e: io3 },
-  { t0: 14.2, t1: 16.0, a: FAR, b: C(0.24, 0.38, 26, [-3.5, 7.5, 0]), e: (u) => u },
-];
-// coupes : début d'un plan qui ne reprend pas la fin du précédent
-const CUTS = SHOTS.slice(1).filter((sh, i) => sh.a !== SHOTS[i].b).map((sh) => sh.t0);
+// Un seul plan tournant : départ tout près, en contre-plongée, sur l'angle avant droit (la colonne d'angle et la
+// console au-dessus), puis un tour complet de 360° autour de la salle pendant qu'elle se dessine et s'assemble, en
+// montant et en reculant, jusqu'à la vue de trois quarts plongeante.
+const ORBIT_AZ0 = 0.8;
+const START: Cam = { az: ORBIT_AZ0, el: -0.08, zoom: 150, target: [8.3, 3.4, 5.6] };
+const END: Cam = { az: ORBIT_AZ0 + 2 * Math.PI, el: 0.6, zoom: 41, target: [0, 6.2, 0] };
+const CUTS: number[] = [];
+const io = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(u));
 const camAt = (t: number): Cam => {
-  const sh = SHOTS.find((x) => t < x.t1) ?? SHOTS[SHOTS.length - 1];
-  return mix(sh.a, sh.b, sh.e(clamp((t - sh.t0) / (sh.t1 - sh.t0))));
+  const u = clamp(t / ANIM_SECONDS);
+  const turn = io(u) * 0.85 + u * 0.15;                    // le tour : jamais à l'arrêt, plus vif au milieu
+  const back = io(Math.min(1, u / 0.75));                  // le recul se fait sur les trois premiers quarts
+  const rise = io(u);                                      // de la contre-plongée à la plongée
+  return {
+    az: lerp(START.az, END.az, turn), el: lerp(START.el, END.el, rise),
+    zoom: Math.exp(lerp(Math.log(START.zoom), Math.log(END.zoom), back)),
+    target: [0, 1, 2].map((k) => lerp(START.target[k], END.target[k], back)) as V3,
+  };
 };
 // pièces : instant où elles touchent leur place (le trajet dépasse puis se recale, voir pathOff)
 const contactsOf = (m: Model) => {
@@ -106,7 +91,7 @@ const fxOf = (style: Style) => {
     // ralenti autour du toit : l'animation avance à 40 % de sa vitesse juste avant et pendant le contact
     const dt = 0.001, real: number[] = [], anim: number[] = [];
     let r = 0;
-    for (let a = 0; a <= ANIM_SECONDS + 1e-9; a += dt) { real.push(r); anim.push(a); r += dt / (1 - 0.6 * Math.exp(-(((a - roof + 0.1) / 0.3) ** 2))); }
+    for (let a = 0; a <= ANIM_SECONDS + 1e-9; a += dt) { real.push(r); anim.push(a); r += dt; }   // pas de ralenti dans le plan tournant
     FX.set(style, { hits: hitsOf(lands), roof, real: Float64Array.from(real), anim: Float64Array.from(anim) });
   }
   return FX.get(style)!;
@@ -315,13 +300,13 @@ export const JiehuaCanevas: React.FC<JiehuaCanevasProps> = ({ style }) => {
   const v = new THREE.Vector3();
   const proj = (p: V3) => { v.set(...p).project(pc); return [((v.x + 1) / 2) * W, ((1 - v.y) / 2) * H]; };
   const [bx, by] = proj([0, 1.4, 1]), [lx] = proj([-12, 0, 9]), [rx] = proj([12, 0, -9]);
-  const mist = ease((t - FAR0 - 0.2) / 1.6);
+  const mist = 0;   // pas de brume dans le plan tournant : vue d'en haut, elle couvrirait la façade
   const titleX = 1590, titleY = 170, CH = 62;
   const sealU = clamp((t - T_SEAL) / 0.35);
   return (
     <AbsoluteFill style={{ background: '#f8f5ee' }}>
       <Audio src={staticFile('jiehua/bande.wav')} />
-      <ShuimoBackground shot={shot} duration={JIEHUA_CANEVAS_SECONDS} halo={false} scroll={c.az * 650} />
+      <ShuimoBackground shot={shot} duration={JIEHUA_CANEVAS_SECONDS} halo={false} scroll={(c.az - ORBIT_AZ0) * 90} />
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse 46% 54% at 50% 54%, rgba(250,247,240,0.86) 0%, rgba(250,247,240,0.6) 60%, rgba(250,247,240,0) 100%)', opacity: 1 - 0.6 * mist }} />
       <svg width={0} height={0} style={{ position: 'absolute' }}>
         <defs>
