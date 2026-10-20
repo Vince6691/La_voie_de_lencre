@@ -131,16 +131,16 @@ const prep = (style: Style) => {
 };
 
 // ---- pièces : volumes peints en aplats, traits, trajet ; décors et filets d'or à la peinture finale ----
-type MeshRt = { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; paint: Paint };
-type PartRt = { meshes: MeshRt[]; lines: LineDef[]; from: V3; land: number; slide: boolean; gold: { l: LineDef; t0: number; len: number }[] };
-const backOut = (u: number) => { const c = 1.1, v = clamp(u) - 1; return 1 + (c + 1) * v * v * v + c * v * v; };
+export type MeshRt = { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; paint: Paint };
+export type PartRt = { meshes: MeshRt[]; lines: LineDef[]; from: V3; land: number; slide: boolean; gold: { l: LineDef; t0: number; len: number }[] };
+export const backOut = (u: number) => { const c = 1.1, v = clamp(u) - 1; return 1 + (c + 1) * v * v * v + c * v * v; };
 // trajet : d'abord l'horizontale jusqu'à l'aplomb de sa place, puis la verticale (ou la seule glissade horizontale)
-const pathOff = (from: V3, u: number, slide: boolean): V3 => {
+export const pathOff = (from: V3, u: number, slide: boolean): V3 => {
   const h = slide ? 1 - backOut(clamp(u)) : 1 - easeOut(clamp(u / 0.6)), v = 1 - backOut(clamp((u - 0.45) / 0.55));
   return [from[0] * h, from[1] * v, from[2] * h];
 };
 const SECOND: Partial<Record<Paint, Paint>> = { green: 'blue', blue: 'green', red: 'green' };   // couleur des bandes 箍頭
-const meshesOf = (m: Model, pal: Record<Paint, Pigment>, solids: Solid[], roof: boolean, deco?: Part['deco']): MeshRt[] => {
+export const meshesOf = (m: Model, pal: Record<Paint, Pigment>, solids: Solid[], roof: boolean, deco?: Part['deco']): MeshRt[] => {
   const by = new Map<Paint, THREE.BufferGeometry[]>();
   const add = (paint: Paint, g: THREE.BufferGeometry) => { const a = by.get(paint) ?? []; a.push(g); by.set(paint, a); };
   solids.forEach((s) => add(s.paint, solidGeo(s)));
@@ -159,7 +159,9 @@ const meshesOf = (m: Model, pal: Record<Paint, Pigment>, solids: Solid[], roof: 
     return { mesh: new THREE.Mesh(g, mat), mat, paint };
   });
 };
-function buildParts(m: Model, pal: Record<Paint, Pigment>): PartRt[] {
+// fenêtre : instants d'emboîtement (land0..land1) et tracé des filets d'or (gold0..gold1)
+export type PartWin = { land0: number; land1: number; gold0: number; gold1: number };
+export function buildParts(m: Model, pal: Record<Paint, Pigment>, win: PartWin = { land0: LAND0, land1: LAND1, gold0: GOLD0, gold1: GOLD1 }): PartRt[] {
   // instants d'emboîtement : chaque pièce occupe sa part de temps (les consoles, nombreuses, s'enchaînent vite)
   const tot = m.parts.reduce((a, p) => a + p.w, 0);
   const golden = m.parts.filter((p) => p.gold).length;
@@ -169,9 +171,9 @@ function buildParts(m: Model, pal: Record<Paint, Pigment>): PartRt[] {
     const r = Math.hypot(p.c[0], p.c[2]), dx = r > 0.5 ? p.c[0] / r : 0.6, dz = r > 0.5 ? p.c[2] / r : 0.8;
     // départ hors champ, du côté de la pièce : juste au-dessus de sa place, du ciel, ou à sa hauteur
     const from: V3 = p.path === 'fall' ? [0, 16, 0] : p.path === 'slide' ? [dx * 26, 0, dz * 26] : [dx * 26, 3.2, dz * 26];
-    const g0 = p.gold ? lerp(GOLD0, GOLD1 - 0.35, gi++ / Math.max(1, golden - 1)) : 0;
+    const g0 = p.gold ? lerp(win.gold0, win.gold1 - 0.35, gi++ / Math.max(1, golden - 1)) : 0;
     const gold = p.gold ? p.lines.map((l, k) => ({ l, t0: g0 + (0.2 * k) / Math.max(1, p.lines.length), len: len3(ptsOf(l, 0)) })) : [];
-    return { meshes: meshesOf(m, pal, p.solids, !!p.roof, p.deco), lines: p.lines, from, land: lerp(LAND0, LAND1, acc / tot), slide: p.path === 'slide', gold };
+    return { meshes: meshesOf(m, pal, p.solids, !!p.roof, p.deco), lines: p.lines, from, land: lerp(win.land0, win.land1, acc / tot), slide: p.path === 'slide', gold };
   });
 }
 
@@ -228,7 +230,7 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
     const off = pathOff(pr.from, u, pr.slide);
     pr.meshes.forEach((me) => {
       me.mesh.visible = true; me.mesh.position.set(...off);
-      me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = 1; me.mat.uniforms.uDeco.value = deco(me.paint);
+      me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = 3;   // aplat entier, même loin de sa place me.mat.uniforms.uDeco.value = deco(me.paint);
     });
     for (const l of pr.lines) { const p = ptsOf(l, c.az); pushStroke(pl, p, WIDTHS[l.w] * px, len3(p), () => 0, off); }
     // filets d'or, tracés après les aplats

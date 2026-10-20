@@ -13,7 +13,8 @@ export type Style = 'song' | 'qing';
 export type LineDef = { pts: V3[] | ((az: number) => V3[]); w: 0 | 1 | 2; axis?: boolean };
 // flat : 'plan' (tracé à plat sur le papier à sa place, puis monte à sa hauteur), sinon élévation couchée sur le
 // papier ; base : terrasse, déjà en place avant l'assemblage (dessin à plat puis soulèvement, voir JiehuaPli)
-export type GroupDef = { mode: 'ruler' | 'free' | 'cascade'; t0: number; t1: number; lines: LineDef[]; flat?: 'plan'; base?: boolean };
+// sketch : pour le canevas au crayon (JiehuaCanevas) — 'none' : non dessiné, 'main' : seulement les traits porteurs
+export type GroupDef = { mode: 'ruler' | 'free' | 'cascade'; t0: number; t1: number; lines: LineDef[]; flat?: 'plan'; base?: boolean; sketch?: 'none' | 'main' };
 // pièce de l'assemblage : ses traits et ses volumes arrivent ensemble ; roof : la couverture (surface du toit)
 // path : 'side' (arrive de côté, juste au-dessus de sa place, puis descend), 'fall' (tombe à la verticale),
 // 'slide' (glisse à sa hauteur) ; w : part de temps que la pièce occupe dans l'assemblage
@@ -354,7 +355,7 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
       ...(Q ? [closed(ramp, 1), closed([rampIn(-1, 0.08), rampIn(1, 0.08), rampIn(1, 0.92), rampIn(-1, 0.92)], 0), ...range(0.2, 0.8, 0.15).map((v) => ({ pts: range(-1, 1, 0.1).map((u) => { const p = rampIn(u * 0.8, v + 0.03 * Math.sin(u * 7)); return p; }), w: 0 as const }))] : []),
     ] },
     // trame des colonnes, au cordeau vermillon
-    { mode: 'cascade', t0: 1.0, t1: 1.4, flat: 'plan', base: true, lines: [...XS.map((x) => ax(seg([x, PLAT.h + 0.01, -7], [x, PLAT.h + 0.01, 7]))), ...ZS.map((z) => ax(seg([-10, PLAT.h + 0.01, z], [10, PLAT.h + 0.01, z])))] },
+    { mode: 'cascade', t0: 1.0, t1: 1.4, flat: 'plan', base: true, sketch: 'none', lines: [...XS.map((x) => ax(seg([x, PLAT.h + 0.01, -7], [x, PLAT.h + 0.01, 7]))), ...ZS.map((z) => ax(seg([-10, PLAT.h + 0.01, z], [10, PLAT.h + 0.01, z])))] },
     // bases et colonnes
     { mode: 'cascade', t0: 1.3, t1: 2.0, lines: COLS.flatMap(([x, z]) => { const b = plinth(x, z); return [...boxEdges(b.c, b.s, 1), ...colLines(x, z)]; }) },
     // linteau et sablière de façade à la règle, puis le reste du cadre (et les 雀替)
@@ -368,13 +369,13 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
     { mode: 'cascade', t0: 4.2, t1: 4.7, lines: [...truss.flatMap((b) => boxEdges(b.c, b.s, 1)), ...braces, ...purlins.flatMap((b) => boxEdges(b.c, b.s, 1))] },
     { mode: 'ruler', t0: 4.6, t1: 4.85, lines: [seg([-X_G - 0.6, T.ridgeP + 0.15, 0.15], [X_G + 0.6, T.ridgeP + 0.15, 0.15], 2)] },
     // arêtiers et chevrons
-    { mode: 'cascade', t0: 4.8, t1: 5.25, lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)] },
+    { mode: 'cascade', t0: 4.8, t1: 5.25, sketch: 'main', lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)] },
     // le bâtiment se referme : façade, murs, balustrade
-    { mode: 'cascade', t0: 5.2, t1: 5.7, lines: [...facade, ...sideWallLines] },
-    { mode: 'cascade', t0: 5.3, t1: 5.8, lines: balustrade },
+    { mode: 'cascade', t0: 5.2, t1: 5.7, sketch: 'main', lines: [...facade, ...sideWallLines] },
+    { mode: 'cascade', t0: 5.3, t1: 5.8, sketch: 'main', lines: balustrade },
     // avant-toit à main levée, couverture de tuiles, arêtiers (et leurs bêtes), faîtage, épis
     { mode: 'free', t0: 5.5, t1: 5.9, lines: [{ pts: eaveLoop(0), w: 2 }, { pts: eaveLoop(-0.32), w: 1 }] },
-    { mode: 'cascade', t0: 5.6, t1: 6.2, lines: slopeLines(Q ? 0.36 : 0.42, 0.04, 0) },
+    { mode: 'cascade', t0: 5.6, t1: 6.2, sketch: 'none', lines: slopeLines(Q ? 0.36 : 0.42, 0.04, 0) },
     { mode: 'cascade', t0: 6.0, t1: 6.35, lines: [
       ...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, 0.15).slice().reverse(), w: 2 as const })), ...corners.map(([sx, sz]) => ({ pts: gableRidge(sx, sz), w: 2 as const })),
       ...[-1, 1].map((sx) => seg([sx * X_G, Y_GABLE + 0.05, -(Z_E - E_G)], [sx * X_G, Y_GABLE + 0.05, Z_E - E_G], 1)),
