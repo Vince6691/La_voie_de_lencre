@@ -1,8 +1,9 @@
 """Bande son de la séquence 界畫 « le canevas au crayon » (remotion/src/jiehua3d/JiehuaCanevas.tsx), mixée d'après la
 chronologie exacte de l'animation (assets/jiehua/events.json, exportée par remotion/src/jiehua3d/exportEvents.ts) :
 - crayon : le grattement de la mine suit, image par image, la longueur de trait en cours de tracé ;
-- vent : un souffle continu suit la vitesse de la caméra (plus fort et plus clair quand elle file), et un grand
-  souffle ElevenLabs culmine sur chacun des trois mouvements les plus rapides ;
+- vent : un souffle continu suit la vitesse de la caméra (plus fort et plus clair quand elle file), un grand
+  souffle ElevenLabs culmine sur chacun des trois mouvements les plus rapides, et un bref souffle (avec un coup de
+  taiko léger) marque chaque coupe du montage ;
 - impacts : chaque pièce sonne à l'instant où elle touche sa place (attaque du son calée sur le contact) — bois grave
   pour colonnes, linteaux, fermes, murs et faîtage, clics secs pour les consoles et les chevrons, grondement du toit ;
 - musique de synthèse : bourdon et guzheng pendant le dessin, taiko qui frappent sur les pièces principales,
@@ -115,6 +116,11 @@ for f in np.argsort(-sp):
     if len(peaks) == 3: break
 for f in peaks:
     put(S['souffle'], f / fps, 0.35, peak(S['souffle']))
+# coupes du montage : un bref souffle d'air centré sur chaque coupe (et un coup de taiko, plus bas)
+sw = S['souffle']; pk = peak(sw); h = int(0.22 * SR)
+swish = sw[max(0, pk - h):pk + h] * np.hanning(len(sw[max(0, pk - h):pk + h]))
+for c in EV['cuts']:
+    put(swish, c, 0.22, h)
 
 # ---- impacts sur le contact de chaque pièce ----
 def pitched(x, r):   # léger changement de hauteur (rééchantillonnage) pour varier les coups
@@ -188,6 +194,8 @@ for L in lands:
         hits.append(L['t']); last = L['t']
 for k, h in enumerate(hits):
     mput(taiko(), h, 0.18 + 0.32 * k / max(1, len(hits) - 1))
+for c in EV['cuts']:
+    if all(abs(c - h) > 0.15 for h in hits): mput(taiko(62), c, 0.16)
 for k, d in enumerate([-0.25, 0, 0.25]):
     mput(taiko(48), t_roof + d, 0.7 if k == 1 else 0.45)
 def flute(m, dur):
