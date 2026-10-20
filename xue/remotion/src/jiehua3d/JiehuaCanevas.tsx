@@ -11,7 +11,7 @@
 // 4. la peinture apporte les décors et les filets d'or ;
 // 5. la base se fond dans la brume, la caméra recule dans le paysage ; le maître inscrit le titre et pose son sceau.
 import React, { useEffect, useMemo, useState } from 'react';
-import { AbsoluteFill, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -23,18 +23,18 @@ import { PALETTE, clamp, ease, easeOut, lerp, mix, partial, ptsOf, roofGeo, soli
 import { InkLines, pushPencil, pushStroke } from './inkline';
 import { buildParts, meshesOf, pathOff } from './JiehuaFeuille';
 
-export const JIEHUA_CANEVAS_SECONDS = 14.5;
+export const JIEHUA_CANEVAS_SECONDS = 16;
 export type JiehuaCanevasProps = { style: Style };
 const W = 1920, H = 1080, FOV = 34;
 // calendrier (secondes)
 const GUIDE0 = 0.3, GUIDE1 = 1.7;             // lignes de construction vers les points de fuite
 const SK0 = 1.1, SK1 = 5.8;                   // canevas au crayon
 const FADE0 = 5.8, FADE1 = 6.6;               // le dessin pâlit en épure ; la terrasse passe à l'encre
-const LAND0 = 7.0, LAND1 = 9.4, FLIGHT = 0.8;  // pièces
-const PAINT0 = 9.6, DECO_DUR = 1.2;           // décors
-const GOLD0 = 10.0, GOLD1 = 11.3;             // filets d'or
-const FAR0 = 11.2, FAR1 = 13.2;               // brume, recul dans le paysage
-const INSCR0 = 12.2, T_SEAL = 13.7;           // inscription, sceau
+const LAND0 = 7.1, LAND1 = 10.0, FLIGHT = 0.8;  // pièces
+const PAINT0 = 10.2, DECO_DUR = 1.2;          // décors
+const GOLD0 = 10.6, GOLD1 = 11.8;             // filets d'or
+const FAR0 = 12.0, FAR1 = 14.2;               // brume, recul dans le paysage
+const INSCR0 = 13.0, T_SEAL = 14.6;           // inscription, sceau
 const HIGH_Y = 8.9;                           // au-dessus : toit et charpente haute
 const GHOST = 0.13, GHOST_HIGH = 0.045;       // opacité de l'épure
 const PENCIL = [0.95, 1.25, 1.6];             // largeur des traits de crayon (px en 1080p)
@@ -42,14 +42,36 @@ const INK = [0.95, 1.6, 2.6];                 // largeur des coups de pinceau
 const TITLE = '營造法式殿堂圖';
 
 // ---- caméra en perspective ; zoom = pixels par unité au point visé ----
-const DRAW_A: Cam = { az: 0.66, el: 0.4, zoom: 40, target: [0, 5.8, 0] };
-const DRAW_B: Cam = { az: 0.58, el: 0.45, zoom: 43, target: [0, 6.0, 0] };
-const WIDE2: Cam = { az: 0.5, el: 0.47, zoom: 46, target: [0, 6.2, 0] };
-const FAR: Cam = { az: 0.46, el: 0.4, zoom: 27, target: [-3.5, 7.5, 0] };
+// Mouvement continu (spline de Catmull-Rom sur des clés, sans arrêt entre elles) :
+// au ras de la terrasse, les lignes de fuite filent ; grand mouvement tournant et ascendant qui dévoile le canevas ;
+// l'épure vue de trois quarts ; contre-plongée héroïque et travelling circulaire devant la façade pendant que les
+// pièces arrivent ; poussée sur les consoles et les linteaux pendant la peinture des décors ; grande grue arrière
+// qui pose la salle dans le paysage.
+type Key = { t: number; c: Cam };
+const KEYS: Key[] = [
+  { t: 0, c: { az: 1.0, el: 0.14, zoom: 98, target: [10.5, 1.6, 8.6] } },
+  { t: 1.7, c: { az: 0.9, el: 0.2, zoom: 72, target: [7.5, 2.8, 6] } },
+  { t: 3.8, c: { az: 0.64, el: 0.33, zoom: 50, target: [2, 5, 2] } },
+  { t: 5.8, c: { az: 0.44, el: 0.42, zoom: 42, target: [0, 6, 0] } },
+  { t: 6.8, c: { az: 0.36, el: 0.38, zoom: 41, target: [0, 6.2, 0] } },
+  { t: 8.5, c: { az: 0.06, el: 0.24, zoom: 40, target: [0, 6.6, 0] } },
+  { t: 10.1, c: { az: -0.2, el: 0.22, zoom: 43, target: [0, 6.6, 0] } },
+  { t: 12.0, c: { az: -0.08, el: 0.16, zoom: 66, target: [0, 7.2, 5] } },
+  { t: 14.2, c: { az: 0.2, el: 0.38, zoom: 27, target: [-3.5, 7.5, 0] } },
+  { t: 16, c: { az: 0.24, el: 0.38, zoom: 26, target: [-3.5, 7.5, 0] } },
+];
+const cr = (p0: number, p1: number, p2: number, p3: number, u: number) =>
+  0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
 const camAt = (t: number): Cam => {
-  if (t < FADE1) return mix(DRAW_A, DRAW_B, ease(t / FADE1));
-  if (t < FAR0) return mix(DRAW_B, WIDE2, ease((t - FADE1) / (FAR0 - FADE1)));
-  return mix(WIDE2, FAR, ease((t - FAR0) / (FAR1 - FAR0)));
+  let i = 0;
+  while (i < KEYS.length - 2 && t > KEYS[i + 1].t) i++;
+  const k = (j: number) => KEYS[Math.max(0, Math.min(KEYS.length - 1, j))].c;
+  const u = clamp((t - KEYS[i].t) / (KEYS[i + 1].t - KEYS[i].t));
+  const f = (g: (c: Cam) => number) => cr(g(k(i - 1)), g(k(i)), g(k(i + 1)), g(k(i + 2)), u);
+  return {
+    az: f((c) => c.az), el: f((c) => c.el), zoom: Math.exp(f((c) => Math.log(c.zoom))),
+    target: [f((c) => c.target[0]), f((c) => c.target[1]), f((c) => c.target[2])],
+  };
 };
 const applyCamP = (cam: THREE.PerspectiveCamera, c: Cam) => {
   const D = H / (c.zoom * 2 * Math.tan(((FOV / 2) * Math.PI) / 180));
@@ -191,6 +213,39 @@ const useFonts = () => {
   }, [h]);
 };
 
+// ---- son : musique, crayon, souffles des grands mouvements, bois qui s'emboîte, toit, pinceau, or, gong, sceau ----
+// (sons ElevenLabs dans public/jiehua/, voir assets/jiehua/README.md)
+type Sfx = { at: number; src: string; vol: number; dur?: number };
+const sfxList = (m: Model): Sfx[] => {
+  // instants d'emboîtement : même répartition que buildParts (part de temps de chaque pièce)
+  const tot = m.parts.reduce((a, p) => a + p.w, 0);
+  let acc = 0, small = 0;
+  const knocks = m.parts.flatMap((p): Sfx[] => {
+    acc += p.w;
+    const at = lerp(LAND0, LAND1, acc / tot);
+    if (p.roof) return [{ at: at - 0.05, src: 'toit', vol: 0.75 }];
+    // les consoles, nombreuses, n'ont qu'un clic sur trois
+    if (p.gold && !p.deco) return small++ % 3 === 0 ? [{ at, src: 'clic', vol: 0.4 }] : [];
+    return [{ at, src: 'bois', vol: p.path === 'slide' ? 0.35 : 0.55 }];
+  });
+  return [
+    { at: 0.9, src: 'crayon', vol: 0.5, dur: 5.2 },
+    { at: 1.2, src: 'souffle', vol: 0.45 }, { at: 6.4, src: 'souffle', vol: 0.4 }, { at: 11.6, src: 'souffle', vol: 0.5 },
+    ...knocks,
+    { at: PAINT0, src: 'pinceau', vol: 0.45 }, { at: GOLD0, src: 'or', vol: 0.35 },
+    { at: FAR1 - 0.3, src: 'gong', vol: 0.3 }, { at: T_SEAL, src: 'sceau', vol: 0.6 },
+  ];
+};
+const SfxTrack: React.FC<{ s: Sfx }> = ({ s }) => {
+  const { fps } = useVideoConfig();
+  const dur = s.dur ?? 3;
+  return (
+    <Sequence from={Math.round(s.at * fps)} durationInFrames={Math.round(dur * fps)}>
+      <Audio src={staticFile(`jiehua/${s.src}.wav`)} volume={(f) => s.vol * interpolate(f, [0, 4, dur * fps - 10, dur * fps], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />
+    </Sequence>
+  );
+};
+
 export const JiehuaCanevas: React.FC<JiehuaCanevasProps> = ({ style }) => {
   useFonts();
   const frame = useCurrentFrame();
@@ -210,8 +265,11 @@ export const JiehuaCanevas: React.FC<JiehuaCanevasProps> = ({ style }) => {
   const mist = ease((t - FAR0 - 0.2) / 1.6);
   const titleX = 1590, titleY = 170, CH = 62;
   const sealU = clamp((t - T_SEAL) / 0.35);
+  const sfx = useMemo(() => sfxList(prep(style).m), [style]);
   return (
     <AbsoluteFill style={{ background: '#f8f5ee' }}>
+      <Audio src={staticFile('jiehua/musique.wav')} volume={(f) => 0.55 * interpolate(f, [0, 10, (JIEHUA_CANEVAS_SECONDS - 0.8) * fps, JIEHUA_CANEVAS_SECONDS * fps], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />
+      {sfx.map((s, i) => <SfxTrack key={i} s={s} />)}
       <ShuimoBackground shot={shot} duration={JIEHUA_CANEVAS_SECONDS} halo={false} scroll={c.az * 650} />
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse 46% 54% at 50% 54%, rgba(250,247,240,0.86) 0%, rgba(250,247,240,0.6) 60%, rgba(250,247,240,0) 100%)', opacity: 1 - 0.6 * mist }} />
       <svg width={0} height={0} style={{ position: 'absolute' }}>
