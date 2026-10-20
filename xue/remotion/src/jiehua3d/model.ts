@@ -366,16 +366,16 @@ const upper: Box[] = [...ring(Y_ZT, 0.3, 0.3, 'green', 0.6), ...ring(Y_DG + 2.4 
     { mode: 'cascade', t0: 3.5, t1: 4.3, lines: OTHER_SETS.flatMap((b) => boxEdges(b.c, b.s, 0)) },
     { mode: 'cascade', t0: 4.05, t1: 4.4, lines: upper.flatMap((b) => boxEdges(b.c, b.s, 1)) },
     // fermes et pannes ; la panne faîtière à la règle
-    { mode: 'cascade', t0: 4.2, t1: 4.7, lines: [...truss.flatMap((b) => boxEdges(b.c, b.s, 1)), ...braces, ...purlins.flatMap((b) => boxEdges(b.c, b.s, 1))] },
-    { mode: 'ruler', t0: 4.6, t1: 4.85, lines: [seg([-X_G - 0.6, T.ridgeP + 0.15, 0.15], [X_G + 0.6, T.ridgeP + 0.15, 0.15], 2)] },
+    { mode: 'cascade', t0: 4.2, t1: 4.7, sketch: 'none', lines: [...truss.flatMap((b) => boxEdges(b.c, b.s, 1)), ...braces, ...purlins.flatMap((b) => boxEdges(b.c, b.s, 1))] },
+    { mode: 'ruler', t0: 4.6, t1: 4.85, sketch: 'none', lines: [seg([-X_G - 0.6, T.ridgeP + 0.15, 0.15], [X_G + 0.6, T.ridgeP + 0.15, 0.15], 2)] },
     // arêtiers et chevrons
-    { mode: 'cascade', t0: 4.8, t1: 5.25, sketch: 'main', lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)] },
+    { mode: 'cascade', t0: 4.8, t1: 5.25, sketch: 'none', lines: [...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, -0.3), w: 2 as const })), ...slopeLines(0.62, -0.32, 0)] },
     // le bâtiment se referme : façade, murs, balustrade
     { mode: 'cascade', t0: 5.2, t1: 5.7, sketch: 'main', lines: [...facade, ...sideWallLines] },
     { mode: 'cascade', t0: 5.3, t1: 5.8, sketch: 'main', lines: balustrade },
     // avant-toit à main levée, couverture de tuiles, arêtiers (et leurs bêtes), faîtage, épis
     { mode: 'free', t0: 5.5, t1: 5.9, lines: [{ pts: eaveLoop(0), w: 2 }, { pts: eaveLoop(-0.32), w: 1 }] },
-    { mode: 'cascade', t0: 5.6, t1: 6.2, sketch: 'none', lines: slopeLines(Q ? 0.36 : 0.42, 0.04, 0) },
+    { mode: 'cascade', t0: 5.6, t1: 6.2, lines: slopeLines(Q ? 0.36 : 0.42, 0.04, 0) },
     { mode: 'cascade', t0: 6.0, t1: 6.35, lines: [
       ...corners.map(([sx, sz]) => ({ pts: hipPts(sx, sz, 0.15).slice().reverse(), w: 2 as const })), ...corners.map(([sx, sz]) => ({ pts: gableRidge(sx, sz), w: 2 as const })),
       ...[-1, 1].map((sx) => seg([sx * X_G, Y_GABLE + 0.05, -(Z_E - E_G)], [sx * X_G, Y_GABLE + 0.05, Z_E - E_G], 1)),

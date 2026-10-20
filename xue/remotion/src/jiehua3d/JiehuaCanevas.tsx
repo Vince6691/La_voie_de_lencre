@@ -1,8 +1,10 @@
 // 界畫 « le canevas au crayon » (style Song par défaut), 14,5 s :
 // 1. le maître dessine directement en perspective : d'abord les lignes de construction qui filent vers les points
 //    de fuite (arêtes de la terrasse, niveau des colonnes, de l'avant-toit, du faîte, verticales d'angle), puis le
-//    canevas de la salle — terrasse, colonnes, linteaux, consoles, charpente, toit — au crayon : mine grise, léger
-//    tremblé, traits qui dépassent aux angles, traits porteurs repassés deux fois ; la caméra tourne à peine autour ;
+//    canevas de la salle — terrasse, colonnes, linteaux, consoles, toit — au crayon : mine grise, léger tremblé,
+//    traits qui dépassent aux angles, traits porteurs repassés deux fois ; seulement ce qui se voit de l'extérieur
+//    (pas de charpente intérieure ; des volumes invisibles cachent ce qui est derrière les murs et sous le toit) ;
+//    la caméra tourne à peine autour ;
 // 2. le dessin pâlit en une épure à peine visible ; la terrasse passe à l'encre et prend sa matière ;
 // 3. les pièces arrivent de l'extérieur du cadre, déjà peintes, du bas vers le haut et sans se croiser, et se fixent
 //    sur l'épure ;
@@ -13,10 +15,11 @@ import { AbsoluteFill, continueRender, delayRender, staticFile, useCurrentFrame,
 import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose } from '../shuimo/layout';
-import { Cam, LineDef, Model, Paint, Style, V3, buildModel } from './model';
-import { PALETTE, clamp, ease, easeOut, lerp, mix, partial, ptsOf, timeLines } from './Jiehua3D';
+import { Cam, LineDef, Model, Paint, Solid, Style, V3, buildModel } from './model';
+import { PALETTE, clamp, ease, easeOut, lerp, mix, partial, ptsOf, roofGeo, solidGeo, timeLines } from './Jiehua3D';
 import { InkLines, pushPencil, pushStroke } from './inkline';
 import { buildParts, meshesOf, pathOff } from './JiehuaFeuille';
 
@@ -98,6 +101,17 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
   applyCamP(camera as THREE.PerspectiveCamera, c);
   const parts = useMemo(() => buildParts(m, pal, { land0: LAND0, land1: LAND1, gold0: GOLD0, gold1: GOLD1 }), [m, pal]);
   const base = useMemo(() => meshesOf(m, pal, m.solids.filter((s) => (s.kind === 'box' && s.c[1] + s.s[1] / 2 <= 1.85 && s.s[0] > 2) || (s.kind === 'quad' && s.paint === 'marble')), false), [m, pal]);
+  // volumes invisibles du dessin : ils n'écrivent que la profondeur, le crayon ne trace que ce qui se voit
+  const occ = useMemo(() => {
+    // un rien plus petits que les pièces : une arête posée contre une face voisine est franchement vue ou cachée
+    const shrink = (x: Solid): Solid => (x.kind === 'box' ? { ...x, s: x.s.map((v) => Math.max(0.01, v - 0.04)) as V3 } : x.kind === 'cyl' ? { ...x, r: x.r - 0.02, h: x.h - 0.04 } : x);
+    const roof = roofGeo(m); roof.translate(0, -0.03, 0);
+    const gs = [...m.solids.map((x) => solidGeo(shrink(x))), roof].map((g) => { if (g.getAttribute('uv')) g.deleteAttribute('uv'); if (g.getAttribute('normal')) g.deleteAttribute('normal'); return g; });
+    const mesh = new THREE.Mesh(mergeGeometries(gs), new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: true, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 6, polygonOffsetUnits: 12 }));
+    mesh.renderOrder = 0;
+    return mesh;
+  }, [m]);
+  occ.visible = t < FADE1;
   const L = useMemo(() => ({
     pencil: new InkLines('#45423e', false, true), pencilHi: new InkLines('#45423e', false, true), guide: new InkLines('#5a5650', false, true),
     dark: new InkLines('#1a1613'), hid: new InkLines('#1a1613', true), gold: new InkLines('#b98a2c'),
@@ -159,6 +173,7 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
 
   return (
     <>
+      <primitive object={occ} />
       {base.map((b, i) => <primitive key={`b${i}`} object={b.mesh} />)}
       {parts.flatMap((pr, i) => pr.meshes.map((me, j) => <primitive key={`p${i}_${j}`} object={me.mesh} />))}
       {[L.guide, L.pencil, L.pencilHi, L.dark, L.hid, L.gold].map((o, i) => <primitive key={`l${i}`} object={o.mesh} />)}
