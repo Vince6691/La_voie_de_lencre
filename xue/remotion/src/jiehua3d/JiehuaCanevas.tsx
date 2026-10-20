@@ -11,7 +11,7 @@
 // 4. la peinture apporte les décors et les filets d'or ;
 // 5. la base se fond dans la brume, la caméra recule dans le paysage ; le maître inscrit le titre et pose son sceau.
 import React, { useEffect, useMemo, useState } from 'react';
-import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -213,37 +213,45 @@ const useFonts = () => {
   }, [h]);
 };
 
-// ---- son : musique, crayon, souffles des grands mouvements, bois qui s'emboîte, toit, pinceau, or, gong, sceau ----
-// (sons ElevenLabs dans public/jiehua/, voir assets/jiehua/README.md)
-type Sfx = { at: number; src: string; vol: number; dur?: number };
-const sfxList = (m: Model): Sfx[] => {
-  // instants d'emboîtement : même répartition que buildParts (part de temps de chaque pièce)
-  const tot = m.parts.reduce((a, p) => a + p.w, 0);
-  let acc = 0, small = 0;
-  const knocks = m.parts.flatMap((p): Sfx[] => {
-    acc += p.w;
-    const at = lerp(LAND0, LAND1, acc / tot);
-    if (p.roof) return [{ at: at - 0.05, src: 'toit', vol: 0.75 }];
-    // les consoles, nombreuses, n'ont qu'un clic sur trois
-    if (p.gold && !p.deco) return small++ % 3 === 0 ? [{ at, src: 'clic', vol: 0.4 }] : [];
-    return [{ at, src: 'bois', vol: p.path === 'slide' ? 0.35 : 0.55 }];
-  });
-  return [
-    { at: 0.9, src: 'crayon', vol: 0.5, dur: 5.2 },
-    { at: 1.2, src: 'souffle', vol: 0.45 }, { at: 6.4, src: 'souffle', vol: 0.4 }, { at: 11.6, src: 'souffle', vol: 0.5 },
-    ...knocks,
-    { at: PAINT0, src: 'pinceau', vol: 0.45 }, { at: GOLD0, src: 'or', vol: 0.35 },
-    { at: FAR1 - 0.3, src: 'gong', vol: 0.3 }, { at: T_SEAL, src: 'sceau', vol: 0.6 },
-  ];
+// ---- son : la bande son (assets/jiehua/bande.wav) est mixée par tools/build_jiehua_audio.py d'après la chronologie
+// exacte de l'animation, exportée par canevasEvents (src/jiehua3d/exportEvents.ts → assets/jiehua/events.json) :
+// activité du crayon et vitesse de la caméra image par image, instant de contact de chaque pièce, peinture, or,
+// inscription, sceau. Toute modification de l'animation se répercute en relançant les deux outils.
+export type CanevasEvents = {
+  fps: number; total: number; pencil: number[]; cam: number[];
+  lands: { t: number; kind: string }[]; ink: number[]; paint: number; gold: [number, number]; far: [number, number]; chars: number[]; seal: number;
 };
-const SfxTrack: React.FC<{ s: Sfx }> = ({ s }) => {
-  const { fps } = useVideoConfig();
-  const dur = s.dur ?? 3;
-  return (
-    <Sequence from={Math.round(s.at * fps)} durationInFrames={Math.round(dur * fps)}>
-      <Audio src={staticFile(`jiehua/${s.src}.wav`)} volume={(f) => s.vol * interpolate(f, [0, 4, dur * fps - 10, dur * fps], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />
-    </Sequence>
-  );
+export const canevasEvents = (style: Style): CanevasEvents => {
+  const { m, sketch, guides, baseInk } = prep(style), fps = 30, n = Math.round(JIEHUA_CANEVAS_SECONDS * fps);
+  // crayon : longueur de trait tracée par seconde (traits porteurs repassés comptés deux fois)
+  const pencil = Array.from({ length: n }, (_, f) => {
+    const t = f / fps;
+    return [...sketch, ...guides].reduce((a, s) => a + (t >= s.t0 && t <= s.t1 ? (len3(ptsOf(s.l, 0)) / (s.t1 - s.t0)) * (s.l.w > 0 ? 1.5 : 1) * (s.l.w === 0 ? 0.5 : 1) : 0), 0);
+  });
+  // caméra : vitesse angulaire, de zoom et de visée
+  const cam = Array.from({ length: n }, (_, f) => {
+    const a = camAt(f / fps), b = camAt((f + 1) / fps);
+    return (Math.abs(b.az - a.az) + Math.abs(b.el - a.el) + 0.5 * Math.abs(Math.log(b.zoom / a.zoom)) + Math.hypot(b.target[0] - a.target[0], b.target[1] - a.target[1], b.target[2] - a.target[2]) / 25) * fps;
+  });
+  // pièces : instant où elles touchent leur place (le trajet dépasse puis se recale, voir pathOff)
+  const tot = m.parts.reduce((a, p) => a + p.w, 0);
+  let acc = 0;
+  const lands = m.parts.map((p) => {
+    acc += p.w;
+    const land = lerp(LAND0, LAND1, acc / tot), slide = p.path === 'slide';
+    const from: V3 = p.path === 'fall' ? [0, 16, 0] : slide ? [26, 0, 26] : [26, 3.2, 26];
+    let u = 0;
+    for (; u <= 1; u += 0.002) { const o = pathOff(from, u, slide); if (slide ? Math.hypot(o[0], o[2]) < 0.06 : o[1] < 0.03) break; }
+    const kind = p.roof ? 'roof' : p.deco === 'column' ? 'column' : p.gold && !p.deco ? 'dougong' : p.deco === 'beam' ? 'beam' : p.path === 'slide' ? 'wall' : p.solids.length ? 'frame' : 'rafter';
+    return { t: land - FLIGHT + u * FLIGHT, kind };
+  });
+  lands[lands.length - 1].kind = 'ridge';
+  return {
+    fps, total: JIEHUA_CANEVAS_SECONDS, pencil, cam, lands,
+    ink: baseInk.map((_, i) => FADE0 + 0.1 + (0.5 * i) / baseInk.length),
+    paint: PAINT0, gold: [GOLD0, GOLD1], far: [FAR0, FAR1],
+    chars: [...TITLE].map((_, i) => INSCR0 + i * 0.18), seal: T_SEAL + 0.1,
+  };
 };
 
 export const JiehuaCanevas: React.FC<JiehuaCanevasProps> = ({ style }) => {
@@ -265,11 +273,9 @@ export const JiehuaCanevas: React.FC<JiehuaCanevasProps> = ({ style }) => {
   const mist = ease((t - FAR0 - 0.2) / 1.6);
   const titleX = 1590, titleY = 170, CH = 62;
   const sealU = clamp((t - T_SEAL) / 0.35);
-  const sfx = useMemo(() => sfxList(prep(style).m), [style]);
   return (
     <AbsoluteFill style={{ background: '#f8f5ee' }}>
-      <Audio src={staticFile('jiehua/musique.wav')} volume={(f) => 0.55 * interpolate(f, [0, 10, (JIEHUA_CANEVAS_SECONDS - 0.8) * fps, JIEHUA_CANEVAS_SECONDS * fps], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />
-      {sfx.map((s, i) => <SfxTrack key={i} s={s} />)}
+      <Audio src={staticFile('jiehua/bande.wav')} />
       <ShuimoBackground shot={shot} duration={JIEHUA_CANEVAS_SECONDS} halo={false} scroll={c.az * 650} />
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse 46% 54% at 50% 54%, rgba(250,247,240,0.86) 0%, rgba(250,247,240,0.6) 60%, rgba(250,247,240,0) 100%)', opacity: 1 - 0.6 * mist }} />
       <svg width={0} height={0} style={{ position: 'absolute' }}>
