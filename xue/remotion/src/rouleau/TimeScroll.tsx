@@ -32,6 +32,8 @@ export type TimeScrollConfig = {
   scroll?: number; // distance de défilement du paysage (px), 1900 par défaut
   tag?: { x: number; y: number; size: number }; // centre et taille du sceau du cartouche d'époque
   cursorScale?: number; // taille de l'objet curseur relativement à sa taille au centre (0,26)
+  y?: number; // hauteur de la frise des sceaux (640 par défaut)
+  counterY?: number; // haut du compteur d'années (300 par défaut)
 };
 
 const VERMILION = [192, 57, 43], INK = 'rgb(29,25,21)';
@@ -41,9 +43,9 @@ const smooth = (a: number, b: number, v: number) => { const u = clamp((v - a) / 
 const ease = (u: number) => { const v = clamp(u); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
-const dur = (c: TimeScrollConfig) => c.duration ?? 5;
-const erasOf = (c: TimeScrollConfig) => c.eras ?? ERAS_XUE;
-const scrollOf = (c: TimeScrollConfig) => c.scroll ?? 1900;
+export const dur = (c: TimeScrollConfig) => c.duration ?? 5;
+export const erasOf = (c: TimeScrollConfig) => c.eras ?? ERAS_XUE;
+export const scrollOf = (c: TimeScrollConfig) => c.scroll ?? 1900;
 const tagOf = (c: TimeScrollConfig) => c.tag ?? { x: 156, y: 136, size: 92 };
 export const tsU = (c: TimeScrollConfig, t: number) => (t - c.at) / dur(c);
 
@@ -68,7 +70,8 @@ export function travelM(u: number) {
 // frise : sceaux régulièrement espacés et centrés (la même place pour chaque époque, les vraies dates en dessous)
 export function geom(c: TimeScrollConfig) {
   const n = erasOf(c).length, dx = Math.min(200, 1400 / Math.max(1, n - 1));
-  return { y: 640, dx, x0: 960 - ((n - 1) * dx) / 2, cursorY: 522 };
+  const y = c.y ?? 640;
+  return { y, dx, x0: 960 - ((n - 1) * dx) / 2, cursorY: y - 118 };
 }
 export const sealX = (c: TimeScrollConfig, i: number) => geom(c).x0 + i * geom(c).dx;
 
@@ -90,11 +93,11 @@ export const tagIn = (c: TimeScrollConfig, t: number) => smooth(c.at + 0.975 * d
 // part de la nouvelle forme pendant la glissade (pour une métamorphose de l'objet curseur)
 export const morphK = (c: TimeScrollConfig, t: number) => smooth(0.3, 0.85, travelM(tsU(c, t)));
 
-const speedAt = (c: TimeScrollConfig, t: number) => scrollOf(c) * (travelM(tsU(c, t + 1 / 30)) - travelM(tsU(c, t))) * 30;
+export const speedAt = (c: TimeScrollConfig, t: number) => scrollOf(c) * (travelM(tsU(c, t + 1 / 30)) - travelM(tsU(c, t))) * 30;
 const MAXSPEED = 3000;
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
-function camera(u: number) {
+export function camera(u: number) {
   if (u <= 0 || u >= 1) return 1;
   const back = u < 0.12 ? ease(u / 0.12) : 1 - ease((u - 0.72) / 0.28);
   const punch = 0.03 * smooth(IMPACT - 0.004, IMPACT + 0.016, u) * (u > IMPACT + 0.016 ? Math.exp(-(u - IMPACT - 0.016) / 0.04) : 1); // montée en 3 images
@@ -137,7 +140,7 @@ const TravelInner: React.FC<{ c: TimeScrollConfig; shot: ReturnType<typeof compo
 };
 
 // le rouleau comme objet : montage de soie, papier, deux bâtons (visibles quand la caméra recule)
-const ScrollObject: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
+export const ScrollObject: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const u = tsU(c, useT()), roll = scrollOf(c) * travelM(u) * 0.35, show = u > 0 && u < 1;
   const roller = (x: number) => (
     <div style={{ position: 'absolute', left: x, top: -70, width: 72, height: 1220 }}>
@@ -160,7 +163,7 @@ const ScrollObject: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
 };
 
 // ciel du voyage : soleil et lune en arcs rapides, jours et nuits (deux cycles)
-const SkyCycles: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
+export const SkyCycles: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const u = tsU(c, useT());
   if (u <= 0 || u >= 1) return null;
   const a = smooth(0.05, 0.2, u) * (1 - smooth(0.74, 0.8, u));
@@ -176,7 +179,7 @@ const SkyCycles: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
 };
 
 // frise des sceaux (dans le monde du rouleau) ; curseur par défaut : un point d'encre, si l'appelant n'en dessine pas
-const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c, defaultCursor }) => {
+export const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c, defaultCursor }) => {
   const t = useT(), u = tsU(c, t);
   if (u <= 0 || u >= 1.02) return null;
   const g = geom(c), eras = erasOf(c);
@@ -186,7 +189,7 @@ const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c
   const cur = cursorPose(c, t);
   return (
     <AbsoluteFill>
-      <AbsoluteFill style={{ background: 'radial-gradient(ellipse 48% 22% at 50% 57%, rgba(250,247,240,0.85), rgba(250,247,240,0))', opacity: line * out }} />
+      <AbsoluteFill style={{ background: `radial-gradient(ellipse 48% 22% at 50% ${((g.y - 25) / 10.8).toFixed(2)}%, rgba(250,247,240,0.85), rgba(250,247,240,0))`, opacity: line * out }} />
       <svg width={1920} height={1080} style={{ position: 'absolute', inset: 0, opacity: out }}>
         <path d={`M${x0},${g.y} L${x0 + (x1 - x0) * line},${g.y + 1}`} stroke={INK} strokeWidth={3} strokeLinecap="round" fill="none" opacity={0.75} />
         {defaultCursor && u > 0.1 && u < 0.86 && <circle cx={cur.x} cy={g.y - 52} r={11} fill={INK} opacity={smooth(0.1, 0.16, u)} />}
@@ -210,7 +213,7 @@ const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c
 };
 
 // ── couches d'écran : vignettage, vent du temps, compteur d'années, sceau qui s'envole
-const Vignette: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
+export const Vignette: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const t = useT(), u = tsU(c, t);
   if (u <= 0 || u >= 1) return null;
   const k = Math.min(1, speedAt(c, t) / MAXSPEED) * 0.75 + 0.25 * smooth(0.05, 0.15, u) * (1 - smooth(0.84, 0.95, u));
@@ -220,7 +223,7 @@ const WIND = (() => {
   const R = rng(77);
   return Array.from({ length: 70 }, (_, i) => ({ x0: R() * 2120, y0: 60 + R() * 960, par: 0.6 + R() * 1.2, petal: R() < 0.38, size: 0.6 + R() * 0.7, ph: R() * 6.28, i }));
 })();
-const Wind: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
+export const Wind: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const t = useT(), u = tsU(c, t);
   if (u <= 0.08 || u >= 0.84) return null;
   const pres = smooth(0.1, 0.22, u) * (1 - smooth(0.74, 0.82, u)), sp = speedAt(c, t), D = scrollOf(c) * travelM(u);
@@ -237,21 +240,21 @@ const Wind: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   );
 };
 const fmtYear = (y: number) => (y < 0 ? [`${-y}`, 'av. J.-C.'] : [`${y}`, '']);
-const YearCounter: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
+export const YearCounter: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const t = useT(), u = tsU(c, t);
   if (u <= 0 || u >= 1) return null;
   const a = smooth(0.06, 0.15, u) * (1 - smooth(0.73, 0.78, u));
   const [n, suffix] = fmtYear(Math.round(lerp(c.years[0], c.years[1], travelM(u))));
   const blur = Math.min(4, (3.5 * speedAt(c, t)) / MAXSPEED);
   return (
-    <div style={{ position: 'absolute', width: '100%', top: 300, textAlign: 'center', opacity: a }}>
+    <div style={{ position: 'absolute', width: '100%', top: c.counterY ?? 300, textAlign: 'center', opacity: a }}>
       <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 88, letterSpacing: 4, color: rgb(VERMILION), filter: `blur(${blur.toFixed(2)}px)`, textShadow: '0 0 18px rgba(250,247,240,0.9)' }}>
         {n} {suffix && <span style={{ fontSize: 44, fontWeight: 500 }}>{suffix}</span>}
       </div>
     </div>
   );
 };
-const FlyingSeal: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
+export const FlyingSeal: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const u = tsU(c, useT());
   if (u <= 0.86 || u >= 0.985) return null;
   const z = camera(0.86), g = geom(c), tag = tagOf(c), k = ease((u - 0.86) / 0.12);
