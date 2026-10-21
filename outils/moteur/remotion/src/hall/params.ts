@@ -35,25 +35,32 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const hex = (s: string) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16));
 const mixHex = (a: string, b: string, k: number) => '#' + hex(a).map((v, i) => Math.round(lerp(v, hex(b)[i], k)).toString(16).padStart(2, '0')).join('');
 
-// Les familles de pièces ne bougent pas toutes en même temps (k = avancement de la transformation, 0 à 1) : pendant que le
-// toit est en l'air ([0,18 ; 0,70]) on voit le corps du bâtiment se transformer dessous ; le décor se pose à l'atterrissage.
-const WINDOW: Record<string, [number, number]> = {
-  base: [0.08, 0.42], col: [0.1, 0.46], br: [0.2, 0.56], roof: [0.2, 0.62], deco: [0.46, 0.88],
-};
+// Chaque transformation a UN élément héros, qui se démonte et se remonte de façon évidente (fenêtres serrées) ; tout le reste
+// évolue lentement et discrètement sur toute la durée, et les couleurs se fondent en continu avec le compteur d'années.
+//   Tang → Song : les consoles (斗拱) ; Song → Ming : les colonnes et le socle ; Ming → Qing : le second étage.
+type Win = Record<string, [number, number]>;
+const SLOW: [number, number] = [0, 1];
+const WINDOWS: Win[] = [
+  { base: SLOW, col: SLOW, br: [0.1, 0.85], roof: SLOW, tier: SLOW, orn: [0.6, 1], deco: [0.3, 1] },
+  { base: [0.05, 0.6], col: [0.05, 0.7], br: SLOW, roof: SLOW, tier: SLOW, orn: [0.5, 1], deco: [0.4, 1] },
+  { base: [0.05, 0.5], col: SLOW, br: SLOW, roof: [0, 0.5], tier: [0.3, 0.8], orn: [0.78, 1], deco: [0.5, 1] },
+];
+const COLOR_WIN: [number, number] = [0.1, 0.95];
 const COL_KEYS = ['tile', 'wall', 'col', 'band'] as const;
 const GROUPS: Record<string, string> = {
   platH: 'base', tiers: 'base', marble: 'base',
-  colH: 'col', colR: 'col', entasis: 'col', wall: 'col', col: 'col',
+  colH: 'col', colR: 'col', entasis: 'col',
   brH: 'br', brSets: 'br',
-  ridgeH: 'roof', over: 'roof', curve: 'roof', lift: 'roof', tier2: 'roof', tile: 'roof', beasts: 'roof',
-  paint: 'deco', gold: 'deco', band: 'deco',
+  ridgeH: 'roof', over: 'roof', curve: 'roof', lift: 'roof', tier2: 'tier', beasts: 'orn',
+  paint: 'deco', gold: 'deco',
 };
 
 export function hallAt(a: number, b: number, k: number): HallParams {
   const A = HALLS[a], B = HALLS[b], o: any = {};
   (Object.keys(A) as (keyof HallParams)[]).forEach((key) => {
-    const [w0, w1] = WINDOW[GROUPS[key]], e = smooth(w0, w1, k);
-    o[key] = (COL_KEYS as readonly string[]).includes(key) ? mixHex(A[key] as string, B[key] as string, e) : lerp(A[key] as number, B[key] as number, e);
+    if ((COL_KEYS as readonly string[]).includes(key)) { o[key] = mixHex(A[key] as string, B[key] as string, smooth(COLOR_WIN[0], COLOR_WIN[1], k)); return; }
+    const [w0, w1] = WINDOWS[a][GROUPS[key]];
+    o[key] = lerp(A[key] as number, B[key] as number, smooth(w0, w1, k));
   });
   return o as HallParams;
 }
@@ -65,27 +72,13 @@ export const STATIONS = [
   { zh: '清', en: 'QING', year: 1697, name: '太和殿', label: 'Taihe' },
 ];
 
-// calendrier : trois rouleaux du temps (rouleau/TimeScroll) enchaînés ; la transformation du hall se déroule entre
-// u = 0,08 et 0,80 (l'impact du rouleau), linéairement : chaque pièce a sa propre fenêtre dans k
-export const T0 = 0.95, DUR = 2.85;
-export const uOf = (t: number, i: number) => (t - (T0 + DUR * i)) / DUR;
-export const kOf = (t: number, i: number) => clamp((uOf(t, i) - 0.08) / 0.72);
+// calendrier : le Tang s'assemble (0 → 2 s), puis trois remplacements de 2,4 s sans temps mort, puis tenue de face
+export const T_INTRO = 2.0, T0 = 2.0, DUR = 2.4;
+export const kOf = (t: number, i: number) => clamp((t - (T0 + DUR * i)) / DUR);
+export const introOf = (t: number) => clamp(t / T_INTRO);
 // avancement continu : 0 à 3 (indice de l'époque, fraction comprise)
 export const progress = (t: number) => [0, 1, 2].reduce((p, i) => p + kOf(t, i), 0);
-export function hallAtProgress(p: number): HallParams {
-  const i = Math.min(2, Math.floor(p)), k = p - i;
-  return hallAt(i, i + 1, k);
-}
-// demi-largeur de façade : 7 travées → 9 → 11, les murs de pignon glissent vers l'extérieur et portent leurs colonnes d'angle
-export const hxOf = (prog: number) => 3.5 + smooth(0.12, 0.5, clamp(prog - 1)) + smooth(0.12, 0.5, clamp(prog - 2));
-// hauteur du toit : il se soulève à chaque transformation, reste en l'air pendant que le corps change, puis retombe avec
-// un petit rebond ; à l'ouverture il descend du ciel
-export const ROOF_UP = 3.0;
-export function roofOff(t: number, prog: number) {
-  let off = ROOF_UP * (1 - smooth(0.15, 0.95, t));
-  [0, 1, 2].forEach((i) => {
-    const k = clamp(prog - i);
-    off += ROOF_UP * (smooth(0, 0.18, k) - smooth(0.7, 0.92, k)) + 0.12 * Math.sin(Math.PI * clamp((k - 0.92) / 0.08)) * (k < 1 ? 1 : 0);
-  });
-  return off;
-}
+// transformation en cours : indice (0 à 2) et avancement k
+export const stepOf = (t: number): { i: number; k: number } => { const i = t < T0 + DUR ? 0 : t < T0 + 2 * DUR ? 1 : 2; return { i, k: kOf(t, i) }; };
+// demi-largeur de façade : 7 travées → 9 (colonnes) → 11, les pignons glissent vers l'extérieur avec leurs colonnes d'angle
+export const hxOf = (prog: number) => 3.5 + smooth(0.1, 0.6, clamp(prog - 1)) + smooth(0, 0.6, clamp(prog - 2));
