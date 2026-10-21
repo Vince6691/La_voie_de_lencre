@@ -33,6 +33,15 @@ class Pile {
     g.translate(x, y + h / 2, z);
     this.parts.push(g);
   }
+  // tube entre deux points (arêtiers, faîtage)
+  tube(a: [number, number, number], b: [number, number, number], r: number, seg = 8) {
+    const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), d = B.clone().sub(A), L = d.length();
+    if (L < 1e-4) return;
+    const g = new THREE.CylinderGeometry(r, r, L, seg, 1);
+    g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()));
+    g.translate((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2);
+    this.parts.push(g);
+  }
   add(g: Part) { this.parts.push(g); }
   build(): Part | null {
     if (!this.parts.length) return null;
@@ -44,12 +53,18 @@ class Pile {
 
 // ── toit : surface réglée (croupe), pente concave, angles relevés ; `slopeW` = largeur de la pente depuis l'avant-toit
 function roofHeight(x: number, z: number, hw: number, hd: number, H: number, q: number, lift: number, slopeW: number) {
-  const d = Math.max(0, Math.min(hw - Math.abs(x), hd - Math.abs(z))), r = Math.min(1, d / slopeW);
-  const w = Math.max(Math.pow(Math.abs(x) / hw, 8), Math.pow(Math.abs(z) / hd, 8));
-  return H * Math.pow(r, q) + lift * w * Math.pow(1 - r, 3);
+  const ex = hw - Math.abs(x), ez = hd - Math.abs(z), d = Math.max(0, Math.min(ex, ez)), r = Math.min(1, d / slopeW);
+  // pente concave (舉折) : plate au bas, qui se raidit vers le faîte
+  const base = H * Math.pow(r, q);
+  // avant-toit « en sourire » : il se relève doucement vers les angles, puis d'un coup au bout (起翹)
+  const smile = Math.pow(ez < ex ? Math.abs(x) / hw : Math.abs(z) / hd, 2.6);
+  const tip = Math.max(Math.pow(Math.abs(x) / hw, 8), Math.pow(Math.abs(z) / hd, 8));
+  // les extrémités du faîtage se redressent un peu aussi
+  const rise = 0.35 * lift * Math.pow(Math.abs(x) / hw, 3) * r;
+  return base + lift * (0.45 * smile + tip) * Math.pow(1 - r, 2.2) + rise;
 }
 function roofGeom(hw: number, hd: number, H: number, q: number, lift: number, slopeW: number, y: number, drop = 0) {
-  const nx = 88, nz = 52, pos: number[] = [], idx: number[] = [], uv: number[] = [];
+  const nx = 124, nz = 76, pos: number[] = [], idx: number[] = [], uv: number[] = [];
   for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
     const x = -hw + (2 * hw * i) / nx, z = -hd + (2 * hd * j) / nz;
     pos.push(x, y + roofHeight(x, z, hw, hd, H, q, lift, slopeW) - drop, z);
@@ -79,7 +94,7 @@ void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normal
 // uKind : 0 aplat, 1 彩畫 des pièces longues (bouts 箍頭 contrastés, losange clair 枋心, filets d'or), 2 anneaux dorés
 // des piliers, 3 rangs de tuiles en relief
 const FRAG = `uniform vec3 uTint; uniform vec3 uTint2; uniform vec3 uPaper; uniform vec3 uGold; uniform float uKind; uniform float uDeco; uniform float uGoldAmt;
-uniform float uEaveY; uniform float uAO; uniform vec2 uRing;
+uniform float uEaveY; uniform float uAO; uniform vec2 uRing; uniform vec2 uDoor;
 varying vec3 vW; varying vec3 vN; varying vec2 vUv;
 float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
 float vn(vec3 p){ vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -92,7 +107,7 @@ void main(){
   float gran = 0.9 + 0.2 * fbm(vW * 3.1);
   vec3 col = uPaper * uTint * gran * shade;
   bool side = abs(n.y) < 0.5;
-  if (uKind > 2.5) {
+  if (uKind > 2.5 && uKind < 3.5) {
     float rib = 0.5 + 0.5 * cos(6.2832 * vUv.x / 2.0);
     col *= (0.92 + 0.08 * rib) * (0.97 + 0.03 * cos(6.2832 * vUv.y / 6.0));
   } else if (uKind > 0.5 && uKind < 1.5 && side) {
@@ -103,16 +118,27 @@ void main(){
     float gl = min(min(abs(u - 0.1), abs(u - 0.9)), abs(abs(u - 0.5) - 0.2));
     dec = mix(dec, uPaper * uGold * shade, (1.0 - smoothstep(0.005, 0.014, gl)) * uGoldAmt);
     col = mix(col, dec, uDeco);
+  } else if (uKind > 3.5) {
+    // 隔扇 : quatre vantaux par travée, panneau plein en bas, treillis de losanges (papier derrière) au-dessus
+    float yy = (vW.y - uDoor.x) / uDoor.y, along = abs(n.z) > 0.5 ? vW.x : vW.z, leaf = fract(along / 0.25);
+    vec3 wood = col;
+    if (yy > 0.3) {
+      float a = fract((along + vW.y) * 5.0), b = fract((along - vW.y) * 5.0), ln = min(min(a, 1.0 - a), min(b, 1.0 - b));
+      col = mix(uPaper * vec3(0.93, 0.85, 0.64) * gran * shade, wood, 1.0 - smoothstep(0.07, 0.13, ln));
+    } else {
+      col *= mix(1.0, 0.8, step(0.14, leaf) * step(leaf, 0.86) * step(0.07, yy) * step(yy, 0.27));
+    }
+    col = mix(col, wood * 0.72, 1.0 - smoothstep(0.03, 0.06, min(leaf, 1.0 - leaf)));
   } else if (uKind > 1.5 && uKind < 2.5) {
     float r = min(abs(vW.y - uRing.x), abs(vW.y - uRing.y));
     col = mix(col, uPaper * uGold * shade, (1.0 - smoothstep(0.02, 0.04, r)) * uGoldAmt);
   }
-  float ao = (side && uKind < 2.5) ? smoothstep(uEaveY - 1.1, uEaveY, vW.y) * uAO : 0.0;
+  float ao = (side && (uKind < 2.5 || uKind > 3.5)) ? smoothstep(uEaveY - 1.1, uEaveY, vW.y) * uAO : 0.0;
   col *= mix(vec3(1.0), vec3(0.78, 0.68, 0.6), ao);
   gl_FragColor = vec4(col, 1.0);
 }`;
 
-export type Wash = { tint: string; tint2?: string; kind?: 0 | 1 | 2 | 3; deco?: number; gold?: number; ao?: number; eaveY?: number; ring?: [number, number] };
+export type Wash = { tint: string; tint2?: string; kind?: 0 | 1 | 2 | 3 | 4; door?: [number, number]; deco?: number; gold?: number; ao?: number; eaveY?: number; ring?: [number, number] };
 const INK = '#1a1613';
 // un maillage en lavis + ses arêtes vives en traits d'encre (w : épaisseur en pixels, 0 : pas de trait)
 const Inked: React.FC<{ geo: Part | null; wash: Wash; w?: number; lineColor?: string; angle?: number; extra?: number[] }> = ({ geo, wash: W, w = 1.4, lineColor = INK, angle = 28, extra }) => {
@@ -120,12 +146,12 @@ const Inked: React.FC<{ geo: Part | null; wash: Wash; w?: number; lineColor?: st
   const mat = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: VERT, fragmentShader: FRAG, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2,
     uniforms: { uTint: { value: new THREE.Color() }, uTint2: { value: new THREE.Color() }, uPaper: { value: PAPER }, uGold: { value: new THREE.Color(0.87, 0.67, 0.27) },
-      uKind: { value: 0 }, uDeco: { value: 0 }, uGoldAmt: { value: 0 }, uEaveY: { value: 99 }, uAO: { value: 0.22 }, uRing: { value: new THREE.Vector2(-99, -99) } },
+      uKind: { value: 0 }, uDeco: { value: 0 }, uGoldAmt: { value: 0 }, uEaveY: { value: 99 }, uAO: { value: 0.22 }, uRing: { value: new THREE.Vector2(-99, -99) }, uDoor: { value: new THREE.Vector2(0, 1) } },
   }), []);
   const lm = useMemo(() => new LineMaterial({ color: new THREE.Color(lineColor).getHex(), linewidth: w, transparent: true, opacity: 0.92, depthWrite: false }), [lineColor, w]);
   const u = mat.uniforms;
   u.uTint.value.set(W.tint); u.uTint2.value.set(W.tint2 ?? W.tint); u.uKind.value = W.kind ?? 0; u.uDeco.value = W.deco ?? 0; u.uGoldAmt.value = W.gold ?? 0;
-  u.uAO.value = W.ao ?? 0.22; u.uEaveY.value = W.eaveY ?? 99; u.uRing.value.set(...(W.ring ?? [-99, -99]));
+  u.uAO.value = W.ao ?? 0.22; u.uEaveY.value = W.eaveY ?? 99; u.uRing.value.set(...(W.ring ?? [-99, -99])); u.uDoor.value.set(...(W.door ?? [0, 1]));
   lm.linewidth = Math.max(1, w * viewport.dpr); lm.resolution.set(size.width * viewport.dpr, size.height * viewport.dpr);
   const lg = useMemo(() => {
     if (!geo || w <= 0) return null;
@@ -162,70 +188,129 @@ const wash = (() => {
   };
 })();
 
+// ── 鴟吻 : grand épi de faîtage, profil extrudé (queue qui s'enroule vers l'intérieur) ; dir = -1 : côté gauche
+const chiwen = (h: number, dir: 1 | -1, x: number, y: number) => {
+  const sh = new THREE.Shape();
+  sh.moveTo(0, 0); sh.lineTo(0.2, 0);
+  sh.bezierCurveTo(0.27, 0.2, 0.27, 0.46, 0.13, 0.58);
+  sh.bezierCurveTo(0.03, 0.66, -0.09, 0.55, -0.02, 0.46);
+  sh.bezierCurveTo(0.05, 0.4, 0.07, 0.34, 0.03, 0.28);
+  sh.bezierCurveTo(0, 0.18, -0.05, 0.08, 0, 0);
+  const g = new THREE.ExtrudeGeometry(sh, { depth: 0.11, bevelEnabled: false, curveSegments: 10 });
+  g.translate(-0.1, 0, -0.055);
+  g.scale(dir * h, h, 1);
+  g.translate(x, y, 0);
+  return g;
+};
+
 // ── le hall
 export const Hall: React.FC<{ p: HallParams }> = ({ p }) => {
   const built = useMemo(() => {
-    const stone = new Pile(), marble = new Pile(), cols = new Pile(), br = new Pile(), walls = new Pile(), doors = new Pile();
-    const band = new Pile(), gold = new Pile(), under = new Pile(), beasts = new Pile();
-    const nTier = clamp(p.tiers, 1, 3);
+    const stone = new Pile(), marble = new Pile(), cols = new Pile(), brA = new Pile(), brB = new Pile(), walls = new Pile(), doors = new Pile();
+    const band = new Pile(), gold = new Pile(), under = new Pile(), beasts = new Pile(), ridges = new Pile(), ends = new Pile(), plaque = new Pile();
+    const nTier = clamp(p.tiers, 1, 3), mk = clamp(p.marble);
 
-    // socle : terrasses empilées, la plus haute porte le hall ; escalier central ; balustrade de marbre
+    // ── socle : terrasses empilées ; chacune est un 須彌座 (pied, taille rentrée, couronnement) quand le marbre arrive
     const tw = [1, clamp(nTier - 1), clamp(nTier - 2)], base = p.platH / nTier;
-    let y = 0; const tops: number[] = [];
-    const beyond = [tw[1] + tw[2], tw[2], 0];
+    const beyond = [tw[1] + tw[2], tw[2], 0], platTop = p.platH;
+    const balustrade = (ex: number, ez: number, yB: number, k: number) => {
+      if (k < 0.05) return;
+      const bh = 0.2 * k, n = (len: number) => Math.max(2, Math.round(len / 0.55));
+      const along = (len: number, fix: number, isX: boolean) => {
+        const N = n(len);
+        for (let i = 0; i <= N; i++) {
+          const t = -len / 2 + (len * i) / N, big = i === 0 || i === N;
+          const px = isX ? t : fix, pz = isX ? fix : t, w = big ? 0.1 : 0.06;
+          marble.box(w, bh, w, px, yB, pz);
+          marble.box(w * 1.5, 0.035 * k, w * 1.5, px, yB + bh, pz); // chapiteau du balustre
+          if (!big && i % 3 === 1 && fix !== 0) { // 螭首 : gargouille qui saille sous la balustrade
+            const out = (isX ? Math.sign(fix) : Math.sign(fix)) * 0.12;
+            marble.box(isX ? 0.05 : 0.2, 0.05, isX ? 0.2 : 0.05, px + (isX ? 0 : out), yB - 0.07, pz + (isX ? out : 0));
+          }
+          if (i < N) { // dalle pleine entre deux balustres, et main courante
+            const mid = t + len / (2 * N), sl = len / N - 0.08;
+            marble.box(isX ? sl : 0.035, bh * 0.62, isX ? 0.035 : sl, isX ? mid : fix, yB + 0.03, isX ? fix : mid);
+            marble.box(isX ? sl : 0.05, 0.025 * k, isX ? 0.05 : sl, isX ? mid : fix, yB + bh * 0.9, isX ? fix : mid);
+          }
+        }
+      };
+      along(2 * ex, ez, true); along(2 * ex, -ez, true); along(2 * ez, ex, false); along(2 * ez, -ex, false);
+    };
+    let y = 0;
     for (let i = 0; i < 3; i++) {
-      const h = base * tw[i]; if (h < 1e-3) { tops.push(y); continue; }
-      const m = 0.55 + 0.5 * beyond[i], mat = p.marble > 0.5 ? marble : stone;
-      mat.box(HW * 2 + 2 * m, h, HD * 2 + 2 * m, 0, y, 0);
-      // escalier central devant la terrasse : trois marches
-      for (let s = 0; s < 3; s++) mat.box(1.2, (h * (3 - s)) / 3, 0.2, 0, y, HD + m + 0.1 + 0.2 * s);
-      y += h; tops.push(y);
-    }
-    const topM = 0.55 + 0.5 * beyond[Math.min(2, Math.max(0, Math.ceil(nTier) - 1))];
-    const platTop = p.platH;
-    if (p.marble > 0.6) { // balustrade : lisse + balustres
-      const k = clamp((p.marble - 0.6) / 0.4), bh = 0.2 * k, ex = HW + topM - 0.06, ez = HD + topM - 0.06;
-      marble.box(2 * ex, 0.03 * k, 0.05, 0, platTop + bh, ez); marble.box(2 * ex, 0.03 * k, 0.05, 0, platTop + bh, -ez);
-      marble.box(0.05, 0.03 * k, 2 * ez, ex, platTop + bh, 0); marble.box(0.05, 0.03 * k, 2 * ez, -ex, platTop + bh, 0);
-      for (let i = 0; i <= 12; i++) { const x = -ex + (2 * ex * i) / 12; marble.box(0.06, bh, 0.06, x, platTop, ez); marble.box(0.06, bh, 0.06, x, platTop, -ez); }
-      for (let j = 1; j < 8; j++) { const z = -ez + (2 * ez * j) / 8; marble.box(0.06, bh, 0.06, ex, platTop, z); marble.box(0.06, bh, 0.06, -ex, platTop, z); }
+      const h = base * tw[i]; if (h < 1e-3) continue;
+      const m = 0.55 + 0.5 * beyond[i], mat = mk > 0.5 ? marble : stone;
+      if (mk > 0.5) {
+        mat.box(HW * 2 + 2 * m + 0.1, h * 0.28, HD * 2 + 2 * m + 0.1, 0, y, 0);                       // 下枋 : pied
+        mat.box(HW * 2 + 2 * m - 0.02, h * 0.44, HD * 2 + 2 * m - 0.02, 0, y + h * 0.28, 0);           // 束腰 : taille rentrée
+        mat.box(HW * 2 + 2 * m + 0.08, h * 0.28, HD * 2 + 2 * m + 0.08, 0, y + h * 0.72, 0);          // 上枋 : couronnement
+        balustrade(HW + m - 0.07, HD + m - 0.07, y + h, mk * tw[i]);
+      } else {
+        mat.box(HW * 2 + 2 * m + 0.06, h * 0.3, HD * 2 + 2 * m + 0.06, 0, y, 0);
+        mat.box(HW * 2 + 2 * m, h * 0.7, HD * 2 + 2 * m, 0, y + h * 0.3, 0);
+      }
+      // escalier central et rampe sculptée 御路 entre deux rampants
+      for (let st = 0; st < 3; st++) mat.box(1.3, (h * (3 - st)) / 3, 0.2, 0, y, HD + m + 0.1 + 0.2 * st);
+      if (mk > 0.5) { mat.box(0.5, h * 0.94, 0.62, 0, y, HD + m + 0.31); [-1, 1].forEach((sg) => mat.box(0.06, h * 0.85, 0.62, sg * 0.68, y, HD + m + 0.31)); }
+      y += h;
     }
 
-    // piliers, murs, portes
-    const y0 = platTop, y1 = y0 + p.colH, rTop = p.colR * (1 - 6 * p.entasis);
+    // ── piliers sur socles de pierre, murs, portes treillissées, plaque
+    const y0 = platTop, y1 = y0 + p.colH, rTop = p.colR * (1 - 6 * p.entasis), sockH = 0.06 + 0.04 * mk;
     const xs = Array.from({ length: BAYS_X + 1 }, (_, i) => -HW + i), zs = Array.from({ length: BAYS_Z + 1 }, (_, j) => -HD + j);
     const ring: [number, number][] = [];
     xs.forEach((x) => { ring.push([x, -HD]); ring.push([x, HD]); });
     zs.slice(1, -1).forEach((z) => { ring.push([-HW, z]); ring.push([HW, z]); });
-    ring.forEach(([x, z]) => cols.cyl(rTop, p.colR, p.colH, x, y0, z));
+    ring.forEach(([x, z]) => { stone.cyl(p.colR * 1.32, p.colR * 1.45, sockH, x, y0, z, 18); cols.cyl(rTop, p.colR, p.colH - sockH, x, y0 + sockH, z, 18); });
     walls.box(HW * 2, p.colH, 0.12, 0, y0, -HD); walls.box(0.12, p.colH, HD * 2, -HW, y0, 0); walls.box(0.12, p.colH, HD * 2, HW, y0, 0);
     walls.box(1.0, p.colH, 0.12, -HW + 0.5, y0, HD); walls.box(1.0, p.colH, 0.12, HW - 0.5, y0, HD);
     walls.box(2.0, p.colH, 0.12, -HW + 2, y0, HD); walls.box(2.0, p.colH, 0.12, HW - 2, y0, HD);
-    for (let i = 2; i <= 4; i++) { // trois travées de portes : vantaux et traverses claires
-      const cx = -HW + i + 0.5;
-      doors.box(0.94, p.colH * 0.9, 0.1, cx, y0 + 0.02, HD + 0.02);
-      band.box(0.98, 0.05, 0.12, cx, y0 + p.colH * 0.62, HD + 0.03);
-    }
+    for (let i = 2; i <= 4; i++) doors.box(0.97, p.colH * 0.9, 0.1, -HW + i + 0.5, y0 + 0.02, HD + 0.02);
+    // 匾額 : plaque sur fond sombre cernée d'un cadre doré, au-dessus de la porte centrale
+    const pw = 0.95, ph = 0.3, py = y1 - 0.4 - 0.08 * mk;
+    plaque.box(pw, ph, 0.05, 0, py, HD + 0.12);
+    [[0, ph - 0.03], [0, 0]].forEach(([, oy]) => gold.box(pw + 0.06, 0.035, 0.07, 0, py + oy, HD + 0.12));
+    [-1, 1].forEach((sg) => gold.box(0.035, ph, 0.07, sg * (pw / 2 + 0.015), py, HD + 0.12));
 
-    // poutre sur piliers et frise : bois nu à l'ouest, peintes ensuite
-    const lintel = (len: number, x: number, z: number, along: 'x' | 'z') =>
-      (along === 'x' ? band.box(len, 0.1, 0.13, x, y1, z) : band.box(0.13, 0.1, len, x, y1, z));
-    lintel(HW * 2, 0, -HD, 'x'); lintel(HW * 2, 0, HD, 'x'); lintel(HD * 2, -HW, 0, 'z'); lintel(HD * 2, HW, 0, 'z');
+    // ── poutres sur piliers (大額枋 + 小額枋 avec 墊板) et 雀替 sous la poutre
+    const lintel = (len: number, x: number, z: number, along: 'x' | 'z', yy: number, h: number) =>
+      (along === 'x' ? band.box(len, h, 0.13, x, yy, z) : band.box(0.13, h, len, x, yy, z));
+    const dbl = clamp((p.paint - 0.35) / 0.4);
+    [[HW * 2, 0, -HD, 'x'], [HW * 2, 0, HD, 'x'], [HD * 2, -HW, 0, 'z'], [HD * 2, HW, 0, 'z']].forEach(([len, x, z, al]) => {
+      lintel(len as number, x as number, z as number, al as 'x' | 'z', y1, 0.1);
+      if (dbl > 0.02) lintel(len as number, x as number, z as number, al as 'x' | 'z', y1 - 0.13 * dbl, 0.09 * dbl);
+    });
+    ring.forEach(([x, z]) => {
+      const front = Math.abs(z) === HD, k = dbl;
+      if (k < 0.05) return;
+      [-1, 1].forEach((sg) => {
+        const L = 0.34 * k, yy = y1 - 0.26 * k;
+        if (front) brA.box(L, 0.14 * k, 0.045, x + sg * (L / 2 + p.colR * 0.7), yy, z + Math.sign(z) * 0.06);
+        else brA.box(0.045, 0.14 * k, L, x + Math.sign(x) * 0.06, yy, z + sg * (L / 2 + p.colR * 0.7));
+      });
+    });
 
-    // consoles : jeux sur chaque pilier + jeux intercalaires qui se divisent quand leur nombre augmente
-    const s = p.brH, yb = y1 + 0.1;
+    // ── consoles 斗拱 : blocs (斗) et bras (栱) séparés pour être peints de deux couleurs ; 昂 oblique tant que les jeux sont grands
+    const s = p.brH, yb = y1 + 0.1, ang = clamp(1.5 - p.brSets * 0.35);
     const set = (x: number, z: number, along: 'x' | 'z', out: 1 | -1, k: number) => {
       const w = s * k; if (w < 0.01) return;
-      const X = (a: number, b: number, c: number) => (along === 'x' ? [a, b, c] : [c, b, a]);
-      const put = (dx: number, dy: number, dz: number, sx: number, sy: number, sz: number) => {
-        const [bx, by, bz] = X(sx, sy, sz); const [ox, , oz] = X(dx, 0, dz * out);
-        br.box(bx, by, bz, x + ox, yb + dy, z + oz);
+      const yaw = along === 'x' ? (out > 0 ? 0 : Math.PI) : (out > 0 ? Math.PI / 2 : -Math.PI / 2);
+      const put = (pile: Pile, sx: number, sy: number, sz: number, dx: number, dy: number, dz: number, rx = 0) => {
+        const g = new THREE.BoxGeometry(sx, sy, sz);
+        if (rx) g.rotateX(rx);
+        g.translate(dx, dy + sy / 2, dz); g.rotateY(yaw); g.translate(x, yb, z);
+        pile.parts.push(g);
       };
-      put(0, 0, 0, 0.55 * w, 0.28 * w, 0.55 * w);
-      put(0, 0.28 * w, 0, 1.0 * w, 0.22 * w, 0.42 * w);
-      put(0, 0.28 * w, 0.55 * w, 0.4 * w, 0.22 * w, 1.5 * w);
-      put(0, 0.5 * w, 0, 0.5 * w, 0.2 * w, 0.5 * w);
-      put(0, 0.7 * w, 0, 1.4 * w, 0.22 * w, 0.46 * w);
+      put(brB, 0.55 * w, 0.26 * w, 0.55 * w, 0, 0, 0);               // 櫨斗 : grand bloc de base
+      put(brA, 1.0 * w, 0.2 * w, 0.4 * w, 0, 0.26 * w, 0);            // 泥道栱 : bras dans le plan du mur
+      put(brA, 0.4 * w, 0.2 * w, 1.55 * w, 0, 0.26 * w, 0.58 * w);    // 華栱 : bras qui sort
+      put(brB, 0.26 * w, 0.16 * w, 0.26 * w, -0.4 * w, 0.46 * w, 0);  // 散斗 : petits blocs sur les bouts
+      put(brB, 0.26 * w, 0.16 * w, 0.26 * w, 0.4 * w, 0.46 * w, 0);
+      put(brB, 0.26 * w, 0.16 * w, 0.26 * w, 0, 0.46 * w, 1.2 * w);
+      put(brA, 1.4 * w, 0.2 * w, 0.42 * w, 0, 0.62 * w, 0);           // 令栱 : bras du haut
+      put(brA, 0.34 * w, 0.18 * w, 0.9 * w, 0, 0.62 * w, 0.62 * w);   // 耍頭
+      put(brB, 0.24 * w, 0.16 * w, 0.24 * w, -0.55 * w, 0.8 * w, 0); put(brB, 0.24 * w, 0.16 * w, 0.24 * w, 0.55 * w, 0.8 * w, 0);
+      if (ang > 0.05) put(brA, 0.18 * w * ang, 0.2 * w, 1.7 * w * ang, 0, 0.1 * w, 0.78 * w * ang, 0.5); // 昂 : bras oblique
     };
     ring.forEach(([x, z]) => {
       const front = Math.abs(z) === HD;
@@ -239,81 +324,111 @@ export const Hall: React.FC<{ p: HallParams }> = ({ p }) => {
       for (let b = 0; b < BAYS_Z; b++) { const z = -HD + b + r; set(HW, z, 'z', 1, k); set(-HW, z, 'z', -1, k); }
     }
 
-    // toit(s)
+    // ── toit(s)
     const yEave = yb + s + 0.04, t2 = clamp(p.tier2), U = 1.0 * t2;
-    // poutre de rive peinte (frise sous l'avant-toit) et dorure
     const rim = (len: number, x: number, z: number, along: 'x' | 'z') => {
       if (along === 'x') { band.box(len, 0.07, 0.12, x, yEave - 0.07, z); gold.box(len, 0.02 * p.gold, 0.14, x, yEave - 0.0, z); }
       else { band.box(0.12, 0.07, len, x, yEave - 0.07, z); gold.box(0.14, 0.02 * p.gold, len, x, yEave - 0.0, z); }
     };
     rim(HW * 2 + 0.2, 0, -HD - 0.12, 'x'); rim(HW * 2 + 0.2, 0, HD + 0.12, 'x'); rim(HD * 2 + 0.2, -HW - 0.12, 0, 'z'); rim(HD * 2 + 0.2, HW + 0.12, 0, 'z');
 
-    const upY = yEave + U;
-    const hwU = HW + p.over, hdU = HD + p.over;
+    const upY = yEave + U, hwU = HW + p.over, hdU = HD + p.over;
     const upper = roofGeom(hwU, hdU, p.ridgeH, p.curve, p.lift, hdU, upY, 0);
     under.add(roofGeom(hwU, hdU, p.ridgeH, p.curve, p.lift, hdU, upY, 0.1));
-    let skirt: Part | null = null;
+    let skirt: Part | null = null, sk2: { hwL: number; hdL: number; sk: number; sw: number; y: number } | null = null;
     if (t2 > 0.02) { // étage supérieur et jupe du premier toit
-      const m = lerp(0.2, p.over + 0.55, t2), hwL = HW + m, hdL = HD + m, sk = 0.42 * t2;
-      skirt = roofGeom(hwL, hdL, sk, 1.2, p.lift * 0.5, Math.max(0.15, m - 0.1), yEave - 0.02, 0);
-      under.add(roofGeom(hwL, hdL, sk, 1.2, p.lift * 0.5, Math.max(0.15, m - 0.1), yEave - 0.02, 0.09));
-      walls.box(HW * 2 + 0.1, Math.max(0, U - 0.42 * t2 * 0.9), HD * 2 + 0.1, 0, yEave + 0.42 * t2 * 0.9, 0);
+      const m = lerp(0.2, p.over * 0.7 + 0.35, t2), hwL = HW + m, hdL = HD + m, sk = 0.5 * t2, sw = Math.max(0.15, m - 0.1);
+      skirt = roofGeom(hwL, hdL, sk, 1.5, p.lift * 0.8, sw, yEave - 0.02, 0);
+      under.add(roofGeom(hwL, hdL, sk, 1.5, p.lift * 0.8, sw, yEave - 0.02, 0.09));
+      sk2 = { hwL, hdL, sk, sw, y: yEave - 0.02 };
+      walls.box(HW * 2 + 0.1, Math.max(0, U - sk * 0.9), HD * 2 + 0.1, 0, yEave + sk * 0.9, 0);
       band.box(HW * 2 + 0.16, 0.06, HD * 2 + 0.16, 0, yEave + U - 0.12, 0);
     }
 
-    // bêtes de faîte (croupes) et becs de faîtage
     const hipY = (x: number, z: number) => upY + roofHeight(x, z, hwU, hdU, p.ridgeH, p.curve, p.lift, hdU);
-    for (let i = 0; i < 5; i++) {
-      const wgt = clamp(p.beasts - i); if (wgt <= 0) continue;
-      const f = 0.1 + 0.12 * i, bs = 0.13 * wgt;
-      [-1, 1].forEach((sx) => [-1, 1].forEach((sz) => {
-        const x = sx * (hwU - f * hdU), z = sz * hdU * (1 - f);
-        beasts.box(bs, bs * 1.5, bs, x, hipY(x, z) - 0.01, z);
-      }));
-    }
-    const kEnd = 0.3 + 0.7 * clamp(p.beasts / 3);
-    [-1, 1].forEach((sx) => {
-      const x = sx * (hwU - hdU); beasts.box(0.2 * kEnd, 0.5 * kEnd, 0.2 * kEnd, x, hipY(x, 0) - 0.02, 0);
-    });
-    // la dorure se pose sur les bêtes et les angles des avant-toits
-    [-1, 1].forEach((sx) => [-1, 1].forEach((sz) => {
-      const x = sx * hwU, z = sz * hdU; gold.box(0.1 * p.gold, 0.1 * p.gold, 0.1 * p.gold, x, hipY(x, z) - 0.04, z);
-    }));
-
-    // arêtiers et faîtage : tracés à la main sur la surface (les arêtes du maillage seraient pointillées)
+    const hipPt = (sx: number, sz: number, f: number): [number, number, number] => { const x = sx * (hwU - f * hdU), z = sz * hdU * (1 - f); return [x, hipY(x, z), z]; };
     const roofLines: number[] = [];
     const seg = (a: [number, number, number], b: [number, number, number]) => roofLines.push(...a, ...b);
+    // arêtiers (垂脊) et faîtage (正脊) : boudins posés sur la surface
+    const rr = 0.04 + 0.02 * mk;
     [-1, 1].forEach((sx) => [-1, 1].forEach((sz) => {
-      let prev: [number, number, number] | null = null;
-      for (let i = 0; i <= 28; i++) {
-        const f = i / 28, x = sx * (hwU - f * hdU), z = sz * hdU * (1 - f), q: [number, number, number] = [x, hipY(x, z) + 0.012, z];
-        if (prev) seg(prev, q);
-        prev = q;
-      }
+      let prev = hipPt(sx, sz, 0);
+      for (let i = 1; i <= 28; i++) { const q = hipPt(sx, sz, i / 28); ridges.tube(prev, q, rr); seg(prev, q); prev = q; }
     }));
-    seg([-(hwU - hdU), hipY(hwU - hdU, 0) + 0.012, 0], [hwU - hdU, hipY(hwU - hdU, 0) + 0.012, 0]);
+    const rx = hwU - hdU, ry = hipY(rx, 0);
+    for (let i = 0; i < 12; i++) { const a = -rx + (2 * rx * i) / 12, b = -rx + (2 * rx * (i + 1)) / 12; ridges.tube([a, hipY(a, 0) + 0.01, 0], [b, hipY(b, 0) + 0.01, 0], rr * 1.3); }
+    seg([-rx, ry + 0.012, 0], [rx, ry + 0.012, 0]);
 
-    return { roofLines, stone: stone.build(), marble: marble.build(), cols: cols.build(), br: br.build(), walls: walls.build(), doors: doors.build(),
-      band: band.build(), gold: gold.build(), under: under.build(), beasts: beasts.build(), upper, skirt, eaveY: yEave, ring: [y0 + 0.14, y1 - 0.2] as [number, number] };
+    // 瓦當 : bouts de tuiles en rang le long des avant-toits
+    const edge = (fx: (t: number) => [number, number], len: number, hy: (x: number, z: number) => number = hipY) => {
+      const N = Math.round(len / 0.17);
+      for (let i = 0; i <= N; i++) {
+        const [x, z] = fx(i / N), hh = 0.045 + 0.02 * mk;
+        ends.box(0.07, hh, 0.07, x, hy(x, z) - 0.02 - hh * 0.5, z);
+      }
+    };
+    edge((t) => [-hwU + 2 * hwU * t, hdU], 2 * hwU); edge((t) => [-hwU + 2 * hwU * t, -hdU], 2 * hwU);
+    edge((t) => [hwU, -hdU + 2 * hdU * t], 2 * hdU); edge((t) => [-hwU, -hdU + 2 * hdU * t], 2 * hdU);
+    if (sk2) { // premier toit des Qing : mêmes arêtiers, bouts de tuiles et clochettes
+      const { hwL, hdL, sk, sw, y } = sk2, hy = (x: number, z: number) => y + roofHeight(x, z, hwL, hdL, sk, 1.5, p.lift * 0.8, sw);
+      [-1, 1].forEach((sx) => [-1, 1].forEach((sz) => {
+        const P = (f: number): [number, number, number] => { const x = sx * (hwL - f * sw), z = sz * (hdL - f * sw); return [x, hy(x, z), z]; };
+        let prev = P(0);
+        for (let i = 1; i <= 10; i++) { const q = P(i / 10); ridges.tube(prev, q, rr); seg(prev, q); prev = q; }
+        const [cx, cy, cz] = P(0);
+        gold.cyl(0.011 * p.gold, 0.011 * p.gold, 0.14 * p.gold, cx, cy - 0.14 * p.gold, cz, 6);
+        gold.cyl(0.0, 0.05 * p.gold, 0.08 * p.gold, cx, cy - 0.22 * p.gold, cz, 8);
+      }));
+      edge((t) => [-hwL + 2 * hwL * t, hdL], 2 * hwL, hy); edge((t) => [-hwL + 2 * hwL * t, -hdL], 2 * hwL, hy);
+      edge((t) => [hwL, -hdL + 2 * hdL * t], 2 * hdL, hy); edge((t) => [-hwL, -hdL + 2 * hdL * t], 2 * hdL, hy);
+    }
+
+    // 鴟吻 aux extrémités du faîtage ; 仙人 + 走獸 sur chaque arêtier selon l'époque ; clochettes d'angle
+    const kEnd = 0.45 + 0.55 * clamp(p.beasts / 3);
+    [-1, 1].forEach((sg) => beasts.add(chiwen(0.9 * kEnd * (0.8 + 0.4 * mk), sg as 1 | -1, sg * rx, ry - 0.03)));
+    for (let i = 0; i < 6; i++) {
+      const wgt = clamp(p.beasts + 1 - i); if (wgt <= 0) continue;
+      const f = 0.07 + 0.105 * i;
+      [-1, 1].forEach((sx) => [-1, 1].forEach((sz) => {
+        const [x, hy, z] = hipPt(sx, sz, f), bs = (i === 0 ? 0.075 : 0.065) * wgt;
+        beasts.box(bs * 1.2, bs * 0.45, bs * 1.2, x, hy + rr * 0.6, z);                 // socle
+        beasts.cyl(bs * 0.1, bs * 0.45, bs * 1.8, x, hy + rr * 0.6 + bs * 0.45, z, 8);   // corps
+        beasts.box(bs * 0.5, bs * 0.4, bs * 0.9, x + sx * bs * 0.15, hy + rr * 0.6 + bs * 1.5, z + sz * bs * 0.15); // tête
+      }));
+    }
+    [-1, 1].forEach((sx) => [-1, 1].forEach((sz) => {
+      const [x, hy, z] = hipPt(sx, sz, 0), gk = p.gold;
+      gold.cyl(0.011 * gk, 0.011 * gk, 0.14 * gk, x, hy - 0.14 * gk, z, 6);
+      gold.cyl(0.0, 0.05 * gk, 0.08 * gk, x, hy - 0.22 * gk, z, 8);
+    }));
+
+    return { roofLines, roofLines2: undefined as number[] | undefined, stone: stone.build(), marble: marble.build(), cols: cols.build(), brA: brA.build(), brB: brB.build(), walls: walls.build(), doors: doors.build(),
+      band: band.build(), gold: gold.build(), under: under.build(), beasts: beasts.build(), ridges: ridges.build(), ends: ends.build(), plaque: plaque.build(), upper, skirt,
+      eaveY: yEave, ring: [y0 + 0.14, y1 - 0.2] as [number, number], door: [y0 + 0.02, p.colH * 0.9] as [number, number] };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(p)]);
 
   const e = built.eaveY, g = p.gold;
-  const brTint = mix(p.col, p.band, p.paint * 0.7);
+  const armTint = mix(p.col, p.band, p.paint * 0.85), blockTint = mix(mix(p.col, '#6e4a2e', 0.2), '#3f8f78', p.paint * 0.7);
+  const ridgeTint = mix(p.tile, '#d9a73a', g * 0.55);
   return (
     <group>
-      <Inked geo={built.stone} wash={{ tint: '#d6ccb8', ao: 0 }} w={2.2} />
-      <Inked geo={built.marble} wash={{ tint: '#f2efe8', ao: 0 }} w={1.3} />
+      <Inked geo={built.stone} wash={{ tint: '#d6ccb8', ao: 0 }} w={2.0} />
+      <Inked geo={built.marble} wash={{ tint: '#f2efe8', ao: 0 }} w={1.1} />
       <Inked geo={built.cols} wash={{ tint: p.col, kind: 2, gold: g, ring: built.ring, eaveY: e }} w={1.5} />
       <Inked geo={built.walls} wash={{ tint: p.wall, eaveY: e }} w={1.4} />
-      <Inked geo={built.doors} wash={{ tint: mix(p.col, '#6b3a28', 0.55), eaveY: e }} w={1.1} />
-      <Inked geo={built.br} wash={{ tint: brTint, eaveY: e, ao: 0.3 }} w={1.0} />
+      <Inked geo={built.doors} wash={{ tint: mix(p.col, '#6b3a28', 0.5), kind: 4, door: built.door, eaveY: e }} w={1.1} />
+      <Inked geo={built.plaque} wash={{ tint: mix('#5a3a2a', '#2c4a7c', p.paint), ao: 0 }} w={1.0} />
+      <Inked geo={built.brA} wash={{ tint: armTint, eaveY: e, ao: 0.3 }} w={0.9} />
+      <Inked geo={built.brB} wash={{ tint: blockTint, eaveY: e, ao: 0.3 }} w={0.9} />
       <Inked geo={built.band} wash={{ tint: mix(p.col, p.band, p.paint), tint2: p.col, kind: 1, deco: p.paint, gold: g, eaveY: e }} w={1.0} />
-      <Inked geo={built.gold} wash={{ tint: '#deab45', ao: 0 }} w={0.9} />
-      <Inked geo={built.under} wash={{ tint: '#8a6a52', ao: 0 }} w={1.6} angle={85} />
-      <Inked geo={built.skirt} wash={{ tint: p.tile, kind: 3 }} w={2.2} angle={85} />
-      <Inked geo={built.upper} wash={{ tint: p.tile, kind: 3 }} w={2.2} angle={85} extra={built.roofLines} />
-      <Inked geo={built.beasts} wash={{ tint: mix(p.tile, '#d9a73a', g * 0.5), ao: 0 }} w={1.2} />
+      <Inked geo={built.gold} wash={{ tint: '#deab45', ao: 0 }} w={0.8} />
+      <Inked geo={built.under} wash={{ tint: '#8a6a52', ao: 0 }} w={1.4} angle={85} />
+      <Inked geo={built.skirt} wash={{ tint: p.tile, kind: 3 }} w={2.0} angle={85} extra={built.roofLines2} />
+      <Inked geo={built.upper} wash={{ tint: p.tile, kind: 3 }} w={2.0} angle={85} extra={built.roofLines} />
+      <Inked geo={built.ridges} wash={{ tint: ridgeTint, ao: 0 }} w={0.9} angle={60} />
+      <Inked geo={built.ends} wash={{ tint: mix(p.tile, mix('#8a6a52', '#d9a73a', g), 0.55), ao: 0 }} w={0.7} />
+      <Inked geo={built.beasts} wash={{ tint: ridgeTint, ao: 0 }} w={0.9} angle={40} />
     </group>
   );
 };

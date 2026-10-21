@@ -16,16 +16,16 @@ export type HallParams = {
 const C = (s: string) => s;
 export const HALLS: HallParams[] = [
   // Tang 857 : pilier haut et fin, consoles énormes, toit bas et très débordant, chaux blanche sur bois ocre
-  { platH: 0.25, tiers: 1, marble: 0, colH: 1.15, colR: 0.085, entasis: 0.012, brH: 0.5, brSets: 1, ridgeH: 0.85, over: 1.35, curve: 1.1, lift: 0.1,
+  { platH: 0.25, tiers: 1, marble: 0, colH: 1.15, colR: 0.085, entasis: 0.012, brH: 0.5, brSets: 1, ridgeH: 0.85, over: 1.35, curve: 1.3, lift: 0.1,
     tier2: 0, beasts: 0, paint: 0.1, gold: 0, tile: C('#a9aeb0'), wall: C('#f7f2e6'), col: C('#b8603c'), band: C('#6aa58a') },
   // Song 1103 : modules standard, toit plus courbe, premiers décors peints
-  { platH: 0.32, tiers: 1, marble: 0.2, colH: 1.1, colR: 0.095, entasis: 0.008, brH: 0.36, brSets: 2, ridgeH: 1.05, over: 1.05, curve: 1.35, lift: 0.22,
+  { platH: 0.32, tiers: 1, marble: 0.2, colH: 1.1, colR: 0.095, entasis: 0.008, brH: 0.36, brSets: 2, ridgeH: 1.05, over: 1.05, curve: 1.65, lift: 0.2,
     tier2: 0, beasts: 1, paint: 0.55, gold: 0, tile: C('#b3babd'), wall: C('#f7f2e6'), col: C('#c24529'), band: C('#66a38c') },
   // Ming 1415 : socle de marbre, consoles petites et serrées, tuiles jaunes, murs rouges
-  { platH: 0.75, tiers: 1.4, marble: 1, colH: 1.3, colR: 0.12, entasis: 0.003, brH: 0.2, brSets: 4, ridgeH: 1.35, over: 0.85, curve: 1.55, lift: 0.34,
+  { platH: 0.75, tiers: 1.4, marble: 1, colH: 1.3, colR: 0.12, entasis: 0.003, brH: 0.2, brSets: 4, ridgeH: 1.35, over: 0.85, curve: 1.95, lift: 0.3,
     tier2: 0, beasts: 3, paint: 0.85, gold: 0.4, tile: C('#e0b862'), wall: C('#c9523c'), col: C('#c03a28'), band: C('#3c6fa6') },
   // Qing 1697 : terrasse à trois niveaux, double toit, consoles décoratives, dorures
-  { platH: 1.5, tiers: 3, marble: 1, colH: 1.45, colR: 0.14, entasis: 0, brH: 0.13, brSets: 6, ridgeH: 1.7, over: 0.75, curve: 1.75, lift: 0.5,
+  { platH: 1.5, tiers: 3, marble: 1, colH: 1.45, colR: 0.14, entasis: 0, brH: 0.13, brSets: 6, ridgeH: 1.7, over: 0.75, curve: 2.2, lift: 0.42,
     tier2: 1, beasts: 5, paint: 1, gold: 1, tile: C('#f1c560'), wall: C('#c9523c'), col: C('#bc3626'), band: C('#29519e') },
 ];
 
