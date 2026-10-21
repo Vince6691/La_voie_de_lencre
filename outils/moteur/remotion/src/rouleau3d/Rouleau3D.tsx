@@ -505,7 +505,7 @@ const Rule: React.FC<{ flip?: boolean }> = ({ flip }) => (
     <div style={{ width: 9, height: 9, transform: 'rotate(45deg)', background: '#e8c882', boxShadow: '0 0 8px rgba(240,200,120,0.7)' }} />
   </div>
 );
-const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number }> = ({ cfg, year, a }) => {
+export const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number }> = ({ cfg, year, a }) => {
   if (a <= 0) return null;
   const [y0, y1] = yearsOf(cfg), k = clamp((year - y0) / (y1 - y0));
   // périodes traversées, avec les mêmes noms que les cartouches (src/periodes.ts)

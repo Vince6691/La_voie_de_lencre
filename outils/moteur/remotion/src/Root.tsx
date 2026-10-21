@@ -15,6 +15,7 @@ import { SHUIMO_XUE_SECONDS, ShuimoXue } from './shuimo_xue/ShuimoXue';
 import { ROULEAU_DEMO_SECONDS, RouleauDemo } from './rouleau/RouleauDemo';
 import { ROULEAU3D_COURT_DEMO_SECONDS, ROULEAU3D_DEMO_SECONDS, Rouleau3DCourtDemo, Rouleau3DDemo } from './rouleau3d/Rouleau3DDemo';
 import { MOSAIQUE_DEMO_SECONDS, MosaiqueDemo } from './mosaique/MosaiqueDemo';
+import { HALL_SECONDS, HallEvolution } from './hall/HallEvolution';
 
 export const FPS = 30;
 
@@ -55,5 +56,7 @@ export const RemotionRoot: React.FC = () => (
   <Composition id="Rouleau3DDemo" component={Rouleau3DDemo} durationInFrames={Math.round(ROULEAU3D_DEMO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="Rouleau3DCourtDemo" component={Rouleau3DCourtDemo} durationInFrames={Math.round(ROULEAU3D_COURT_DEMO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="MosaiqueDemo" component={MosaiqueDemo} durationInFrames={Math.round(MOSAIQUE_DEMO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  {/* panel d'évolution n°3 : hall impérial 3D qui se transforme de Tang à Qing (src/hall), 10 s */}
+  <Composition id="HallEvolution" component={HallEvolution} durationInFrames={HALL_SECONDS * 30} fps={FPS} width={1920} height={1080} />
   </>
 );
