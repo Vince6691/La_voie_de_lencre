@@ -505,7 +505,9 @@ const Rule: React.FC<{ flip?: boolean }> = ({ flip }) => (
     <div style={{ width: 9, height: 9, transform: 'rotate(45deg)', background: '#e8c882', boxShadow: '0 0 8px rgba(240,200,120,0.7)' }} />
   </div>
 );
-export const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number }> = ({ cfg, year, a }) => {
+// roll : les chiffres défilent comme un compteur mécanique (le chiffre des unités en continu, les autres se reportent à la fin du
+// tour) ; glint (0 à 1) : un reflet doré balaie les chiffres de gauche à droite
+export const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number; roll?: boolean; glint?: number; rollSpeed?: number }> = ({ cfg, year, a, roll = false, glint = 0, rollSpeed = 0 }) => {
   if (a <= 0) return null;
   const [y0, y1] = yearsOf(cfg), k = clamp((year - y0) / (y1 - y0));
   // périodes traversées, avec les mêmes noms que les cartouches (src/periodes.ts)
@@ -526,7 +528,25 @@ export const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number
         <div style={{ display: 'flex', alignItems: 'center', gap: 28, marginTop: 4 }}>
           <Rule />
           <div style={{ display: 'flex', filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.55))' }}>
-            {digits.map((d, i) => (
+            {roll && year >= 0 ? (() => {
+              const n = String(Math.floor(year)).length;
+              return Array.from({ length: n }, (_, i) => {
+                const j = n - 1 - i, idx = Math.floor(year / 10 ** j) % 10;
+                const lower = j === 0 ? 0 : (year % 10 ** j) / 10 ** j;
+                const off = idx + (j === 0 ? year - Math.floor(year) : sm(seg(lower, 1 - 10 ** -j, 1)));
+                const g = glint * 170 - 35 - i * 30, blur = Math.min(j === 0 ? 5 : 2, rollSpeed / (j === 0 ? 60 : 500)); // flou de vitesse : le chiffre des unités file
+                const bg = glint > 0 && glint < 1 ? `linear-gradient(105deg, rgba(255,250,232,0) ${g - 14}%, rgba(255,250,232,0.98) ${g}%, rgba(255,250,232,0) ${g + 14}%), ${GOLD}` : GOLD;
+                return (
+                  <div key={i} style={{ width: 82, height: 118, overflow: 'hidden', maskImage: 'linear-gradient(180deg, transparent 0%, #000 16%, #000 84%, transparent 100%)', WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 16%, #000 84%, transparent 100%)' }}>
+                    <div style={{ transform: `translateY(${-off * 118}px)`, filter: blur > 0.2 ? `blur(${blur.toFixed(1)}px)` : undefined }}>
+                      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((d, q) => (
+                        <div key={q} style={{ height: 118, fontFamily: 'ShuimoCaps', fontWeight: 700, fontSize: 118, lineHeight: 1, textAlign: 'center', ...goldText, backgroundImage: bg }}>{d}</div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              });
+            })() : digits.map((d, i) => (
               <span key={i} style={{ fontFamily: 'ShuimoCaps', fontWeight: 700, fontSize: 118, lineHeight: 1, width: d === '−' ? 62 : 82, textAlign: 'center', ...goldText }}>{d}</span>
             ))}
           </div>

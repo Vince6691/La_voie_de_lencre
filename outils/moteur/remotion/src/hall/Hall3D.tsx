@@ -8,7 +8,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
-import { HallParams, hxOf } from './params';
+import { DUR, HallParams, T0, T_INTRO, hxOf } from './params';
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
@@ -94,7 +94,7 @@ void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normal
 // uKind : 0 aplat, 1 彩畫 des pièces longues (bouts 箍頭 contrastés, losange clair 枋心, filets d'or), 2 anneaux dorés
 // des piliers, 3 rangs de tuiles en relief
 const FRAG = `uniform vec3 uTint; uniform vec3 uTint2; uniform vec3 uPaper; uniform vec3 uGold; uniform float uKind; uniform float uDeco; uniform float uGoldAmt;
-uniform float uEaveY; uniform float uAO; uniform vec2 uRing; uniform vec2 uDoor;
+uniform float uEaveY; uniform float uAO; uniform vec2 uRing; uniform vec2 uDoor; uniform float uTime; uniform float uShine;
 varying vec3 vW; varying vec3 vN; varying vec2 vUv;
 float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
 float vn(vec3 p){ vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -118,7 +118,7 @@ void main(){
     float gl = min(min(abs(u - 0.1), abs(u - 0.9)), abs(abs(u - 0.5) - 0.2));
     dec = mix(dec, uPaper * uGold * shade, (1.0 - smoothstep(0.005, 0.014, gl)) * uGoldAmt);
     col = mix(col, dec, uDeco);
-  } else if (uKind > 3.5) {
+  } else if (uKind > 3.5 && uKind < 4.5) {
     // 隔扇 : quatre vantaux par travée, panneau plein en bas, treillis de losanges (papier derrière) au-dessus
     float yy = (vW.y - uDoor.x) / uDoor.y, along = abs(n.z) > 0.5 ? vW.x : vW.z, leaf = fract(along / 0.25);
     vec3 wood = col;
@@ -129,29 +129,37 @@ void main(){
       col *= mix(1.0, 0.8, step(0.14, leaf) * step(leaf, 0.86) * step(0.07, yy) * step(yy, 0.27));
     }
     col = mix(col, wood * 0.72, 1.0 - smoothstep(0.03, 0.06, min(leaf, 1.0 - leaf)));
+  } else if (uKind > 4.5) {
+    // or : dégradé selon l'orientation, éclats qui courent sur la feuille d'or
+    float sp = pow(max(0.0, sin(dot(vW, vec3(13.1, 7.7, 9.3)) * 1.7 + uTime * 2.4)), 24.0);
+    float sp2 = pow(max(0.0, sin(dot(vW, vec3(5.3, 11.7, 8.9)) * 2.3 - uTime * 3.1)), 30.0);
+    col = col * (0.9 + 0.28 * (n.y * 0.5 + 0.5)) + uPaper * vec3(1.0, 0.9, 0.62) * (sp + 0.8 * sp2) * uShine;
   } else if (uKind > 1.5 && uKind < 2.5) {
     float r = min(abs(vW.y - uRing.x), abs(vW.y - uRing.y));
     col = mix(col, uPaper * uGold * shade, (1.0 - smoothstep(0.02, 0.04, r)) * uGoldAmt);
   }
-  float ao = (side && (uKind < 2.5 || uKind > 3.5)) ? smoothstep(uEaveY - 1.1, uEaveY, vW.y) * uAO : 0.0;
+  col *= 0.965 + 0.07 * h(vec3(floor(gl_FragCoord.xy * 0.5), 3.0)); // grain du papier
+  float ao = (side && (uKind < 2.5 || (uKind > 3.5 && uKind < 4.5))) ? smoothstep(uEaveY - 1.1, uEaveY, vW.y) * uAO : 0.0;
   col *= mix(vec3(1.0), vec3(0.78, 0.68, 0.6), ao);
   gl_FragColor = vec4(col, 1.0);
 }`;
 
-export type Wash = { tint: string; tint2?: string; kind?: 0 | 1 | 2 | 3 | 4; door?: [number, number]; deco?: number; gold?: number; ao?: number; eaveY?: number; ring?: [number, number] };
+export type Wash = { tint: string; tint2?: string; kind?: 0 | 1 | 2 | 3 | 4 | 5; door?: [number, number]; deco?: number; gold?: number; ao?: number; eaveY?: number; ring?: [number, number] };
 const INK = '#1a1613';
+// temps et éclat de l'or, posés par Hall avant le rendu de ses matériaux
+const HALL_TIME = { t: 0, shine: 0.4 };
 // un maillage en lavis + ses arêtes vives en traits d'encre (w : épaisseur en pixels, 0 : pas de trait)
 const Inked: React.FC<{ geo: Part | null; wash: Wash; w?: number; lineColor?: string; angle?: number; extra?: number[] }> = ({ geo, wash: W, w = 1.4, lineColor = INK, angle = 28, extra }) => {
   const { size, viewport } = useThree();
   const mat = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: VERT, fragmentShader: FRAG, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2,
     uniforms: { uTint: { value: new THREE.Color() }, uTint2: { value: new THREE.Color() }, uPaper: { value: PAPER }, uGold: { value: new THREE.Color(0.87, 0.67, 0.27) },
-      uKind: { value: 0 }, uDeco: { value: 0 }, uGoldAmt: { value: 0 }, uEaveY: { value: 99 }, uAO: { value: 0.22 }, uRing: { value: new THREE.Vector2(-99, -99) }, uDoor: { value: new THREE.Vector2(0, 1) } },
+      uKind: { value: 0 }, uDeco: { value: 0 }, uGoldAmt: { value: 0 }, uEaveY: { value: 99 }, uAO: { value: 0.22 }, uRing: { value: new THREE.Vector2(-99, -99) }, uDoor: { value: new THREE.Vector2(0, 1) }, uTime: { value: 0 }, uShine: { value: 0.4 } },
   }), []);
   const lm = useMemo(() => new LineMaterial({ color: new THREE.Color(lineColor).getHex(), linewidth: w, transparent: true, opacity: 0.92, depthWrite: false }), [lineColor, w]);
   const u = mat.uniforms;
   u.uTint.value.set(W.tint); u.uTint2.value.set(W.tint2 ?? W.tint); u.uKind.value = W.kind ?? 0; u.uDeco.value = W.deco ?? 0; u.uGoldAmt.value = W.gold ?? 0;
-  u.uAO.value = W.ao ?? 0.22; u.uEaveY.value = W.eaveY ?? 99; u.uRing.value.set(...(W.ring ?? [-99, -99])); u.uDoor.value.set(...(W.door ?? [0, 1]));
+  u.uAO.value = W.ao ?? 0.22; u.uEaveY.value = W.eaveY ?? 99; u.uRing.value.set(...(W.ring ?? [-99, -99])); u.uDoor.value.set(...(W.door ?? [0, 1])); u.uTime.value = HALL_TIME.t; u.uShine.value = HALL_TIME.shine;
   lm.linewidth = Math.max(1, w * viewport.dpr); lm.resolution.set(size.width * viewport.dpr, size.height * viewport.dpr);
   const lg = useMemo(() => {
     if (!geo || w <= 0) return null;
@@ -258,10 +266,11 @@ const buildRoof = (r: RoofSpec): RoofParts => {
 
 // ── l'état du hall à un instant : proportions lentes `p`, époques de départ `A` et d'arrivée `B`, transformation en cours
 // (`i` de 0 à 2, avancement `k`), avancement continu `prog` (0 à 3), construction du Tang `intro` (0 à 1) ──
-export type HallState = { p: HallParams; A: HallParams; B: HallParams; i: number; k: number; prog: number; intro: number };
+export type HallState = { p: HallParams; A: HallParams; B: HallParams; i: number; k: number; prog: number; intro: number; t: number; shine: number };
 
 export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
-  const { p, A, B, i: ti, k, prog, intro } = s;
+  const { p, A, B, i: ti, k, prog, intro, t } = s;
+  HALL_TIME.t = t; HALL_TIME.shine = s.shine;
   const built = useMemo(() => {
     const stone = new Pile(), marble = new Pile(), cols = new Pile(), brA = new Pile(), brB = new Pile(), walls = new Pile(), doors = new Pile();
     const band = new Pile(), gold = new Pile(), plaque = new Pile(), storey = new Pile(), storeyBand = new Pile();
@@ -330,12 +339,12 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
     ring.forEach(([x, z]) => {
       const a = ang(x, z);
       let yOff = 0, R = p.colR, hideAll = false, rad = 0;
-      if (building) { const ph = clamp(((I - 0.12) / 0.5) * 1.5 - a * 0.5); if (ph <= 0) hideAll = true; yOff = (1 - easeIO(ph)) * 3.0; }
+      if (building) { const ph = clamp(((I - 0.12) / 0.5) * 1.5 - a * 0.5); if (ph <= 0) hideAll = true; yOff = ph < 0.8 ? 3.0 * (1 - Math.pow(ph / 0.8, 2)) : 0.12 * Math.sin((Math.PI * (ph - 0.8)) / 0.2); }
       if (ti === 1 && k > 0 && k < 1) {
         const ph = clamp(k * 1.7 - a * 0.7);
         // l'ancienne colonne s'en va vers l'extérieur en s'effaçant, la nouvelle (plus épaisse) arrive de l'extérieur
         if (ph < 0.5) { const u = easeIO(ph / 0.5); rad = u * 1.7; R = lerp(A.colR, A.colR * 0.25, u); }
-        else { const u = easeIO((ph - 0.5) / 0.5); rad = (1 - u) * 1.7; R = lerp(B.colR * 0.25, B.colR, u); }
+        else { const x = clamp((ph - 0.5) / 0.5), u = 1 + 2 * Math.pow(x - 1, 3) + Math.pow(x - 1, 2); rad = (1 - u) * 1.7; R = lerp(B.colR * 0.25, B.colR, clamp(u)); }
       }
       if (hideAll) return;
       const ox = Math.abs(x) >= hx - 1e-3 ? Math.sign(x) : 0, oz = Math.abs(z) >= HD - 1e-3 ? Math.sign(z) : 0, on = Math.hypot(ox, oz) || 1;
@@ -452,14 +461,21 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
       const u = clamp((k3 - 0.3) / 0.45);
       off2 = 9 * (1 - u * u) + 0.15 * Math.sin(Math.PI * clamp((k3 - 0.75) / 0.1)) * (k3 < 1 ? 1 : 0);
     }
+    // poussières d'encre : un anneau qui s'étale et s'efface à chaque pose (colonnes de l'ouverture et de Ming, toit Tang, étage)
+    const puffs: { x: number; y: number; z: number; age: number; size: number }[] = [];
+    const addPuff = (x: number, yy: number, z: number, age: number, size: number) => { if (age > 0 && age < 1) puffs.push({ x, y: yy, z, age, size }); };
+    if (building || t < T_INTRO + 0.5) ring.forEach(([x, z]) => addPuff(x, y0 + 0.03, z, (I - (0.12 + ((1 + ang(x, z) * 0.5) / 1.5) * 0.5)) / 0.14, 0.5));
+    if (ti === 1) ring.forEach(([x, z]) => addPuff(x, y0 + 0.03, z, (k - (1 + ang(x, z) * 0.7) / 1.7) / 0.12, 0.45));
+    addPuff(0, y0 + 0.03, 0, (t - T_INTRO) / 0.4, 1.6 * (hx + p.over));
+    addPuff(0, yEave + 0.05, 0, (t - (T0 + DUR * 2 + 0.75 * DUR)) / 0.45, 1.5 * (hx + p.over));
     // à l'ouverture, le toit Tang descend du ciel en dernier, avec un petit rebond
     const off1 = building ? 5 * (1 - easeIO(clamp((I - 0.72) / 0.28))) : 0;
 
-    return { roof1, roof2, off1, off2, stone: stone.build(), marble: marble.build(), cols: cols.build(), brA: brA.build(), brB: brB.build(), walls: walls.build(), doors: doors.build(),
+    return { puffs, shadow: { w: 2 * spec1.hw + 0.3, d: 2 * spec1.hd + 0.3, y: y0 + 0.012 }, roof1, roof2, off1, off2, stone: stone.build(), marble: marble.build(), cols: cols.build(), brA: brA.build(), brB: brB.build(), walls: walls.build(), doors: doors.build(),
       band: band.build(), gold: gold.build(), plaque: plaque.build(), storey: storey.build(), storeyBand: storeyBand.build(),
       eaveY: yEave, ring: [y0 + 0.14, y1 - 0.2] as [number, number], door: [y0 + 0.02, hW * 0.9] as [number, number] };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(p), prog.toFixed(4), intro.toFixed(4)]);
+  }, [JSON.stringify(p), prog.toFixed(4), intro.toFixed(4), t.toFixed(3)]);
 
   const e = built.eaveY, g = p.gold;
   const armTint = mix(p.col, p.band, p.paint * 0.85), blockTint = mix(mix(p.col, '#6e4a2e', 0.2), '#3f8f78', p.paint * 0.7);
@@ -467,6 +483,8 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
   const R = built.roof1, R2 = built.roof2;
   return (
     <group>
+      <EaveShadow w={built.shadow.w} d={built.shadow.d} y={built.shadow.y} a={0.34 * (1 - clamp(built.off1 / 3))} />
+      {built.puffs.map((q, n) => <Puff key={n} {...q} />)}
       <Inked geo={built.stone} wash={{ tint: '#d6ccb8', ao: 0 }} w={2.0} />
       <Inked geo={built.marble} wash={{ tint: '#f2efe8', ao: 0 }} w={1.1} />
       <Inked geo={built.cols} wash={{ tint: p.col, kind: 2, gold: g, ring: built.ring, eaveY: e }} w={1.5} />
@@ -476,14 +494,14 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
       <Inked geo={built.brA} wash={{ tint: armTint, eaveY: e, ao: 0.3 }} w={0.9} />
       <Inked geo={built.brB} wash={{ tint: blockTint, eaveY: e, ao: 0.3 }} w={0.9} />
       <Inked geo={built.band} wash={{ tint: mix(p.col, p.band, p.paint), tint2: p.col, kind: 1, deco: p.paint, gold: g, eaveY: e }} w={1.0} />
-      <Inked geo={built.gold} wash={{ tint: '#deab45', ao: 0 }} w={0.8} />
+      <Inked geo={built.gold} wash={{ tint: '#deab45', kind: 5, ao: 0 }} w={0.8} />
       <group position={[0, built.off1, 0]}>
         <Inked geo={R.under} wash={{ tint: '#8a6a52', ao: 0 }} w={1.4} angle={85} />
         <Inked geo={R.surf} wash={{ tint: p.tile, kind: 3 }} w={2.0} angle={85} extra={R.lines} />
         <Inked geo={R.ridges} wash={{ tint: ridgeTint, ao: 0 }} w={0.9} angle={60} />
         <Inked geo={R.ends} wash={{ tint: endTint, ao: 0 }} w={0.7} />
         <Inked geo={R.beasts} wash={{ tint: ridgeTint, ao: 0 }} w={0.9} angle={40} />
-        <Inked geo={R.gold} wash={{ tint: '#deab45', ao: 0 }} w={0.7} />
+        <Inked geo={R.gold} wash={{ tint: '#deab45', kind: 5, ao: 0 }} w={0.7} />
       </group>
       {R2 && (
         <group position={[0, built.off2, 0]}>
@@ -494,10 +512,47 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
           <Inked geo={R2.ridges} wash={{ tint: mix(B.tile, '#d9a73a', 0.55), ao: 0 }} w={0.9} angle={60} />
           <Inked geo={R2.ends} wash={{ tint: mix(B.tile, mix('#8a6a52', '#d9a73a', 1), 0.55), ao: 0 }} w={0.7} />
           <Inked geo={R2.beasts} wash={{ tint: mix(B.tile, '#d9a73a', 0.55), ao: 0 }} w={0.9} angle={40} />
-          <Inked geo={R2.gold} wash={{ tint: '#deab45', ao: 0 }} w={0.7} />
+          <Inked geo={R2.gold} wash={{ tint: '#deab45', kind: 5, ao: 0 }} w={0.7} />
         </group>
       )}
     </group>
+  );
+};
+
+// ombre douce que le toit jette sur le socle (rectangle aux bords fondus, de la taille du toit)
+let shadowTex: THREE.CanvasTexture | null = null;
+const shadowTexture = () => {
+  if (shadowTex) return shadowTex;
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d')!;
+  g.filter = 'blur(10px)'; g.fillStyle = 'rgba(30,24,20,1)'; g.fillRect(22, 22, 84, 84);
+  shadowTex = new THREE.CanvasTexture(c);
+  return shadowTex;
+};
+const EaveShadow: React.FC<{ w: number; d: number; y: number; a: number }> = ({ w, d, y, a }) => (
+  <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, y, 0]} renderOrder={1}>
+    <planeGeometry args={[w, d]} />
+    <meshBasicMaterial map={shadowTexture()} transparent opacity={a} depthWrite={false} />
+  </mesh>
+);
+// anneau de poussière d'encre : s'étale et s'efface (age de 0 à 1)
+let ringTex: THREE.CanvasTexture | null = null;
+const ringTexture = () => {
+  if (ringTex) return ringTex;
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d')!, rg = g.createRadialGradient(64, 64, 8, 64, 64, 62);
+  rg.addColorStop(0, 'rgba(40,34,30,0)'); rg.addColorStop(0.55, 'rgba(40,34,30,0.05)'); rg.addColorStop(0.78, 'rgba(40,34,30,0.55)'); rg.addColorStop(1, 'rgba(40,34,30,0)');
+  g.fillStyle = rg; g.fillRect(0, 0, 128, 128);
+  ringTex = new THREE.CanvasTexture(c);
+  return ringTex;
+};
+const Puff: React.FC<{ x: number; y: number; z: number; age: number; size: number }> = ({ x, y, z, age, size }) => {
+  const sz = size * (0.45 + age * 1.3);
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[x, y, z]} renderOrder={3}>
+      <planeGeometry args={[sz, sz]} />
+      <meshBasicMaterial map={ringTexture()} transparent opacity={Math.pow(1 - age, 1.6) * 0.6} depthWrite={false} />
+    </mesh>
   );
 };
 
