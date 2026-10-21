@@ -1,7 +1,7 @@
 # Outils vidéo shuimo (série 墨道)
 
 Outils communs à tous les épisodes « tout shuimo » (skill `video-shuimo`). Chaque épisode a son dossier
-(ex. `xue/shuimo_v2/`, ou `episodes/<pinyin>/` pour les suivants) avec un `episode.json` (voir `modele_episode.json`
+(`episodes/<pinyin>/`, ex. `episodes/xue/`) avec un `episode.json` (voir `modele_episode.json`
 et la documentation en tête de `episode.py`).
 
 | Outil | Rôle | Entrée → sortie |
@@ -29,7 +29,7 @@ episodes/<pinyin>/
   audio/           musique.wav
   apercus/         aperçus 720p (ignorés par git si trop lourds)
 ```
-Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (le projet Remotion commun), chemins ajoutés à `sync.mjs`.
+Composition Remotion : `outils/moteur/remotion/src/shuimo_<pinyin>/` (le projet Remotion commun), chemins ajoutés à `sync.mjs`.
 Noms : dossier et composition en pinyin sans tons ; clips de voix `b01`… dans l'ordre des blocs.
 
 ## Enchaînement
@@ -41,11 +41,11 @@ python3 voix_prep.py ../../<episode>/episode.json     # après chaque nouvelle p
 python3 reperes.py   ../../<episode>/episode.json     # repères + ligne de temps (« _ligne »)
 python3 musique.py   ../../<episode>/episode.json     # fond musical
 ```
-Puis `node sync.mjs` dans `xue/remotion` (le projet Remotion commun) copie voix, repères et musique dans
+Puis `node sync.mjs` dans `outils/moteur/remotion` (le projet Remotion commun) copie voix, repères et musique dans
 `public/` et `src/data/` (ajouter les chemins de l'épisode à `sync.mjs`).
 
 La composition lit `reperes` : `cues[bNN].cues[nom]` (temps dans le clip) et `_ligne` (`clips[bNN].debut`,
 `rouleaux[i].debut`, `pauses`, `fin`, `total`) ; un repère absolu = `clips[bNN].debut + cue`
 (+ durée de la pause si le repère est après la coupe).
 
-Épisode de référence : 學 (`xue/shuimo_v2/episode.json`, composition `XueV2`).
+Épisode de référence : 學 (`episodes/xue/episode.json`, composition `XueV2`).

@@ -9,7 +9,7 @@ Validé par l'utilisateur sur deux essais : pavillon dans une mer de nuages (ré
 水 à l'eau (encre qui gagne, puis délavé — l'effet qu'il préfère pour un personnage).
 
 ## Entrées
-- **Une paire d'images alignées** : `<nom>_3d.jpg` et `<nom>_encre.jpg` dans `xue/assets/morph/`, même cadrage, mêmes
+- **Une paire d'images alignées** : `<nom>_3d.jpg` et `<nom>_encre.jpg` dans `outils/moteur/assets/morph/`, même cadrage, mêmes
   proportions (vérifier la superposition : `Image.merge('RGB', (a, b, b))` sur les deux en gris ; un décalage visible
   donne un dédoublement pendant le fondu → demander une version mieux alignée).
 - Version encre à générer avec Nano Banana, image 3D en référence :
@@ -19,7 +19,7 @@ Validé par l'utilisateur sur deux essais : pavillon dans une mer de nuages (ré
 - Ranger et renommer les fichiers déposés par l'utilisateur (`assets/morph/<nom>_3d.jpg`, `<nom>_encre.jpg`).
 
 ## Les trois modes (`MorphEncre`, prop `dir`)
-| `dir` | Effet | Préparation (`xue/tools/build_morph.py`) |
+| `dir` | Effet | Préparation (`outils/moteur/tools/build_morph.py`) |
 |---|---|---|
 | `to3d` | lavis sur papier → la couleur naît au point focal et se répand comme de l'eau ; ce qui est loin reste à l'encre | entrée dans `PAIRS` : `focus` (fraction largeur, hauteur), `tall` (étirement vertical, ~2 pour un personnage debout) → `<nom>_champ.png` |
 | `toInk` | 3D → l'encre gagne depuis les bords et s'arrête autour du sujet | même champ |
@@ -29,7 +29,7 @@ Frontière (to3d / toInk) : couleur derrière le seuil, juste devant une 3D dél
 humide, au-delà le lavis sur papier xuan. Le délavé n'a pas de frontière.
 
 ## Étapes
-1. Ajouter la paire dans `PAIRS` et/ou `SUBJECTS`, puis `python3 tools/build_morph.py` (depuis `xue/`).
+1. Ajouter la paire dans `PAIRS` et/ou `SUBJECTS`, puis `python3 tools/build_morph.py` (depuis `outils/moteur/`).
 2. Pour `fade`, contrôler la silhouette (elle est tirée de la version encre : traits sombres, fermés et remplis, dans
    `box`) en superposant le masque à l'image 3D ; ajuster `box` / `cut`. Elle peut englober l'espace entre les jambes
    ou un objet posé : le dire à l'utilisateur.

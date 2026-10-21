@@ -1,0 +1,820 @@
+{
+ "voix": "voix",
+ "reperes": "voix/reperes.json",
+ "musique": "audio/musique.wav",
+ "debut": 0.6,
+ "sequence": [
+  {
+   "clip": "b01",
+   "apres": 0.8
+  },
+  {
+   "clip": "b02",
+   "apres": 4.0
+  },
+  {
+   "clip": "b03",
+   "apres": 0.3
+  },
+  {
+   "plage": 1.25,
+   "nom": "danse",
+   "apres": 0.0,
+   "son": "clips/03_danseur_v2.mp4",
+   "son_decalage": 0.75,
+   "son_volume": 0.7,
+   "son_duree": 8.0
+  },
+  {
+   "clip": "b12",
+   "apres": 0.3
+  },
+  {
+   "clip": "b04",
+   "apres": 0.8
+  },
+  {
+   "clip": "b05",
+   "apres": 0.4
+  },
+  {
+   "rouleau3d": "complet",
+   "apres": 0.3
+  },
+  {
+   "clip": "b06",
+   "pause": {
+    "repere": "autrement",
+    "decalage": -0.12,
+    "duree": 4.5
+   },
+   "apres": 0.8
+  },
+  {
+   "clip": "b07",
+   "apres": 0.6,
+   "pause": {
+    "repere": "xushen",
+    "decalage": -0.15,
+    "rouleau3d": "court"
+   }
+  },
+  {
+   "clip": "b11",
+   "apres": 1.0
+  },
+  {
+   "clip": "b08",
+   "apres": 1.0
+  },
+  {
+   "clip": "b10",
+   "apres": 1.2
+  },
+  {
+   "clip": "b09",
+   "apres": 0.3
+  }
+ ],
+ "queue": 10.0,
+ "reperes_cles": {
+  "b01": {
+   "beau": "beau",
+   "mouton": "c'est le caractère",
+   "officiel": "l'explication officielle",
+   "lettre": "un lettré",
+   "dico": "premier grand",
+   "haut": "un mouton en",
+   "grand": "et le mot",
+   "bon": "Un gros mouton",
+   "donc": "donc c'est",
+   "song": "Mille ans",
+   "marbre": "dans le marbre",
+   "maxime": "Quand le mouton",
+   "entendu": "est grand",
+   "gros": "il est beau"
+  },
+  "b02": {
+   "vraiment": "vraiment"
+  },
+  "b03": {
+   "origine": "Remontons"
+  },
+  "b12": {
+   "debut": "Il y a",
+   "pluie": "quand la pluie",
+   "danse": "on dansait",
+   "plumes": "Coiffés de",
+   "frappaient": "frappaient",
+   "tambours": "au son"
+  },
+  "b04": {
+   "pluie": "la pluie viendrait",
+   "rois": "les rois",
+   "os": "os de divination",
+   "signe": "un signe qui",
+   "homme": "un homme, debout",
+   "corps": "Une tête",
+   "coiffe": "une haute coiffe",
+   "branches": "quatre branches",
+   "mouton": "le mouton a",
+   "museau": "un museau",
+   "rien": "Ici, rien",
+   "pare": "homme paré",
+   "plumes": "coiffé de plumes",
+   "terre": "Ces os ne",
+   "jamais": "n'en a jamais"
+  },
+  "b05": {
+   "bronze": "vases de bronze",
+   "inscr": "des inscriptions",
+   "epaissit": "Le trait s'épaissit",
+   "coiffe": "La coiffe perd",
+   "cornes": "des cornes",
+   "naitre": "en train"
+  },
+  "b06": {
+   "royaumes": "Royaumes combattants",
+   "retrouve": "on a retrouvé",
+   "guodian": "dans le sud",
+   "laozi": "les plus anciens",
+   "vers": "On y lit",
+   "beau": "Quand tout",
+   "laideur": "voilà la laideur",
+   "autrement": "Autrement dit",
+   "decide": "dès qu'on",
+   "laid": "aussi de ce",
+   "maitre": "Le vieux maître"
+  },
+  "b07": {
+   "empereur": "premier empereur",
+   "sceau": "le petit sceau",
+   "ordre": "Pour unifier",
+   "symetrique": "bien symétriques",
+   "cornes": "deux cornes",
+   "mouton": "C'est exactement",
+   "xushen": "Trois siècles",
+   "vingt": "vingt ans",
+   "neufmille": "neuf mille",
+   "yeux": "sous les yeux",
+   "savoureux": "savoureux",
+   "erreur": "Son erreur",
+   "ecriture": "Le mouton, c'est"
+  },
+  "b10": {
+   "encore": "Et l'erreur",
+   "cle": "la clé",
+   "dico": "dictionnaires",
+   "cherche": "on cherche",
+   "rayon": "au rayon",
+   "agneau": "l'agneau",
+   "troupeau": "troupeau",
+   "meiguo": "partout",
+   "beaupays": "le beau pays",
+   "enfin": "Enfin",
+   "amerique": "d'Amérique",
+   "meishi": "Et 美食",
+   "perdu": "n'a pas"
+  },
+  "b11": {
+   "pinceau": "prenons le",
+   "neuf": "neuf traits",
+   "haut": "En haut",
+   "cornes": "deux petites",
+   "couches": "trois traits",
+   "debout": "un trait debout",
+   "bas": "En bas",
+   "couche": "un trait couché",
+   "jambes": "les deux jambes"
+  },
+  "b08": {
+   "reprenons": "Reprenons",
+   "formes": "deux dessins",
+   "homme": "L'homme, debout",
+   "coiffe": "Et sur sa",
+   "plumes": "des plumes sur",
+   "bronze": "des branches courbes",
+   "sceau": "Au petit sceau",
+   "reste": "et le mouton reste",
+   "shang": "Pour les",
+   "parer": "C'était se",
+   "ciel": "au ciel",
+   "naissance": "Ainsi naît",
+   "beau": "le beau"
+  },
+  "b09": {
+   "maxime": "Le mouton, c'est",
+   "danseur": "Le danseur",
+   "parure": "Mais la parure",
+   "tombent": "les plumes tombent",
+   "blancs": "cheveux blancs"
+  }
+ },
+ "bruitages": [
+  [
+   "pinceau",
+   "b01",
+   null,
+   -0.1,
+   0.45
+  ],
+  [
+   "sceau",
+   "b01",
+   "mouton",
+   0.6,
+   0.4
+  ],
+  [
+   "ciseau",
+   "b01",
+   "marbre",
+   0.3,
+   0.5
+  ],
+  [
+   "ciseau",
+   "b01",
+   "marbre",
+   1.3,
+   0.45
+  ],
+  [
+   "sceau",
+   "b01",
+   "maxime",
+   0.15,
+   0.55
+  ],
+  [
+   "marbre",
+   "b02",
+   null,
+   1.54,
+   0.75
+  ],
+  [
+   "gravure",
+   "b04",
+   "os",
+   0.6,
+   0.4
+  ],
+  [
+   "sceau",
+   "b04",
+   "mouton",
+   0,
+   0.45
+  ],
+  [
+   "sceau",
+   "b05",
+   "bronze",
+   0,
+   0.5
+  ],
+  [
+   "pinceau",
+   "b06",
+   "vers",
+   0,
+   0.35
+  ],
+  [
+   "pinceau",
+   "b06",
+   "beau",
+   1.0,
+   0.3
+  ],
+  [
+   "sceau",
+   "b10",
+   "rayon",
+   0,
+   0.45
+  ],
+  [
+   "pinceau",
+   "b11",
+   "cornes",
+   0,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b11",
+   "couches",
+   0,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b11",
+   "debout",
+   0,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b11",
+   "couche",
+   0,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b11",
+   "jambes",
+   -0.3,
+   0.4
+  ],
+  [
+   "gong",
+   "b08",
+   "sceau",
+   0,
+   0.35
+  ],
+  [
+   "sceau",
+   "b08",
+   "naissance",
+   0,
+   0.45
+  ],
+  [
+   "gong",
+   "b09",
+   "blancs",
+   -0.3,
+   0.35
+  ],
+  [
+   "sceau",
+   "b04",
+   null,
+   0.06,
+   0.6
+  ],
+  [
+   "sceau",
+   "b05",
+   "inscr",
+   0.6,
+   0.6
+  ],
+  [
+   "sceau",
+   "b07",
+   "sceau",
+   0.9,
+   0.6
+  ],
+  [
+   "sceau",
+   "b07",
+   "mouton",
+   0.36,
+   0.5
+  ],
+  [
+   "sceau",
+   "b07",
+   "mouton",
+   1.12,
+   0.55
+  ],
+  [
+   "sceau",
+   "b07",
+   "mouton",
+   2.0,
+   0.6
+  ],
+  [
+   "gong",
+   "b07",
+   "mouton",
+   2.0,
+   0.35
+  ],
+  [
+   "tonnerre",
+   "b12",
+   null,
+   -1.3,
+   0.42
+  ],
+  [
+   "tambour",
+   "b12",
+   "danse",
+   0,
+   0.35
+  ],
+  [
+   "tambour",
+   "b12",
+   "frappaient",
+   0,
+   0.45
+  ],
+  [
+   "tambour",
+   "b12",
+   "tambours",
+   0.1,
+   0.5
+  ],
+  [
+   "tambour",
+   "b04",
+   "signe",
+   0,
+   0.25
+  ],
+  [
+   "tambour",
+   "b04",
+   "rien",
+   0,
+   0.25
+  ],
+  [
+   "tambour",
+   "b07",
+   "mouton",
+   2.0,
+   0.3
+  ],
+  [
+   "tambour",
+   "b09",
+   "danseur",
+   0,
+   0.3
+  ],
+  [
+   "feuilles",
+   "b10",
+   "dico",
+   0.5,
+   0.55
+  ]
+ ],
+ "glyphes": {
+  "reels": {
+   "mei_jiaguwen": {
+    "img": "glyphes/mei_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "後2.14.9",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        158
+       ],
+       [
+        0,
+        158
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_jiaguwen2": {
+    "img": "glyphes/mei_xiaoxue/02.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲686",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        150
+       ],
+       [
+        0,
+        150
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_jinwen": {
+    "img": "glyphes/mei_xiaoxue/03.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "美爵",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        212
+       ],
+       [
+        0,
+        212
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_xiaozhuan": {
+    "img": "glyphes/mei_xiaoxue/05.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·羊部",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        182
+       ],
+       [
+        0,
+        182
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_mawangdui": {
+    "img": "glyphes/mei_xiaoxue/08.png",
+    "label": "帛書",
+    "era": "Han",
+    "piece": "老子乙前 (馬王堆)",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        228
+       ],
+       [
+        0,
+        228
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_lishu": {
+    "img": "glyphes/mei_xiaoxue/11.png",
+    "label": "隸書",
+    "era": "Han",
+    "piece": "曹全碑",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": [
+     [
+      "coiffe",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        192
+       ],
+       [
+        0,
+        192
+       ]
+      ]
+     ]
+    ]
+   },
+   "mei_yang_jiaguwen": {
+    "img": "glyphes/yang_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "佚450",
+    "defaut": "mouton",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_lao_jiaguwen": {
+    "img": "glyphes/lao_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "老",
+    "defaut": "homme",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_yang_xiaozhuan": {
+    "img": "glyphes/yang_xiaoxue/09.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·羊部",
+    "defaut": "mouton",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_00": {
+    "img": "glyphes/vers/00.png",
+    "label": "天",
+    "era": "Chu",
+    "piece": "帛甲5.18 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_01": {
+    "img": "glyphes/vers/01.png",
+    "label": "下",
+    "era": "Chu",
+    "piece": "郭.老乙.9",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_02": {
+    "img": "glyphes/vers/02.png",
+    "label": "皆",
+    "era": "Chu",
+    "piece": "包2.123 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_03": {
+    "img": "glyphes/vers/03.png",
+    "label": "智",
+    "era": "Chu",
+    "piece": "包2.135 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_04": {
+    "img": "glyphes/vers/04.png",
+    "label": "美",
+    "era": "Chu",
+    "piece": "中山王壺 (Royaumes combattants)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_05": {
+    "img": "glyphes/vers/05.png",
+    "label": "之",
+    "era": "Chu",
+    "piece": "包2.12 (Chu)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_06": {
+    "img": "glyphes/vers/06.png",
+    "label": "為",
+    "era": "Chu",
+    "piece": "郭.老甲.2",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_07": {
+    "img": "glyphes/vers/07.png",
+    "label": "美",
+    "era": "Chu",
+    "piece": "中山王壺",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_08": {
+    "img": "glyphes/vers/08.png",
+    "label": "也",
+    "era": "Chu",
+    "piece": "郭.語3.66",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_09": {
+    "img": "glyphes/vers/09.png",
+    "label": "惡",
+    "era": "Chu",
+    "piece": "郭.語2.25",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   },
+   "mei_vers_10": {
+    "img": "glyphes/vers/10.png",
+    "label": "已",
+    "era": "Chu",
+    "piece": "郭.成.36 (巳 = 已)",
+    "defaut": "encre",
+    "fusion": 0.0,
+    "polys": []
+   }
+  },
+  "traits": {
+   "mei_regulier": {
+    "src": "glyphes/traits/mei.json",
+    "comp": [
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "coiffe",
+     "homme",
+     "homme",
+     "homme"
+    ]
+   },
+   "mei_lao": {
+    "src": "glyphes/traits/lao.json",
+    "comp": [
+     "homme",
+     "homme",
+     "homme",
+     "homme",
+     "homme",
+     "homme"
+    ]
+   }
+  }
+ },
+ "coupures": [
+  [
+   "b01",
+   "gros",
+   0.9,
+   "b03",
+   null,
+   0.4
+  ]
+ ]
+}

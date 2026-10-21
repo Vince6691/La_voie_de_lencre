@@ -5,8 +5,8 @@ description: Écrire ou réviser la voix off française d'une vidéo de la chaî
 
 # Voix off 墨道
 
-Style extrait des 10 dernières vidéos longues (analyse complète : `voix-off/STYLE.md`, textes de référence :
-`voix-off/TRANSCRIPTIONS.md`). Relire au moins deux transcriptions avant d'écrire.
+Style extrait des 10 dernières vidéos longues (analyse complète : `outils/voix-off/STYLE.md`, textes de référence :
+`outils/voix-off/TRANSCRIPTIONS.md`). Relire au moins deux transcriptions avant d'écrire.
 
 ## Avant d'écrire
 1. Décomposition du caractère (composantes, sens, formes anciennes : os, bronze, sceau, régulière) — vérifier

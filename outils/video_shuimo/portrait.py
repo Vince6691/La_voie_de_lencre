@@ -5,7 +5,7 @@ Section « portraits » de episode.json :
   "portraits": {clé: {"img": "images/confucius_baimiao_1.jpg", "largeur": 1700, ["seuil": 150, "epaissir": 0,]
                       "zones": [[nom, part_du_temps, [x0, y0, x1, y1] en fractions de l'image, ou null = le reste]…]}}
 Les zones sont testées dans l'ordre (la première qui contient le milieu du trait l'emporte) et peintes dans cet ordre ;
-dans chaque zone, le pinceau va de proche en proche en partant du haut. Méthode de xue/tools/build_portrait.py :
+dans chaque zone, le pinceau va de proche en proche en partant du haut. Méthode de outils/moteur/tools/build_portrait.py :
 encre vectorisée (potrace) + squelette coupé aux croisements, chaque tronçon dévoile l'encre sous lui.
 Sortie : <épisode>/glyphes/portrait_<clé>.js → window.PORTRAITS[clé] (copié par sync.mjs dans legacy/episodes.js).
 --debug : <épisode>/apercus/portrait_<clé>_zones.png (traits colorés par zone)."""
@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw
 from scipy import ndimage
 from skimage.morphology import skeletonize
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'xue', 'tools'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'moteur', 'tools'))
 from build_portrait import chains, rdp  # noqa: E402
 
 

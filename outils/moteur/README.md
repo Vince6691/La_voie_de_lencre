@@ -1,0 +1,129 @@
+# 学 — 3 000 ans d'histoire d'un caractère
+
+Animation vidéo (≈ 2 min 06, 1920×1080, 30 i/s) générée **entièrement par du code** :
+l'évolution du caractère 學 / 学 (*xué*, « apprendre ») depuis les os oraculaires jusqu'à la
+forme simplifiée, composante par composante.
+
+> Les contenus propres à l'épisode 學 (textes, voix, rendus, version shuimo) sont dans `episodes/xue/` ;
+> ce dossier `outils/moteur/` contient le moteur et les outils partagés par toute la série.
+
+- **Vidéo finale** : `../../episodes/xue/fond_noir/rendu/xue_evolution.mp4`
+- **Sous-titres** : `../../episodes/xue/fond_noir/rendu/xue_evolution.fr.srt` (à téléverser sur YouTube)
+- **Texte de la voix off** : `../../episodes/xue/fond_noir/SCRIPT.md`
+
+## Principe pédagogique
+
+Chaque composante garde **la même couleur** d'une écriture à l'autre :
+
+| Couleur | Composante | Sens |
+|---|---|---|
+| rouge | 𦥑 | deux mains |
+| or | 爻 *yáo* | baguettes à compter (croisements) |
+| jade | 冖 | toit, bâtiment |
+| bleu | 子 | enfant (apparaît avec les bronzes Zhou) |
+| orange | ⺍ | abréviation cursive de tout le haut (𦥑 + 爻) |
+
+Les formes archaïques (甲骨文, 金文, 小篆, 隸書, 草書) sont tracées à la main dans
+`src/glyphs.js`, avec le même nombre de traits par composante pour permettre les
+métamorphoses animées d'une écriture à l'autre. Les formes 楷書 學 et 学 viennent de la
+police LXGW WenKai TC (contours extraits par `tools/extract_glyphs.py`).
+
+## Déroulé
+
+| Temps | Scène |
+|---|---|
+| 0:00 | Accroche : 学, flash des 7 formes, « APPRENDRE » |
+| 0:07 | Shang, Anyang (v. 1250 av. J.-C.) : carte, plastron de tortue, gravure de 爻 + toit + mains |
+| 0:28 | Zhou : carte, vase ding et estampage, arrivée de 子 ; le tir à l'arc au 學宮 (inscription du *Jing gui*) |
+| 0:49 | Qin, 221 av. J.-C. : unification, 書同文, petit sceau et sa symétrie |
+| 1:02 | Xu Shen, *Shuowen jiezi* (v. 100) : 斆，覺悟也 … 冂，尚矇也 |
+| 1:13 | Han, écriture des clercs : aplatissement, 燕尾, les mains deviennent « 臼 » |
+| 1:23 | Kaishu : 學, 16 traits |
+| 1:28 | Cursive → ⺍, imprimés Song–Yuan, Japon 1949 / Chine 1956, 学 en 8 traits |
+| 1:45 | Conclusion : bandeau des 7 formes, rubans de composantes |
+| 1:59 | Carte de fin (appel au commentaire, 墨道) |
+
+## Version Remotion (`remotion/`)
+
+Proposition enrichie, rendue avec [Remotion](https://www.remotion.dev) → `../../episodes/xue/fond_noir/rendu/xue_remotion.mp4` (≈ 2 min 53),
+voix « Chinese narration » (`eleven_v4`, `../../episodes/xue/fond_noir/voice_cn/`) : les noms chinois sont écrits en caractères
+dans le texte envoyé au synthétiseur, la voix bascule alors en mandarin sur ces mots.
+
+- **Respirations** : `tools/build_warp.py` insère des pauses dans la voix (début de scène, après les
+  moments clés) et recale l'animation phrase à phrase ; les métamorphoses s'achèvent dans ces pauses.
+- **Tortue 3D** : vrai contour de plastron, tranche d'os visible, creusets 鑽 / 鑿, tige de bronze
+  rougie, étincelles et fumée, fissure 卜 incandescente qui refroidit, signe incisé puis rempli de cinabre.
+- **Tir à l'arc en lavis** (`src/lavis.js`) : papier, montagnes dans la brume, pavillon du 學宮 et son
+  reflet dans le Grand Étang (大池), archers peints au pinceau et articulés, maître Jing, cible 侯, sceau.
+- **Kaishu** : tous les 學 / 学 réguliers viennent de *Make Me a Hanzi*, les mêmes que le tracé trait par trait.
+
+- Le moteur Canvas 2D ci-dessous sert de couche de base, piloté image par image par Remotion.
+- **3D (Three.js / `@remotion/three`)** : carapace de tortue bombée dont la texture (craquelures,
+  lueur du feu) est dessinée à chaque image, puis plongée caméra jusqu'au signe ; vase ding en
+  bronze patiné (panse tournée, pieds, anses, frise) qui monte dans le cadre en tournant.
+- **Transitions « tache d'encre »** entre scènes (bords organiques via `@remotion/noise`).
+- **Accroche** : « Ce caractère cache deux mains… que plus personne ne voit » — les mains de 學
+  s'allument puis partent en cendres pour laisser 学.
+- **Kaishu tracé trait par trait dans l'ordre réel** (16 traits pour 學, 8 pour 学), d'après
+  *Make Me a Hanzi* / hanzi-writer-data (Arphic Public License, `assets/strokes/`).
+- **Cartes** : côtes, fleuves, lacs et reliefs Natural Earth (domaine public), frontières des Zhou
+  et de l'empire unifié d'après *historical-basemaps* (GPL-3.0) — `tools/build_geo.py`.
+- **Vase ding 3D** : plan de ~7 s, la caméra monte au-dessus du bord et plonge vers l'inscription
+  coulée au fond du vase.
+- Rythme plus posé : 0,95 s entre répliques, transitions plus longues.
+- Sous-titres animés mot à mot : désactivés par défaut (option `captions`).
+- Voix off posée clip par clip dans la timeline, fond sonore (`out/bed.wav`) séparé.
+- Options dans le Studio (panneau *Props*) : `three`, `captions`, `inkTransitions`.
+
+```sh
+cd remotion && npm install
+npm run studio     # aperçu interactif, timeline, réglages
+npm run render     # → remotion/out/xue_remotion.mp4
+```
+
+Licence Remotion : gratuite pour les particuliers et structures de 3 personnes au plus.
+
+## Reconstruire
+
+```sh
+pip install playwright pillow numpy scipy imageio-ffmpeg fonttools
+./tools/prepare_voice.sh                 # silences rognés → out/voice_raw
+python3 tools/build_warp.py              # pauses + recalage → ../episodes/xue/fond_noir/voice_fast, src/warp.js
+python3 tools/build_timeline.py          # timeline depuis ../episodes/xue/fond_noir/voice_fast/*.wav
+python3 tools/render.py preview 12.5 40  # images de contrôle dans out/preview/
+./tools/render_all.sh                    # vidéo complète → out/xue_evolution.mp4
+```
+
+`src/index.html?play` rejoue l'animation en temps réel dans un navigateur (servir le dossier
+`outils/moteur/` en HTTP).
+
+- Voix off (version Canvas, `../../episodes/xue/fond_noir/rendu/xue_evolution.mp4`) : ElevenLabs, voix « German Epic Trailer Voice – Helmut », modèle `eleven_v4`
+  avec balises d'interprétation (`[deep voice]`, `[dramatically]`…) et noms chinois en API
+  (`../../episodes/xue/fond_noir/voice_v4/*.mp3`). Les deux versions partagent désormais la prise « François Louis »
+  (`../../episodes/xue/fond_noir/voice_fl/`, silences rognés dans `../../episodes/xue/fond_noir/voice_fast/`) : `./tools/render_all.sh`
+  régénère la version Canvas avec cette voix. `src/warp.js` recale les ancres de l'animation
+  sur la prise courante. (`../../episodes/xue/fond_noir/voice/` : première prise, « Helmut German »,
+  `eleven_multilingual_v2`, conservée pour comparaison.)
+- Musique et bruitages : synthèse procédurale (`tools/audio.py`) — bourdon, cordes,
+  guzheng pentatonique, taiko, souffles, craquements d'os, gong de bronze.
+- Polices : LXGW WenKai TC, Noto Serif TC, Cinzel, Cormorant Garamond (licence OFL).
+
+## Sources des formes
+
+- **Jiaguwen, jinwen, Royaumes combattants, petit sceau** : glyphes de zdic.net vectorisés,
+  fournis par l'auteur (`assets/glyphs/`), découpés en composantes par `tools/build_real_glyphs.py`.
+- **Lishu** : stèle de Cao Quan 曹全碑 (185), 小學堂 (Academia Sinica), CC0.
+- **Lattes du Shuowen** : police de petit sceau 崇羲篆體 (小學堂, Academia Sinica), licence CC BY-ND 3.0 TW
+  (usage commercial autorisé avec mention de l'auteur, police non modifiée).
+- **Portrait de Xu Shen** (scène 5) : portrait imaginé (il n'existe aucun portrait d'époque), dessin 白描 généré
+  (`assets/portrait/xushen_a.jpg`, variante `xushen_b.jpg`), vectorisé et découpé en traits par
+  `tools/build_portrait.py` → `src/portrait.js`, peint dans l'ordre tête → robe → mains → table → natte.
+- **Cursive** : police Liu Jian Mao Cao (Google Fonts, OFL), forme 学.
+- **Kaishu 學 / 学** : ordre et forme des traits d'après *Make Me a Hanzi* (hanzi-writer-data).
+
+## Points historiques à vérifier avant publication
+
+- Les dates « Japon 1949 » (当用漢字字体表) et « Chine 1956 » (汉字简化方案) pour 学.
+- La mention des imprimés populaires Song–Yuan (cf. 《宋元以來俗字譜》, 1930).
+- Le rattachement du 學宮 et de l'enseignement du tir à l'arc à l'inscription du *Jing gui* 靜簋.
+- Les frontières historiques (historical-basemaps) sont approximatives.

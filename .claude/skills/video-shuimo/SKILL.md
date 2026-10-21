@@ -6,8 +6,8 @@ description: Chef d'orchestre d'une vidéo longue 墨道 « tout shuimo » à pa
 # Vidéo 墨道 « tout shuimo » — de l'input (un caractère) à la vidéo
 
 **Input : un caractère.** Modèle validé par l'utilisateur : le 學 en shuimo, composition `XueV2`
-(`xue/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `xue/shuimo_v2/`
-(PROPOSITION.md, VOIX.md, episode.json), aperçu `xue/out/preview/xue_shuimo_v2d_720.mp4`.
+(`outils/moteur/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `episodes/xue/`
+(PROPOSITION.md, VOIX.md, episode.json), aperçu `outils/moteur/out/preview/xue_shuimo_v2d_720.mp4`.
 
 **Outils communs : `outils/video_shuimo/`** (README) — `voix_prep.py`, `reperes.py`, `musique.py`, pilotés par
 l'`episode.json` de l'épisode (modèle : `modele_episode.json`).
@@ -21,15 +21,17 @@ episodes/<pinyin>/
   voix/mots/ (bNN.json, minutage Scribe)   voix/prises/ (toutes les prises)
   clips/ (NN_scene.mp4, clips Seedance renommés)   images/ (Nano Banana)   audio/ (musique.wav)   apercus/
 ```
-Composition Remotion : `xue/remotion/src/shuimo_<pinyin>/` (modèle à jour : `shuimo_jiao/JiaoV1.tsx`, qui lit la
+Composition Remotion : `outils/moteur/remotion/src/shuimo_<pinyin>/` (modèle à jour : `shuimo_jiao/JiaoV1.tsx`, qui lit la
 ligne de temps `_ligne` du fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`. Les fichiers
 déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce schéma dès leur arrivée. (Le 學, épisode
-pilote, est resté dans `xue/` ; ne pas le prendre comme modèle de rangement.)
+pilote, est maintenant rangé de la même façon dans `episodes/xue/`.)
 
-Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `coup-de-pinceau`, `encre-3d`,
+Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `rouleau-3d` (rouleau 3D signature, une fois par vidéo ; cartouches d'époque toujours tirés de `src/periodes.ts`), `mosaique-de-mots` (transition : les mots qui dessinent le caractère), `coup-de-pinceau`, `encre-3d`,
 `fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
 
 ## Principes
+- **Note artistique** (skill `note-artistique`) : à la fin du plan, de la voix, des images fixes et du rendu vidéo, proposer
+  la note des cinq experts (Technique, Artistique, Historique, Design, Storytelling, objectif 8/10, très exigeante) ; corrections après validation.
 - **Toujours dialoguer avec l'utilisateur en français.**
 - **Vidéo autonome** : un renvoi à un épisode précédent est permis, mais on réexplique toujours les bases (un caractère
   = un assemblage de petits dessins ; ce que représente chaque composante), quitte à se répéter d'un épisode à l'autre.
@@ -84,6 +86,11 @@ appliquer, recalculer la durée).
   produit deux « jiao » d'affilée — toujours faire écouter le début de l'accroche. Dans une phrase,
   le caractère passe bien.
 - Nombres en lettres ; « … » pour une respiration. Textes dans `VOIX.md`.
+- **Prises** : 2 par bloc modifié (`generations_count` 2), comparaison d'écoute `apercus/comparaison_prises_vNN.mp3`,
+  l'utilisateur choisit (« première prise »…) ; toutes les prises gardées dans `voix/prises/bNN_vNN_takeN.mp3`.
+- Un nom chinois en **fin de bloc** sort plus souvent mal (许慎 écorché) : le placer en milieu de phrase ou l'éviter.
+- **Humour** bienvenu en une phrase, juste après une révélation légère (validé : « 美国, “le beau pays”. Enfin… rien à voir
+  avec la beauté : /měɪ/, c'est juste le “mé” d'Amérique. »).
 - `python3 outils/video_shuimo/voix_prep.py <episode>/episode.json` : silences rognés, −18 LUFS → `voix/bNN.wav`.
 
 ## Étape 3 — Synchronisation mot à mot (indispensable)
@@ -94,6 +101,11 @@ l'épingler d'abord (`creative_add_flow_asset_node`). Télécharger `words_downl
 absolue (`sequence` : clips, silences, rouleaux, pause avant la révélation). Les `reperes_cles` d'un bloc doivent être
 **dans l'ordre de la voix** (recherche séquentielle). Caractères partagés avec le japonais (教, 孝, 文, 宋…) : 2 prises. Toute l'animation se cale sur
 `at(bloc, repère)` ; ne jamais coder les temps en dur.
+Prise retenue : `creative_add_flow_asset_node` (generation_id) → `creative_transcribe_audio` (`eleven_scribe_v1`,
+`connect_from`) → `creative_get_flow_run_status` → télécharger `words_download_url` → `{"words": […]}` dans
+`voix/mots/bNN.json` et `bNN_vNN_takeN.json` ; retirer les balises (`[warmly]`…) que Scribe rend comme des mots.
+Après tout changement de texte : vérifier que chaque `reperes_cles` existe encore (reperes.py s'arrête sinon), en
+ajouter pour chaque nouveau visuel, puis `reperes.py` → `musique.py` (la durée totale change) → `sync.mjs` → `bande_son.py`.
 
 ## Étape 4 — Montage (composants validés)
 | Élément | Règle validée |
@@ -101,20 +113,24 @@ absolue (`sequence` : clips, silences, rouleaux, pause avant la révélation). L
 | **Accroche** | papier nu, le caractère tracé trait par trait (Make Me a Hanzi, `drawStrokes`, **sans texture de pinceau** : `brush: false`), la composante-clé s'allume en pigment puis s'efface ; fondu net entre formes (pas de superposition) |
 | **Paysages** | `fond-shuimo` (`compose(seed…)`), un seed et une ambiance par époque ; respiration après chaque plan dense |
 | **Estampages + glyphes réels** | `InkStage` (paramétrable `T`, `travel`) : plastron / bronze tamponnés, signe révélé en blanc puis à l'encre, composantes en **pigments constants** (爻 gomme-gutte, 冖 malachite, mains vermillon, 子 azurite) |
-| **Rouleaux du temps** | 2–3 par vidéo, **variés** (5 s classique avec le caractère en curseur, 3,5 s rapide, 6 s long) ; voix muette pendant le voyage ; cartouche d'époque posé par le sceau |
+| **Rouleaux du temps** | 2–3 par vidéo, **variés** : rouleaux 2D (`rouleau-du-temps`) et **rouleau 3D** (`rouleau-3d`) : un **complet** (5,3 s, sceau miel) sur le plus grand saut, au plus un **court** (3,6 s, sceau rouge, autre cloche) à plus d'1 min 30 ; jamais trois. Dans `episode.json` : `{"rouleau3d": "complet"}` entre deux blocs, ou une pause dans un bloc `"pause": {"repere": …, "rouleau3d": "court"}`. Voix muette pendant le voyage ; cartouche d'époque posé par le sceau, toujours `cartouche(id)` de `src/periodes.ts` (même nom sur le rouleau et le papier) |
 | **Cartes** | moteur Canvas `E.drawMap(…, { paper: true })` : mer = papier, régions historiques, marqueurs (Anyang, Hao, Xianyang, Japon 1949 / Chine 1956) ; dans `MapPanel` au début du bloc concerné |
-| **Portrait** | `E.drawPortrait` à l'encre, tracé en 3 s, mention « portrait imaginé » |
+| **Portrait** | `E.drawPortrait` à l'encre, tracé en 3 s, mention « portrait imaginé ». Option parmi d'autres quand un personnage revient dans le récit : le montrer brièvement dès qu'il est nommé (ex. médaillon au trait de Xu Shen dans le 美), puis le retrouver plus tard ; à choisir selon l'épisode |
+| **Objets et décors** | pas de clipart (un ding en aplats gris a été jugé « clipart ») ; pour le reste, **varier les traitements** d'une scène à l'autre : peinture à l'encre et lavis, 3D, baimiao (白描), autres arts chinois (estampage, papier découpé, gongbi, laque, broderie…), selon ce qui sert la scène et l'époque |
 | **Mise en valeur d'une composante** | l'allumer en pigment + halo, le reste pâlit — **jamais de voile noir** (incompris) |
 | **Clips 3D (Seedance 8–15 s)** | plein cadre, jamais de fenêtre partielle. **Entrée** : à travers le caractère (`VideoReveal mode="glyphe"`) **si un caractère est à l'écran juste avant**, sinon mer de nuages (`CloudReveal`, nuages aquarelle de la banque). **Sortie** : coups de pinceau (`outMode="pinceau"`) dans tous les cas. Ralentir le clip si le plan est plus long (`rate = min(0.9, durée_clip / durée_plan)`) |
 | **Synthèse** | **obligatoire, voir « Scène récapitulative » ci-dessous** (bandeau horizontal de toutes les formes, chaque composante clignote dans toutes les formes sur son mot) |
-| **Fin** | maxime, passerelle vers le caractère suivant (esquissé), coupe nette sur un écran de fin ; pas de queue musicale |
-| **Textes** | lisibles sur téléphone : étiquettes ≥ 66 px (caractère ≥ 100 px), légendes ≥ 38 px, rubans ≥ 56 px |
+| **Fin** (repère, pas un modèle) | éviter de casser l'élan entre la révélation et la chute par un long bloc pédagogique ; l'ordre se décide pour chaque épisode (dans le 美 : révélation → traits → récap → mots courants et humour → chute) |
+| **Fin** | chute, passerelle vers le caractère suivant (esquissé), puis **écran de fin sur papier ≈ 10 s** (`"queue": 10`) : marque 墨道 et « Prochain caractère » dans le **tiers gauche**, les deux tiers droits libres pour les éléments de fin YouTube ; fondu depuis le dernier plan, jamais de fond noir |
+| **Textes** | lisibles sur téléphone : étiquettes ≥ 66 px (caractère ≥ 100 px), **légendes ≥ 44 px**, rubans ≥ 56 px, dates des cartouches 36 px ; aucune légende dans les **8 % du bas** (barre de progression YouTube : le composant `Caption` les remonte) ; jamais deux textes qui se touchent |
+| **Exactitude** | à juger au cas par cas avec la note artistique (expert Historique) ; quand une image ou une légende risque d'induire en erreur, une précision discrète suffit (ex. du 美 : « lecture la plus répandue », « note à son édition du Shuowen ») |
 | **Musique** | `musique.py` : bourdon + guzheng, creux sous les rouleaux et la pause avant la révélation, coupure nette |
-| **Dynamisme (validé sur le 教)** | **caméra** `Cam` (JiaoV1) dans chaque scène : clés `[t, cx, cy, échelle, durée]` calées sur les repères (poussée sur le détail cité, panoramique d'un élément à l'autre, retour au plan large), respiration lente permanente, **punch** +3,5 % sur chaque révélation, neutre pendant les rouleaux (`calm`) ; fonds, glyphes, étiquettes dans la caméra, légendes et cartouches hors caméra. **Un changement visuel toutes les 6–8 s** au plus. Rythme de la voix et des silences : inchangé (resserrage refusé par l'utilisateur ; `"tempo"` dans episode.json reste disponible sur demande) |
-| **Bruitages** | ElevenLabs text-to-sound (`creative_generate_in_flow`, type sfx) → `audio/sfx_*.wav` (−20 LUFS, fondu) : pinceau sur les tracés, sceau sur les révélations / coups, gravure sur l'os, gong (≤ 3) sur les moments-clés ; volumes 0,35–0,6, liste `sfx()` dans la composition |
+| **Dynamisme (validé sur le 教)** | **caméra** `Cam` (JiaoV1) dans chaque scène : clés `[t, cx, cy, échelle, durée]` calées sur les repères (poussée sur le détail cité, panoramique d'un élément à l'autre, retour au plan large), respiration lente permanente, **punch** +3,5 % sur chaque révélation, neutre pendant les rouleaux (`calm`) ; fonds, glyphes, étiquettes dans la caméra, légendes et cartouches hors caméra. **Un changement visuel toutes les 6–8 s** au plus ; dans un long bloc sur un même glyphe, une clé de caméra par phrase (poussée sur la partie citée, retour) ; **jamais plus de 2 s de papier vide** (après une cassure : goutte d'encre qui s'épanouit en lavis). Rythme de la voix et des silences : inchangé (resserrage refusé par l'utilisateur ; `"tempo"` dans episode.json reste disponible sur demande) |
+| **Bruitages** | ElevenLabs text-to-sound (`creative_generate_in_flow`, type sfx) → `audio/sfx_*.wav` (−20 LUFS, fondu) : pinceau sur les tracés, sceau sur les révélations / coups, gravure sur l'os, gong (≤ 3) sur les moments-clés ; volumes 0,35–0,6, liste `bruitages` d'episode.json. **Leitmotiv** (validé sur le 美) : tonnerre à l'ouverture du récit ancien, tambour grave pendant la scène rituelle, qui **revient discrètement** (0,25–0,3) sur chaque révélation liée ; **cascade frappée** : sur la phrase-révélation, les formes successives (os → bronze → sceau) frappées en colonne, un coup de sceau par mot fort, gong sur le dernier ; feuilletage rapide qui s'arrête net sur la bonne page. Un bruitage ne couvre jamais la voix : le poser dans le silence qui précède (mesurer : jamais plus fort que la voix pendant qu'elle parle). Les bruitages ElevenLabs sortent en ≈ 1 s quel que soit le prompt : un son long (tonnerre, roulement) se **synthétise** dans `audio/sfx_src/fabriquer_<pinyin>.py` (sources gardées dans `sfx_src/`) |
 
-Révélations disponibles mais non retenues (sur demande) : lavis + taches, goutte d'encre, rouleau suspendu
-(`VideoReveal`), brume (`VideoEncre`, jugée bizarre).
+Révélations disponibles mais non retenues (sur demande) : lavis + taches, rouleau suspendu (`VideoReveal`), brume
+(`VideoEncre`, jugée bizarre). **Refusés** : le « fondu d'encre » entre deux formes (`inkMorph`, jugé nul → fondus
+enchaînés nets) ; un sceau qui tremble en oscillant à l'impact (clignote → simple affaissement de 4 px).
 
 ## Scène récapitulative (obligatoire, à chaque épisode)
 C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduire à un simple tracé.
@@ -130,7 +146,7 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
 - **Accident d'écriture** (ex. faux 孝 des Han) : seule la forme concernée reste nette et grossit, la partie fautive en ocre,
   le faux caractère au-dessus, barré au moment de la réfutation.
 - **Fin** : toutes les couleurs reviennent ensemble sur « Ainsi naît », puis mots courants (教室 / 教师…).
-- Implémentation de référence : `drawBand` dans `xue/remotion/src/shuimo_jiao/JiaoV1.tsx` (phases calées sur les repères
+- Implémentation de référence : `drawBand` dans `outils/moteur/remotion/src/shuimo_jiao/JiaoV1.tsx` (phases calées sur les repères
   `formes`, `yao`, `enfant`, `main`, `han`, `pasde`, `naissance` du bloc).
 
 ## Étape 5 — Vérifier, puis rendre
@@ -140,9 +156,14 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
   secondes) ; à proposer avant tout rendu quand seule la voix a changé.
 - Itérations rapides : `outils/video_shuimo/apercu.sh <Composition> scene <début> <fin>` (un passage en 540p, quelques
   minutes) ou `brouillon` (toute la vidéo en 360p) ; ne jamais dépasser `nproc` en concurrence (4 cœurs ici).
-- Rendu 720p (`apercu.sh <Composition> final`) : `--scale=0.6666666666666666 --crf=30`, puis loudnorm −14 LUFS → `xue/out/preview/`. Navigateur :
+- Avec un rouleau 3D (three.js en WebGL logiciel) : `--timeout=200000` et `--concurrency=2` ; brouillon 360p d'une
+  vidéo de 4 min 50 ≈ 1 h 20 en deux moitiés (`--frames=0-N`, puis assemblage `ffmpeg -f concat -c copy`) ; **ne jamais
+  modifier les sources pendant un rendu** (chaque moitié refait son bundle) : noter les défauts et corriger après.
+- Rendu 720p (`apercu.sh <Composition> final`) : `--scale=0.6666666666666666 --crf=30`, puis loudnorm −14 LUFS → `outils/moteur/out/preview/`. Navigateur :
   `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`.
 - Retours de l'utilisateur → corriger → images fixes → nouveau rendu. Commit et push à chaque étape.
+- Envoyer une **planche d'images fixes** légendées (minutage + correction) pendant les longs rendus ; les légendes de la
+  planche sans caractères chinois (Cormorant n'en a pas).
 
 ## Pièges techniques rencontrés
 - Rendu complet : une tâche de fond est coupée à 2 h → `outils/video_shuimo/rendu_morceaux.sh` (bundle, morceaux de 3000 images ≈ 45 min chacun, puis assembler : bande son par ffmpeg via bande_son.py, sans rendu). Bruitages : liste `bruitages` d'episode.json (une seule source pour la composition et le mixage).

@@ -1,0 +1,445 @@
+{
+ "b01": {
+  "duration": 30.17,
+  "cues": {
+   "beau": 1.0,
+   "mouton": 3.21,
+   "officiel": 6.55,
+   "lettre": 9.64,
+   "dico": 12.76,
+   "haut": 15.72,
+   "grand": 17.16,
+   "bon": 19.48,
+   "donc": 21.56,
+   "song": 23.48,
+   "marbre": 25.32,
+   "maxime": 28.28,
+   "entendu": 28.92,
+   "gros": 29.72
+  }
+ },
+ "b02": {
+  "duration": 1.29,
+  "cues": {
+   "vraiment": 0.89
+  }
+ },
+ "b03": {
+  "duration": 1.35,
+  "cues": {
+   "origine": 0.0
+  }
+ },
+ "b12": {
+  "duration": 10.14,
+  "cues": {
+   "debut": 0.0,
+   "pluie": 2.59,
+   "danse": 4.07,
+   "plumes": 5.87,
+   "frappaient": 8.07,
+   "tambours": 9.03
+  }
+ },
+ "b04": {
+  "duration": 41.53,
+  "cues": {
+   "pluie": 0.69,
+   "rois": 2.01,
+   "os": 4.57,
+   "signe": 7.69,
+   "homme": 10.36,
+   "corps": 13.05,
+   "coiffe": 18.05,
+   "branches": 19.42,
+   "mouton": 24.25,
+   "museau": 26.17,
+   "rien": 29.53,
+   "pare": 31.69,
+   "plumes": 33.45,
+   "terre": 35.37,
+   "jamais": 39.97
+  }
+ },
+ "b05": {
+  "duration": 17.68,
+  "cues": {
+   "bronze": 3.84,
+   "inscr": 5.72,
+   "epaissit": 7.08,
+   "coiffe": 10.12,
+   "cornes": 14.76,
+   "naitre": 16.84
+  }
+ },
+ "b06": {
+  "duration": 27.21,
+  "cues": {
+   "royaumes": 3.23,
+   "retrouve": 6.03,
+   "guodian": 9.43,
+   "laozi": 10.99,
+   "vers": 14.11,
+   "beau": 15.21,
+   "laideur": 17.63,
+   "autrement": 19.42,
+   "decide": 20.56,
+   "laid": 23.19,
+   "maitre": 25.07
+  }
+ },
+ "b07": {
+  "duration": 39.22,
+  "cues": {
+   "empereur": 0.78,
+   "sceau": 4.19,
+   "ordre": 5.66,
+   "symetrique": 9.94,
+   "cornes": 12.5,
+   "mouton": 14.54,
+   "xushen": 17.9,
+   "vingt": 23.02,
+   "neufmille": 24.94,
+   "yeux": 27.5,
+   "savoureux": 32.86,
+   "erreur": 34.41,
+   "ecriture": 36.74
+  }
+ },
+ "b10": {
+  "duration": 30.57,
+  "cues": {
+   "encore": 0.0,
+   "cle": 4.83,
+   "dico": 7.57,
+   "cherche": 10.15,
+   "rayon": 11.27,
+   "agneau": 13.11,
+   "troupeau": 13.87,
+   "meiguo": 15.71,
+   "beaupays": 18.59,
+   "enfin": 20.03,
+   "amerique": 25.2,
+   "meishi": 26.19,
+   "perdu": 29.68
+  }
+ },
+ "b11": {
+  "duration": 14.6,
+  "cues": {
+   "pinceau": 1.18,
+   "neuf": 4.22,
+   "haut": 5.34,
+   "cornes": 7.02,
+   "couches": 8.26,
+   "debout": 9.46,
+   "bas": 10.7,
+   "couche": 12.3,
+   "jambes": 13.98
+  }
+ },
+ "b08": {
+  "duration": 26.19,
+  "cues": {
+   "reprenons": 0.03,
+   "formes": 2.99,
+   "homme": 4.07,
+   "coiffe": 6.47,
+   "plumes": 8.53,
+   "bronze": 9.91,
+   "sceau": 12.11,
+   "reste": 14.87,
+   "shang": 16.47,
+   "parer": 21.11,
+   "ciel": 23.15,
+   "naissance": 24.15,
+   "beau": 25.83
+  }
+ },
+ "b09": {
+  "duration": 12.55,
+  "cues": {
+   "maxime": 0.02,
+   "danseur": 2.5,
+   "parure": 5.54,
+   "tombent": 8.42,
+   "blancs": 12.1
+  }
+ },
+ "_ligne": {
+  "clips": {
+   "b01": {
+    "debut": 0.6,
+    "duree": 30.17
+   },
+   "b02": {
+    "debut": 31.57,
+    "duree": 1.29
+   },
+   "b03": {
+    "debut": 36.86,
+    "duree": 1.35
+   },
+   "b12": {
+    "debut": 39.76,
+    "duree": 10.14
+   },
+   "b04": {
+    "debut": 50.2,
+    "duree": 41.53
+   },
+   "b05": {
+    "debut": 92.53,
+    "duree": 17.68
+   },
+   "b06": {
+    "debut": 116.21,
+    "duree": 27.21,
+    "pause": {
+     "coupe": 19.3,
+     "duree": 4.5
+    }
+   },
+   "b07": {
+    "debut": 148.72,
+    "duree": 39.22,
+    "pause": {
+     "coupe": 17.75,
+     "duree": 3.6
+    }
+   },
+   "b11": {
+    "debut": 192.14,
+    "duree": 14.6
+   },
+   "b08": {
+    "debut": 207.74,
+    "duree": 26.19
+   },
+   "b10": {
+    "debut": 234.93,
+    "duree": 30.57
+   },
+   "b09": {
+    "debut": 266.7,
+    "duree": 12.55
+   }
+  },
+  "rouleaux": [
+   {
+    "debut": 110.61,
+    "duree": 5.3,
+    "modele": "3d-complet"
+   },
+   {
+    "debut": 166.47,
+    "duree": 3.6,
+    "modele": "3d-court"
+   }
+  ],
+  "pauses": [
+   [
+    135.51,
+    4.5
+   ],
+   [
+    166.47,
+    3.6
+   ]
+  ],
+  "plages": {
+   "danse": {
+    "debut": 38.51,
+    "duree": 1.25,
+    "son": "clips/03_danseur_v2.mp4",
+    "son_decalage": 0.75,
+    "son_volume": 0.7,
+    "son_duree": 8.0
+   }
+  },
+  "fin": 279.55,
+  "total": 289.55,
+  "bruitages": [
+   [
+    "pinceau",
+    0.5,
+    0.45
+   ],
+   [
+    "sceau",
+    4.41,
+    0.4
+   ],
+   [
+    "ciseau",
+    26.22,
+    0.5
+   ],
+   [
+    "ciseau",
+    27.22,
+    0.45
+   ],
+   [
+    "sceau",
+    29.03,
+    0.55
+   ],
+   [
+    "marbre",
+    33.11,
+    0.75
+   ],
+   [
+    "gravure",
+    55.37,
+    0.4
+   ],
+   [
+    "sceau",
+    74.45,
+    0.45
+   ],
+   [
+    "sceau",
+    96.37,
+    0.5
+   ],
+   [
+    "pinceau",
+    130.32,
+    0.35
+   ],
+   [
+    "pinceau",
+    132.42,
+    0.3
+   ],
+   [
+    "sceau",
+    246.2,
+    0.45
+   ],
+   [
+    "pinceau",
+    199.16,
+    0.4
+   ],
+   [
+    "pinceau",
+    200.4,
+    0.4
+   ],
+   [
+    "pinceau",
+    201.6,
+    0.4
+   ],
+   [
+    "pinceau",
+    204.44,
+    0.4
+   ],
+   [
+    "pinceau",
+    205.82,
+    0.4
+   ],
+   [
+    "gong",
+    219.85,
+    0.35
+   ],
+   [
+    "sceau",
+    231.89,
+    0.45
+   ],
+   [
+    "gong",
+    278.5,
+    0.35
+   ],
+   [
+    "sceau",
+    50.26,
+    0.6
+   ],
+   [
+    "sceau",
+    98.85,
+    0.6
+   ],
+   [
+    "sceau",
+    153.81,
+    0.6
+   ],
+   [
+    "sceau",
+    163.62,
+    0.5
+   ],
+   [
+    "sceau",
+    164.38,
+    0.55
+   ],
+   [
+    "sceau",
+    165.26,
+    0.6
+   ],
+   [
+    "gong",
+    165.26,
+    0.35
+   ],
+   [
+    "tonnerre",
+    38.46,
+    0.42
+   ],
+   [
+    "tambour",
+    43.83,
+    0.35
+   ],
+   [
+    "tambour",
+    47.83,
+    0.45
+   ],
+   [
+    "tambour",
+    48.89,
+    0.5
+   ],
+   [
+    "tambour",
+    57.89,
+    0.25
+   ],
+   [
+    "tambour",
+    79.73,
+    0.25
+   ],
+   [
+    "tambour",
+    165.26,
+    0.3
+   ],
+   [
+    "tambour",
+    269.2,
+    0.3
+   ],
+   [
+    "feuilles",
+    243.0,
+    0.55
+   ]
+  ]
+ }
+}

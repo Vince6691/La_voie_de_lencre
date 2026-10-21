@@ -43,8 +43,21 @@ env = np.clip(t / 3, 0, 1)
 for r in L['rouleaux']:
     a, b = r['debut'], r['debut'] + r['duree']
     env *= 1 - 0.85 * np.clip(np.minimum((t - a + 0.6) / 0.6, (b + 0.8 - t) / 0.8), 0, 1)
+for pl in L.get('plages', {}).values():
+    a = pl['debut']; b = a + max(pl['duree'], pl.get('son_decalage', 0) + pl.get('son_duree', 0))
+    env *= 1 - 0.65 * np.clip(np.minimum((t - a) / 0.8, (b + 1.0 - t) / 1.0), 0, 1)
 for a, d in L['pauses']:
+    if any(abs(r['debut'] - a) < 0.01 for r in L['rouleaux']): continue  # pause déjà creusée comme rouleau
     env *= 1 - 0.7 * np.clip(np.minimum((t - a) / 0.3, (a + d + 0.2 - t) / 0.5), 0, 1)
+# coupures nettes (episode.json « coupures » : [[bloc, repère|null, décalage, bloc, repère|null, décalage]…]) :
+# la musique se coupe d'un coup (0,05 s) au premier point et revient doucement (1,5 s) au second — ex. le figé du 美
+_rep = json.load(open(cfg['reperes'], encoding='utf-8'))
+def _abs(b, r, d):
+    c = _rep['_ligne']['clips'][b]; v = 0 if r is None else _rep[b]['cues'][r]
+    return c['debut'] + v + d + (c['pause']['duree'] if c.get('pause') and v > c['pause']['coupe'] else 0)
+for b1, r1, d1, b2, r2, d2 in cfg.get('coupures', []):
+    a, b = _abs(b1, r1, d1), _abs(b2, r2, d2)
+    env *= 1 - np.clip(np.minimum((t - a) / 0.05, (b + 1.5 - t) / 1.5), 0, 1)
 env[t >= END] = 0
 bed *= env
 i = int((END + 0.15) * SR); g = pluck(f(50), 3.0) * 0.18; bed[i:i + len(g)] += g[:N - i]

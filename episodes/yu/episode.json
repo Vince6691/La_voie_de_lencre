@@ -1,0 +1,53 @@
+{
+ "voix": "voix",
+ "reperes": "voix/reperes.json",
+ "musique": "audio/musique.wav",
+ "debut": 0.6,
+ "sequence": [
+  {
+   "clip": "b01",
+   "apres": 0.9
+  },
+  {
+   "clip": "b02",
+   "apres": 1.0
+  },
+  {
+   "clip": "b03",
+   "apres": 0.7
+  },
+  {
+   "rouleau": 5,
+   "apres": 0.3
+  },
+  {
+   "clip": "b04",
+   "apres": 0.8
+  },
+  {
+   "clip": "b05",
+   "pause": {
+    "repere": "reponse",
+    "decalage": -0.12,
+    "duree": 1.7
+   },
+   "apres": 1.0
+  },
+  {
+   "clip": "b06",
+   "apres": 0.5
+  }
+ ],
+ "queue": 3.2,
+ "reperes_cles": {
+  "b01": {
+   "mains": "deux mains"
+  },
+  "b03": {
+   "signe": "C'est là"
+  },
+  "b05": {
+   "reponse": "Les mains n'ont pas"
+  }
+ }
+}

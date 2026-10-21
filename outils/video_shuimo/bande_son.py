@@ -21,9 +21,17 @@ for k, c in L['clips'].items():
 for n, t, vol in L.get('bruitages', []):
     i = len(ins) // 2; ins += ['-i', os.path.join(base, 'audio', f'sfx_{n}.wav')]
     parts.append(f'[{i}:a]volume={vol},adelay={int(t * 1000)}:all=1[v{i}]')
+for pl in L.get('plages', {}).values():
+    if 'son' not in pl: continue
+    i = len(ins) // 2; ins += ['-i', os.path.join(base, pl['son'])]
+    parts.append(f'[{i}:a]volume={pl.get("son_volume", 1)},adelay={int((pl["debut"] + pl.get("son_decalage", 0)) * 1000)}:all=1[v{i}]')
 # son des rouleaux (TimeScrollStage : souffle, glissando, impact, calé sur 5 s ; gong quand le sceau se pose)
-RS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'xue', 'remotion', 'public', 'rouleau')
+RS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'moteur', 'remotion', 'public', 'rouleau')
 for r in L['rouleaux']:
+    if r.get('modele', '').startswith('3d'):  # rouleau 3D : son complet (souffle, guzheng, coup du sceau, cloche) calé sur sa durée
+        i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'rouleau3d_court.wav' if r['modele'] == '3d-court' else 'rouleau3d.wav')]
+        parts.append(f'[{i}:a]volume=0.8,adelay={int(r["debut"] * 1000)}:all=1[v{i}]')
+        continue
     i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'rouleau.wav')]
     parts.append(f'[{i}:a]atempo={5 / r["duree"]:.4f},volume=0.6,adelay={int(r["debut"] * 1000)}:all=1[v{i}]')
     i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'gong.wav')]

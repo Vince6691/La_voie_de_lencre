@@ -6,6 +6,11 @@
  "sequence": [
   {
    "clip": "b01",
+   "pause": {
+    "repere": "pourtant",
+    "decalage": -0.08,
+    "duree": 1.3
+   },
    "apres": 0.9
   },
   {
@@ -22,101 +27,121 @@
   },
   {
    "clip": "b04",
-   "apres": 0.6
-  },
-  {
-   "rouleau": 3.5,
-   "apres": 0.3
+   "pause": {
+    "repere": "qin",
+    "decalage": -0.15,
+    "duree": 5.0,
+    "rouleau": true
+   },
+   "apres": 1.4
   },
   {
    "clip": "b05",
-   "apres": 3.6
-  },
-  {
-   "clip": "b06",
-   "apres": 1.8
-  },
-  {
-   "rouleau": 6,
-   "apres": 0.4
-  },
-  {
-   "clip": "b07",
+   "pause": {
+    "repere": "simple",
+    "decalage": -0.2,
+    "duree": 3.4
+   },
    "apres": 1.0
   },
   {
-   "clip": "b08",
+   "rouleau": 5,
+   "apres": 0.4
+  },
+  {
+   "clip": "b06",
+   "apres": 1.0
+  },
+  {
+   "clip": "b07",
    "apres": 0.5
   }
  ],
  "queue": 3.2,
  "reperes_cles": {
   "b01": {
+   "milliard": "milliard",
+   "zhongwen": "中文",
+   "wenhua": "文化",
+   "fawen": "法文",
+   "pourtant": "Pourtant",
    "homme": "c'est un homme",
+   "debout": "debout",
+   "face": "de face",
    "tatouage": "un tatouage",
+   "prince": "Un prince",
+   "jamais": "jamais",
+   "roi": "roi",
    "comment": "Comment un"
   },
   "b02": {
-   "os": "Sur les os",
+   "os": "gravé sur",
    "bras": "deux bras",
    "marque": "une marque",
    "croix": "Une croix",
-   "shirakawa": "Selon le savant",
-   "morts": "des morts",
-   "rois": "honorer ses rois",
-   "honneur": "Le tatouage est",
-   "excuse": "une excellente"
+   "tatouage": "Un tatouage",
+   "punition": "une punition",
+   "rois": "ses rois",
+   "wending": "comme le",
+   "sens": "Voilà le",
+   "peau": "sur la peau"
   },
   "b03": {
-   "duc": "le vieux duc",
-   "probleme": "Problème",
-   "fuite": "s'enfuit",
-   "tatouer": "se fait tatouer",
-   "carriere": "Carrière terminée",
-   "neveu": "Son neveu",
-   "roi": "On l'appellera",
-   "bronze": "Quand la dynastie",
-   "coeur": "un vrai cœur",
-   "grand": "Le tatouage n'a"
+   "clan": "Dans le clan",
+   "taibo": "l'aîné",
+   "tatouer": "se fait",
+   "regner": "pour ne",
+   "prince": "un prince",
+   "carriere": "Carrière",
+   "bronze": "Sur les bronzes",
+   "coeur": "un vrai",
+   "orne": "On ne",
+   "sens": "Deuxième sens",
+   "roi": "Un roi",
+   "caractere": "comme notre",
+   "fils": "Son fils",
+   "wu": "le guerrier",
+   "duo": "文 et",
+   "raff": "le raffinement",
+   "force": "la force"
   },
   "b04": {
-   "royaumes": "Royaumes combattants",
-   "mutations": "Livre des mutations",
-   "ciel": "pour suivre",
-   "hommes": "pour transformer",
-   "etoiles": "les étoiles",
-   "rites": "les rites",
-   "peau": "Le motif quitte",
-   "bambou": "lattes de bambou",
-   "disparait": "souvent, la marque",
-   "sort": "Parfois, le cœur"
+   "motifs": "quels motifs",
+   "ecriture": "Ceux de",
+   "bambou": "sur le bambou",
+   "sens": "Troisième sens",
+   "quitte": "la marque quitte",
+   "chu": "Dans le royaume",
+   "sort": "sort même",
+   "cote": "à côté",
+   "qin": "Puis la dynastie",
+   "sceau": "le petit sceau",
+   "symetrique": "parfaitement",
+   "vide": "le torse vide",
+   "scribes": "Mais les scribes",
+   "tete": "la tête devient",
+   "quatre": "Quatre traits",
+   "ne": "est né"
   },
   "b05": {
-   "sceau": "le petit sceau",
-   "vide": "le torse est vide",
-   "scribes": "Mais les scribes",
-   "quatre": "Quatre traits",
-   "ne": "est né",
    "han": "Sous la dynastie",
    "tiying": "une jeune fille",
+   "pere": "sauver son",
+   "coupe": "Ce qu'on",
    "abolit": "abolit",
-   "visage": "tatouage du visage",
+   "visage": "du visage",
    "nom": "Son nom",
-   "wen": "L'empereur Wen"
+   "wen": "L'empereur",
+   "simple": "Une simple",
+   "mot": "mot que",
+   "transformer": "c'est transformer",
+   "hommes": "transformer les",
+   "armes": "par les armes",
+   "elever": "Élever les",
+   "appelons": "nous appelons",
+   "sens": "Quatrième sens"
   },
   "b06": {
-   "soie": "un fil de soie",
-   "motif": "le motif",
-   "song": "Mais sous",
-   "ecriture": "c'est de l'écriture",
-   "deserteurs": "Pour reconnaître",
-   "caracteres": "en caractères",
-   "diqing": "L'un d'eux",
-   "remede": "un remède",
-   "garde": "Je les garde"
-  },
-  "b07": {
-   "traits": "quatre traits",
    "reprenons": "Reprenons",
    "formes": "un seul dessin",
    "tete": "La tête",
@@ -126,17 +151,25 @@
    "os": "un V",
    "bronze": "un cœur",
    "rien": "puis plus rien",
+   "sens": "La marque",
+   "orn": "l'ornement",
+   "ecr": "l'écriture",
+   "cul": "la culture",
    "naissance": "Ainsi naît",
-   "chinois": "le chinois",
-   "bunka": "un mot que"
+   "ecritures": "le nom des",
+   "jiagu": "甲骨文",
+   "jinwen": "金文",
+   "wenzi": "文字"
   },
-  "b08": {
+  "b07": {
    "peau": "sur la peau",
-   "autre": "Un autre homme",
-   "tete": "sur la tête",
-   "plumes": "Des plumes",
-   "mouton": "un gros mouton",
-   "manger": "Bon à manger"
+   "cote": "Et à côté",
+   "yuwen": "dans Yǔwén",
+   "ecoliers": "tous les écoliers",
+   "autre": "un autre",
+   "parole": "la parole",
+   "ecriture": "avant l'écriture",
+   "bientot": "Nous le"
   }
  },
  "bruitages": [
@@ -145,7 +178,84 @@
    "b01",
    null,
    -0.3,
+   0.35
+  ],
+  [
+   "pinceau",
+   "b01",
+   "zhongwen",
+   0,
+   0.3
+  ],
+  [
+   "tapotement",
+   "b01",
+   "fawen",
+   0.95,
+   0.7
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   -1.33,
    0.45
+  ],
+  [
+   "gong",
+   "b01",
+   "pourtant",
+   -1.3,
+   0.22
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   0.9,
+   0.25
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   1.3,
+   0.31
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   1.7,
+   0.37
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   2.1,
+   0.43
+  ],
+  [
+   "sceau",
+   "b01",
+   "pourtant",
+   2.5,
+   0.49
+  ],
+  [
+   "gong",
+   "b01",
+   "tatouage",
+   0.35,
+   0.35
+  ],
+  [
+   "sceau",
+   "b01",
+   "jamais",
+   0.3,
+   0.55
   ],
   [
    "sceau",
@@ -176,13 +286,6 @@
    0.5
   ],
   [
-   "pinceau",
-   "b04",
-   "bambou",
-   0.2,
-   0.4
-  ],
-  [
    "sceau",
    "R2",
    "impact",
@@ -191,7 +294,14 @@
   ],
   [
    "pinceau",
-   "b05",
+   "b04",
+   "bambou",
+   0.2,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b04",
    "sceau",
    0,
    0.4
@@ -199,22 +309,15 @@
   [
    "effondrement",
    "b05",
-   "wen",
-   2.6,
+   "simple",
+   -3.3,
    0.6
   ],
   [
-   "pinceau",
-   "b06",
-   "soie",
-   -0.2,
-   0.4
-  ],
-  [
    "gong",
-   "b06",
-   "garde",
-   0.4,
+   "b05",
+   "sens",
+   0,
    0.45
   ],
   [
@@ -226,21 +329,21 @@
   ],
   [
    "pinceau",
-   "b07",
+   "b06",
    null,
    0.2,
    0.4
   ],
   [
    "gong",
-   "b07",
+   "b06",
    "naissance",
    0,
    0.5
   ],
   [
    "gong",
-   "b08",
+   "b07",
    "peau",
    -0.6,
    0.45
@@ -256,27 +359,6 @@
     "defaut": "jambes",
     "fusion": 0.0,
     "polys": [
-     [
-      "marque",
-      [
-       [
-        168,
-        140
-       ],
-       [
-        228,
-        140
-       ],
-       [
-        228,
-        205
-       ],
-       [
-        168,
-        205
-       ]
-      ]
-     ],
      [
       "tete",
       [
@@ -319,7 +401,15 @@
        ]
       ]
      ]
-    ]
+    ],
+    "graines": {
+     "marque": [
+      [
+       197,
+       170
+      ]
+     ]
+    }
    },
    "wen_shang_croix": {
     "img": "glyphes/wen_xiaoxue/01.png",
@@ -392,7 +482,13 @@
        ]
       ]
      ]
-    ]
+    ],
+    "interieur": {
+     "marque": [
+      11,
+      "bras"
+     ]
+    }
    },
    "wen_shang_noeud": {
     "img": "glyphes/wen_xiaoxue/03.png",
@@ -403,27 +499,6 @@
     "fusion": 0.0,
     "polys": [
      [
-      "marque",
-      [
-       [
-        175,
-        115
-       ],
-       [
-        225,
-        115
-       ],
-       [
-        225,
-        160
-       ],
-       [
-        175,
-        160
-       ]
-      ]
-     ],
-     [
       "tete",
       [
        [
@@ -465,7 +540,15 @@
        ]
       ]
      ]
-    ]
+    ],
+    "graines": {
+     "marque": [
+      [
+       199,
+       138
+      ]
+     ]
+    }
    },
    "wen_zhou": {
     "img": "glyphes/wen_xiaoxue/14.png",
@@ -476,27 +559,6 @@
     "fusion": 0.0,
     "polys": [
      [
-      "marque",
-      [
-       [
-        160,
-        128
-       ],
-       [
-        242,
-        128
-       ],
-       [
-        242,
-        242
-       ],
-       [
-        160,
-        242
-       ]
-      ]
-     ],
-     [
       "tete",
       [
        [
@@ -538,7 +600,15 @@
        ]
       ]
      ]
-    ]
+    ],
+    "graines": {
+     "marque": [
+      [
+       195,
+       230
+      ]
+     ]
+    }
    },
    "wen_chu": {
     "img": "glyphes/wen_xiaoxue/21.png",
@@ -552,20 +622,20 @@
       "marque",
       [
        [
-        245,
+        257,
         55
        ],
        [
-        378,
+        372,
         55
        ],
        [
-        378,
-        215
+        372,
+        238
        ],
        [
-        245,
-        215
+        257,
+        238
        ]
       ]
      ],
@@ -859,6 +929,20 @@
      "homme",
      "homme",
      "homme"
+    ]
+   },
+   "wen_yu": {
+    "src": "glyphes/traits/yu.json",
+    "comp": [
+     "parole",
+     "parole",
+     "moi",
+     "moi",
+     "moi",
+     "moi",
+     "bouche",
+     "bouche",
+     "bouche"
     ]
    }
   }

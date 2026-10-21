@@ -5,14 +5,16 @@ description: Chef d'orchestre d'une vidéo longue 墨道 « fond noir » à part
 
 # Vidéo 墨道 « fond noir » — de l'input (un caractère) à la vidéo publiée
 
-Style de référence : `xue/remotion/src/Xue.tsx` (rendu `xue/rendu/xue_remotion.mp4`). Pour le style papier / paysages
+Style de référence : `outils/moteur/remotion/src/Xue.tsx` (rendu `episodes/xue/fond_noir/rendu/xue_remotion.mp4`). Pour le style papier / paysages
 à l'encre, voir la skill `video-shuimo` (validée sur le 學, composition `XueV2`).
 
 **Input : un caractère** (ex. 家). Tout le reste se décide avec l'utilisateur, par étapes. Modèle complet existant :
-`xue/` (學, README, SCRIPT.md, tools/, remotion/). Skills appelées : `voix-off-modo`, `fiche-caractere`,
+`xue/` (moteur : README, tools/, remotion/) et `episodes/xue/fond_noir/` (學 : SCRIPT.md, voix, rendus). Skills appelées : `voix-off-modo`, `fiche-caractere`,
 `fond-shuimo`, `rouleau-du-temps`, `encre-3d`, `coup-de-pinceau`, `motion-design`.
 
 ## Principes
+- **Note artistique** (skill `note-artistique`) : à la fin du plan, de la voix, des images fixes et du rendu vidéo, proposer
+  la note des cinq experts (Technique, Artistique, Historique, Design, Storytelling, objectif 8/10, très exigeante) ; corrections après validation.
 - **Proposer, pas imposer** : à chaque point de décision, 2 à 4 options concrètes avec une recommandation en premier
   (AskUserQuestion), puis avancer. Ne pas poser de question dont la réponse se déduit (sources, conventions déjà
   validées ci-dessous).
@@ -21,7 +23,7 @@ Style de référence : `xue/remotion/src/Xue.tsx` (rendu `xue/rendu/xue_remotion
 - **Le voyage** est l'identité de la chaîne : époques, lieux, supports (os, bronze, bambou, pierre, papier).
 - L'utilisateur regarde sur **téléphone** : aperçus en images fixes et extraits 720p compressés ; jamais de rendu
   1080p complet sans demande explicite.
-- Commits réguliers sur la branche de travail ; un dossier par caractère (ex. `jia/`, sur le modèle de `xue/`).
+- Commits réguliers sur la branche de travail ; un dossier par caractère (ex. `episodes/jia/fond_noir/`, sur le modèle de `episodes/xue/fond_noir/` ; moteur commun dans `outils/moteur/`).
 
 ## Étape 1 — Recherche (sans question, puis synthèse)
 - Décomposition : composantes, sens, formes 甲骨文 / 金文 / 小篆 / 隸書 / 楷書 (/ 草書, simplifiée s'il y a lieu),
@@ -47,7 +49,7 @@ Proposer, puis faire choisir :
 Skill `voix-off-modo`, **mouture v2** : caractère à l'écran + question en 10 s, relance à chaque saut d'époque,
 retournement aux deux tiers, 2 phrases concrètes pour 1 poétique, « Alors le pinceau unit… » + pinyin, le caractère
 aujourd'hui, maxime, passerelle. Livrer le script par blocs avec `> plan :` et la durée estimée.
-Proposer 1–2 variantes d'accroche. Écrire `SCRIPT.md` (sources en bas). **Attendre la validation du texte.**
+Proposer 1–2 variantes d'accroche. Écrire `episodes/<pinyin>/fond_noir/SCRIPT.md` (sources en bas). **Attendre la validation du texte.**
 
 ## Étape 4 — Storyboard et choix des éléments ⟶ validation
 Tableau plan par plan : temps, texte, fond, élément visuel, transition, son. Pour chaque bloc, choisir dans le
@@ -57,7 +59,7 @@ Images fixes de contrôle des plans clés avant d'animer.
 ### Catalogue (aucun n'est obligatoire)
 | Élément | Quand c'est le bon choix | Quand l'éviter |
 |---|---|---|
-| **Fond noir** (moteur Canvas `xue/src`, halos, couleurs par composante) | analyse technique des traits, métamorphoses d'une écriture à l'autre, archéologie (os, bronze) | caractère poétique / nature où le noir est froid |
+| **Fond noir** (moteur Canvas `outils/moteur/src`, halos, couleurs par composante) | analyse technique des traits, métamorphoses d'une écriture à l'autre, archéologie (os, bronze) | caractère poétique / nature où le noir est froid |
 | **Fond shuimo** (`fond-shuimo`) — seeds, mouvements pan/push/rise/focus/still, ambiances jour/aube/nuit/brume | nature, voyage, philosophie (山 道 茶) ; respirations entre blocs denses | plans d'analyse fine du glyphe |
 | **Tout shuimo** (modèle `src/shuimo_xue/` : estampages, pigments minéraux) | vidéo contemplative, caractère lié au paysage ou au rite | caractère très « technique » ou politique |
 | **Rouleau du temps** (`rouleau-du-temps`) | 1 à 3 grands sauts d'époque (≥ 500 ans), retournement ; varier sens, durée, intensité à chaque fois | sauts courts, ou plus de 3 fois par vidéo |
@@ -80,7 +82,7 @@ d'époque ; le caractère (ou sa composante en cours) reste lisible à l'écran 
   `tools/build_timeline.py`. Pause de la durée d'un rouleau du temps dans la voix à chaque voyage.
 
 ## Étape 6 — Animation et aperçus
-- Remotion (`xue/remotion` comme modèle : `sync.mjs` pour les assets, compositions dans `Root.tsx`).
+- Remotion (`outils/moteur/remotion` comme modèle : `sync.mjs` pour les assets, compositions dans `Root.tsx`).
   Navigateur : `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`.
 - Contrôle : images fixes (`npx remotion still`) aux instants clés, puis extraits 720p
   (`--scale=0.6666666666666666`, CRF élevé) envoyés avec SendUserFile (chemins absolus).
@@ -89,7 +91,7 @@ d'époque ; le caractère (ou sa composante en cours) reste lisible à l'écran 
   améliorations.
 
 ## Étape 7 — Rendu final (sur demande)
-Rendu 1080p (`render.sh`), loudnorm −14 LUFS (TP −1,5) → `rendu/`, sous-titres `.srt` (`tools/subtitles.py`),
+Rendu 1080p (`render.sh`), loudnorm −14 LUFS (TP −1,5) → `episodes/<pinyin>/fond_noir/rendu/`, sous-titres `.srt` (`tools/subtitles.py`),
 aperçu 720p compressé pour le téléphone, commit.
 
 ## Étape 8 — Paquet YouTube (propositions)

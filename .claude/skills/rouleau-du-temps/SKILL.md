@@ -5,17 +5,19 @@ description: Transition « premium » d'une époque à l'autre (série 墨道) d
 
 # Rouleau du temps (Remotion)
 
+(Version 3D « signature » : skill `rouleau-3d`.)
+
 Validé par l'utilisateur (« très bien fait ») après plusieurs itérations : frise des sceaux au centre, caractère
 en curseur, rythme spectaculaire, **un seul mouvement de caméra à la fin** (pas de plongée puis retour).
 
 ## Où est quoi
-- Composant : `xue/remotion/src/rouleau/TimeScroll.tsx` — `TimeScrollStage`, `TimeScrollConfig`, `ERAS_XUE`,
+- Composant : `outils/moteur/remotion/src/rouleau/TimeScroll.tsx` — `TimeScrollStage`, `TimeScrollConfig`, `ERAS_XUE`,
   `cursorPose`, `arrivePose`, `morphK`, `tagIn`, `travelM`, `IMPACT`, `Seal`.
 - Démo autonome : composition `RouleauDemo` (`src/rouleau/RouleauDemo.tsx`, 周 → 秦, curseur point d'encre).
 - Exemple complet : `src/shuimo_xue/` (essai tout shuimo du 學, Shang → Zhou, le 學 en curseur dessiné par le canvas
   `InkStage` avec `glyphPose` = `cursorPose` / `arrivePose`).
-- Sons : `xue/assets/rouleau/` (`rouleau.wav` 5 s : souffle, glissando de guzheng, silence, impact ; `gong.wav`),
-  générés par `python3 tools/build_sfx.py` (depuis `xue/`), copiés par `node sync.mjs`.
+- Sons : `outils/moteur/assets/rouleau/` (`rouleau.wav` 5 s : souffle, glissando de guzheng, silence, impact ; `gong.wav`),
+  générés par `python3 tools/build_sfx.py` (depuis `outils/moteur/`), copiés par `node sync.mjs`.
 - Dépend du fond shuimo (skill `fond-shuimo`) : paysages `compose(seed…)`, papier, éléments du ciel.
 
 ## Utilisation
@@ -36,7 +38,8 @@ const CFG: TimeScrollConfig = { at: 22.4, from: 0, to: 1, years: [-1250, -1046] 
   reste caché jusqu'à sa phrase.
 - **Cartouche d'époque** : le sceau volant se pose au centre (156, 136), 92 px (`cfg.tag` pour changer) ; afficher
   le cartouche avec l'opacité `tagIn(CFG, t)`, sans translation (sinon saut).
-- **Époques** : `eras` (sceau + date affichée), `from` / `to` (indices, non adjacents possibles), `years` (signés,
+- **Époques** : sceaux et noms tirés de `src/periodes.ts` (même table que les cartouches et le rouleau 3D : ex.
+  `eras: ['shang', 'zhou'].map((id) => ({ zh: periode(id).sceau, date: yearFmt(periode(id).debut) }))`) ; `eras` (sceau + date affichée), `from` / `to` (indices, non adjacents possibles), `years` (signés,
   négatif = av. J.-C.). Échelle régulière (même place pour chaque époque), les vraies dates sous les sceaux.
 - **Durée** : 5 s par défaut (`duration`, 3 à 5 s pour bien comprendre) ; le son suit (`playbackRate`).
 
