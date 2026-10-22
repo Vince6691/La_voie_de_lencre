@@ -247,7 +247,8 @@ const sm = (a: number, b: number, v: number) => { const u = clamp((v - a) / (b -
 const easeIO = (u: number) => sm(0, 1, u);
 const CS = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
 // ordre « en cercle » autour du bâtiment (0 à 1) : les pièces d'une même famille arrivent et partent l'une après l'autre
-const ang = (x: number, z: number) => (Math.atan2(z, x) + Math.PI) / (2 * Math.PI);
+// le tour commence au coin avant droit (celui que vise la caméra) et file d'abord le long du pignon droit, la façade vient en dernier
+const ang = (x: number, z: number) => ((((0.5191 - Math.atan2(z, x)) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) / (2 * Math.PI);
 
 // ── toit : surface, dessous (chevrons), arêtiers et faîtage en boudins, 瓦當, bêtes, 鴟吻, clochettes ──
 type RoofSpec = { hw: number; hd: number; H: number; q: number; lift: number; sw: number; y: number; beasts: number; gold: number; mk: number; chi: number };
@@ -372,7 +373,7 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
       const a = ang(x, z);
       let yOff = 0, R = p.colR, hideAll = false, rad = 0;
       if (building) { const ph = clamp(((I - 0.12) / 0.5) * 1.5 - a * 0.5); if (ph <= 0) hideAll = true; yOff = ph < 0.8 ? 3.0 * (1 - Math.pow(ph / 0.8, 2)) : 0.12 * Math.sin((Math.PI * (ph - 0.8)) / 0.2); }
-      if (ti === 1 && k > 0 && k < 1) {
+      if (ti === 0 && k > 0 && k < 1) {
         const ph = clamp(k * 1.7 - a * 0.7);
         // l'ancienne colonne s'en va vers l'extérieur en s'effaçant, la nouvelle (plus épaisse) arrive de l'extérieur
         if (ph < 0.5) { const u = easeIO(ph / 0.5); rad = u * 1.7; R = lerp(A.colR, A.colR * 0.25, u); }
@@ -423,7 +424,7 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
       const a = ang(x, z);
       let ex = 0, drop = 0;
       if (building) { const ph = clamp(((I - 0.5) / 0.3) * 1.5 - a * 0.5); if (ph <= 0) return null; ex += 1 - easeIO(ph); drop += (1 - easeIO(ph)) * 1.0; }
-      if (ti === 0 && k > 0 && k < 1) ex += Math.sin(Math.PI * clamp(k * 1.7 - a * 0.7));
+      if (ti === 1 && k > 0 && k < 1) ex += Math.sin(Math.PI * clamp(k * 1.7 - a * 0.7));
       return { ex, drop };
     };
     const set = (x: number, z: number, along: 'x' | 'z', out: 1 | -1, kScale: number, dropExtra = 0) => {
@@ -517,7 +518,7 @@ export const Hall: React.FC<{ s: HallState }> = ({ s }) => {
     const puffs: { x: number; y: number; z: number; age: number; size: number }[] = [];
     const addPuff = (x: number, yy: number, z: number, age: number, size: number) => { if (age > 0 && age < 1) puffs.push({ x, y: yy, z, age, size }); };
     if (building || t < T_INTRO + 0.5) ring.forEach(([x, z]) => addPuff(x, y0 + 0.03, z, (I - (0.12 + ((1 + ang(x, z) * 0.5) / 1.5) * 0.5)) / 0.14, 0.5));
-    if (ti === 1) ring.forEach(([x, z]) => addPuff(x, y0 + 0.03, z, (k - (1 + ang(x, z) * 0.7) / 1.7) / 0.12, 0.45));
+    if (ti === 0) ring.forEach(([x, z]) => addPuff(x, y0 + 0.03, z, (k - (1 + ang(x, z) * 0.7) / 1.7) / 0.12, 0.45));
     addPuff(0, y0 + 0.03, 0, (t - T_INTRO) / 0.4, 1.6 * (hx + p.over));
     addPuff(0, yEave + 0.05, 0, (t - (T0 + DUR * 2 + 0.75 * DUR)) / 0.45, 1.5 * (hx + p.over));
     // à l'ouverture, le toit Tang descend du ciel en dernier, avec un petit rebond

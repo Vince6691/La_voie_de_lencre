@@ -1,27 +1,24 @@
-// Caméra du panel d'évolution : une trajectoire à images clés, interpolée en continu (Hermite, tangentes par différences finies :
-// pas d'arrêt aux images clés). Chaque image clé donne l'azimut, l'élévation, un facteur de zoom et un point visé (une « ancre » :
-// le cadrage de base, le coin du bâtiment où se trouve une console, l'étage, le faîtage) ; les ancres suivent le bâtiment qui change.
-// L'azimut croît sans cesse (un tour complet autour du hall, de trois quarts jusqu'à la façade), à vitesse variable : lent pendant
-// les plans macro, plus vif entre les éléments héros.
-export type Anchor = 'base' | 'brCorner' | 'storey' | 'ridge' | 'plaque';
+// Caméra du panel d'évolution : UNE seule montée macro sur le coin avant droit du hall, sans aller-retour. Elle part du pied de la
+// structure Tang, tourne lentement vers la façade tout en montant : le bas (les colonnes remplacées, Song), puis le haut (les consoles
+// et les rives du toit, Ming), enfin le sommet (l'étage des Qing qui tombe), avant un seul recul vers la façade complète.
+// Trajectoire à images clés, interpolée en continu (Hermite, tangentes par différences finies : pas d'arrêt aux images clés).
+// Chaque image clé donne l'azimut, l'élévation, un facteur de zoom et un point visé (une « ancre » qui suit le bâtiment qui change).
+export type Anchor = 'base' | 'cornerLow' | 'brCorner' | 'eaveCorner' | 'storeyCorner';
 export type CamKey = { t: number; az: number; el: number; zoom: number; a: Anchor; dx?: number }; // dx : décalage latéral du point visé (monde)
 
-// azimut 0 = façade ; positif = on tourne vers la droite du hall
+// azimut 0 = façade ; positif = on regarde plutôt le pignon droit
 export const KEYS: CamKey[] = [
-  { t: 0.0, az: -0.95, el: 0.04, zoom: 0.92, a: 'base' },     // ouverture : plan bas, le socle pousse
-  { t: 1.1, az: -0.72, el: 0.08, zoom: 1.0, a: 'base' },
-  { t: 2.0, az: -0.35, el: 0.11, zoom: 1.05, a: 'base' },     // le toit se pose
-  { t: 2.9, az: 0.42, el: 0.07, zoom: 2.5, a: 'brCorner' },   // MACRO : la console d'angle s'ouvre
-  { t: 3.8, az: 0.78, el: 0.09, zoom: 2.5, a: 'brCorner' },
-  { t: 4.5, az: 1.25, el: 0.16, zoom: 1.1, a: 'base' },       // on recule : les consoles se referment
-  { t: 5.0, az: 1.75, el: 0.32, zoom: 0.94, a: 'base' },      // ronde haute : les colonnes sont remplacées
-  { t: 5.9, az: 2.7, el: 0.36, zoom: 0.9, a: 'base' },
-  { t: 6.7, az: 3.75, el: 0.2, zoom: 0.98, a: 'base' },
-  { t: 7.3, az: 4.35, el: 0.06, zoom: 0.9, a: 'base' },       // plan bas : l'étage tombe du ciel
-  { t: 8.3, az: 5.25, el: 0.09, zoom: 0.94, a: 'base' },
-  { t: 8.75, az: 5.62, el: 0.13, zoom: 0.97, a: 'base' },     // impact de l'étage
-  { t: 9.3, az: 6.28, el: 0.17, zoom: 0.98, a: 'base', dx: -0.5 }, // façade, un peu à droite pour dégager le cartouche
-  { t: 10.0, az: 6.28, el: 0.19, zoom: 1.03, a: 'base', dx: -0.7 }, // poussée lente
+  { t: 0.0, az: 1.4, el: 0.05, zoom: 1.9, a: 'cornerLow' },    // Tang : le pied du coin, le socle pousse, les colonnes tombent
+  { t: 1.2, az: 1.28, el: 0.06, zoom: 1.9, a: 'cornerLow' },
+  { t: 2.4, az: 1.12, el: 0.07, zoom: 1.85, a: 'cornerLow' },   // Song, le BAS : les colonnes sont remplacées une à une
+  { t: 3.6, az: 0.95, el: 0.08, zoom: 1.75, a: 'cornerLow' },
+  { t: 4.7, az: 0.78, el: 0.09, zoom: 1.95, a: 'brCorner' },    // on monte : Ming, le HAUT — les consoles s'ouvrent et se referment
+  { t: 5.8, az: 0.6, el: 0.1, zoom: 2.0, a: 'brCorner' },
+  { t: 6.5, az: 0.46, el: 0.12, zoom: 1.75, a: 'eaveCorner' },  // la rive du toit : bêtes de faîte, tuiles vernissées
+  { t: 7.3, az: 0.32, el: 0.14, zoom: 1.4, a: 'storeyCorner' }, // Qing, le SOMMET : l'étage tombe du ciel
+  { t: 8.7, az: 0.16, el: 0.16, zoom: 1.2, a: 'storeyCorner' }, // impact
+  { t: 9.5, az: 0.0, el: 0.18, zoom: 0.98, a: 'base', dx: -0.5 }, // un seul recul vers la façade, à droite pour dégager le cartouche
+  { t: 10.0, az: 0.0, el: 0.19, zoom: 1.02, a: 'base', dx: -0.7 },
 ];
 
 const hermite = (t0: number, t1: number, v0: number, v1: number, m0: number, m1: number, t: number) => {
@@ -39,14 +36,15 @@ export function channel(vals: number[], t: number): number {
 }
 
 export type Hall3 = { platH: number; colH: number; brH: number; ridgeH: number; tier2: number; hx: number; HD: number };
-// point visé (monde) pour chaque ancre, à zoom `zoom` (le cadrage de base place le pied du hall à 660 px du haut de l'écran)
+// point visé (monde) pour chaque ancre, à zoom `zoom` ; le décalage -k/zoom place le point vers 390 px du haut de l'écran, au-dessus du
+// compteur. Le cadrage de base place le pied du hall à 660 px.
 export function anchorPoint(a: Anchor, h: Hall3, zoom: number): [number, number, number] {
-  const yb = h.platH + h.colH + 0.3, top = h.platH + h.colH + 0.4 + h.brH + h.ridgeH + h.tier2;
+  const yb = h.platH + h.colH + 0.3, yEave = h.platH + h.colH + 0.14 + h.brH;
   switch (a) {
-    case 'brCorner': return [h.hx - 0.2, yb + 0.1 - 150 / zoom, h.HD]; // la console apparaît au-dessus du compteur (vers 390 px)
-    case 'storey': return [0, h.platH + h.colH + 0.4 + h.brH + 0.9, 0];
-    case 'ridge': return [0, top - 0.35, 0];
-    case 'plaque': return [0, yb - 0.3, h.HD];
+    case 'cornerLow': return [h.hx - 0.15, h.platH + 0.55 - 150 / zoom, h.HD];
+    case 'brCorner': return [h.hx - 0.2, yb + 0.1 - 150 / zoom, h.HD];
+    case 'eaveCorner': return [h.hx - 0.1, yEave + 0.15 - 150 / zoom, h.HD + 0.3];
+    case 'storeyCorner': return [h.hx * 0.8, yEave + 1.0 - 120 / zoom, h.HD];
     default: return [0, (660 - 540) / zoom, 0];
   }
 }
@@ -57,7 +55,7 @@ export function cameraAt(t: number, h: Hall3, zoomFit: number): CamPose {
   const az = channel(KEYS.map((k) => k.az), t), el = channel(KEYS.map((k) => k.el), t);
   const lz = channel(KEYS.map((k) => Math.log(k.zoom)), t), zoom = zoomFit * Math.exp(lz);
   // point visé : interpolation des ancres résolues, avec les mêmes poids que les canaux (on lit le canal d'un indicateur par ancre)
-  const names: Anchor[] = ['base', 'brCorner', 'storey', 'ridge', 'plaque'];
+  const names: Anchor[] = ['base', 'cornerLow', 'brCorner', 'eaveCorner', 'storeyCorner'];
   const w = names.map((nm) => Math.max(0, channel(KEYS.map((k) => (k.a === nm ? 1 : 0)), t)));
   const sum = w.reduce((a, b) => a + b, 0) || 1;
   const target: [number, number, number] = [0, 0, 0];

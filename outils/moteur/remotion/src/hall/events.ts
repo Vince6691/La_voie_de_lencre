@@ -6,7 +6,7 @@ import { DUR, T0, T_INTRO } from './params';
 export type EvKind = 'bois' | 'clic' | 'toit' | 'impact' | 'cloche' | 'gong' | 'or' | 'souffle' | 'tac' | 'note' | 'pinceau';
 export type Ev = { t: number; k: EvKind; v: number; f?: number; n?: number };
 
-const ang = (x: number, z: number) => (Math.atan2(z, x) + Math.PI) / (2 * Math.PI);
+const ang = (x: number, z: number) => ((((0.5191 - Math.atan2(z, x)) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) / (2 * Math.PI);
 const HD = 2;
 // piliers du hall à 7 travées (Tang, Song) : rangées de façade et de fond, et trois piliers par pignon
 const RING: [number, number][] = (() => {
@@ -32,17 +32,19 @@ export function hallEvents(): { total: number; events: Ev[] } {
   at(T_INTRO, 'toit', 0.9); at(T_INTRO, 'impact', 0.7);
   at(0.15, 'souffle', 0.5);
 
-  // ── Tang → Song : chaque jeu de consoles s'ouvre puis se referme, tour à tour
+  // ── Tang → Song : chaque colonne est remplacée, tour à tour ; le socle s'affine
   const t1 = T0, t2 = T0 + DUR, t3 = T0 + DUR * 2;
-  at(t1 + 0.1, 'souffle', 0.55);
-  RING.forEach(([x, z]) => { const a = ang(x, z); at(t1 + DUR * ((0.5 + a * 0.7) / 1.7), 'clic', 0.38); at(t1 + DUR * ((1 + a * 0.7) / 1.7), 'clic', 0.22); });
-  at(t1 + DUR * 0.5, 'pinceau', 0.35);
+  at(t1 + 0.1, 'souffle', 0.5);
+  at(t1 + DUR * 0.3, 'impact', 0.35);
+  RING.forEach(([x, z]) => at(t1 + DUR * ((1 + ang(x, z) * 0.7) / 1.7), 'bois', 0.55));
+  at(t1 + DUR * 0.55, 'pinceau', 0.3);
 
-  // ── Song → Ming : le socle de marbre monte, chaque colonne est remplacée, les balustres arrivent
+  // ── Song → Ming : le marbre monte, les balustres arrivent, chaque jeu de consoles s'ouvre puis se referme, les bêtes de faîte montent
   at(t2 + 0.1, 'souffle', 0.55);
-  at(t2 + DUR * 0.3, 'impact', 0.45);
-  RING.forEach(([x, z]) => at(t2 + DUR * ((1 + ang(x, z) * 0.7) / 1.7), 'bois', 0.55));
-  [0.45, 0.52, 0.6, 0.68, 0.76, 0.84].forEach((k) => at(t2 + DUR * k, 'clic', 0.32));
+  at(t2 + DUR * 0.25, 'impact', 0.45);
+  [0.15, 0.22, 0.3, 0.38, 0.46, 0.5].forEach((k) => at(t2 + DUR * k, 'clic', 0.32));
+  RING.forEach(([x, z]) => { const a = ang(x, z); at(t2 + DUR * ((0.5 + a * 0.7) / 1.7), 'clic', 0.38); at(t2 + DUR * ((1 + a * 0.7) / 1.7), 'clic', 0.22); });
+  [0.6, 0.68, 0.76].forEach((k) => at(t2 + DUR * k, 'clic', 0.3));
 
   // ── Ming → Qing : le toit s'aplatit, l'étage tombe, les bêtes de faîte montent
   at(t3 + 0.1, 'souffle', 0.6);
@@ -51,15 +53,15 @@ export function hallEvents(): { total: number; events: Ev[] } {
   at(tLand, 'impact', 1.0); at(tLand, 'toit', 0.9); at(tLand + 0.02, 'bois', 0.8, { f: 0.8 });
   for (let i = 0; i < 5; i++) at(t3 + DUR * (0.78 + 0.04 * i), 'clic', 0.34);
 
-  // ── sceaux : frappe (cloche + « tac » + reflet d'or), envol
+  // ── sceaux : frappe (« tac » + reflet d'or), envol
   SEALS.forEach((s) => {
-    at(s.stamp, 'tac', 0.7); at(s.stamp, 'cloche', 0.7, { f: s.n === 0 ? 1 : 1 }); at(s.stamp + 0.05, 'or', 0.4);
+    at(s.stamp, 'tac', 0.7); at(s.stamp + 0.05, 'or', 0.4);
     at(s.fly0, 'souffle', 0.3);
     at(s.stamp, 'note', 0.55, { f: NOTES[s.n], n: s.n });
   });
 
-  // ── fin : reflet de l'or, gong, signature 墨道 ; accord final
-  at(9.0, 'or', 0.5); at(T0 + DUR * 3 + 0.05, 'gong', 0.55); at(9.5, 'tac', 0.7);
+  // ── fin : reflet de l'or, signature 墨道 ; accord final (pas de cloche ni de gong aux changements d'époque)
+  at(9.0, 'or', 0.5); at(9.5, 'tac', 0.7);
   at(9.3, 'note', 0.6, { f: 587.33, n: 4 });
   return { total: 10, events: ev.sort((a, b) => a.t - b.t) };
 }

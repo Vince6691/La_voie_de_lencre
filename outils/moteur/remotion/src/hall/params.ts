@@ -37,12 +37,15 @@ const mixHex = (a: string, b: string, k: number) => '#' + hex(a).map((v, i) => M
 
 // Chaque transformation a UN élément héros, qui se démonte et se remonte de façon évidente (fenêtres serrées) ; tout le reste
 // évolue lentement et discrètement sur toute la durée, et les couleurs se fondent en continu avec le compteur d'années.
-//   Tang → Song : les consoles (斗拱) ; Song → Ming : les colonnes et le socle ; Ming → Qing : le second étage.
+//   Tang → Song : les colonnes (le bas) ; Song → Ming : les consoles 斗拱 et le toit (le haut) ; Ming → Qing : le second étage (le sommet).
 type Win = Record<string, [number, number]>;
 const SLOW: [number, number] = [0, 1];
 const WINDOWS: Win[] = [
-  { base: SLOW, col: SLOW, br: [0.1, 0.85], roof: SLOW, tier: SLOW, orn: [0.6, 1], deco: [0.3, 1] },
+  // Tang → Song : le bas — les colonnes sont remplacées en cercle, le socle s'affine
   { base: [0.05, 0.6], col: [0.05, 0.7], br: SLOW, roof: SLOW, tier: SLOW, orn: [0.5, 1], deco: [0.4, 1] },
+  // Song → Ming : le haut — les consoles s'ouvrent et se referment, le marbre monte, les bêtes de faîte arrivent
+  { base: [0, 0.5], col: SLOW, br: [0.2, 0.85], roof: SLOW, tier: SLOW, orn: [0.55, 1], deco: [0.4, 1] },
+  // Ming → Qing : le sommet — l'étage tombe
   { base: [0.05, 0.5], col: SLOW, br: SLOW, roof: [0, 0.5], tier: [0.3, 0.8], orn: [0.78, 1], deco: [0.5, 1] },
 ];
 const COLOR_WIN: [number, number] = [0.1, 0.95];

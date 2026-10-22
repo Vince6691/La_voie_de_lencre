@@ -66,6 +66,9 @@ const useFonts = () => {
 
 // cartouche d'époque (même gabarit que Rouleau3DDemo) : sceau, nom de la période, hall
 const Tag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({ zh, name, dates, a }) => (
+  <>
+  {/* voile de papier : le cartouche reste lisible quand le toit sombre passe derrière lui */}
+  <div style={{ position: 'absolute', left: 40, top: 40, width: 760, height: 200, background: 'radial-gradient(ellipse 55% 55% at 40% 50%, rgba(250,247,240,0.78), rgba(250,247,240,0))', opacity: a }} />
   <div style={{ position: 'absolute', left: 110, top: 90, display: 'flex', alignItems: 'center', gap: 26, opacity: a }}>
     <div style={{ width: 92, height: 92, background: 'rgba(192,57,43,0.92)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 64, lineHeight: 1, color: '#f6eee0' }}>{zh}</div>
     <div>
@@ -73,6 +76,7 @@ const Tag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({
       <div style={{ fontFamily: 'ShuimoLatin', fontSize: 30, color: '#6b5d50' }}>{dates}</div>
     </div>
   </div>
+  </>
 );
 
 export const HallEvolution: React.FC = () => {
@@ -112,7 +116,7 @@ export const HallEvolution: React.FC = () => {
   const appear = smooth(0, 0.6, t);
 
   // cartouches : celui d'une époque apparaît quand son sceau s'y pose, et s'efface quand le sceau suivant est frappé
-  const macro = smooth(1.4, 2.3, cam.zoom / Math.min(1150 / diag, 600 / top));
+  const macro = smooth(1.8, 2.4, cam.zoom / Math.min(1150 / diag, 600 / top));
   const tagA = (n: number) => (1 - 0.9 * macro) * smooth(ARR[n].fly1 - 0.05, ARR[n].fly1 + 0.2, t) * (ARR[n + 1] ? 1 - smooth(ARR[n + 1].stamp - 0.25, ARR[n + 1].stamp + 0.05, t) : 1);
   // reflet doré sur le compteur à chaque frappe de sceau
   const glint = ARR.map((a) => (t >= a.stamp - 0.2 && t <= a.stamp + 0.6 ? (t - (a.stamp - 0.2)) / 0.8 : 0)).find((g) => g > 0) ?? 0;
