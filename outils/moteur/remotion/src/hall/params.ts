@@ -82,3 +82,19 @@ export const progress = (t: number) => [0, 1, 2].reduce((p, i) => p + kOf(t, i),
 export const stepOf = (t: number): { i: number; k: number } => { const i = t < T0 + DUR ? 0 : t < T0 + 2 * DUR ? 1 : 2; return { i, k: kOf(t, i) }; };
 // demi-largeur de façade : 7 travées → 9 (colonnes) → 11, les pignons glissent vers l'extérieur avec leurs colonnes d'angle
 export const hxOf = (prog: number) => 3.5 + smooth(0.1, 0.6, clamp(prog - 1)) + smooth(0, 0.6, clamp(prog - 2));
+
+// lumière du jour qui avance avec les époques : aube dorée (Tang), matin clair (Song), plein jour (Ming), crépuscule vermillon (Qing).
+// sun = direction vers le soleil (monde, +z = façade, +x = droite) ; tint = couleur de la lumière directe ; amb = part de lumière ambiante
+export type Light = { sun: [number, number, number]; tint: [number, number, number]; amb: number; sky: [number, number, number, number] };
+export const LIGHTS: Light[] = [
+  { sun: [-0.75, 0.38, 0.55], tint: [1.0, 0.84, 0.62], amb: 0.66, sky: [255, 196, 140, 0.38] },
+  { sun: [-0.4, 0.75, 0.5], tint: [0.97, 0.99, 1.0], amb: 0.7, sky: [175, 200, 225, 0.22] },
+  { sun: [0.25, 0.9, 0.4], tint: [1.0, 0.97, 0.9], amb: 0.72, sky: [255, 246, 225, 0.12] },
+  { sun: [0.8, 0.3, 0.55], tint: [1.0, 0.74, 0.55], amb: 0.6, sky: [255, 140, 96, 0.42] },
+];
+export function lightAt(i: number, k: number): Light {
+  const A = LIGHTS[i], B = LIGHTS[Math.min(3, i + 1)], e = smooth(0.1, 0.9, k);
+  const mix3 = (a: number[], b: number[]) => a.map((v, j) => lerp(v, b[j], e));
+  const sun = mix3(A.sun, B.sun), n = Math.hypot(sun[0], sun[1], sun[2]);
+  return { sun: [sun[0] / n, sun[1] / n, sun[2] / n], tint: mix3(A.tint, B.tint) as [number, number, number], amb: lerp(A.amb, B.amb, e), sky: mix3(A.sky, B.sky) as [number, number, number, number] };
+}
