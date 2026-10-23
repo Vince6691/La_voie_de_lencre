@@ -17,6 +17,7 @@ import { AbsoluteFill, Audio, Img, Sequence, interpolate, staticFile, useCurrent
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
+import { periodesEntre } from '../periodes';
 
 export type Era = { zh: string; date: string };
 // époques du 學 (dates de référence) ; remplacer par celles de la vidéo
@@ -145,13 +146,13 @@ const ScrollObject: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
       <div style={{ position: 'absolute', left: 0, top: 40, width: 72, height: 1140, borderRadius: 10, boxShadow: '0 10px 30px rgba(0,0,0,0.45)',
         background: 'repeating-linear-gradient(90deg, rgba(120,100,70,0.10) 0 3px, rgba(0,0,0,0) 3px 11px), linear-gradient(90deg,#b9ad93,#f1e9d8 45%,#a89b80)',
         backgroundPositionX: `${roll % 11}px, 0` }} />
-      {[0, 1188].map((y) => <div key={y} style={{ position: 'absolute', left: 16, top: y, width: 40, height: 32, borderRadius: 8, background: 'linear-gradient(90deg,#9fae9b,#e3ebdd 50%,#8c9b88)' }} />)}
+      {[0, 1188].map((y) => <div key={y} style={{ position: 'absolute', left: 16, top: y, width: 40, height: 32, borderRadius: 8, background: 'linear-gradient(90deg,#8d6a2a,#e8c882 50%,#7a5a22)' }} />)}
     </div>
   );
   return (
     <>
-      {show && <div style={{ position: 'absolute', left: -6, top: -52, width: 1932, height: 1184, background: '#d6cbb2', boxShadow: '0 30px 80px rgba(0,0,0,0.55)',
-        backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0 40px, rgba(90,70,40,0.35) 40px 42px, rgba(0,0,0,0) 42px 1142px, rgba(90,70,40,0.35) 1142px 1144px, rgba(0,0,0,0) 1144px)' }} />}
+      {show && <div style={{ position: 'absolute', left: -6, top: -52, width: 1932, height: 1184, background: '#c9b186', boxShadow: '0 36px 90px rgba(0,0,0,0.65), 0 6px 14px rgba(0,0,0,0.4)',
+        backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0 36px, rgba(176,134,52,0.85) 36px 39px, rgba(0,0,0,0) 39px 1145px, rgba(176,134,52,0.85) 1145px 1148px, rgba(0,0,0,0) 1148px), repeating-linear-gradient(45deg, rgba(120,92,50,0.12) 0 2px, rgba(0,0,0,0) 2px 7px), repeating-linear-gradient(-45deg, rgba(255,240,205,0.10) 0 2px, rgba(0,0,0,0) 2px 7px)' }} />}
       <Img src={staticFile('shuimo/paper.jpg')} style={{ position: 'absolute', width: 1920, height: 1080, objectFit: 'cover' }} />
       {show && roller(-78)}
       {show && roller(1926)}
@@ -188,7 +189,7 @@ const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c
     <AbsoluteFill>
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse 48% 22% at 50% 57%, rgba(250,247,240,0.85), rgba(250,247,240,0))', opacity: line * out }} />
       <svg width={1920} height={1080} style={{ position: 'absolute', inset: 0, opacity: out }}>
-        <path d={`M${x0},${g.y} L${x0 + (x1 - x0) * line},${g.y + 1}`} stroke={INK} strokeWidth={3} strokeLinecap="round" fill="none" opacity={0.75} />
+        <path d={`M${x0},${g.y} L${x0 + (x1 - x0) * line},${g.y + 1}`} stroke={INK} strokeWidth={4.5} strokeLinecap="round" fill="none" opacity={0.8} />
         {defaultCursor && u > 0.1 && u < 0.86 && <circle cx={cur.x} cy={g.y - 52} r={11} fill={INK} opacity={smooth(0.1, 0.16, u)} />}
       </svg>
       {eras.map((e, i) => {
@@ -198,12 +199,12 @@ const Timeline: React.FC<{ c: TimeScrollConfig; defaultCursor: boolean }> = ({ c
         const past = c.to < c.from ? i >= c.from : i <= c.from;
         const isTo = i === c.to, done = past || (isTo && u >= IMPACT);
         const fillK = past ? 1 : isTo ? smooth(IMPACT, IMPACT + 0.03, u) : 0;
-        const size = 64 * (0.6 + 0.4 * pop) * (isTo ? 1 + 0.28 * flash : 1);
+        const size = 86 * (0.6 + 0.4 * pop) * (isTo ? 1 + 0.28 * flash : 1);
         const a = pop * out * (isTo && u > 0.86 ? 0 : 1) * (done || isTo ? 1 : 0.55);
         return (
           <React.Fragment key={e.zh + i}>
             <Seal zh={e.zh} x={sealX(c, i)} y={g.y} size={size} fill={fillK} glow={isTo ? flash : 0} a={a} />
-            <div style={{ position: 'absolute', left: sealX(c, i) - 60, width: 120, top: g.y + 46, textAlign: 'center', fontFamily: 'ShuimoLatin', fontSize: 24, color: '#6b5d50', opacity: pop * out * (done || isTo ? 0.9 : 0.5) }}>{e.date}</div>
+            <div style={{ position: 'absolute', left: sealX(c, i) - 60, width: 120, top: g.y + 60, textAlign: 'center', fontFamily: 'ShuimoLatin', fontSize: 36, fontWeight: 600, color: '#4b4038', opacity: pop * out * (done || isTo ? 1 : 0.6) }}>{e.date}</div>
           </React.Fragment>
         );
       })}
@@ -239,16 +240,27 @@ const Wind: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   );
 };
 const fmtYear = (y: number) => (y < 0 ? [`${-y}`, 'av. J.-C.'] : [`${y}`, '']);
+const GOLD_DARK = 'linear-gradient(180deg, #e0b457 0%, #b8862f 45%, #7d5619 100%)';
 const YearCounter: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const t = useT(), u = tsU(c, t);
   if (u <= 0 || u >= 1) return null;
   const a = smooth(0.06, 0.15, u) * (1 - smooth(0.73, 0.78, u));
-  const [n, suffix] = fmtYear(Math.round(lerp(c.years[0], c.years[1], travelM(u))));
+  const year = Math.round(lerp(c.years[0], c.years[1], travelM(u)));
+  const per = periodesEntre(c.years[0], c.years[1]);
+  let pi = 0; per.forEach((p, i) => { if (year >= p.debut) pi = i; });
+  const P = per[pi], next = per[pi + 1];
+  const pa = P ? Math.min(pi === 0 ? 1 : clamp((year - P.debut) / 25), next ? clamp((next.debut - year) / 25) : 1) : 0;
   const blur = Math.min(4, (3.5 * speedAt(c, t)) / MAXSPEED);
+  const [n, suffix] = fmtYear(year);
   return (
-    <div style={{ position: 'absolute', width: '100%', top: 300, textAlign: 'center', opacity: a }}>
-      <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 88, letterSpacing: 4, color: rgb(VERMILION), filter: `blur(${blur.toFixed(2)}px)`, textShadow: '0 0 18px rgba(250,247,240,0.9)' }}>
-        {n} {suffix && <span style={{ fontSize: 44, fontWeight: 500 }}>{suffix}</span>}
+    <div style={{ position: 'absolute', width: '100%', top: 250, textAlign: 'center', opacity: a, filter: 'drop-shadow(0 2px 8px rgba(250,247,240,0.95))' }}>
+      <div style={{ height: 56, display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 18, opacity: pa }}>
+        {P && <span style={{ fontFamily: 'ShuimoKai', fontSize: 46, color: rgb(VERMILION) }}>{P.zh}</span>}
+        {P && <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 600, fontSize: 30, letterSpacing: '0.3em', color: '#4b4038' }}>{P.nom}</span>}
+      </div>
+      <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 18, filter: `blur(${blur.toFixed(2)}px)` }}>
+        <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 700, fontSize: 112, lineHeight: 1.05, letterSpacing: 4, backgroundImage: GOLD_DARK, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent' }}>{n}</span>
+        {suffix && <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 500, fontSize: 40, color: '#7d5619' }}>{suffix}</span>}
       </div>
     </div>
   );
@@ -258,7 +270,7 @@ const FlyingSeal: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   if (u <= 0.86 || u >= 0.985) return null;
   const z = camera(0.86), g = geom(c), tag = tagOf(c), k = ease((u - 0.86) / 0.12);
   const sx = 960 + (sealX(c, c.to) - 960) * z, sy = 540 + (g.y - 540) * z;
-  return <Seal zh={erasOf(c)[c.to].zh} x={lerp(sx, tag.x, k)} y={lerp(sy, tag.y, k)} size={lerp(64 * z * 1.15, tag.size, k)} fill={1} glow={0.5 * (1 - k)} />;
+  return <Seal zh={erasOf(c)[c.to].zh} x={lerp(sx, tag.x, k)} y={lerp(sy, tag.y, k)} size={lerp(86 * z * 1.15, tag.size, k)} fill={1} glow={0.5 * (1 - k)} />;
 };
 
 // ── scène complète : table, caméra et monde du rouleau (paysages, ciel, enfants, frise), couches d'écran, son.
@@ -270,7 +282,7 @@ export const TimeScrollStage: React.FC<{
   const { fps } = useVideoConfig();
   const z = camera(tsU(cfg, useT())), end = cfg.at + dur(cfg);
   return (
-    <AbsoluteFill style={{ background: 'repeating-linear-gradient(92deg, #2b2119 0 6px, #30251c 6px 13px, #271e17 13px 21px)' }}>
+    <AbsoluteFill style={{ background: 'radial-gradient(ellipse 75% 62% at 50% 48%, rgba(150,96,48,0.55) 0%, rgba(90,56,30,0.25) 55%, rgba(0,0,0,0) 100%), repeating-linear-gradient(1.2deg, #2a1e15 0 4px, #33251a 4px 9px, #241911 9px 17px, #2f2218 17px 22px)' }}>
       <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${960 - 960 * z}px, ${540 - 540 * z}px) scale(${z})` }}>
         <ScrollObject c={cfg} />
         {under}

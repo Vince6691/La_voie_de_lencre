@@ -37,9 +37,9 @@ export const XUE_V2_SECONDS = Math.ceil(L.total * 10) / 10; // écran de fin de 
 
 const TR1: TimeScrollConfig = { at: R1, duration: L.rouleaux[0].duree, from: 0, to: 1, years: [-1250, -1046] };
 const TR2: TimeScrollConfig = { at: R2, duration: L.rouleaux[1].duree, from: 1, to: 2, years: [-1046, -221] };
-// rouleau 3D complet sur le plus grand saut (Han → aujourd'hui) ; vers de l'inscription : le caractère étudié
+// rouleau 3D complet sur le plus grand saut (Tang, écriture régulière → aujourd'hui : la régulière est déjà dite) ; vers de l'inscription : le caractère étudié
 const R3A: Rouleau3DConfig = {
-  at: R3, de: 'han', vers: 'aujourdhui', annees: [100, 1956], variant: 'complet', stone: 'miel',
+  at: R3, de: 'tang', vers: 'aujourdhui', annees: [618, 1956], variant: 'complet', stone: 'miel',
   fromLand: { seed: 3, mood: 'jour' }, toLand: { seed: 30, mood: 'aube' }, midSeeds: [17, 21],
   inscriptions: [
     { x: 1500, y: 200, size: 74, font: 'ShuimoKai', cols: ['學而時習之', '不亦說乎'], sig: '論語學而', seal: '長樂', ink: 0.88 },
@@ -75,10 +75,11 @@ const useSetup = () => {
     Promise.all([
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load(),
+      new FontFace('ShuimoCaps', `url(${staticFile('fonts/Cinzel.ttf')})`, { weight: '400 900' }).load(),
       new FontFace('ShuimoPinceau', `url(${staticFile('fonts/MaShanZheng-Regular.ttf')})`).load(),
       new FontFace('ShuimoLegende', `url(${staticFile('fonts/ZhuqueFangsong-Regular.ttf')})`).load().catch(() => new FontFace('ShuimoLegende', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load()),
       chargerCartes(['chine_centre_nord']),
-    ]).then((fs) => { fs.slice(0, 4).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
+    ]).then((fs) => { fs.slice(0, 5).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
   }, [h]);
   return ready;
 };
@@ -118,9 +119,10 @@ const Paper: React.FC = () => <AbsoluteFill style={{ background: `#f3eee4 url(${
 // le caractère quand un caractère est à l'écran juste avant ; sortie par les coups de pinceau dans tous les cas
 // clips Seedance dédiés (episodes/xue/A_FOURNIR.md) : PRETS passe à true à l'arrivée du fichier ; d'ici là, un emplacement marqué
 const CLIPS = { devins: 'episodes/xue/clips/01_devins.mp4', arc: 'episodes/xue/clips/02_tir_arc.mp4' };
-const PRETS: Record<keyof typeof CLIPS, boolean> = { devins: false, arc: false };
+const PRETS: Record<keyof typeof CLIPS, boolean> = { devins: true, arc: false };
 const CLIP_TITRES = { devins: ['Clip 1 · les devins', 'Seedance, 12 s : la tige brûlante, l\'écaille qui craque'], arc: ['Clip 2 · le tir à l\'arc au 學宮', 'Seedance, 8 s : le roi guide la main de l\'élève'] };
-const CLIP_SECONDS = { devins: 12, arc: 8 }; // durée des clips Seedance
+const CLIP_SECONDS = { devins: 8, arc: 8 }; // durée des clips Seedance
+const CLIP_ZOOM = { devins: 1.12, arc: 1 }; // recadrage (filigrane du générateur hors cadre)
 const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry: 'nuages' | 'glyphe'; inDur?: number }> = ({ src, from, len, entry, inDur = 3.2 }) => {
   const { fps } = useVideoConfig();
   if (!PRETS[src]) {
@@ -131,15 +133,16 @@ const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry
     );
   }
   const rate = Math.min(0.9, CLIP_SECONDS[src] / len); // ralenti si le plan est plus long que le clip
+  const crop = (el: React.ReactNode) => (CLIP_ZOOM[src] === 1 ? <>{el}</> : <AbsoluteFill style={{ transformOrigin: '10% 20%', transform: `scale(${CLIP_ZOOM[src]})` }}>{el}</AbsoluteFill>);
   if (entry === 'glyphe') {
-    return (
+    return crop(
       <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(len * fps)}>
         <VideoReveal src={CLIPS[src]} mode="glyphe" outMode="pinceau" inDur={inDur} outDur={2.4} playbackRate={rate} zoom={1} />
       </Sequence>
     );
   }
   const cl = inDur + 0.4; // nuages qui se referment puis s'écartent, puis la vidéo seule jusqu'aux coups de pinceau
-  return (
+  return crop(
     <>
       <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(cl * fps)}>
         <CloudReveal src={CLIPS[src]} inDur={inDur} exit={false} playbackRate={rate} />
@@ -312,7 +315,7 @@ const ShangZhou: React.FC = () => {
       {/* les devins (clip), puis le tir à l'arc au 學宮 (clip) */}
       <Clip src="devins" from={at('b03', 'devins') - 0.4} len={TT.plastronIn[0] - at('b03', 'devins') + 1.8} entry="nuages" />
       <Clip src="arc" from={vase - 0.3} len={R2 - vase + 0.6} entry="glyphe" />
-      <EraTag {...cartouche('shang', 'Anyang · v. 1250 av. J.-C.')} a={win(t, A3 + 0.3, R1 + 0.4, 0.8)} />
+      <EraTag {...cartouche('shang', 'Anyang · v. 1250 av. J.-C.')} a={win(t, A3 + 0.3, R1 + 0.4, 0.8) * (1 - win(t, at('b03', 'devins') - 0.2, TT.plastronIn[0] + 1.6, 0.5))} />
       <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
       <Label x={1220} y={420} zh="爻" text="baguettes" color={PIGMENT.yao} a={win(t, TT.yao + 0.3, R1, 0.6)} />
       <Label x={1220} y={720} zh="宀" text="le toit" color={PIGMENT.roof} a={win(t, TT.roof + 0.3, R1, 0.6)} />
@@ -412,6 +415,18 @@ const Retournement: React.FC = () => {
       <Cam keys={[[A7, 960, 540, 1.02], [fig - 0.2, 960, 520, 1.14, 1.2], [reg - 0.2, 960, 540, 1.02, 1.0], [cop + 0.8, 960, 500, 1.15, 1.4], [rep - 0.3, 960, 540, 1.02, 1.0]]} punch={[reg, rep]}>
       <Landscape seed={3} from={A7 - 1} to={R3 + 2} move="pan" mood="jour" faint={0.4} />
       <Draw draw={(ctx, tt, E) => {
+        // « les scribes écrivent vite » : le petit sceau de Xu Shen, puis des copies de plus en plus vite et de plus en plus plates
+        const sc = seg(tt, A7 - 0.3, A7 + 0.6) * (1 - seg(tt, apl + 0.3, apl + 1.2));
+        if (sc > 0) E.drawRealGlyph(ctx, 'xiaozhuan', { x: 960, y: 500, size: 560, opacity: sc, color: () => inkCss });
+        const run = seg(tt, A7 + 1.0, A7 + 1.8) * (1 - seg(tt, apl + 0.2, apl + 1.0));
+        if (run > 0) {
+          const sp = 260 + 520 * seg(tt, A7 + 1.0, apl), x0 = 2300 - sp * (tt - (A7 + 1.0)) * 0.9;
+          for (let i = 0; i < 9; i++) {
+            const x = x0 + i * 330, f = seg(x, 1900, 1500) * seg(x, -100, 250);
+            if (f <= 0) continue;
+            E.drawRealGlyph(ctx, i < 3 ? 'xiaozhuan' : i < 6 ? 'lishu' : 'lishu', { x, y: 905, size: 130, opacity: 0.55 * run * f, color: () => inkCss });
+          }
+        }
         // écriture des clercs : les mains vermillon pâlissent et se figent en bloc gris
         const li = seg(tt, apl + 0.6, apl + 1.6) * (1 - seg(tt, reg - 0.6, reg));
         if (li > 0) {
@@ -435,6 +450,8 @@ const Retournement: React.FC = () => {
         }
       }} />
       </Cam>
+      <Caption text="dans les bureaux de l'empire · on copie, vite" a={win(t, A7 + 0.5, apl - 0.2, 0.5)} y={730} size={44} />
+      <EraTag {...cartouche('tang', "楷書 · l'écriture régulière")} a={win(t, reg + 0.2, R3 - 0.3, 0.5)} />
       <Caption text="écriture des clercs 隸書 · les mains figées en « mortier » 臼" a={win(t, fig, reg - 0.4)} />
       <Caption text="écriture régulière 楷書 · 16 traits" a={win(t, reg + 0.4, cop + 0.8)} />
       <Caption text="« les mains n'ont pas été effacées par un décret »" a={win(t, rep, R3 - 0.2)} size={44} y={920} />

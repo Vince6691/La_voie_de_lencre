@@ -21,7 +21,7 @@ const CLOUDS = (() => {
   return out.sort((a, b) => a.depth - b.depth);
 })();
 
-export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: number; exit?: boolean; startFrom?: number; playbackRate?: number; videoAt?: number; volume?: number }> = ({ src, inDur = 3.6, outDur = 3.2, exit = true, startFrom = 0, playbackRate = 1, videoAt, volume = 0 }) => {
+export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: number; exit?: boolean; startFrom?: number; playbackRate?: number; videoAt?: number; volume?: number; zoom?: number }> = ({ src, inDur = 3.6, outDur = 3.2, exit = true, startFrom = 0, playbackRate = 1, videoAt, volume = 0, zoom = 1 }) => {
   const { fps, durationInFrames } = useVideoConfig();
   const t = useCurrentFrame() / fps, total = durationInFrames / fps, oAt = exit ? total - outDur : Infinity; // exit = false : entrée seule (la sortie est confiée à un autre effet)
   const inPh = t < oAt, u = inPh ? clamp(t / inDur) : clamp((t - oAt) / outDur);
@@ -33,8 +33,8 @@ export const CloudReveal: React.FC<{ src: string; inDur?: number; outDur?: numbe
     <AbsoluteFill>
       {/* videoAt (s) : la vidéo démarre à son début à cet instant (au lieu de démarrer avec la séquence) */}
       {videoAt !== undefined
-        ? <Sequence from={Math.round(videoAt * fps)} layout="none"><OffthreadVideo src={staticFile(src)} muted={volume === 0} volume={volume} startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></Sequence>
-        : showVid && <OffthreadVideo src={staticFile(src)} muted startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+        ? <Sequence from={Math.round(videoAt * fps)} layout="none"><OffthreadVideo src={staticFile(src)} muted={volume === 0} volume={volume} startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} style={{ width: '100%', height: '100%', objectFit: 'cover', transform: zoom !== 1 ? `scale(${zoom})` : undefined }} /></Sequence>
+        : showVid && <OffthreadVideo src={staticFile(src)} muted startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} style={{ width: '100%', height: '100%', objectFit: 'cover', transform: zoom !== 1 ? `scale(${zoom})` : undefined }} />}
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse 75% 70% at 50% 50%, rgba(246,241,231,1) 40%, rgba(246,241,231,0.85) 75%, rgba(246,241,231,0) 100%)', opacity: core }} />
       {CLOUDS.map((c, i) => {
         const k = close(c.delay) * (1 - open(c.delay));
