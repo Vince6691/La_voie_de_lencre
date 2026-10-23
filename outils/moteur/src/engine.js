@@ -459,6 +459,7 @@
     const paint = (c, P, clip, invert) => {
       const a = o.alpha ? o.alpha(c) : 1, rv = o.reveal ? o.reveal(c) : 1;
       if (a <= 0 || rv <= 0) return;
+      painted = true;
       rctx.save();
       if (clip) {
         if (invert) { const q = new Path2D(); q.rect(-10, -10, 420, 420); q.addPath(clip); rctx.clip(q, 'evenodd'); }
@@ -468,6 +469,8 @@
       rctx.globalAlpha = a; rctx.fillStyle = o.color(c); rctx.fill(P);
       rctx.restore();
     };
+    // rien de peint (révélation à 0) : ne rien poser, sinon Chrome peut reposer l'image précédente du canevas partagé
+    let painted = false;
     rctx.setTransform(1, 0, 0, 1, 0, 0); rctx.clearRect(0, 0, 1000, 1000);
     rctx.setTransform(2.5, 0, 0, 2.5, 0, 0);
     for (const p of paths) {
@@ -480,6 +483,7 @@
       }
       paint(p.c, p.P, rest, true);
     }
+    if (!painted) return;
     ctx.save();
     const x0 = o.x - o.size / 2, y0 = o.y - o.size / 2;
     ctx.globalAlpha = o.opacity ?? 1;

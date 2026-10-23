@@ -10,15 +10,20 @@
   },
   {
    "clip": "b02",
-   "apres": 1.0
+   "apres": 0.8
   },
   {
    "clip": "b03",
-   "apres": 0.7
+   "apres": 0.3
   },
   {
-   "rouleau": 5,
+   "rouleau3d": "complet",
    "apres": 0.3
+  },
+  {
+   "plage": 2.0,
+   "nom": "cloche",
+   "apres": 0.0
   },
   {
    "clip": "b04",
@@ -26,28 +31,955 @@
   },
   {
    "clip": "b05",
-   "pause": {
-    "repere": "reponse",
-    "decalage": -0.12,
-    "duree": 1.7
-   },
-   "apres": 1.0
+   "apres": 0.3
+  },
+  {
+   "plage": 1.5,
+   "nom": "pinceau",
+   "apres": 0.2
   },
   {
    "clip": "b06",
-   "apres": 0.5
+   "pause": {
+    "repere": "reponse",
+    "decalage": -0.12,
+    "duree": 1.8
+   },
+   "apres": 0.8
+  },
+  {
+   "clip": "b07",
+   "apres": 0.3
+  },
+  {
+   "plage": 7.5,
+   "nom": "carte_ages",
+   "son": "audio/sfx_carte_ages.wav",
+   "son_volume": 0.7,
+   "apres": 0.3
+  },
+  {
+   "clip": "b08",
+   "apres": 0.8
+  },
+  {
+   "clip": "b09",
+   "apres": 1.0
+  },
+  {
+   "clip": "b10",
+   "apres": 0.3
   }
  ],
- "queue": 3.2,
+ "queue": 10,
  "reperes_cles": {
   "b01": {
-   "mains": "deux mains"
+   "dire": "dire",
+   "deux": "le chinois a deux",
+   "yu1": "语",
+   "yan1": "言",
+   "precepte": "Un vieux précepte",
+   "dit": "dit",
+   "citation": "食不语，寝不言",
+   "table": "À table",
+   "yu2": "ne 语",
+   "lit": "Au lit",
+   "yan2": "ne 言",
+   "interdit": "On interdit",
+   "ici": "ici",
+   "autre": "l'autre",
+   "difference": "Quelle différence",
+   "p1": "entre parler",
+   "parler": "et parler"
+  },
+  "b02": {
+   "gauche": "À gauche",
+   "droite": "À droite",
+   "moi": "pour dire",
+   "enigme": "Mais que vient",
+   "jeune": "Le caractère est",
+   "os": "gravées sur"
   },
   "b03": {
-   "signe": "C'est là"
+   "anyang": "Anyang",
+   "devin": "le devin",
+   "signe": "Le signe de",
+   "bouche": "une bouche",
+   "langue": "une langue",
+   "son": "et sans doute",
+   "cinq": "Un autre signe",
+   "traits": "D'abord cinq",
+   "croix": "Puis plus court",
+   "pose": "Pose ce cinq",
+   "pourquoi": "Pourquoi cinq",
+   "prononcait": "On prononçait"
+  },
+  "b04": {
+   "siecles": "Six siècles",
+   "frappe": "On le frappe",
+   "repond": "et la salle",
+   "flancs": "Sur ses flancs",
+   "gauche": "la parole en haut",
+   "dessous": "une seconde bouche",
+   "cote": "et le cinq",
+   "rencontre": "Les deux pièces"
   },
   "b05": {
-   "reponse": "Les mains n'ont pas"
+   "royaumes": "Puis viennent",
+   "sept": "Sept États",
+   "conseillers": "des conseillers",
+   "argumente": "On argumente",
+   "hesite": "Le signe, lui",
+   "sceaux": "sur les sceaux",
+   "empile": "se dédouble"
+  },
+  "b06": {
+   "han": "Trois siècles",
+   "dico": "un dictionnaire",
+   "question": "notre question",
+   "reponse": "言, c'est parler",
+   "discuter": "语, c'est discuter",
+   "table": "Voilà pourquoi",
+   "pleine": "on ne lance",
+   "lit": "Et au lit"
+  },
+  "b07": {
+   "lettre": "Un siècle plus tôt",
+   "voix": "d'une seule voix",
+   "soldats": "les soldats",
+   "confins": "venus des confins",
+   "pinceau": "notait leurs mots",
+   "annees": "Vingt-sept ans",
+   "livre": "Le livre"
+  },
+  "b08": {
+   "annee": "En mille",
+   "traits": "La parole se réduit",
+   "partout": "est partout",
+   "hanyu": "la langue chinoise",
+   "anglais": "l'anglais",
+   "francais": "le français",
+   "lois": "langue des lois",
+   "rien": "Enfin",
+   "ecriture": "Une seule écriture",
+   "canton": "à Canton"
+  },
+  "b09": {
+   "formes": "Reprenons",
+   "parole": "La parole",
+   "cinq": "Le cinq",
+   "bouche": "Et dessous",
+   "face": "Voilà ce que",
+   "naissance": "Ainsi naît",
+   "mots": "On le retrouve",
+   "chengyu": "et dans"
+  },
+  "b10": {
+   "dire": "Dire",
+   "converser": "Converser",
+   "maitre": "Et celui",
+   "armee": "Pourtant"
+  }
+ },
+ "bruitages": [
+  [
+   "allumage",
+   "b01",
+   null,
+   -0.5,
+   0.5
+  ],
+  [
+   "souffle",
+   "b01",
+   "yu1",
+   -0.3,
+   0.35
+  ],
+  [
+   "souffle",
+   "b01",
+   "yan1",
+   -0.3,
+   0.35
+  ],
+  [
+   "pinceau",
+   "b01",
+   "precepte",
+   0.5,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b01",
+   "precepte",
+   1.9,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b01",
+   "precepte",
+   3.3,
+   0.3
+  ],
+  [
+   "sceau",
+   "b01",
+   "table",
+   -0.75,
+   0.35
+  ],
+  [
+   "tonnerre",
+   "b02",
+   "os",
+   0.3,
+   0.4
+  ],
+  [
+   "gravure",
+   "b03",
+   "devin",
+   0.3,
+   0.4
+  ],
+  [
+   "sceau",
+   "b03",
+   "pourquoi",
+   -0.6,
+   0.4
+  ],
+  [
+   "cloche",
+   "b04",
+   null,
+   -1.8,
+   0.55
+  ],
+  [
+   "cloche",
+   "b04",
+   "frappe",
+   0.55,
+   0.28
+  ],
+  [
+   "sceau",
+   "b04",
+   "rencontre",
+   0.4,
+   0.4
+  ],
+  [
+   "gong",
+   "b04",
+   null,
+   20.45,
+   0.35
+  ],
+  [
+   "sceau",
+   "b05",
+   "sept",
+   -0.05,
+   0.3
+  ],
+  [
+   "sceau",
+   "b05",
+   "sept",
+   0.31,
+   0.25
+  ],
+  [
+   "sceau",
+   "b05",
+   "sept",
+   0.67,
+   0.3
+  ],
+  [
+   "ciseau",
+   "b05",
+   "conseillers",
+   0.2,
+   0.35
+  ],
+  [
+   "sceau",
+   "b05",
+   "sceaux",
+   0.2,
+   0.3
+  ],
+  [
+   "sceau",
+   "b05",
+   "empile",
+   1.2,
+   0.4
+  ],
+  [
+   "pinceau",
+   "b06",
+   null,
+   -1.6,
+   0.5
+  ],
+  [
+   "feuilles",
+   "b06",
+   "dico",
+   -0.3,
+   0.5
+  ],
+  [
+   "cloche",
+   "b06",
+   "reponse",
+   -1.85,
+   0.25
+  ],
+  [
+   "sceau",
+   "b06",
+   "reponse",
+   -1.32,
+   0.45
+  ],
+  [
+   "sceau",
+   "b06",
+   "reponse",
+   -0.87,
+   0.5
+  ],
+  [
+   "gong",
+   "b06",
+   "reponse",
+   -0.87,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b07",
+   "pinceau",
+   0,
+   0.35
+  ],
+  [
+   "pinceau",
+   "b08",
+   "traits",
+   -0.1,
+   0.4
+  ],
+  [
+   "cloche",
+   "b09",
+   "face",
+   0.3,
+   0.25
+  ],
+  [
+   "gong",
+   "b09",
+   "naissance",
+   -0.5,
+   0.35
+  ],
+  [
+   "tambour",
+   "b10",
+   null,
+   13.1,
+   0.45
+  ]
+ ],
+ "glyphes": {
+  "reels": {
+   "yu_jinwen": {
+    "img": "glyphes/yu_xiaoxue/00.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "余贎乘兒鐘",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        215,
+        0
+       ],
+       [
+        215,
+        238
+       ],
+       [
+        0,
+        238
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        238
+       ],
+       [
+        215,
+        238
+       ],
+       [
+        215,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_xi": {
+    "img": "glyphes/yu_xiaoxue/02.png",
+    "label": "璽印",
+    "era": "Royaumes",
+    "piece": "璽彙2774 (Jin)",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        200,
+        0
+       ],
+       [
+        200,
+        162
+       ],
+       [
+        0,
+        162
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        162
+       ],
+       [
+        200,
+        162
+       ],
+       [
+        200,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_xi2": {
+    "img": "glyphes/yu_xiaoxue/03.png",
+    "label": "璽印",
+    "era": "Royaumes",
+    "piece": "璽彙3193 (Jin)",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        200,
+        0
+       ],
+       [
+        200,
+        155
+       ],
+       [
+        0,
+        155
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        155
+       ],
+       [
+        200,
+        155
+       ],
+       [
+        200,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_chu": {
+    "img": "glyphes/yu_xiaoxue/04.png",
+    "label": "楚簡",
+    "era": "Royaumes",
+    "piece": "郭店·五行34",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        200,
+        0
+       ],
+       [
+        200,
+        180
+       ],
+       [
+        0,
+        180
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        180
+       ],
+       [
+        200,
+        180
+       ],
+       [
+        200,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_xiaozhuan": {
+    "img": "glyphes/yu_xiaoxue/05.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·言部",
+    "defaut": "bouche",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        190,
+        0
+       ],
+       [
+        190,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ],
+     [
+      "cinq",
+      [
+       [
+        190,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        228
+       ],
+       [
+        190,
+        228
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_mawangdui": {
+    "img": "glyphes/yu_xiaoxue/07.png",
+    "label": "帛書",
+    "era": "Han",
+    "piece": "縱橫家書 (馬王堆)",
+    "defaut": "bouche",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        190,
+        0
+       ],
+       [
+        190,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ],
+     [
+      "cinq",
+      [
+       [
+        190,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        205
+       ],
+       [
+        190,
+        205
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_lishu": {
+    "img": "glyphes/yu_xiaoxue/08.png",
+    "label": "隸書",
+    "era": "Han",
+    "piece": "祀三公山碑",
+    "defaut": "bouche",
+    "polys": [
+     [
+      "parole",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        190,
+        0
+       ],
+       [
+        190,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ],
+     [
+      "cinq",
+      [
+       [
+        190,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        197
+       ],
+       [
+        190,
+        197
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_yan_jiaguwen": {
+    "img": "glyphes/yan_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲499 (言)",
+    "defaut": "langue",
+    "polys": [
+     [
+      "trait",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        62
+       ],
+       [
+        0,
+        62
+       ]
+      ]
+     ],
+     [
+      "bouche",
+      [
+       [
+        0,
+        250
+       ],
+       [
+        400,
+        250
+       ],
+       [
+        400,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_wu_jiaguwen": {
+    "img": "glyphes/wu_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "燕796 (吾)",
+    "defaut": "cinq",
+    "polys": [
+     [
+      "bouche",
+      [
+       [
+        0,
+        196
+       ],
+       [
+        400,
+        196
+       ],
+       [
+        400,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "yu_wu5_traits": {
+    "img": "glyphes/wu5_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "林1.18.13 (五)",
+    "defaut": "cinq",
+    "polys": []
+   },
+   "yu_wu5_croix": {
+    "img": "glyphes/wu5_xiaoxue/02.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "甲561 (五)",
+    "defaut": "cinq",
+    "polys": []
+   },
+   "yu_shi_jiaguwen": {
+    "img": "glyphes/shi_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "鐵4.3 (𠂤)",
+    "defaut": "encre",
+    "polys": []
+   }
+  },
+  "traits": {
+   "yu_kai": {
+    "src": "glyphes/traits/yu.json",
+    "comp": [
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "cinq",
+     "cinq",
+     "cinq",
+     "cinq",
+     "bouche",
+     "bouche",
+     "bouche"
+    ]
+   },
+   "yu_simp": {
+    "src": "glyphes/traits/yu_simp.json",
+    "comp": [
+     "parole",
+     "parole",
+     "cinq",
+     "cinq",
+     "cinq",
+     "cinq",
+     "bouche",
+     "bouche",
+     "bouche"
+    ]
+   },
+   "yu_yan_kai": {
+    "src": "glyphes/traits/yan.json",
+    "comp": [
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole",
+     "parole"
+    ]
+   },
+   "yu_wu_kai": {
+    "src": "glyphes/traits/wu.json",
+    "comp": [
+     "cinq",
+     "cinq",
+     "cinq",
+     "cinq",
+     "bouche",
+     "bouche",
+     "bouche"
+    ]
+   },
+   "yu_shi_kai": {
+    "src": "glyphes/traits/shi.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
+   },
+   "yu_p_shi": {
+    "src": "glyphes/traits/p_shi.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
+   },
+   "yu_p_bu": {
+    "src": "glyphes/traits/p_bu.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
+   },
+   "yu_p_qin": {
+    "src": "glyphes/traits/p_qin.json",
+    "comp": [
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre",
+     "encre"
+    ]
+   }
   }
  }
 }

@@ -6,6 +6,15 @@ import { JIAO_SECONDS, JiaoV1 } from './shuimo_jiao/JiaoV1';
 import { TIYING_SECONDS, TiyingReveal } from './shuimo_wen/TiyingReveal';
 import { WEN_SECONDS, WenV1 } from './shuimo_wen/WenV1';
 import { MEI_SECONDS, MeiV1 } from './shuimo_mei/MeiV1';
+import { YU_SECONDS, YuV1 } from './shuimo_yu/YuV1';
+import { INTRO_SECONDS, YuIntroEncre, YuIntroLaque, YuIntroOmbres } from './shuimo_yu/IntroTests';
+import { CARTES_GUIDES, CartesGuides } from './cartes/CartesGuides';
+import { EssaiPekin3D, PEKIN3D_SECONDS } from './cartes/Pekin3D';
+import { EssaiPekinPlat, PEKINPLAT_SECONDS } from './cartes/PekinPlat';
+import { EssaiTravelling, TRAVELLING_SECONDS } from './cartes/TravellingSommets';
+import { EssaiTravellingSoie, SOIE_SECONDS } from './cartes/TravellingSoie';
+import { EssaiTravellingFleur, FLEUR_SECONDS } from './cartes/TravellingFleur';
+import { AGES_SECONDS, EssaiCarteAges } from './cartes/CarteAges';
 import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
@@ -46,6 +55,17 @@ export const RemotionRoot: React.FC = () => (
   <Composition id="VideoEncreDemo" component={VideoEncreDemo} durationInFrames={VIDEO_ENCRE_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
  <Composition id="JiaoV1" component={JiaoV1} durationInFrames={Math.round(JIAO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="MeiV1" component={MeiV1} durationInFrames={Math.round(MEI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="YuV1" component={YuV1} durationInFrames={Math.round(YU_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="YuIntroEncre" component={YuIntroEncre} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="YuIntroOmbres" component={YuIntroOmbres} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="EssaiPekin3D" component={EssaiPekin3D} durationInFrames={Math.round(PEKIN3D_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="EssaiPekinPlat" component={EssaiPekinPlat} durationInFrames={Math.round(PEKINPLAT_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="EssaiTravelling" component={EssaiTravelling} durationInFrames={Math.round(TRAVELLING_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="EssaiTravellingSoie" component={EssaiTravellingSoie} durationInFrames={Math.round(SOIE_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="EssaiTravellingFleur" component={EssaiTravellingFleur} durationInFrames={Math.round(FLEUR_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="EssaiCarteAges" component={EssaiCarteAges} durationInFrames={Math.round(AGES_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="CartesGuides" component={CartesGuides} durationInFrames={CARTES_GUIDES} fps={FPS} width={1920} height={1080} />
+  <Composition id="YuIntroLaque" component={YuIntroLaque} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenV1" component={WenV1} durationInFrames={Math.round(WEN_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenTiying" component={TiyingReveal} durationInFrames={Math.round(TIYING_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="XueV2" component={XueV2} durationInFrames={Math.round(XUE_V2_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
