@@ -2,6 +2,7 @@
   "name": "xue-remotion",
   "private": true,
   "scripts": {
+    "postinstall": "node patch_rspack.mjs",
     "studio": "node sync.mjs && remotion studio",
     "render": "./render.sh"
   },
