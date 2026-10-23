@@ -13,6 +13,7 @@ import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
+import { GrainVignette, Shake } from '../commun/Effets';
 import { INK, PIGMENT } from '../shuimo_xue/InkStage';
 import { Rouleau3DConfig, Rouleau3DStage, r3Seconds, r3TagIn } from '../rouleau3d/Rouleau3D';
 import { MosaicConfig, MosaicTransition, mosaicSeconds } from '../mosaique/MosaicTransition';
@@ -243,38 +244,7 @@ const SEALS = () => [
   { t: at('b04', 'rencontre') + 0.4, zh: '周' },
   { t: at('b05', 'empile') + 1.2, zh: '戰' },
 ];
-const shakeAt = (t: number) => {
-  let dy = 0;
-  for (const s of SEALS()) { const u = t - s.t; if (u < 0 || u > 0.3) continue; dy += 4 * Math.sin(Math.PI * u / 0.3) * (1 - u / 0.3); }
-  return dy;
-};
-const Shake: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const t = useT();
-  return <AbsoluteFill style={{ transform: `translate(0px, ${shakeAt(t).toFixed(2)}px)` }}>{children}</AbsoluteFill>;
-};
 const SealStamps: React.FC = () => <Draw draw={(ctx, tt, E) => { for (const s of SEALS()) drawSeal(ctx, E, 1810, 860, 128, s.zh, tt - s.t); }} />;
-let grainTiles: HTMLCanvasElement[] | null = null;
-const GrainVignette: React.FC = () => {
-  const f = useCurrentFrame();
-  const ref = useRef<HTMLCanvasElement>(null);
-  useLayoutEffect(() => {
-    if (!ref.current) return;
-    if (!grainTiles) grainTiles = [0, 1, 2, 3].map((k) => {
-      const c = document.createElement('canvas'); c.width = 480; c.height = 270;
-      const x = c.getContext('2d')!, im = x.createImageData(480, 270), r = rng(900 + k);
-      for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (r() - 0.5) * 90; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
-      x.putImageData(im, 0, 0); return c;
-    });
-    const ctx = ref.current.getContext('2d')!;
-    ctx.drawImage(grainTiles[f % 4], 0, 0, 1920, 1080);
-  });
-  return (
-    <AbsoluteFill style={{ pointerEvents: 'none' }}>
-      <canvas ref={ref} width={1920} height={1080} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', mixBlendMode: 'overlay', opacity: 0.16 }} />
-      <AbsoluteFill style={{ background: 'radial-gradient(ellipse 80% 75% at 50% 48%, rgba(60,40,20,0) 55%, rgba(60,40,20,0.22) 100%)' }} />
-    </AbsoluteFill>
-  );
-};
 // goutte d'encre qui tombe et s'épanouit en lavis (jamais plus de 2 s de papier vide entre deux tableaux)
 const inkBloom = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number, t1: number, tt: number) => {
   // une goutte tombe, l'encre se dilue et gagne tout le cadre (cœur sombre qui pâlit, plusieurs lobes, bords flous) ;
@@ -1215,7 +1185,7 @@ export const YuV1: React.FC = () => {
   const PB = L.plages.pinceau;
   return (
     <AbsoluteFill style={{ background: '#f3eee4' }}>
-      {ready && <Shake>
+      {ready && <Shake impacts={SEALS().map((x) => x.t)}>
         <Win from={0} to={A('b02') - 0.1}><Opening /></Win>
         <Win fade={0.8} from={A('b02') - 0.1} to={A('b03') - 0.3}><Pieces /></Win>
         <Win fade={0.8} from={A('b03') - 0.3} to={R1 + 0.6}><Shang /></Win>

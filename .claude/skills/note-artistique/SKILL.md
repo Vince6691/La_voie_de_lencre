@@ -16,6 +16,33 @@ remarquable, 10 = presque jamais. Partir de 6 et ne monter que sur preuves. Chaq
 ne jamais arrondir vers le haut, ne jamais excuser un défaut par le coût de sa correction (le coût sert à classer les
 corrections, pas à adoucir la note). Une note sévère doit toujours venir avec une correction concrète.
 
+## Référence technique : YuV1
+La version la plus à jour, qui fait référence pour la **technique, les polices et le style**, est `語` :
+`outils/moteur/remotion/src/shuimo_yu/YuV1.tsx` (ligne de temps lue dans `_ligne`, caméra `Cam` à spline de Hermite,
+légendes en pastille de papier, polices `ShuimoKai` / `ShuimoLatin` / `ShuimoPinceau` / `ShuimoLegende`, cartouches `cartouche()`,
+rouleau 3D, fondus `Win fade`, écran de fin, bruitages). Tout épisode se compare à elle ; un écart par rapport à YuV1 est un
+constat, et un écart aux contraintes ci-dessous est une correction **obligatoire**.
+
+## Contraintes techniques (liste de contrôle, vérifiée à chaque passe)
+Chaque point manquant est une correction, **sans limite de nombre** (la limite de cinq ne vaut que pour les choix créatifs).
+1. **Ligne de temps** : lue dans `reperes.json` (`_ligne`), jamais recalculée ni codée en dur ; aucun temps en secondes
+   ajouté à un repère sans raison (tout visuel est calé sur `at(bloc, repère)`).
+2. **Polices** : celles de YuV1 (`ShuimoKai`, `ShuimoLatin`, `ShuimoPinceau`, `ShuimoLegende`), chargées avec repli ; aucune police système.
+3. **Légendes** : pastille de papier (fond `rgba(246,241,231,0.8)`), ≥ 44 px, jamais dans les 8 % du bas (haut du texte ≤ 975 − 1,7 × taille) ;
+   étiquettes ≥ 66 px, rubans ≥ 56 px, dates des cartouches ≥ 36 px ; jamais deux textes qui se touchent.
+4. **Cartouches** : toujours `cartouche(id, précision?)` de `src/periodes.ts` (même nom que le rouleau).
+5. **Rouleaux** : 2–3 par vidéo, variés ; **un rouleau 3D complet** sur le plus grand saut (au plus un court), `{"rouleau3d": …}` dans `episode.json`.
+6. **Caméra** : `Cam` dans chaque scène (clés calées sur les repères, punch sur les révélations) ; un changement visuel toutes les 6–8 s ;
+   jamais plus de 2 s de papier vide.
+7. **Raccords** : `Win fade` entre scènes (pas de coupe sèche hors rouleaux) ; paysages continus d'une scène à l'autre.
+8. **Clips** : plein cadre, entrée par les nuages ou à travers le caractère, sortie au pinceau ; **aucun clip d'exemple ni mention « clip d'exemple »
+   dans le rendu final** (sinon un emplacement marqué à l'écran, comme YuV1).
+9. **Son** : voix, musique (`musique.py`), **bruitages** listés dans `bruitages` d'`episode.json` (pinceau, sceau, gong ≤ 3, leitmotiv) ; un bruitage ne couvre jamais la voix.
+10. **Fin** : écran de fin sur papier ≈ 10 s (`"queue": 10`), marque et prochain caractère dans le tiers gauche, fondu depuis le dernier plan, jamais de fond noir.
+11. **Schéma de dossier** : `PROPOSITION.md`, `VOIX.md`, `SOURCES.md`, `NOTES.md`, `episode.json`, `voix/`, `clips/`, `images/`, `audio/`, `apercus/`.
+12. **Cartes** : cartes peintes de la bibliothèque (`carte-peinte`) quand la vue existe ; sinon `E.mapLayer` (fond mis en cache), **jamais `E.drawMap` à chaque image** ; texte du cachet contenu dans son cartouche.
+13. **Propreté du code** : `npx tsc --noEmit` sans erreur ; images fixes aux moments-clés rendues et regardées avant tout rendu long.
+
 ## Quand la lancer
 | Étape | Ce qu'on regarde | Matière à lire |
 |---|---|---|
@@ -103,10 +130,11 @@ Règles de voix de la chaîne : skill `voix-off-modo` (ne pas les répéter, s'y
    recouvre l'étiquette 羊 »), positifs compris.
 3. **Proposer des corrections** seulement pour les domaines sous 8 (et toute erreur factuelle) : pour chacune, ce qui
    change, le gain attendu (+0,5 / +1), le **coût** (léger : code ; moyen : nouveau rendu de scène ; lourd : nouvelle
-   voix ElevenLabs, nouveau rendu complet) et la note visée. Au plus 5 corrections par passe, les plus rentables d'abord.
+   voix ElevenLabs, nouveau rendu complet) et la note visée. Classer par rentabilité. **Toutes** les corrections nécessaires pour respecter la liste « Contraintes techniques » sont proposées (pas de plafond) ; au plus 5 pour les choix purement créatifs.
    Les domaines déjà à 8 ou plus : au plus une suggestion facultative, signalée comme telle.
-4. **Demander la validation** (AskUserQuestion, multiSelect : une option par correction, recommandée en premier).
-   Ne rien modifier avant la réponse.
+4. **Corriger d'office** (consigne permanente de l'utilisateur) tout écart aux contraintes techniques et toute erreur factuelle ; puis **demander la validation**
+   (AskUserQuestion, multiSelect : une option par correction, recommandée en premier) pour les choix créatifs et les corrections lourdes
+   (nouvelle voix, clips Seedance, bruitages générés, rendu complet).
 5. **Appliquer** uniquement ce qui est validé, puis re-noter **sans nouvelle passe complète** : seulement les domaines
    touchés, à partir des images fixes ou extraits concernés. Si un domaine reste sous 8, proposer une seule fois de plus ;
    ensuite, l'utilisateur tranche (on n'insiste pas).
@@ -141,5 +169,5 @@ Puis la question de validation. Rester bref : le tableau et les corrections suff
 - Ne jamais proposer une correction qui contredit un choix déjà validé par l'utilisateur (le noter dans le constat si
   on le trouve discutable, sans le corriger), ni une règle des skills de la chaîne.
 - Les corrections lourdes (nouvelles voix, rendu complet) sont regroupées et signalées : l'utilisateur doit voir le
-  coût avant de dire oui.
+  coût avant de dire oui. Les corrections techniques légères (code, durées, légendes, cartouches) sont appliquées sans attendre.
 - Une erreur factuelle reste à corriger même si toutes les notes sont à 8 ou plus.

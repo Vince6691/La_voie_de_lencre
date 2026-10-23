@@ -10,7 +10,7 @@
   },
   {
    "clip": "b02",
-   "apres": 1.0
+   "apres": 1
   },
   {
    "clip": "b03",
@@ -30,11 +30,11 @@
   },
   {
    "clip": "b05",
-   "apres": 1.0
+   "apres": 1
   },
   {
    "clip": "b06",
-   "apres": 1.0
+   "apres": 1
   },
   {
    "clip": "b07",
@@ -46,19 +46,19 @@
    "apres": 0.8
   },
   {
-   "rouleau": 6,
+   "rouleau3d": "complet",
    "apres": 0.4
   },
   {
    "clip": "b08",
-   "apres": 1.0
+   "apres": 1
   },
   {
    "clip": "b09",
    "apres": 0.5
   }
  ],
- "queue": 3.2,
+ "queue": 10,
  "reperes_cles": {
   "b01": {
    "mains": "deux mains",
@@ -120,5 +120,252 @@
    "autre": "Ces baguettes",
    "baton": "Mais cette fois"
   }
- }
+ },
+ "bruitages": [
+  [
+   "pinceau",
+   "b01",
+   null,
+   -0.2,
+   0.45
+  ],
+  [
+   "sceau",
+   "b01",
+   "mains",
+   0,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b02",
+   "retrouver",
+   0.4,
+   0.3
+  ],
+  [
+   "gravure",
+   "b03",
+   "devins",
+   0.3,
+   0.35
+  ],
+  [
+   "gravure",
+   "b03",
+   "signe",
+   -1.3,
+   0.35
+  ],
+  [
+   "sceau",
+   "b03",
+   "signe",
+   0,
+   0.5
+  ],
+  [
+   "sceau",
+   "b03",
+   "yao",
+   0,
+   0.35
+  ],
+  [
+   "sceau",
+   "b03",
+   "toit",
+   0,
+   0.35
+  ],
+  [
+   "sceau",
+   "b03",
+   "mains",
+   0,
+   0.35
+  ],
+  [
+   "tambour",
+   "b03",
+   "manque",
+   0,
+   0.3
+  ],
+  [
+   "sceau",
+   "R1",
+   "impact",
+   0,
+   0.6
+  ],
+  [
+   "sceau",
+   "b04",
+   "bronze",
+   0.3,
+   0.4
+  ],
+  [
+   "sceau",
+   "b04",
+   "enfant",
+   0,
+   0.5
+  ],
+  [
+   "sceau",
+   "b04",
+   "vase",
+   0,
+   0.3
+  ],
+  [
+   "sceau",
+   "R2",
+   "impact",
+   0,
+   0.6
+  ],
+  [
+   "pinceau",
+   "b05",
+   "ministre",
+   0,
+   0.45
+  ],
+  [
+   "sceau",
+   "b05",
+   "symetrie",
+   0,
+   0.3
+  ],
+  [
+   "sceau",
+   "b05",
+   "mains",
+   0,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b06",
+   "lettre",
+   -0.6,
+   0.4
+  ],
+  [
+   "sceau",
+   "b06",
+   "livre",
+   0,
+   0.35
+  ],
+  [
+   "sceau",
+   "b06",
+   "toit",
+   0,
+   0.35
+  ],
+  [
+   "pinceau",
+   "b07",
+   "aplatit",
+   0,
+   0.45
+  ],
+  [
+   "sceau",
+   "b07",
+   "figent",
+   0,
+   0.4
+  ],
+  [
+   "tambour",
+   "b07",
+   "figent",
+   0.1,
+   0.3
+  ],
+  [
+   "pinceau",
+   "b07",
+   "reguliere",
+   0,
+   0.4
+  ],
+  [
+   "sceau",
+   "b07",
+   "copies",
+   0.6,
+   0.3
+  ],
+  [
+   "gong",
+   "b07",
+   "reponse",
+   -1.3,
+   0.45
+  ],
+  [
+   "pinceau",
+   "b08",
+   "pinceau",
+   0,
+   0.4
+  ],
+  [
+   "sceau",
+   "b08",
+   "baguettes",
+   0,
+   0.3
+  ],
+  [
+   "sceau",
+   "b08",
+   "toit",
+   0,
+   0.3
+  ],
+  [
+   "sceau",
+   "b08",
+   "mains",
+   0,
+   0.3
+  ],
+  [
+   "sceau",
+   "b08",
+   "enfant",
+   0,
+   0.35
+  ],
+  [
+   "gong",
+   "b08",
+   "nait",
+   0,
+   0.4
+  ],
+  [
+   "sceau",
+   "b09",
+   "baton",
+   0,
+   0.5
+  ],
+  [
+   "gong",
+   "b09",
+   "baton",
+   0.9,
+   0.4
+  ]
+ ]
 }

@@ -21,7 +21,7 @@ episodes/<pinyin>/
   voix/mots/ (bNN.json, minutage Scribe)   voix/prises/ (toutes les prises)
   clips/ (NN_scene.mp4, clips Seedance renommés)   images/ (Nano Banana)   audio/ (musique.wav)   apercus/
 ```
-Composition Remotion : `outils/moteur/remotion/src/shuimo_<pinyin>/` (modèle à jour : `shuimo_jiao/JiaoV1.tsx`, qui lit la
+Composition Remotion : `outils/moteur/remotion/src/shuimo_<pinyin>/` (modèle à jour, **référence technique, polices et style : `shuimo_yu/YuV1.tsx`** — 語 ; il lit la
 ligne de temps `_ligne` du fichier de repères au lieu de recalculer les temps), chemins de l'épisode ajoutés à `sync.mjs`. Les fichiers
 déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce schéma dès leur arrivée. (Le 學, épisode
 pilote, est maintenant rangé de la même façon dans `episodes/xue/`.)
