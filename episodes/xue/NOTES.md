@@ -34,3 +34,12 @@ Référence technique : `YuV1` (語). Passe du 2026-10-23, étape 4 (constructio
 - Scène Xu Shen : glyphe remonté, blocs de texte séparés et sur pastille, légende « portrait imaginé » sous le portrait, caméra plus douce (les textes se superposaient).
 - Bandeau de synthèse décalé à gauche (dernière forme et son étiquette cachées par le rocher).
 - Incident : le Studio Remotion avait inséré `from={-248}` sur la racine de `XueV2` (décalage de 8,3 s de toute la vidéo) ; retiré. Ne pas utiliser les flèches du clavier dans le Studio sans vérifier que rien n'est modifié.
+
+## Passe 2 — étape 4 (planche de 20 images fixes + code), notes
+| Domaine | Note | En bref |
+|---|---|---|
+| Technique | 7,5 | aligné sur YuV1 ; mouvement, sons et rendu complet non vérifiés ; deux emplacements de clips |
+| Artistique | 6,5 | cartes, rouleau 3D, bandeau très beaux ; deux cadres en pointillé dans le film, retournement sans image forte |
+| Historique | 7 | citation corrigée (荀子 勸學 : 青取之於藍) ; restent 斆 → 學, « tige de bronze », date des formes abrégées |
+| Design | 7,5 | lisible, sans collision ; ligne italique de Xu Shen sur le pin, ruban fusion sous le rocher |
+| Storytelling | 7,5 | question tenue, retournement net ; les devins (accroche du bloc 3) et le tir à l'arc manquent encore |

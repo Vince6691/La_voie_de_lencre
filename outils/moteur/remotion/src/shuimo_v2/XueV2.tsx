@@ -43,7 +43,7 @@ const R3A: Rouleau3DConfig = {
   fromLand: { seed: 3, mood: 'jour' }, toLand: { seed: 30, mood: 'aube' }, midSeeds: [17, 21],
   inscriptions: [
     { x: 1500, y: 200, size: 74, font: 'ShuimoKai', cols: ['學而時習之', '不亦說乎'], sig: '論語學而', seal: '長樂', ink: 0.88 },
-    { x: 5500, y: 170, size: 80, font: 'ShuimoKai', cols: ['學不可以已', '青出於藍'], sig: '荀子勸學', seal: '雲水', ink: 0.92 },
+    { x: 5500, y: 170, size: 80, font: 'ShuimoKai', cols: ['學不可以已', '青取之於藍'], sig: '荀子勸學', seal: '雲水', ink: 0.92 },
   ],
 };
 
