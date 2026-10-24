@@ -2,7 +2,8 @@
   rouleau3d.wav       version complète (5,3 s) : souffle 0,2 s, glissando 0,35–2 s, impact 3,5 s, cloche 5,3 s
   rouleau3d_court.wav version courte (3,6 s)   : souffle, glissando 0,05–1,55 s, impact 2,3 s, cloche une quarte plus bas 3,15 s
 Bruitages ElevenLabs (assets/rouleau3d/) : souffle du rouleau qui défile, coup sec du sceau de pierre, cloche bianzhong ;
-glissando de guzheng synthétisé (cordes pincées, Karplus-Strong), discret sous le souffle.
+glissando de guzheng : un des trois 流水拂 retenus (assets/rouleau3d/liushui_1..3.wav, rendus avec guzheng-sound) →
+  rouleau3d_liushui_N.wav et rouleau3d_court_liushui_N.wav (N = 1, 2, 3 ; choix par rouleau : voir sonRouleau).
 python3 tools/build_sfx_3d.py"""
 import wave
 import numpy as np
@@ -26,22 +27,26 @@ def pluck(rng, f, dur=1.6):
     return out * np.exp(-np.arange(len(out)) / SR / 0.9)
 NOTES = [293.66, 329.63, 369.99, 440, 493.88, 587.33, 659.25, 739.99, 880, 987.77, 1174.66, 1318.5, 1480]
 
-def build(out, dur, souffle, gliss, impact, cloche, bell_shift=1.0):
+def build(out, dur, souffle, gliss, impact, cloche, bell_shift=1.0, liushui=None, souffle_g=0.55):
     """souffle : début du bruitage ; gliss : (début, durée) ; impact : instant du coup ; cloche : instant de la cloche ;
     bell_shift : rapport de hauteur de la cloche (0,75 = une quarte plus bas)."""
     rng = np.random.default_rng(9)
     n = int(SR * dur); t = np.arange(n) / SR
     duck = 1 - np.clip((t - (impact - 0.55)) / 0.3, 0, 1) * (t < impact)  # silence juste avant l'impact
     mix = np.zeros(n)
-    wh = load('souffle.wav'); put(mix, wh / np.abs(wh).max(), souffle, 0.55)
+    wh = load('souffle.wav'); put(mix, wh / np.abs(wh).max(), souffle, souffle_g)
     mix *= duck
     g0, gd = gliss
-    times = g0 + gd * (1 - 0.86 ** np.arange(len(NOTES))) / (1 - 0.86 ** len(NOTES))  # de plus en plus serré
-    gl = np.zeros(n)
-    for f, at in zip(NOTES, times): put(gl, pluck(rng, f), at, 0.6)
-    gl = signal.lfilter(*signal.butter(2, 5500 / (SR / 2)), gl)  # adoucit l'attaque métallique
-    gl += 0.3 * signal.fftconvolve(gl, rng.standard_normal(int(0.6 * SR)) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.25))[:n] / 40
-    mix += GUZHENG * gl * duck / (np.abs(gl).max() + 1e-9)
+    if liushui:  # glissando enregistré (流水拂) à la place des cordes synthétisées
+        gl = np.zeros(n); x = load(liushui); put(gl, x / np.abs(x).max(), g0, 1.0)
+        mix += 0.42 * gl * duck
+    else:
+        times = g0 + gd * (1 - 0.86 ** np.arange(len(NOTES))) / (1 - 0.86 ** len(NOTES))  # de plus en plus serré
+        gl = np.zeros(n)
+        for f, at in zip(NOTES, times): put(gl, pluck(rng, f), at, 0.6)
+        gl = signal.lfilter(*signal.butter(2, 5500 / (SR / 2)), gl)  # adoucit l'attaque métallique
+        gl += 0.3 * signal.fftconvolve(gl, rng.standard_normal(int(0.6 * SR)) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.25))[:n] / 40
+        mix += GUZHENG * gl * duck / (np.abs(gl).max() + 1e-9)
     # impact : le premier coup du bruitage (1,97–2,32 s), un grave bref sous lui, une courte réverbération de pièce
     imp = load('impact.wav'); i0 = int(1.975 * SR); hit = imp[i0:i0 + int(0.35 * SR)].copy()
     hit *= np.minimum(1, np.linspace(6, 0, len(hit))); hit /= np.abs(hit).max()
@@ -64,3 +69,6 @@ def build(out, dur, souffle, gliss, impact, cloche, bell_shift=1.0):
 
 build('rouleau3d.wav', 7.1, souffle=0.2, gliss=(0.35, 1.65), impact=3.5, cloche=5.3)
 build('rouleau3d_court.wav', 5.0, souffle=-0.35, gliss=(0.05, 1.5), impact=2.3, cloche=3.15, bell_shift=0.75)
+for k in (1, 2, 3):  # les trois 流水拂, souffle moyen
+    build(f'rouleau3d_liushui_{k}.wav', 7.1, souffle=0.2, gliss=(0.3, 1.65), impact=3.5, cloche=5.3, liushui=f'liushui_{k}.wav', souffle_g=0.38)
+    build(f'rouleau3d_court_liushui_{k}.wav', 5.0, souffle=-0.35, gliss=(0.0, 1.5), impact=2.3, cloche=3.15, bell_shift=0.75, liushui=f'liushui_{k}.wav', souffle_g=0.38)

@@ -1,0 +1,46 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>流水拂 des rouleaux</title>
+<!--
+  Recette des trois glissandos 流水拂 liúshuǐ fú des rouleaux du temps (validés), avec le paquet npm guzheng-sound (MIT,
+  Karplus-Strong, 21 cordes en ré pentatonique, ré2 → ré6 ; corde 0 = la plus grave, loin du joueur).
+  Pour les régénérer : `npm pack guzheng-sound@0.1.1` dans un dossier à part, extraire `package/`, servir ce dossier avec ce
+  fichier (python -m http.server), ouvrir la page dans le navigateur intégré ; elle rend les sons hors ligne
+  (OfflineAudioContext, 48 kHz) et les propose en .wav ; les ranger dans assets/rouleau3d/liushui_1..3.wav, puis
+  `python3 tools/build_sfx_3d.py` (3D) et le mixage 2D (souffle 0,38, voir tools/build_glissandos.py, base_rouleau).
+-->
+<p id="etat">rendu…</p>
+<script type="module">
+import { Guzheng } from './package/dist/esm/index.js';
+const SR = 48000, DUR = 5.0;
+const P = (gz, c, w, v = 0.75, o = {}) => gz.pluck(Math.max(0, Math.min(20, c)), { velocity: v, when: w, ...o });
+const balaye = (gz, de, a, t, pasMs, v = 0.7) => { const s = a >= de ? 1 : -1; let w = t; for (let c = de; s > 0 ? c <= a : c >= a; c += s) { P(gz, c, w, v); w += pasMs / 1000; } return w; };
+// petits balayages de 5 cordes vers le joueur qui se chevauchent en remontant, plus soutenus au médium ;
+// pas = ms entre deux cordes, écart = s entre deux balayages (au milieu : pas1, écart1)
+const liushui = (gz, t, departs, pas0, pas1, ecart0, ecart1) => {
+  let w = t; const n = departs.length;
+  departs.forEach((d, k) => { const m = 1 - Math.abs(k - (n - 1) / 2) / ((n - 1) / 2); balaye(gz, d, d + 4, w, pas0 + (pas1 - pas0) * m, 0.45 + 0.3 * m); w += ecart0 + (ecart1 - ecart0) * m; });
+  return w;
+};
+const SONS = {
+  liushui_1: (gz, t) => { const w = liushui(gz, t, [2, 4, 6, 8, 10, 12, 14], 55, 45, 0.42, 0.32); P(gz, 18, w + 0.25, 0.75, { vibrato: { rateHz: 5.2, depthCents: 10 } }); }, // lent, note vibrée
+  liushui_2: (gz, t) => { const w = liushui(gz, t, [3, 5, 7, 9, 11, 13], 75, 62, 0.56, 0.44); P(gz, 17, w + 0.3, 0.75, { vibrato: { rateHz: 5, depthCents: 10 } }); }, // très lent, note vibrée
+  liushui_3: (gz, t) => { liushui(gz, t, [2, 3, 5, 6, 8, 9, 11, 12, 14], 62, 50, 0.3, 0.22); }, // lent et chevauché, sans note finale
+};
+const wav = (buf) => {
+  const L = buf.getChannelData(0), R = buf.getChannelData(1), n = L.length, dv = new DataView(new ArrayBuffer(44 + n * 4));
+  let pk = 1e-9; for (let i = 0; i < n; i++) pk = Math.max(pk, Math.abs(L[i]), Math.abs(R[i]));
+  const s = (o, t) => [...t].forEach((c, i) => dv.setUint8(o + i, c.charCodeAt(0)));
+  s(0, 'RIFF'); dv.setUint32(4, 36 + n * 4, true); s(8, 'WAVEfmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 2, true);
+  dv.setUint32(24, SR, true); dv.setUint32(28, SR * 4, true); dv.setUint16(32, 4, true); dv.setUint16(34, 16, true); s(36, 'data'); dv.setUint32(40, n * 4, true);
+  for (let i = 0; i < n; i++) { dv.setInt16(44 + 4 * i, (L[i] / pk) * 0.9 * 32767, true); dv.setInt16(46 + 4 * i, (R[i] / pk) * 0.9 * 32767, true); }
+  return new Blob([dv], { type: 'audio/wav' });
+};
+const liens = [];
+for (const [nom, f] of Object.entries(SONS)) {
+  const ctx = new OfflineAudioContext(2, Math.round(SR * DUR), SR);
+  f(new Guzheng({ audioContext: ctx, reverb: true, reverbMix: 0.3, sustainSeconds: 4 }), 0.05);
+  liens.push(`<a download="${nom}.wav" href="${URL.createObjectURL(wav(await ctx.startRendering()))}">${nom}.wav</a>`);
+}
+document.getElementById('etat').innerHTML = liens.join(' · ');
+</script>

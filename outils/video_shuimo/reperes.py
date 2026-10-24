@@ -45,6 +45,15 @@ def _abs(clip, cue):
     v = out[clip]['cues'][cue]
     return c['debut'] + v + (c['pause']['duree'] if c.get('pause') and v > c['pause']['coupe'] else 0)
 out['_ligne']['bruitages'] = [[n, round(_abs(b, r) + d, 3), vol] for n, b, r, d, vol in cfg.get('bruitages', [])]
+# musique de fin (outils/moteur/assets/musique/<fichier>) : entre « avance » s avant la fin de la dernière phrase, discrète
+# sous la voix (volume_voix), monte au volume plein quand la voix s'arrête, puis s'éteint en fondu sur l'écran de fin
+mf = cfg.get('musique_fin')
+if mf:
+    last = list(out['_ligne']['clips'].values())[-1]
+    fin_voix = last['debut'] + last['duree'] + (last['pause']['duree'] if last.get('pause') else 0)
+    out['_ligne']['musique_fin'] = {'fichier': mf['fichier'], 'debut': round(fin_voix - mf.get('avance', 2.0), 3), 'fin_voix': round(fin_voix, 3),
+                                    'fin': out['_ligne']['total'], 'volume_voix': mf.get('volume_voix', 0.14), 'volume': mf.get('volume', 0.32),
+                                    'montee': mf.get('montee', 1.5), 'fondu': mf.get('fondu', 2.5), 'depart': mf.get('depart', 0.0)}
 os.makedirs(os.path.dirname(cfg['reperes']), exist_ok=True)
 json.dump(out, open(cfg['reperes'], 'w', encoding='utf-8'), indent=1, ensure_ascii=False)
 L = out['_ligne']

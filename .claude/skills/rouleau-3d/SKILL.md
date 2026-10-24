@@ -17,7 +17,15 @@ tenue sur le sceau après l'impact, glissando de guzheng discret, inscriptions r
   chinois, nom du cartouche, dates). Le rouleau en tire ses sceaux, sa frise et les noms du
   compteur ; les cartouches de la vidéo **doivent** en tirer les leurs (`cartouche(id, précision?)`), pour que le
   rouleau et le papier disent la même chose.
-- Sons : `outils/moteur/assets/rouleau/rouleau3d.wav` (complète) et `rouleau3d_court.wav` (courte, cloche une quarte
+- Sons : `outils/moteur/assets/rouleau/rouleau3d_liushui_1..3.wav` (complète) et `rouleau3d_court_liushui_1..3.wav` (courte),
+  mixés par `tools/build_sfx_3d.py` avec les 流水拂 de `assets/rouleau3d/liushui_1..3.wav` (souffle moyen 0,38).
+  **Glissando de guzheng (validé, tous les épisodes)** : un des trois 流水拂 *liúshuǐ fú* (« l'eau qui coule » : petites vagues de
+  5 cordes qui remontent l'instrument en se chevauchant), rendus avec le paquet npm `guzheng-sound` (MIT) :
+  1 lent (7 vagues, 55 → 45 ms par corde, note vibrée) · 2 très lent (6 vagues, 75 → 62 ms, note vibrée) · 3 lent et chevauché
+  (9 vagues, deux mains en alternance, sans note finale). Souffle moyen (0,38). Choix **varié d'un rouleau à l'autre** :
+  `sonRouleau(at)` = (⌊at⌋ mod 3) + 1 (`TimeScroll.tsx`, même calcul dans `bande_son.py`), ou imposé par `son: 1 | 2 | 3` dans
+  la configuration du rouleau. Ne plus utiliser les glissandos synthétisés (jugés « harpe ») ni ceux d'ElevenLabs (refusés).
+- Anciens sons : `outils/moteur/assets/rouleau/rouleau3d.wav` (complète) et `rouleau3d_court.wav` (courte, cloche une quarte
   plus bas), mixés par `python3 tools/build_sfx_3d.py` (depuis `outils/moteur/`) à partir des bruitages ElevenLabs de
   `assets/rouleau3d/` (souffle, coup de pierre, cloche bianzhong) et d'un glissando de guzheng synthétisé.
 - Polices : `ShuimoKai`, `ShuimoLatin`, `ShuimoCaps` (Cinzel, compteur doré), `ShuimoCao` (cursive 刘建毛草, chargée

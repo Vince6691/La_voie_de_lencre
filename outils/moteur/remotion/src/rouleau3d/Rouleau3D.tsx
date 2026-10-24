@@ -18,7 +18,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { compose, Mood, Shot } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
-import { travelM } from '../rouleau/TimeScroll';
+import { sonRouleau, travelM } from '../rouleau/TimeScroll';
 import { periode, periodesEntre } from '../periodes';
 
 export type Rouleau3DConfig = {
@@ -31,6 +31,7 @@ export type Rouleau3DConfig = {
   collection?: Collect[]; // sceaux de collection (par défaut : COLLECT)
   variant?: 'complet' | 'court'; // complet 5,3 s (verticale → rasante → plongée) ; court 3,6 s (rasante d'emblée, sortie en fondu)
   stone?: 'miel' | 'rouge'; // pierre du sceau : Shoushan miel, ou pierre « sang de poulet » (鸡血石) rouge
+  son?: 1 | 2 | 3; // 流水拂 du son (rouleau3d_liushui_N.wav) ; par défaut sonRouleau(at), comme le rouleau 2D
 };
 
 // ── géométrie de la peinture, en « pixels de plan » P (un plan 2D = 1920 × 1080 P) ──
@@ -621,7 +622,7 @@ export const Rouleau3DStage: React.FC<{ cfg: Rouleau3DConfig }> = ({ cfg }) => {
   }, [cfg, h]);
   const sealUrl = useMemo(() => (A ? (A.seal.image as HTMLCanvasElement).toDataURL() : ''), [A]);
   // le son reste monté du début à la fin de la cloche, même quand l'image du rouleau a disparu
-  const sound = <Sequence from={Math.round(cfg.at * fps)} durationInFrames={Math.round((v.len + 2.5) * fps)} layout="none"><Audio src={staticFile(v.sound)} volume={0.8} playbackRate={v.len / dur(cfg)} /></Sequence>;
+  const sound = <Sequence from={Math.round(cfg.at * fps)} durationInFrames={Math.round((v.len + 2.5) * fps)} layout="none"><Audio src={staticFile(v.sound.replace('.wav', `_liushui_${cfg.son ?? sonRouleau(cfg.at)}.wav`))} volume={0.8} playbackRate={v.len / dur(cfg)} /></Sequence>;
   if (!A || s < -0.4 || s > v.seal.fade[1] + 0.1) return sound;
   const year = lerp(yearsOf(cfg)[0], yearsOf(cfg)[1], v.travel(s));
   const ya = sm(seg(s, v.year[0], v.year[1])) * (1 - sm(seg(s, v.year[2], v.year[3])));

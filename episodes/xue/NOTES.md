@@ -66,3 +66,11 @@ Corrections : caméra dans Shang/Zhou, Qin et aujourd'hui (plus de plan figé su
 | Historique | 7 | voix : 斆 → 學, « tige de bronze », date des formes abrégées |
 | Design | 8 | fiche lisible, bandeau dégagé, légendes sur pastille |
 | Storytelling | 8 | accroche, voyage et chute tiennent ; scènes humaines en place |
+
+## Défaut relevé par l'utilisateur (à corriger)
+- **Royaumes combattants (bloc 5, ≈ 1:42)** : les « variantes régionales » posées en désordre avant le petit sceau sont toutes la **même** forme 戰國 (`zhanguo`), seulement tournée ou en miroir. Le propos (« d'un royaume à l'autre, le même mot changeait de visage ») demande de **vraies formes différentes** par royaume : 楚系 (Chu, bambou et soie), 齊系 (Qi), 燕系 (Yan), 晉系 (Han, Zhao, Wei), 秦系 (Qin) — à chercher sur 小學堂 (`outils/video_shuimo/xiaoxue.py`, formes des Royaumes combattants classées par système), une étiquette de royaume sous chacune.
+
+## Sons validés (même jour)
+- Rouleaux : un des trois 流水拂 (guzheng-sound), varié d'un rouleau à l'autre, 2D et 3D ; souffle moyen.
+- Fin : bamboo grove (Pixabay), 2 s avant la fin de la dernière phrase, discret, puis porte l'écran de fin.
+- « Pour les retrouver… » : glissando du morceau flashback (5–8 s), 0,1 s après le début de la phrase, volume 0,5.

@@ -506,6 +506,22 @@
    "vase",
    3.3,
    0.3
+  ],
+  [
+   "flashback",
+   "b02",
+   "retrouver",
+   0.1,
+   0.5
   ]
- ]
+ ],
+ "musique_fin": {
+  "fichier": "bamboo_grove_434735.mp3",
+  "avance": 2,
+  "volume_voix": 0.12,
+  "volume": 0.3,
+  "montee": 1.5,
+  "fondu": 2.5,
+  "depart": 0
+ }
 }

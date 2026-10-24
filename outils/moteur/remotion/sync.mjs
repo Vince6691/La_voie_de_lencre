@@ -34,7 +34,9 @@ fs.writeFileSync(`${here}/src/data/realglyphs.json`, fs.readFileSync(`${X}/src/r
 // panel d'évolution « L'édifice qui change » (tools/build_hall_audio.py) : bande son
 if (fs.existsSync(`${X}/assets/hall/bande.wav`)) cp(`${X}/assets/hall/bande.wav`, `${here}/public/hall/bande.wav`);
 // rouleau du temps (tools/build_sfx.py) : sons
-for (const f of fs.readdirSync(`${X}/assets/rouleau`)) cp(`${X}/assets/rouleau/${f}`, `${here}/public/rouleau/${f}`);
+for (const f of fs.readdirSync(`${X}/assets/rouleau`)) if (fs.statSync(`${X}/assets/rouleau/${f}`).isFile()) cp(`${X}/assets/rouleau/${f}`, `${here}/public/rouleau/${f}`);
+// musiques communes à tous les épisodes (bamboo_grove : musique de fin ; flashback : glissando « revenons au départ »)
+if (fs.existsSync(`${X}/assets/musique`)) for (const f of fs.readdirSync(`${X}/assets/musique`)) if (/\.(mp3|wav)$/.test(f)) cp(`${X}/assets/musique/${f}`, `${here}/public/musique/${f}`);
 // mosaïque de mots (skill mosaique-de-mots) : sons et tuile de fibres du papier xuan
 for (const f of fs.readdirSync(`${X}/assets/mosaique`)) cp(`${X}/assets/mosaique/${f}`, `${here}/public/mosaique/${f}`);
 // clips vidéo d'exemple (Seedance / Veo) pour les tests d'intégration encre

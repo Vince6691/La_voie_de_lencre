@@ -16,7 +16,15 @@ en curseur, rythme spectaculaire, **un seul mouvement de caméra à la fin** (pa
 - Démo autonome : composition `RouleauDemo` (`src/rouleau/RouleauDemo.tsx`, 周 → 秦, curseur point d'encre).
 - Exemple complet : `src/shuimo_xue/` (essai tout shuimo du 學, Shang → Zhou, le 學 en curseur dessiné par le canvas
   `InkStage` avec `glyphPose` = `cursorPose` / `arrivePose`).
-- Sons : `outils/moteur/assets/rouleau/` (`rouleau.wav` 5 s : souffle, glissando de guzheng, silence, impact ; `gong.wav`),
+- Sons : `outils/moteur/assets/rouleau/rouleau_liushui_1..3.wav` (5 s : souffle moyen, glissando 流水拂, silence, impact) et
+  `ding.wav` (ding léger tiré de la cloche du rouleau 3D, quand le sceau s'envole, à 0,9 de la durée).
+  **Glissando de guzheng (validé, tous les épisodes)** : un des trois 流水拂 *liúshuǐ fú* (« l'eau qui coule » : petites vagues de
+  5 cordes qui remontent l'instrument en se chevauchant), rendus avec le paquet npm `guzheng-sound` (MIT) :
+  1 lent (7 vagues, 55 → 45 ms par corde, note vibrée) · 2 très lent (6 vagues, 75 → 62 ms, note vibrée) · 3 lent et chevauché
+  (9 vagues, deux mains en alternance, sans note finale). Souffle moyen (0,38). Choix **varié d'un rouleau à l'autre** :
+  `sonRouleau(at)` = (⌊at⌋ mod 3) + 1 (`TimeScroll.tsx`, même calcul dans `bande_son.py`), ou imposé par `son: 1 | 2 | 3` dans
+  la configuration du rouleau. Ne plus utiliser les glissandos synthétisés (jugés « harpe ») ni ceux d'ElevenLabs (refusés).
+  Anciens sons : `rouleau.wav`, `gong.wav`,
   générés par `python3 tools/build_sfx.py` (depuis `outils/moteur/`), copiés par `node sync.mjs`.
 - Dépend du fond shuimo (skill `fond-shuimo`) : paysages `compose(seed…)`, papier, éléments du ciel.
 

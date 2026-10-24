@@ -33,7 +33,14 @@ export type TimeScrollConfig = {
   scroll?: number; // distance de défilement du paysage (px), 1900 par défaut
   tag?: { x: number; y: number; size: number }; // centre et taille du sceau du cartouche d'époque
   cursorScale?: number; // taille de l'objet curseur relativement à sa taille au centre (0,26)
+  // inscriptions calligraphiées sur la peinture : [0] sur le paysage quitté, [1] sur celui qui arrive (colonnes lues de
+  // droite à gauche ; idéalement des vers qui contiennent le caractère étudié, citation vérifiée) ; sceaux de collection
+  inscriptions?: { cols: string[]; sig?: string; seal?: string }[];
+  collection?: string[];
+  son?: 1 | 2 | 3; // 流水拂 du rouleau (assets/rouleau/rouleau_liushui_N.wav) ; par défaut sonRouleau(at)
 };
+// un des trois 流水拂 retenus pour chaque rouleau, varié d'un rouleau à l'autre ; bande_son.py fait le même calcul
+export const sonRouleau = (at: number) => (Math.floor(at) % 3) + 1;
 
 const VERMILION = [192, 57, 43], INK = 'rgb(29,25,21)';
 const rgb = (c: number[], a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
@@ -103,14 +110,31 @@ function camera(u: number) {
 }
 
 // ── sceau vermillon (plein ou esquissé, scintillement)
-export const Seal: React.FC<{ zh: string; x: number; y: number; size: number; fill: number; glow?: number; a?: number }> = ({ zh, x, y, size, fill, glow = 0, a = 1 }) => (
-  <div style={{
-    position: 'absolute', left: x - size / 2, top: y - size / 2, width: size, height: size, opacity: a, borderRadius: size * 0.11,
-    background: rgb(VERMILION, 0.92 * fill), border: `${Math.max(2, size * 0.045)}px solid ${rgb(VERMILION, 0.55 + 0.4 * fill)}`, boxSizing: 'border-box',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: size * 0.68, lineHeight: 1,
-    color: fill > 0.5 ? '#f6eee0' : rgb(VERMILION, 0.85), boxShadow: glow > 0 ? `0 0 ${36 * glow}px ${10 * glow}px rgba(235,120,60,${0.55 * glow})` : 'none',
-  }}>{zh}</div>
-);
+// sceau : même dessin que le rouleau 3D (Rouleau3D.tsx, drawSealSquare) — contour à peine irrégulier (±1,25 % du côté sur
+// 40 points), 70 petits manques d'encre ; un sceau à venir n'est qu'esquissé (contour et caractère pâles)
+const sealGeom = (zh: string) => {
+  const r = rng(zh.charCodeAt(0)), pts: string[] = [];
+  for (let i = 0; i < 40; i++) {
+    const k = i / 40, side = Math.floor(k * 4), f = (k * 4) % 1, j = (r() - 0.5) * 2.5;
+    const q = [[-1 + 2 * f, -1], [1, -1 + 2 * f], [1 - 2 * f, 1], [-1, 1 - 2 * f]][side];
+    pts.push(`${(50 + q[0] * 50 + j).toFixed(2)},${(50 + q[1] * 50 + j).toFixed(2)}`);
+  }
+  const holes = Array.from({ length: 70 }, () => [100 * r(), 100 * r(), 0.5 + r() * 1.2, 0.25 + 0.5 * r()]);
+  return { d: `M${pts.join('L')}Z`, holes };
+};
+export const Seal: React.FC<{ zh: string; x: number; y: number; size: number; fill: number; glow?: number; a?: number }> = ({ zh, x, y, size, fill, glow = 0, a = 1 }) => {
+  const { d, holes } = sealGeom(zh), id = `sceau_${zh.charCodeAt(0)}`;
+  return (
+    <div style={{ position: 'absolute', left: x - size / 2, top: y - size / 2, width: size, height: size, opacity: a,
+      filter: glow > 0 ? `drop-shadow(0 0 ${20 * glow}px rgba(235,120,60,${0.7 * glow}))` : undefined }}>
+      <svg viewBox="0 0 100 100" width={size} height={size} style={{ overflow: 'visible' }}>
+        <defs><mask id={id}><rect x="-5" y="-5" width="110" height="110" fill="#fff" />{holes.map(([hx, hy, hr, ha], i) => <circle key={i} cx={hx} cy={hy} r={hr} fill="#000" opacity={ha} />)}</mask></defs>
+        <path d={d} fill={rgb(VERMILION, 0.94 * fill)} stroke={rgb(VERMILION, 0.55 + 0.4 * fill)} strokeWidth={4.5 * (1 - 0.6 * fill)} strokeLinejoin="round" mask={fill > 0.05 ? `url(#${id})` : undefined} />
+        <text x="50" y="53" textAnchor="middle" dominantBaseline="central" fontFamily="ShuimoKai" fontSize="68" fill={fill > 0.5 ? '#f6eee0' : rgb(VERMILION, 0.85)} mask={fill > 0.5 ? `url(#${id})` : undefined}>{zh}</text>
+      </svg>
+    </div>
+  );
+};
 
 // paysages des deux époques : celui qu'on quitte (depuis `since`) glisse vers la gauche, l'autre (jusqu'à `until`)
 // arrive par la droite ; ils se relaient pendant la traversée
@@ -139,7 +163,7 @@ const TravelInner: React.FC<{ c: TimeScrollConfig; shot: ReturnType<typeof compo
 
 // le rouleau comme objet : montage de soie, papier, deux bâtons (visibles quand la caméra recule)
 const ScrollObject: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
-  const u = tsU(c, useT()), roll = scrollOf(c) * travelM(u) * 0.35, show = u > 0 && u < 1;
+  const u = tsU(c, useT()), roll = scrollOf(c) * travelM(u) * 0.35, show = u > 0 && u < 1, back = clamp((1 - camera(u)) / 0.2);
   const roller = (x: number) => (
     <div style={{ position: 'absolute', left: x, top: -70, width: 72, height: 1220 }}>
       <div style={{ position: 'absolute', left: 22, top: 0, width: 28, height: 1220, borderRadius: 14, background: 'linear-gradient(90deg,#3a2614,#8a5e34 45%,#3a2614)' }} />
@@ -151,12 +175,52 @@ const ScrollObject: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   );
   return (
     <>
-      {show && <div style={{ position: 'absolute', left: -6, top: -52, width: 1932, height: 1184, background: '#c9b186', boxShadow: '0 36px 90px rgba(0,0,0,0.65), 0 6px 14px rgba(0,0,0,0.4)',
+      {show && <div style={{ position: 'absolute', left: -6, top: -52, width: 1932, height: 1184, background: '#c9b186', boxShadow: `${-14 + 28 * travelM(u)}px ${30 + 26 * back}px ${80 + 40 * back}px rgba(0,0,0,0.65), 0 6px 14px rgba(0,0,0,0.4)`,
         backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0 36px, rgba(176,134,52,0.85) 36px 39px, rgba(0,0,0,0) 39px 1145px, rgba(176,134,52,0.85) 1145px 1148px, rgba(0,0,0,0) 1148px), repeating-linear-gradient(45deg, rgba(120,92,50,0.12) 0 2px, rgba(0,0,0,0) 2px 7px), repeating-linear-gradient(-45deg, rgba(255,240,205,0.10) 0 2px, rgba(0,0,0,0) 2px 7px)' }} />}
       <Img src={staticFile('shuimo/paper.jpg')} style={{ position: 'absolute', width: 1920, height: 1080, objectFit: 'cover' }} />
       {show && roller(-78)}
       {show && roller(1926)}
+      {show && (() => {
+        // règle des années sur la bordure de soie du bas : graduations, années des époques, repère doré qui avance
+        const [y0, y1] = c.years, k = travelM(u), X0 = 200, X1 = 1720;
+        const xs = (y: number) => X0 + ((y - y0) / (y1 - y0)) * (X1 - X0);
+        return (
+          <svg width={1920} height={60} style={{ position: 'absolute', left: 0, top: 1084, overflow: 'visible' }}>
+            <line x1={X0} y1={14} x2={X1} y2={14} stroke="rgba(110,80,35,0.7)" strokeWidth={1.5} />
+            {Array.from({ length: 41 }, (_, i) => <line key={i} x1={X0 + (i * (X1 - X0)) / 40} y1={14} x2={X0 + (i * (X1 - X0)) / 40} y2={i % 5 ? 20 : 26} stroke="rgba(110,80,35,0.7)" strokeWidth={1.2} />)}
+            {erasOf(c).filter((e) => { const v = Number(e.date.replace('−', '-')); return v >= Math.min(y0, y1) && v <= Math.max(y0, y1); }).map((e) => (
+              <text key={e.zh} x={xs(Number(e.date.replace('−', '-')))} y={44} textAnchor="middle" fontFamily="ShuimoKai" fontSize={22} fill="rgba(110,60,25,0.85)">{e.zh}</text>
+            ))}
+            <polygon points={`${X0 + k * (X1 - X0) - 7},2 ${X0 + k * (X1 - X0) + 7},2 ${X0 + k * (X1 - X0)},13`} fill="#c99a4b" />
+          </svg>
+        );
+      })()}
     </>
+  );
+};
+
+const Inscriptions: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
+  const u = tsU(c, useT());
+  if (!c.inscriptions?.length || u <= 0 || u >= 1) return null;
+  const S = scrollOf(c) * travelM(u), a = smooth(0.02, 0.1, u) * (1 - smooth(0.9, 0.99, u));
+  const coll = c.collection ?? ['長樂', '雲水', '墨道'];
+  return (
+    <AbsoluteFill style={{ opacity: a }}>
+      {c.inscriptions.slice(0, 2).map((ins, i) => {
+        const x = (i === 0 ? 1840 : 1840 + scrollOf(c)) - S; // bord droit des colonnes, à l'écart du compteur
+        if (x < -300 || x > 2300) return null;
+        return (
+          <React.Fragment key={i}>
+            <div style={{ position: 'absolute', left: x - 200, top: 120, width: 200, height: 380, display: 'flex', flexDirection: 'row-reverse', gap: 10 }}>
+              {ins.cols.map((col, j) => <div key={j} style={{ writingMode: 'vertical-rl', fontFamily: 'ShuimoKai', fontSize: 32, letterSpacing: 4, color: 'rgba(29,25,21,0.55)' }}>{col}</div>)}
+              {ins.sig && <div style={{ writingMode: 'vertical-rl', fontFamily: 'ShuimoKai', fontSize: 18, letterSpacing: 3, color: 'rgba(29,25,21,0.45)', marginTop: 80 }}>{ins.sig}</div>}
+            </div>
+            {ins.seal && <Seal zh={ins.seal} x={x - 44 * ins.cols.length - 46} y={420} size={26} fill={1} a={0.75} />}
+            {coll[i] && <div style={{ position: 'absolute', left: x - 1500, top: 930, width: 40, height: 40, background: rgb(VERMILION, 0.7), borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', writingMode: 'vertical-rl', fontFamily: 'ShuimoKai', fontSize: 16, color: '#f6eee0', transform: 'rotate(1.5deg)' }}>{coll[i]}</div>}
+          </React.Fragment>
+        );
+      })}
+    </AbsoluteFill>
   );
 };
 
@@ -221,20 +285,41 @@ const Vignette: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
 };
 const WIND = (() => {
   const R = rng(77);
-  return Array.from({ length: 70 }, (_, i) => ({ x0: R() * 2120, y0: 60 + R() * 960, par: 0.6 + R() * 1.2, petal: R() < 0.38, size: 0.6 + R() * 0.7, ph: R() * 6.28, i }));
+  return Array.from({ length: 54 }, (_, i) => {
+    const near = R() < 0.28; // premier plan : plus grands, flous ; fond : petits, nets, pâles
+    return { x0: R() * 2200, y0: 40 + R() * 1000, par: near ? 1.5 + R() * 0.6 : 0.5 + R() * 0.8, near, dust: R() < 0.3, size: near ? 1.5 + R() * 0.8 : 0.6 + R() * 0.6, ph: R() * 6.28, spin: 0.6 + R() * 1.6, tint: R(), i };
+  });
 })();
+const PETAL = 'M0,-1 C0.62,-0.86 0.82,-0.08 0.12,0.9 Q0,1.04 -0.12,0.9 C-0.82,-0.08 -0.62,-0.86 0,-1Z';
 const Wind: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const t = useT(), u = tsU(c, t);
-  if (u <= 0.08 || u >= 0.84) return null;
-  const pres = smooth(0.1, 0.22, u) * (1 - smooth(0.74, 0.82, u)), sp = speedAt(c, t), D = scrollOf(c) * travelM(u);
+  if (u <= 0.06 || u >= 0.86) return null;
+  const pres = smooth(0.08, 0.2, u) * (1 - smooth(0.74, 0.84, u)), sp = speedAt(c, t), D = scrollOf(c) * travelM(u), tt = t - c.at;
   return (
     <svg width={1920} height={1080} style={{ position: 'absolute', inset: 0 }}>
+      <defs>
+        <radialGradient id="petale" cx="50%" cy="35%" r="70%"><stop offset="0%" stopColor="#fff6f4" /><stop offset="55%" stopColor="#f6cfd4" /><stop offset="100%" stopColor="#e29aa8" /></radialGradient>
+        <radialGradient id="petale2" cx="50%" cy="35%" r="70%"><stop offset="0%" stopColor="#fffaf2" /><stop offset="60%" stopColor="#f3dfe2" /><stop offset="100%" stopColor="#d9aab3" /></radialGradient>
+        <filter id="flou"><feGaussianBlur stdDeviation="1.6" /></filter>
+        <radialGradient id="poussiere"><stop offset="0%" stopColor="rgba(255,236,190,0.95)" /><stop offset="100%" stopColor="rgba(255,236,190,0)" /></radialGradient>
+      </defs>
       {WIND.map((p) => {
-        const x = ((((p.x0 - D * 1.7 * p.par - (t - c.at) * 30 * p.par) % 2120) + 2120) % 2120) - 100;
-        const y = p.y0 + 16 * Math.sin(t * 1.4 + p.ph) + (p.petal ? 40 * u * p.par : 0);
-        const rx = (p.petal ? 7 : 2) * p.size * (1 + Math.min(7, (sp * p.par) / 520)), ry = (p.petal ? 4 : 1.6) * p.size;
-        return <ellipse key={p.i} cx={x} cy={y} rx={rx} ry={ry} transform={`rotate(${p.petal ? 8 * Math.sin(t * 3 + p.ph) : 0} ${x} ${y})`}
-          fill={p.petal ? 'rgb(238,200,204)' : 'rgb(40,34,30)'} opacity={pres * (p.petal ? 0.85 : 0.45)} />;
+        const x = ((((p.x0 - D * 1.6 * p.par - tt * 40 * p.par) % 2200) + 2200) % 2200) - 140;
+        const y = p.y0 + 22 * Math.sin(tt * 1.3 * p.spin + p.ph) + 70 * u * p.par; // ondulation + lente chute
+        if (p.dust) {
+          const r = 2.2 * p.size, a = pres * (0.35 + 0.35 * Math.sin(tt * 5 + p.ph) ** 2);
+          return <circle key={p.i} cx={x} cy={y} r={r * 2.4} fill="url(#poussiere)" opacity={a} />;
+        }
+        // le pétale tourne sur lui-même (rotation) et se retourne (aplatissement), s'étire un peu dans la vitesse
+        const rot = (p.ph * 57 + tt * 90 * p.spin) % 360, flip = 0.25 + 0.75 * Math.abs(Math.cos(tt * 2.4 * p.spin + p.ph));
+        const stretch = 1 + Math.min(1.2, (sp * p.par) / 1400), k = 9 * p.size;
+        return (
+          <g key={p.i} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${stretch.toFixed(2)} 1) rotate(${rot.toFixed(1)}) scale(${(k * flip).toFixed(2)} ${k.toFixed(2)})`}
+            opacity={pres * (p.near ? 0.7 : 0.85)} filter={p.near ? 'url(#flou)' : undefined}>
+            <path d={PETAL} fill={p.tint < 0.6 ? 'url(#petale)' : 'url(#petale2)'} />
+            <path d="M0,-0.7 Q0.05,0 0,0.8" stroke="rgba(200,120,135,0.45)" strokeWidth={0.06} fill="none" />
+          </g>
+        );
       })}
     </svg>
   );
@@ -251,7 +336,7 @@ const YearCounter: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const P = per[pi], next = per[pi + 1];
   const pa = P ? Math.min(pi === 0 ? 1 : clamp((year - P.debut) / 25), next ? clamp((next.debut - year) / 25) : 1) : 0;
   const blur = Math.min(4, (3.5 * speedAt(c, t)) / MAXSPEED);
-  const [n, suffix] = fmtYear(year);
+  const [, suffix] = fmtYear(year);
   return (
     <div style={{ position: 'absolute', width: '100%', top: 250, textAlign: 'center', opacity: a, filter: 'drop-shadow(0 2px 8px rgba(250,247,240,0.95))' }}>
       <div style={{ height: 56, display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 18, opacity: pa }}>
@@ -259,7 +344,22 @@ const YearCounter: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
         {P && <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 600, fontSize: 30, letterSpacing: '0.3em', color: '#4b4038' }}>{P.nom}</span>}
       </div>
       <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 18, filter: `blur(${blur.toFixed(2)}px)` }}>
-        <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 700, fontSize: 112, lineHeight: 1.05, letterSpacing: 4, backgroundImage: GOLD_DARK, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent' }}>{n}</span>
+        <span style={{ display: 'inline-flex' }}>{(() => {
+          const v = Math.abs(lerp(c.years[0], c.years[1], travelM(u))), nd = String(Math.floor(v)).length, glint = smooth(0.62, 0.74, u);
+          return Array.from({ length: nd }, (_, i) => {
+            const j = nd - 1 - i, idx = Math.floor(v / 10 ** j) % 10, lower = j === 0 ? 0 : (v % 10 ** j) / 10 ** j;
+            const off = idx + (j === 0 ? v - Math.floor(v) : smooth(1 - 10 ** -j, 1, lower));
+            const gx = glint * 170 - 35 - i * 30;
+            const bg = glint > 0 && glint < 1 ? `linear-gradient(105deg, rgba(255,246,220,0) ${gx - 14}%, rgba(255,246,220,0.95) ${gx}%, rgba(255,246,220,0) ${gx + 14}%), ${GOLD_DARK}` : GOLD_DARK;
+            return (
+              <span key={i} style={{ width: 74, height: 118, overflow: 'hidden', display: 'inline-block', maskImage: 'linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%)', WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%)' }}>
+                <span style={{ display: 'block', transform: `translateY(${-off * 118}px)` }}>
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((dd, q) => <span key={q} style={{ display: 'block', height: 118, fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 700, fontSize: 112, lineHeight: '118px', textAlign: 'center', backgroundImage: bg, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent' }}>{dd}</span>)}
+                </span>
+              </span>
+            );
+          });
+        })()}</span>
         {suffix && <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 500, fontSize: 40, color: '#7d5619' }}>{suffix}</span>}
       </div>
     </div>
@@ -283,12 +383,14 @@ export const TimeScrollStage: React.FC<{
   const z = camera(tsU(cfg, useT())), end = cfg.at + dur(cfg);
   return (
     <AbsoluteFill style={{ background: 'radial-gradient(ellipse 75% 62% at 50% 48%, rgba(150,96,48,0.55) 0%, rgba(90,56,30,0.25) 55%, rgba(0,0,0,0) 100%), repeating-linear-gradient(1.2deg, #2a1e15 0 4px, #33251a 4px 9px, #241911 9px 17px, #2f2218 17px 22px)' }}>
-      <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${960 - 960 * z}px, ${540 - 540 * z}px) scale(${z})` }}>
+      <AbsoluteFill style={{ background: 'linear-gradient(100deg, rgba(255,226,180,0) 38%, rgba(255,226,180,0.12) 50%, rgba(255,226,180,0) 62%)', backgroundSize: '220% 100%', backgroundPositionX: `${100 - 100 * travelM(tsU(cfg, useT()))}%`, opacity: clamp((1 - z) / 0.2) }} />
+      <AbsoluteFill style={{ transformOrigin: '960px 600px', transform: `perspective(2600px) rotateX(${(7 * clamp((1 - z) / 0.2)).toFixed(2)}deg) scale(${z})` }}>
         <ScrollObject c={cfg} />
         {under}
         <TravelLandscape c={cfg} land={fromLandscape} from={fromLandscape.since} to={end + 0.2} role="from" />
         <TravelLandscape c={cfg} land={toLandscape} from={cfg.at} to={toLandscape.until} role="to" />
         <SkyCycles c={cfg} />
+        <Inscriptions c={cfg} />
         {children}
         <Timeline c={cfg} defaultCursor={defaultCursor} />
       </AbsoluteFill>
@@ -299,7 +401,7 @@ export const TimeScrollStage: React.FC<{
       {sound && (
         <>
           {/* souffle, glissando de guzheng, silence, impact ; ding léger (cloche du rouleau 3D) quand le sceau s'envole (sons calés sur 5 s) */}
-          <Sequence from={Math.round(cfg.at * fps)}><Audio src={staticFile('rouleau/rouleau.wav')} volume={0.6} playbackRate={5 / dur(cfg)} /></Sequence>
+          <Sequence from={Math.round(cfg.at * fps)}><Audio src={staticFile(`rouleau/rouleau_liushui_${cfg.son ?? sonRouleau(cfg.at)}.wav`)} volume={0.6} playbackRate={5 / dur(cfg)} /></Sequence>
           <Sequence from={Math.round((cfg.at + 0.9 * dur(cfg)) * fps)}><Audio src={staticFile('rouleau/ding.wav')} volume={0.3} /></Sequence>
         </>
       )}

@@ -4,7 +4,7 @@
 // d'exemple, réutilisés à chaque emplacement, en attendant les clips Seedance), glyphes réels et tracé des traits
 // du moteur Canvas (legacy), pigments minéraux constants par composante.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { INK, InkStage, InkTiming, PIGMENT } from '../shuimo_xue/InkStage';
@@ -20,7 +20,8 @@ import rep from '../data/episodes/xue.json';
 
 type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b08' | 'b09';
 type Rep = Record<Clip, { duration: number; cues: Record<string, number> }> & {
-  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; fin: number; total: number; bruitages?: [string, number, number][] };
+  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; fin: number; total: number; bruitages?: [string, number, number][];
+    musique_fin?: { fichier: string; debut: number; fin_voix: number; fin: number; volume_voix: number; volume: number; montee: number; fondu: number; depart: number } };
 };
 const R = rep as unknown as Rep;
 const L = R._ligne;
@@ -35,8 +36,10 @@ const R1 = L.rouleaux[0].debut, R2 = L.rouleaux[1].debut, R3 = L.rouleaux[2].deb
 const END = L.fin;
 export const XUE_V2_SECONDS = Math.ceil(L.total * 10) / 10; // écran de fin de 10 s inclus
 
-const TR1: TimeScrollConfig = { at: R1, duration: L.rouleaux[0].duree, from: 0, to: 1, years: [-1250, -1046] };
-const TR2: TimeScrollConfig = { at: R2, duration: L.rouleaux[1].duree, from: 1, to: 2, years: [-1046, -221] };
+const TR1: TimeScrollConfig = { at: R1, duration: L.rouleaux[0].duree, from: 0, to: 1, years: [-1250, -1046],
+  inscriptions: [{ cols: ['學而時習之', '不亦說乎'], sig: '論語 學而', seal: '學' }, { cols: ['學然後知不足', '教然後知困'], sig: '禮記 學記', seal: '教' }] };
+const TR2: TimeScrollConfig = { at: R2, duration: L.rouleaux[1].duree, from: 1, to: 2, years: [-1046, -221],
+  inscriptions: [{ cols: ['玉不琢不成器', '人不學不知道'], sig: '禮記 學記', seal: '道' }, { cols: ['學不可以已'], sig: '荀子 勸學', seal: '荀' }], collection: ['雲水', '長樂'] };
 // rouleau 3D complet sur le plus grand saut (Tang, écriture régulière → aujourd'hui : la régulière est déjà dite) ; vers de l'inscription : le caractère étudié
 const R3A: Rouleau3DConfig = {
   at: R3, de: 'tang', vers: 'aujourdhui', annees: [618, 1956], variant: 'complet', stone: 'miel',
@@ -60,6 +63,7 @@ const TT: InkTiming = {
 // coups de sceau et révélations qui font trembler le cadre (4 px, 0,3 s)
 const IMPACTS = [at('b03', 'signe'), at('b04', 'enfant'), at('b07', 'reponse'), at('b08', 'nait')];
 const SFX = (L.bruitages ?? []) as [string, number, number][];
+const MF = L.musique_fin;
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const seg = (t: number, a: number, b: number) => { const u = clamp((t - a) / (b - a)); return u * u * (3 - 2 * u); };
 const rgb = (c: number[], a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
@@ -167,19 +171,24 @@ const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry
 
 const FadeIn: React.FC<{ dur: number; children: React.ReactNode }> = ({ dur, children }) => <AbsoluteFill style={{ opacity: seg(useT(), 0, dur) }}>{children}</AbsoluteFill>; // appelé dans une Sequence : temps relatif
 
-const DEV_A: [number, number] = [0, 2.35], DEV_C: [number, number] = [4.2, 7.9], DEV_R = 0.7;
+const DEV_A: [number, number] = [0, 2.35], DEV_C: [number, number] = [4.3, 7.9], DEV_R = 0.7;
 const DEV_LA = (DEV_A[1] - DEV_A[0]) / DEV_R, DEV_LC = (DEV_C[1] - DEV_C[0]) / DEV_R;
-const DEV_END = TT.plastronIn[0] + 1.4, DEV_START = DEV_END - (DEV_LA + DEV_LC - 0.5);
+const DEV_END = TT.plastronIn[0] + 1.4, DEV_START = DEV_END - (DEV_LA + DEV_LC);
 const DevinsClip: React.FC = () => {
   const { fps } = useVideoConfig();
   const z = CLIP_ZOOM.devins;
+  const f0 = Math.round(DEV_START * fps), fCut = Math.round((DEV_START + DEV_LA) * fps); // coupe franche entre les deux plans
   return (
     <AbsoluteFill style={{ transformOrigin: '10% 20%', transform: `scale(${z})` }}>
-      <Sequence from={Math.round(DEV_START * fps)} durationInFrames={Math.round(DEV_LA * fps)}>
+      <Sequence from={f0} durationInFrames={fCut - f0}>
         <CloudReveal src={CLIPS.devins} inDur={2.4} exit={false} startFrom={DEV_A[0]} playbackRate={DEV_R} />
       </Sequence>
-      <Sequence from={Math.round((DEV_START + DEV_LA - 0.5) * fps)} durationInFrames={Math.round(DEV_LC * fps)}>
-        <FadeIn dur={0.5}><VideoReveal src={CLIPS.devins} mode="pinceau" inDur={0.001} outDur={1.8} startFrom={DEV_C[0]} playbackRate={DEV_R} zoom={1} /></FadeIn>
+      {/* sous le canevas du pinceau, la vidéo brute du plan 2 le temps que le canevas soit dessiné (sinon le papier apparaît à la coupe) */}
+      <Sequence from={fCut} durationInFrames={Math.round(0.6 * fps)} premountFor={Math.round(fps)}>
+        <OffthreadVideo src={staticFile(CLIPS.devins)} muted startFrom={Math.round(DEV_C[0] * fps)} playbackRate={DEV_R} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </Sequence>
+      <Sequence from={fCut} durationInFrames={Math.round(DEV_LC * fps)} premountFor={Math.round(fps)}>
+        <VideoReveal src={CLIPS.devins} mode="pinceau" inDur={0.001} outDur={1.8} startFrom={DEV_C[0]} playbackRate={DEV_R} zoom={1} />
       </Sequence>
     </AbsoluteFill>
   );
@@ -321,8 +330,6 @@ const Opening: React.FC = () => {
       }} />
       </Cam>
       {/* compteurs de traits */}
-      <Caption text="8 traits" a={win(t, at('b02', 'huit') - 0.1, at('b02', 'seize'))} y={860} size={44} />
-      <Caption text="16 traits" a={win(t, at('b02', 'seize'), retro)} y={860} size={44} />
       <Caption text="學 · xué · apprendre" a={win(t, A1 + 1.4, at('b01', 'mains') - 0.2)} y={860} size={44} />
     </AbsoluteFill>
   );
@@ -359,8 +366,7 @@ const ShangZhou: React.FC = () => {
       <EraTag {...cartouche('shang', 'Anyang · v. 1250 av. J.-C.')} a={win(t, A3 + 0.3, R1 + 0.4, 0.8) * (1 - win(t, DEV_START + 0.6, DEV_END + 0.2, 0.5))} />
       <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4)) * (1 - win(t, vase - 0.3, R2 - 0.2, 0.5))} />
       <Caption text="estampage d'un plastron de tortue · fissures de divination 卜" a={win(t, TT.plastronIn[0] + 0.6, TT.plastronOut[1])} />
-      <Caption text="inscription coulée dans le bronze · vase rituel, Zhou de l'Ouest" a={win(t, TT.bronzeIn[1], TT.bronzeOut[1])} />
-      <Caption text="le tir à l'arc enseigné dans la salle d'étude 學宮 · Jing gui 靜簋" a={win(t, vase + 1.5, R2 - 0.6)} />
+      <Caption text="vase Jing gui 靜簋 · le tir à l'arc enseigné au 學宮" a={win(t, vase + 1.5, R2 - 0.6)} />
     </AbsoluteFill>
   );
 };
@@ -433,7 +439,6 @@ const XuShen: React.FC = () => {
       }} />
       </Cam>
       <EraTag {...cartouche('han', 'v. 100 · Xu Shen 許慎')} a={seg(t, A6 + 0.2, A6 + 1.2) * (1 - seg(t, R3, R3 + 0.4))} />
-      <Caption text="expliquer la forme de chaque caractère" a={win(t, A6 + 2.6, lettre - 0.4, 0.5)} y={850} size={44} />
       <Caption text="portrait imaginé" a={win(t, lettre + 1.2, A7 - 0.5)} y={920} size={44} left={160} width={800} />
       <div style={{ position: 'absolute', left: 1020, top: 590, width: 760, background: 'rgba(246,241,231,0.78)', borderRadius: 14, padding: '6px 0', textAlign: 'center', opacity: win(t, livre, A7 - 0.3) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 56, color: inkCss }}>說文解字</div>
@@ -492,11 +497,8 @@ const Retournement: React.FC = () => {
         }
       }} />
       </Cam>
-      <Caption text="dans les bureaux de l'empire · on copie, vite" a={win(t, A7 + 0.5, apl - 0.2, 0.5)} y={730} size={44} />
       <EraTag {...cartouche('tang', "楷書 · l'écriture régulière")} a={win(t, reg + 0.2, R3 - 0.3, 0.5)} />
-      <Caption text="écriture des clercs 隸書 · les mains figées en « mortier » 臼" a={win(t, fig, reg - 0.4)} />
-      <Caption text="écriture régulière 楷書 · 16 traits" a={win(t, reg + 0.4, cop + 0.8)} />
-      <Caption text="« les mains n'ont pas été effacées par un décret »" a={win(t, rep, R3 - 0.2)} size={44} y={920} />
+      <Caption text="écriture des clercs 隸書 · les mains devenues 臼, le « mortier »" a={win(t, fig, reg - 0.4)} />
     </AbsoluteFill>
   );
 };
@@ -591,7 +593,6 @@ const Today: React.FC = () => {
         E.marker(ctx, tt, v, E.CITIES.beijing, 'Chine · 1956', '汉字简化方案', seg(u, 0.45, 0.55), '#c0392b', -1);
       }} />
       <EraTag {...cartouche('aujourdhui', 'Japon 1949 · Chine 1956 · 8 traits')} a={r3TagIn(R3A, t) * (1 - seg(t, A9, A9 + 0.6))} />
-      <Caption text="xué · apprendre" a={win(t, nait + 0.5, ecole)} y={720} size={44} />
       <div style={{ position: 'absolute', width: '100%', top: 790, display: 'flex', justifyContent: 'center', gap: 120, fontFamily: 'ShuimoKai', fontSize: 80, color: inkCss }}>
         <span style={{ opacity: win(t, mots + 0.2, rec + 0.3) }}>学生<div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, textAlign: 'center' }}>l'élève</div></span>
         <span style={{ opacity: win(t, ecole + 0.2, rec + 0.3) }}>学校<div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, textAlign: 'center' }}>l'école</div></span>
@@ -670,7 +671,12 @@ export const XueV2: React.FC = () => {
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/xue/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
       ))}
       {clips.map(voice)}
-      <Audio src={staticFile('episodes/xue/audio/musique.wav')} volume={0.55} />
+      <Audio src={staticFile('episodes/xue/audio/musique.wav')} volume={(f) => 0.55 * (MF ? Math.max(0, Math.min(1, 1 - (f / fps - MF.debut) / 2)) : 1)} />
+      {/* musique de fin (bamboo grove) : discrète sous la dernière phrase, pleine sur l'écran de fin, puis fondu */}
+      {MF && <Sequence from={Math.round(MF.debut * fps)}><Audio src={staticFile(`musique/${MF.fichier}`)} startFrom={Math.round(MF.depart * fps)}
+        volume={(f) => { const s = f / fps, fv = MF.fin_voix - MF.debut, lg = MF.fin - MF.debut;
+          const v = s < fv ? MF.volume_voix * Math.min(1, s / MF.montee) : MF.volume_voix + (MF.volume - MF.volume_voix) * Math.min(1, (s - fv) / MF.montee);
+          return v * Math.max(0, Math.min(1, (lg - s) / MF.fondu)); }} /></Sequence>}
     </AbsoluteFill>
   );
 };
