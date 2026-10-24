@@ -57,6 +57,7 @@ Sortie : `episodes/<pinyin>/rendu/<pinyin>_<hauteur>p.mp4` (ne pas commiter la v
   episodes/<p>/episode.json` → `episodes/<p>/rendu/<p>_fr.srt`, d'après `voix/mots/*.json` recalés comme `reperes.py`
   (silence de tête, tempo, pause insérée dans un clip) ; ≤ 2 lignes d'environ 42 caractères, ≤ 6 s, coupure sur la ponctuation.
   À lancer avec le rendu final (le montage est figé), vérifier une réplique après chaque pause.
+- **Description et chapitres** : skill `description-youtube` (modèle de la chaîne, chapitres calés par `chapitres.py`).
 - Proposer le reste du paquet YouTube : chapitres sur les changements d'époque,
   titres (skill `voix-off-modo` / `youtube-title-creator`), miniature.
 
