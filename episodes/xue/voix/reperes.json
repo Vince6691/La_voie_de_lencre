@@ -59,7 +59,10 @@
    "figent": 9.15,
    "reguliere": 15.39,
    "copies": 22.19,
-   "reponse": 27.15
+   "reponse": 27.15,
+   "decret": 28.91,
+   "autres": 30.91,
+   "presses": 32.67
   }
  },
  "b08": {
@@ -74,6 +77,7 @@
    "nait": 16.21,
    "ecole": 19.17,
    "mots": 22.77,
+   "universite": 27.37,
    "reconnaitre": 28.69
   }
  },
@@ -432,6 +436,21 @@
    [
     "flashback",
     22.81,
+    0.5
+   ],
+   [
+    "ecole",
+    206.56,
+    0.35
+   ],
+   [
+    "universite",
+    213.26,
+    0.35
+   ],
+   [
+    "pinceau",
+    176.92,
     0.5
    ]
   ],

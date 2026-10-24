@@ -466,10 +466,11 @@ const XuShen: React.FC = () => {
 const Retournement: React.FC = () => {
   const t = useT();
   const apl = at('b07', 'aplatit'), fig = at('b07', 'figent'), reg = at('b07', 'reguliere'), cop = at('b07', 'copies'), rep = at('b07', 'reponse');
+  const dec = at('b07', 'decret'), aut = at('b07', 'autres');
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[A7, 960, 540, 1.02], [fig - 0.2, 960, 520, 1.14, 1.2], [reg - 0.2, 960, 540, 1.02, 1.0], [cop + 0.8, 960, 500, 1.15, 1.4], [rep - 0.3, 960, 540, 1.02, 1.0]]} punch={[reg, rep]}>
+      <Cam keys={[[A7, 960, 540, 1.02], [fig - 0.2, 960, 520, 1.14, 1.2], [reg - 0.2, 960, 540, 1.02, 1.0], [cop + 0.8, 960, 500, 1.15, 1.4], [rep - 0.3, 960, 540, 1.02, 1.0], [aut - 0.2, 960, 540, 0.95, 1.6]]} punch={[reg, rep]}>
       <Landscape seed={3} from={A7 - 1} to={R3 + 2} move="pan" mood="jour" faint={0.4} />
       <Draw draw={(ctx, tt, E) => {
         // « les scribes écrivent vite » : le petit sceau de Xu Shen, puis des copies de plus en plus vite et de plus en plus plates
@@ -498,12 +499,54 @@ const Retournement: React.FC = () => {
           E.drawStrokes(ctx, 'xue_trad', { x: 960, y: 540, size: 600, progress: 16 * seg(tt, reg - 0.3, reg + 2.6), brush: false, color: (c: string) => (c === 'hand' ? rgb(GRAY) : inkCss) });
           ctx.restore();
         }
-        // au fil des copies : le haut se resserre en trois petits traits (fondu, pas de cursive)
-        const si = seg(tt, cop + 1.0, cop + 2.6);
+        // au fil des copies : une file de copies défile en bas, 學 puis 学 (le haut se resserre en trois petits traits)
+        const fil = seg(tt, cop - 0.2, cop + 0.6) * (1 - seg(tt, rep - 0.2, rep + 0.6));
+        if (fil > 0) {
+          const x0 = 2100 - 300 * (tt - cop);
+          for (let i = 0; i < 12; i++) {
+            const x = x0 + i * 210, f = seg(x, 1900, 1550) * seg(x, -100, 250);
+            if (f <= 0) continue;
+            ctx.save(); ctx.globalAlpha = 0.55 * fil * f;
+            E.drawFontGlyph(ctx, i < 4 ? 'kai_xue_trad' : 'kai_xue_simp', { x, y: 915, size: 120, color: (c: string) => (c === 'hand' || c === 'yao' ? rgb(FUSION) : inkCss), alpha: () => 0.55 * fil * f });
+            ctx.restore();
+          }
+        }
+        // « les mains n'ont pas été effacées » : leur fantôme vermillon (學) remonte derrière 学, puis s'efface
+        const gh = 0.2 * seg(tt, rep - 0.1, rep + 0.8) * (1 - seg(tt, aut - 0.2, aut + 0.8));
+        if (gh > 0) {
+          ctx.save(); ctx.globalAlpha = gh;
+          E.drawStrokes(ctx, 'xue_trad', { x: 960, y: 540, size: 600, brush: false, color: (c: string) => (c === 'hand' ? rgb(VERM) : inkCss) });
+          ctx.restore();
+        }
+        const si = seg(tt, cop + 1.0, cop + 2.6), glow = seg(tt, aut, aut + 0.6);
         if (si > 0) {
           ctx.save(); ctx.globalAlpha = si;
-          E.drawStrokes(ctx, 'xue_simp', { x: 960, y: 540, size: 600, brush: false, color: (c: string) => (c === 'fusion' ? rgb(FUSION) : inkCss) });
+          E.drawStrokes(ctx, 'xue_simp', { x: 960, y: 540, size: 600, brush: false, color: (c: string) => (c === 'fusion' ? rgb(FUSION) : inkCss), glow: 24 * glow, glowColor: rgb(FUSION, 0.55) });
           ctx.restore();
+        }
+        // « pas par un décret » : le sceau d'un édit impérial (敕) se pose, puis se dissout
+        const ed = seg(tt, dec - 0.6, dec - 0.1) * (1 - seg(tt, dec + 0.9, aut - 0.1));
+        if (ed > 0) {
+          const sx = 1540, sy = 300, S = 190, dz = 1 + 0.12 * seg(tt, dec + 0.9, aut - 0.1);
+          ctx.save(); ctx.globalAlpha = 0.8 * ed; ctx.translate(sx, sy); ctx.scale(dz, dz); ctx.rotate(-0.05);
+          ctx.strokeStyle = rgb(VERM); ctx.lineWidth = 9; ctx.strokeRect(-S / 2, -S / 2, S, S);
+          ctx.restore();
+          E.text(ctx, '敕', sx, sy, { font: 'Kai', size: 140, color: rgb(VERM), alpha: 0.8 * ed });
+          E.text(ctx, 'édit impérial', sx, sy + 150, { font: 'Cormorant', size: 40, color: '#5e5044', alpha: 0.8 * ed });
+        }
+        // « par d'autres mains : celles des scribes pressés » : des colonnes de copies se couvrent à toute vitesse,
+        // de droite à gauche, autour du 学 ; le haut ⺍ de chaque copie en vermillon
+        if (tt > aut - 0.1) {
+          const COLS = [1700, 1580, 1460, 460, 340, 220], N = 7;
+          COLS.forEach((cx, j) => {
+            for (let k = 0; k < N; k++) {
+              const t0 = aut + 0.08 * (j * N + k), a = seg(tt, t0, t0 + 0.15);
+              if (a <= 0) continue;
+              ctx.save(); ctx.globalAlpha = 0.5 * a;
+              E.drawFontGlyph(ctx, j * N + k < 3 ? 'kai_xue_trad' : 'kai_xue_simp', { x: cx + 6 * Math.sin(j * 7 + k * 3), y: 230 + k * 100, size: 84, color: (c: string) => (c === 'hand' || c === 'yao' ? rgb(FUSION) : inkCss), alpha: () => 0.5 * a });
+              ctx.restore();
+            }
+          });
         }
       }} />
       </Cam>

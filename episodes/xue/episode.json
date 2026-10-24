@@ -100,7 +100,10 @@
    "figent": "Les deux mains se figent",
    "reguliere": "L'écriture régulière",
    "copies": "Au fil des copies",
-   "reponse": "Les mains n'ont pas"
+   "reponse": "Les mains n'ont pas",
+   "decret": "décret",
+   "autres": "d'autres mains",
+   "presses": "scribes pressés"
   },
   "b08": {
    "huit": "Huit traits",
@@ -112,6 +115,7 @@
    "nait": "Ainsi naît",
    "ecole": "On le lit",
    "mots": "Il ouvre",
+   "universite": "l'université",
    "reconnaitre": "Pour le reconnaître"
   },
   "b09": {
@@ -512,6 +516,27 @@
    "b02",
    "retrouver",
    0.1,
+   0.5
+  ],
+  [
+   "ecole",
+   "b08",
+   "ecole",
+   1.3,
+   0.35
+  ],
+  [
+   "universite",
+   "b08",
+   "universite",
+   -0.2,
+   0.35
+  ],
+  [
+   "pinceau",
+   "b07",
+   "autres",
+   0.0,
    0.5
   ]
  ],
