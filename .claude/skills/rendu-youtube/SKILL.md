@@ -51,7 +51,11 @@ Sortie : `episodes/<pinyin>/rendu/<pinyin>_<hauteur>p.mp4` (ne pas commiter la v
   Une image noire courte à la sortie d'un clip au pinceau (encre pleine) est voulue ; un plan figé > 2 s hors écran
   de fin est un défaut (caméra manquante).
 - Regarder **toutes** les planches (`Read`), proposer la note artistique (skill `note-artistique`).
-- Proposer le paquet YouTube : sous-titres FR depuis `voix/mots/*.json`, chapitres sur les changements d'époque,
+- **Sous-titres FR** (fichier à envoyer sur YouTube, pas incrustés) : `python outils/video_shuimo/sous_titres.py
+  episodes/<p>/episode.json` → `episodes/<p>/rendu/<p>_fr.srt`, d'après `voix/mots/*.json` recalés comme `reperes.py`
+  (silence de tête, tempo, pause insérée dans un clip) ; ≤ 2 lignes d'environ 42 caractères, ≤ 6 s, coupure sur la ponctuation.
+  À lancer avec le rendu final (le montage est figé), vérifier une réplique après chaque pause.
+- Proposer le reste du paquet YouTube : chapitres sur les changements d'époque,
   titres (skill `voix-off-modo` / `youtube-title-creator`), miniature.
 
 ## Pièges rencontrés
