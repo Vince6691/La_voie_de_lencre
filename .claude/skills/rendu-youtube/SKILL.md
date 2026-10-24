@@ -47,7 +47,9 @@ En tâche de fond (`run_in_background`) : la notification arrive à la fin, ne p
 Sortie : `episodes/<pinyin>/rendu/<pinyin>_<hauteur>p.mp4` (ne pas commiter la vidéo).
 
 ## Après le rendu
-- Lire `rapport.txt` : nombre d'images = total ; vidéo `yuv420p(tv, bt709)` ; son ≈ −14 LUFS, pic ≤ −1 dBTP.
+- Lire `rapport.txt` : nombre d'images = total ; vidéo `yuv420p(tv, bt709)` ; son ≈ −14 LUFS, pic ≤ −1 dBTP ;
+  son **stéréo** 48 kHz (`ffmpeg -i` sur la vidéo) : avant la correction de `bande_son.py` (chaque entrée en stéréo
+  avant `amix`), le mélange suivait la voix mono et aplatissait la musique de fin et les bruitages.
   Une image noire courte à la sortie d'un clip au pinceau (encre pleine) est voulue ; un plan figé > 2 s hors écran
   de fin est un défaut (caméra manquante).
 - Regarder **toutes** les planches (`Read`), proposer la note artistique (skill `note-artistique`).

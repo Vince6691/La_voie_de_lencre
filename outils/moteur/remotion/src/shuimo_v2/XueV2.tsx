@@ -293,7 +293,7 @@ const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; ch
   });
   let cx = hermite(ts, xs, t), cy = hermite(ts, ys, t), sc = hermite(ts, zs, t);
   sc *= 1 + 0.018 * (0.5 - 0.5 * Math.cos((t * 2 * Math.PI) / 16));
-  cx += 12 * Math.sin((t * 2 * Math.PI) / 19); cy += 7 * Math.sin((t * 2 * Math.PI) / 23);
+  cx += 4 * Math.sin((t * 2 * Math.PI) / 19); cy += 6 * Math.sin((t * 2 * Math.PI) / 23); // dérive surtout verticale : peu de gauche-droite
   for (const p of punch) { const u = seg(t, p - 0.2, p + 1.2); sc *= 1 + 0.022 * Math.sin(Math.PI * u) ** 2; }
   const amp = 1 - Math.max(0, ...calm.map(([a, b]) => win(t, a, b, 0.6)));
   sc = 1 + (sc - 1) * amp;
@@ -308,7 +308,7 @@ const Opening: React.FC = () => {
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[0, 960, 540, 1], [mains - 0.3, 960, 500, 1.12, 1.2], [mains + 4.2, 960, 540, 1, 1.4], [retro, 960, 540, 1.08, 2.0]]} punch={[mains]}>
+      <Cam keys={[[0, 960, 540, 1], [mains - 0.3, 960, 500, 1.12, 1.2], [mains + 4.2, 960, 540, 1, 1.4], [at('b02', 'huit') + 1.2, 960, 510, 1.08, 2.4], [retro, 960, 540, 1.04, 2.0]]} punch={[mains]}>
       <Landscape seed={14} from={retro - 0.6} to={R1 + 2} move="push" mood="aube" />
       <Draw draw={(ctx, tt, E) => {
         const shrink = seg(tt, retro + 0.4, retro + 2.4); // le signe se rétracte en point d'encre
@@ -333,7 +333,9 @@ const Opening: React.FC = () => {
         // 学 (8 traits) en fondu croisé
         if (k > 0) {
           ctx.save(); ctx.globalAlpha = a * k;
-          E.drawStrokes(ctx, 'xue_simp', { x: 960, y, size, brush: false, color: () => inkCss });
+          // « huit traits » : 学 se retrace trait par trait
+          const h8 = seg(tt, at('b02', 'huit') - 0.1, at('b02', 'huit') + 1.8);
+          E.drawStrokes(ctx, 'xue_simp', { x: 960, y, size, progress: h8 > 0 && h8 < 1 ? 1 + 7 * h8 : 8, brush: false, color: () => inkCss });
           ctx.restore();
         }
       }} />
@@ -435,7 +437,7 @@ const XuShen: React.FC = () => {
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[A6, 960, 540, 1.02], [lettre - 0.4, 760, 560, 1.06, 2.5], [livre - 0.2, 1000, 540, 1.04, 1.6], [toit - 0.3, 1200, 440, 1.06, 1.2]]} punch={[toit]}>
+      <Cam keys={[[A6, 960, 540, 1.02], [lettre - 0.4, 900, 560, 1.06, 2.5], [livre - 0.2, 980, 540, 1.04, 1.6], [toit - 0.3, 1040, 460, 1.06, 1.2]]} punch={[toit]}>
       <Landscape seed={3} from={A6 - 1} to={A7 + 1} move="still" mood="brume" faint={0.55} />
       <Draw draw={(ctx, tt, E) => {
         E.drawPortrait(ctx, { x: 560, y: 590, height: 640, progress: seg(tt, lettre - 0.6, lettre + 2.4), color: '#2a231d', alpha: 1 - seg(tt, A7 - 0.8, A7) });
@@ -471,7 +473,7 @@ const Retournement: React.FC = () => {
     <AbsoluteFill>
       <Paper />
       <Cam keys={[[A7, 960, 540, 1.02], [fig - 0.2, 960, 520, 1.14, 1.2], [reg - 0.2, 960, 540, 1.02, 1.0], [cop + 0.8, 960, 500, 1.15, 1.4], [rep - 0.3, 960, 540, 1.02, 1.0], [aut - 0.2, 960, 540, 0.95, 1.6]]} punch={[reg, rep]}>
-      <Landscape seed={3} from={A7 - 1} to={R3 + 2} move="pan" mood="jour" faint={0.4} />
+      <Landscape seed={3} from={A7 - 1} to={R3 + 2} move="push" mood="jour" faint={0.4} />
       <Draw draw={(ctx, tt, E) => {
         // « les scribes écrivent vite » : le petit sceau de Xu Shen, puis des copies de plus en plus vite et de plus en plus plates
         const sc = seg(tt, A7 - 0.3, A7 + 0.6) * (1 - seg(tt, apl + 0.3, apl + 1.2));

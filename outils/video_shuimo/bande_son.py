@@ -47,7 +47,10 @@ if mf:
 m = len(ins) // 2; ins += ['-i', cfg['musique']]
 labels = ''.join(f'[v{j}]' for j in range(m))
 vm = f"0.55*if(lt(t,{mf['debut']}),1,max(0,1-(t-{mf['debut']})/2))" if mf else '0.55'  # la musique principale s'efface sous celle de fin
-graph = ';'.join(parts) + f";[{m}:a]volume='{vm}':eval=frame[m];{labels}[m]amix=inputs={m + 1}:normalize=0:duration=longest,loudnorm=I=-14:TP=-1.5[o]"
+# chaque entrée passe en stéréo avant le mélange : sinon amix suit la voix (mono) et aplatit la musique et les bruitages stéréo
+st = ''.join(f';[v{j}]aformat=channel_layouts=stereo[s{j}]' for j in range(m))
+labels = ''.join(f'[s{j}]' for j in range(m))
+graph = ';'.join(parts) + st + f";[{m}:a]volume='{vm}':eval=frame,aformat=channel_layouts=stereo[m];{labels}[m]amix=inputs={m + 1}:normalize=0:duration=longest,loudnorm=I=-14:TP=-1.5,aresample=48000[o]"
 out = os.path.abspath(sys.argv[2]) if len(sys.argv) > 2 else os.path.join(base, 'apercus', 'bande_son.mp3')
 os.makedirs(os.path.dirname(out), exist_ok=True)
 fmt = ['-c:a', 'pcm_s16le'] if out.endswith('.wav') else ['-b:a', '160k']

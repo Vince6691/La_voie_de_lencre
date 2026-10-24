@@ -105,7 +105,7 @@ if (manquants.length) { journal(`ÉCHEC : morceaux incomplets ${manquants.map((m
 const son = path.join(OUT, 'son.wav'), sonYT = path.join(OUT, 'son_yt.wav');
 spawnSync(PY, [path.join(ICI, 'bande_son.py'), path.join(EP, 'episode.json'), son], { stdio: 'inherit' });
 const I = Number((ff(['-i', son, '-af', 'ebur128', '-f', 'null', '-']).stderr.match(/I:\s+(-?[\d.]+) LUFS/g) ?? ['I: -14']).pop().match(/-?[\d.]+/)[0]);
-ff(['-y', '-loglevel', 'error', '-i', son, '-af', `volume=${(-14 - I).toFixed(2)}dB,alimiter=limit=0.89:level=false`, '-ar', '48000', '-c:a', 'pcm_s16le', sonYT]);
+ff(['-y', '-loglevel', 'error', '-i', son, '-af', `volume=${(-14 - I).toFixed(2)}dB,alimiter=limit=0.89:level=false`, '-ar', '48000', '-ac', '2', '-c:a', 'pcm_s16le', sonYT]);
 journal(`son : ${I} LUFS → gain ${(-14 - I).toFixed(2)} dB`);
 
 // ── 5. assemblage : les morceaux sont quasi sans perte (crf 10, veryfast) ; un seul encodage final (crf choisi, slow),
@@ -118,7 +118,7 @@ const video = ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(CRF), '-vf',
 journal(`encodage final (crf ${CRF}, slow)${pleine ? ' avec conversion pleine plage → plage TV' : ''}`);
 const asm = ff(['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', liste, '-i', sonYT, '-map', '0:v', '-map', '1:a', ...video,
   '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
-  '-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-movflags', '+faststart', '-shortest', final]);
+  '-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-ac', '2', '-movflags', '+faststart', '-shortest', final]);
 if (asm.status !== 0) { journal(`ÉCHEC de l'assemblage : ${asm.stderr.slice(-400)}`); process.exit(1); }
 
 // ── 6. contrôle : images, format, noirs, plans figés, silences, niveau ; planches toutes les 3 s pour la note
