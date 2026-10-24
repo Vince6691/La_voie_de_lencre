@@ -34,13 +34,19 @@ for r in L['rouleaux']:
         continue
     i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'rouleau.wav')]
     parts.append(f'[{i}:a]atempo={5 / r["duree"]:.4f},volume=0.6,adelay={int(r["debut"] * 1000)}:all=1[v{i}]')
-    i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'gong.wav')]
-    parts.append(f'[{i}:a]volume=0.22,adelay={int((r["debut"] + 0.97 * r["duree"]) * 1000)}:all=1[v{i}]')
+    i = len(ins) // 2; ins += ['-i', os.path.join(RS, 'ding.wav')]
+    parts.append(f'[{i}:a]volume=0.3,adelay={int((r["debut"] + 0.9 * r["duree"]) * 1000)}:all=1[v{i}]')
 m = len(ins) // 2; ins += ['-i', cfg['musique']]
 labels = ''.join(f'[v{j}]' for j in range(m))
 graph = ';'.join(parts) + f';[{m}:a]volume=0.55[m];{labels}[m]amix=inputs={m + 1}:normalize=0:duration=longest,loudnorm=I=-14:TP=-1.5[o]'
 out = os.path.abspath(sys.argv[2]) if len(sys.argv) > 2 else os.path.join(base, 'apercus', 'bande_son.mp3')
 os.makedirs(os.path.dirname(out), exist_ok=True)
 fmt = ['-c:a', 'pcm_s16le'] if out.endswith('.wav') else ['-b:a', '160k']
-subprocess.run([ff, '-y', '-loglevel', 'error', *ins, '-filter_complex', graph + f';[o]atrim=end={L["total"]}[f]', '-map', '[f]', *fmt, out], check=True)
+# graphe écrit dans un fichier : avec beaucoup de bruitages la ligne de commande dépasse la limite de Windows (≈ 32 000 caractères)
+import tempfile
+script = tempfile.NamedTemporaryFile('w', suffix='.txt', delete=False, encoding='utf-8'); script.write(graph + f';[o]atrim=end={L["total"]}[f]'); script.close()
+try:
+    subprocess.run([ff, '-y', '-loglevel', 'error', *ins, '-filter_complex_script', script.name, '-map', '[f]', *fmt, out], check=True)
+finally:
+    os.unlink(script.name)
 print(out)

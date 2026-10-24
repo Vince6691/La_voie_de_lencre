@@ -298,9 +298,9 @@ export const TimeScrollStage: React.FC<{
       <FlyingSeal c={cfg} />
       {sound && (
         <>
-          {/* souffle, glissando de guzheng, silence, impact ; gong quand le sceau se pose (sons calés sur 5 s) */}
+          {/* souffle, glissando de guzheng, silence, impact ; ding léger (cloche du rouleau 3D) quand le sceau s'envole (sons calés sur 5 s) */}
           <Sequence from={Math.round(cfg.at * fps)}><Audio src={staticFile('rouleau/rouleau.wav')} volume={0.6} playbackRate={5 / dur(cfg)} /></Sequence>
-          <Sequence from={Math.round((cfg.at + 0.97 * dur(cfg)) * fps)}><Audio src={staticFile('rouleau/gong.wav')} volume={0.22} /></Sequence>
+          <Sequence from={Math.round((cfg.at + 0.9 * dur(cfg)) * fps)}><Audio src={staticFile('rouleau/ding.wav')} volume={0.3} /></Sequence>
         </>
       )}
     </AbsoluteFill>

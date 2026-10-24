@@ -43,3 +43,26 @@ Référence technique : `YuV1` (語). Passe du 2026-10-23, étape 4 (constructio
 | Historique | 7 | citation corrigée (荀子 勸學 : 青取之於藍) ; restent 斆 → 學, « tige de bronze », date des formes abrégées |
 | Design | 7,5 | lisible, sans collision ; ligne italique de Xu Shen sur le pin, ruban fusion sous le rocher |
 | Storytelling | 7,5 | question tenue, retournement net ; les devins (accroche du bloc 3) et le tir à l'arc manquent encore |
+
+## Clips (mise à jour)
+- Devins : `clips/01_devins.mp4` (Veo, recadré à 112 %). Tir à l'arc : `clips/02a_tir_arc.mp4` (6,0 s, le roi guide l'élève, entrée à travers 學) puis `clips/02b_tir_arc.mp4` (5,9 s, fondu enchaîné de 0,4 s, sortie au pinceau), lus à vitesse normale ; 6 s de silence ajoutées après la voix du bloc 4 (`"apres": 6`) pour que la scène 2 se joue en entier avant le rouleau 2.
+- Durée totale : 252,9 s.
+
+## Passe 3 — étape 4, rendu 720p complet (apercus/xue_720.mp4, 4:12,9), 84 images (toutes les 3 s) + analyse ffmpeg
+| Domaine | Note | En bref |
+|---|---|---|
+| Technique | 7,5 | rendu complet propre (7 590 images, aucune image noire hors 0,33 s d'encre à 41,2 s) ; pas de caméra Cam dans les scènes Shang/Zhou, Qin et aujourd'hui ; plan fixe de 7 s sur le bronze (79–86 s) ; éclair de papier vide de 0,8 s avant l'écran de fin ; −15,4 LUFS (cible −14) |
+| Artistique | 7,5 | clips devins et tir à l'arc très beaux, rouleaux 2D et 3D premium, bandeau ; même paysage (seed 3) de Xu Shen à la Tang, beaucoup de plans « glyphe au centre sur paysage » |
+| Historique | 7 | rouleau 3D depuis les Tang ; restent 斆 → 學, « tige de bronze », date des formes abrégées (voix) |
+| Design | 7,5 | légendes lisibles, cartouches masqués sur les clips ; ruban fusion du bandeau sous le rocher |
+| Storytelling | 8 | les deux scènes humaines sont là, question tenue jusqu'à 教 ; le bronze statique ralentit le bloc 4 |
+
+## Passe 4 — rendu 720p complet après les corrections légères (apercus/xue_720.mp4, 4:07,7)
+Corrections : caméra dans Shang/Zhou, Qin et aujourd'hui (plus de plan figé sur le bronze), fiche caractère de 学, voile sous le bandeau, raccord de fin sans papier vide, son à −14,4 LUFS (pic −2,1 dBTP), clip des devins sans la coupe interne du fichier Veo (plan 1 puis plan de la carapace en fondu), 学 qui ne revient plus par-dessus le bandeau.
+| Domaine | Note | En bref |
+|---|---|---|
+| Technique | 8 | rendu propre, plus de plan figé hors écran de fin ; reste 0,33 s d'encre noire à la sortie des devins (41,6 s) |
+| Artistique | 7,5 | même paysage de Xu Shen aux Tang, beaucoup de plans « glyphe au centre » |
+| Historique | 7 | voix : 斆 → 學, « tige de bronze », date des formes abrégées |
+| Design | 8 | fiche lisible, bandeau dégagé, légendes sur pastille |
+| Storytelling | 8 | accroche, voyage et chute tiennent ; scènes humaines en place |

@@ -118,12 +118,13 @@ const Paper: React.FC = () => <AbsoluteFill style={{ background: `#f3eee4 url(${
 // clip vidéo plein cadre (exemples réutilisés en attendant les clips Seedance) : entrée par les nuages, ou à travers
 // le caractère quand un caractère est à l'écran juste avant ; sortie par les coups de pinceau dans tous les cas
 // clips Seedance dédiés (episodes/xue/A_FOURNIR.md) : PRETS passe à true à l'arrivée du fichier ; d'ici là, un emplacement marqué
-const CLIPS = { devins: 'episodes/xue/clips/01_devins.mp4', arc: 'episodes/xue/clips/02_tir_arc.mp4' };
-const PRETS: Record<keyof typeof CLIPS, boolean> = { devins: true, arc: false };
-const CLIP_TITRES = { devins: ['Clip 1 · les devins', 'Seedance, 12 s : la tige brûlante, l\'écaille qui craque'], arc: ['Clip 2 · le tir à l\'arc au 學宮', 'Seedance, 8 s : le roi guide la main de l\'élève'] };
-const CLIP_SECONDS = { devins: 8, arc: 8 }; // durée des clips Seedance
-const CLIP_ZOOM = { devins: 1.12, arc: 1 }; // recadrage (filigrane du générateur hors cadre)
-const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry: 'nuages' | 'glyphe'; inDur?: number }> = ({ src, from, len, entry, inDur = 3.2 }) => {
+const CLIPS = { devins: 'episodes/xue/clips/01_devins.mp4', arc1: 'episodes/xue/clips/02a_tir_arc.mp4', arc2: 'episodes/xue/clips/02b_tir_arc.mp4' };
+const PRETS: Record<keyof typeof CLIPS, boolean> = { devins: true, arc1: true, arc2: true };
+const CLIP_TITRES = { devins: ['Clip 1 · les devins', 'Seedance, 12 s : la tige brûlante, l\'écaille qui craque'], arc1: ['Clip 2a · le roi guide l\'élève', ''], arc2: ['Clip 2b · la flèche', ''] };
+const CLIP_SECONDS = { devins: 8, arc1: 6.04, arc2: 5.89 }; // durée des clips
+const CLIP_VITESSE: Partial<Record<keyof typeof CLIPS, number>> = { arc2: 1 }; // lu à vitesse normale (le plan est monté sur sa durée)
+const CLIP_ZOOM = { devins: 1.12, arc1: 1, arc2: 1 }; // recadrage (filigrane du générateur hors cadre)
+const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry: 'nuages' | 'glyphe' | 'fondu'; inDur?: number; sortie?: boolean }> = ({ src, from, len, entry, inDur = 3.2, sortie = true }) => {
   const { fps } = useVideoConfig();
   if (!PRETS[src]) {
     return (
@@ -132,12 +133,22 @@ const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry
       </Sequence>
     );
   }
-  const rate = Math.min(0.9, CLIP_SECONDS[src] / len); // ralenti si le plan est plus long que le clip
+  const rate = CLIP_VITESSE[src] ?? Math.min(0.9, (0.93 * CLIP_SECONDS[src]) / len); // ralenti si le plan est plus long que le clip, avec 7 % de marge (pas d'image noire en fin de clip)
   const crop = (el: React.ReactNode) => (CLIP_ZOOM[src] === 1 ? <>{el}</> : <AbsoluteFill style={{ transformOrigin: '10% 20%', transform: `scale(${CLIP_ZOOM[src]})` }}>{el}</AbsoluteFill>);
+  if (entry === 'fondu') {
+    // suite directe d'un plan : fondu enchaîné d'entrée, puis sortie au pinceau
+    return crop(
+      <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(len * fps)}>
+        <FadeIn dur={inDur}>
+          <VideoReveal src={CLIPS[src]} mode="pinceau" inDur={0.001} outDur={1.8} playbackRate={rate} zoom={1} />
+        </FadeIn>
+      </Sequence>
+    );
+  }
   if (entry === 'glyphe') {
     return crop(
       <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(len * fps)}>
-        <VideoReveal src={CLIPS[src]} mode="glyphe" outMode="pinceau" inDur={inDur} outDur={2.4} playbackRate={rate} zoom={1} />
+        <VideoReveal src={CLIPS[src]} mode="glyphe" outMode={sortie ? 'pinceau' : 'glyphe'} outAt={sortie ? undefined : len + 10} inDur={inDur} outDur={1.8} playbackRate={rate} zoom={1} />
       </Sequence>
     );
   }
@@ -148,9 +159,29 @@ const Clip: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry
         <CloudReveal src={CLIPS[src]} inDur={inDur} exit={false} playbackRate={rate} />
       </Sequence>
       <Sequence from={Math.round((from + cl) * fps)} durationInFrames={Math.round((len - cl) * fps)}>
-        <VideoReveal src={CLIPS[src]} mode="pinceau" inDur={0.001} outDur={2.4} startFrom={cl * rate} playbackRate={rate} zoom={1} />
+        <VideoReveal src={CLIPS[src]} mode="pinceau" inDur={0.001} outDur={1.8} startFrom={cl * rate} playbackRate={rate} zoom={1} />
       </Sequence>
     </>
+  );
+};
+
+const FadeIn: React.FC<{ dur: number; children: React.ReactNode }> = ({ dur, children }) => <AbsoluteFill style={{ opacity: seg(useT(), 0, dur) }}>{children}</AbsoluteFill>; // appelé dans une Sequence : temps relatif
+
+const DEV_A: [number, number] = [0, 2.35], DEV_C: [number, number] = [4.2, 7.9], DEV_R = 0.7;
+const DEV_LA = (DEV_A[1] - DEV_A[0]) / DEV_R, DEV_LC = (DEV_C[1] - DEV_C[0]) / DEV_R;
+const DEV_END = TT.plastronIn[0] + 1.4, DEV_START = DEV_END - (DEV_LA + DEV_LC - 0.5);
+const DevinsClip: React.FC = () => {
+  const { fps } = useVideoConfig();
+  const z = CLIP_ZOOM.devins;
+  return (
+    <AbsoluteFill style={{ transformOrigin: '10% 20%', transform: `scale(${z})` }}>
+      <Sequence from={Math.round(DEV_START * fps)} durationInFrames={Math.round(DEV_LA * fps)}>
+        <CloudReveal src={CLIPS.devins} inDur={2.4} exit={false} startFrom={DEV_A[0]} playbackRate={DEV_R} />
+      </Sequence>
+      <Sequence from={Math.round((DEV_START + DEV_LA - 0.5) * fps)} durationInFrames={Math.round(DEV_LC * fps)}>
+        <FadeIn dur={0.5}><VideoReveal src={CLIPS.devins} mode="pinceau" inDur={0.001} outDur={1.8} startFrom={DEV_C[0]} playbackRate={DEV_R} zoom={1} /></FadeIn>
+      </Sequence>
+    </AbsoluteFill>
   );
 };
 
@@ -235,7 +266,7 @@ const hermite = (ts: number[], vs: number[], t: number) => {
   const h = ts[i + 1] - ts[i], u = (t - ts[i]) / h, u2 = u * u, u3 = u2 * u;
   return (2 * u3 - 3 * u2 + 1) * vs[i] + (u3 - 2 * u2 + u) * h * tan(i) + (-2 * u3 + 3 * u2) * vs[i + 1] + (u3 - u2) * h * tan(i + 1);
 };
-const Cam: React.FC<{ keys: K[]; punch?: number[]; children: React.ReactNode }> = ({ keys, punch = [], children }) => {
+const Cam: React.FC<{ keys: K[]; punch?: number[]; calm?: [number, number][]; children: React.ReactNode }> = ({ keys, punch = [], calm = [], children }) => {
   const t = useT();
   const ts: number[] = [], xs: number[] = [], ys: number[] = [], zs: number[] = [];
   keys.forEach(([kt, x, y, z, d = 1.2], k) => {
@@ -246,6 +277,8 @@ const Cam: React.FC<{ keys: K[]; punch?: number[]; children: React.ReactNode }> 
   sc *= 1 + 0.018 * (0.5 - 0.5 * Math.cos((t * 2 * Math.PI) / 16));
   cx += 12 * Math.sin((t * 2 * Math.PI) / 19); cy += 7 * Math.sin((t * 2 * Math.PI) / 23);
   for (const p of punch) { const u = seg(t, p - 0.2, p + 1.2); sc *= 1 + 0.022 * Math.sin(Math.PI * u) ** 2; }
+  const amp = 1 - Math.max(0, ...calm.map(([a, b]) => win(t, a, b, 0.6)));
+  sc = 1 + (sc - 1) * amp;
   cx = Math.min(1920 - 960 / sc, Math.max(960 / sc, cx)); cy = Math.min(1080 - 540 / sc, Math.max(540 / sc, cy));
   return <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${960 - cx * sc}px, ${540 - cy * sc}px) scale(${sc})` }}>{children}</AbsoluteFill>;
 };
@@ -300,27 +333,31 @@ const ShangZhou: React.FC = () => {
   const t = useT();
   const vase = at('b04', 'vase');
   const glyphA = 1 - seg(t, vase - 0.6, vase + 0.6);
-  const manque = at('b03', 'manque');
+  const manque = at('b03', 'manque'), dit = at('b04', 'dit');
   return (
     <AbsoluteFill>
+      <Cam keys={[[A3, 960, 540, 1.0], [SIGNE - 0.4, 960, 540, 1.08, 1.4], [TT.yao - 0.3, 960, 450, 1.12, 1.0], [TT.roof - 0.3, 960, 600, 1.1, 1.0], [TT.hand - 0.3, 960, 480, 1.06, 1.0], [manque - 0.3, 960, 620, 1.12, 1.2], [R1 - 0.8, 960, 540, 1.0, 0.8],
+        [at('b04', 'bronze') + 0.6, 960, 520, 1.06, 1.6], [TT.child - 0.3, 960, 640, 1.14, 1.0], [dit - 0.2, 960, 440, 1.12, 1.4], [dit + 2.0, 960, 560, 1.1, 1.2], [dit + 3.6, 960, 650, 1.14, 1.2], [vase - 0.8, 960, 540, 1.0, 0.8]]}
+        punch={[SIGNE, TT.child]} calm={[[R1 - 0.6, R1 + TR1.duration! + 0.4]]}>
       <TimeScrollStage cfg={TR1} under={<Landscape seed={14} from={A3 - 2} to={SIGNE - 1.5} move="pan" mood="aube" />}
         fromLandscape={{ seed: 5, since: SIGNE - 4 }} toLandscape={{ seed: 9, until: R2 + 1 }}>
         <AbsoluteFill style={{ opacity: glyphA }}><InkStage T={TT} travel={TR1} /></AbsoluteFill>
         {/* « il manque quelqu'un » : un vide lumineux sous le toit */}
         <AbsoluteFill style={{ background: 'radial-gradient(circle at 50% 66%, rgba(255,250,236,0.95) 0, rgba(255,250,236,0) 9%)', opacity: win(t, manque, R1 - 0.2, 0.8) }} />
       </TimeScrollStage>
-      {/* cartes : Anyang, capitale des Shang ; Hao, capitale des Zhou */}
-      <MapPanel from={A3 - 0.3} to={at('b03', 'devins') + 0.2} draw={(ctx, u, E, tt) => peinte(ctx, u, E, tt, 'anyang', A3 + 0.6)} />
-      <MapPanel from={A4 - 0.5} to={at('b04', 'bronze') + 0.1} draw={(ctx, u, E, tt) => peinte(ctx, u, E, tt, 'hao', A4 + 0.3)} />
-      {/* les devins (clip), puis le tir à l'arc au 學宮 (clip) */}
-      <Clip src="devins" from={at('b03', 'devins') - 0.4} len={TT.plastronIn[0] - at('b03', 'devins') + 1.8} entry="nuages" />
-      <Clip src="arc" from={vase - 0.3} len={R2 - vase + 0.6} entry="glyphe" />
-      <EraTag {...cartouche('shang', 'Anyang · v. 1250 av. J.-C.')} a={win(t, A3 + 0.3, R1 + 0.4, 0.8) * (1 - win(t, at('b03', 'devins') - 0.2, TT.plastronIn[0] + 1.6, 0.5))} />
-      <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4))} />
       <Label x={1220} y={420} zh="爻" text="baguettes" color={PIGMENT.yao} a={win(t, TT.yao + 0.3, R1, 0.6)} />
       <Label x={1220} y={720} zh="宀" text="le toit" color={PIGMENT.roof} a={win(t, TT.roof + 0.3, R1, 0.6)} />
       <Label x={700} y={420} zh="𦥑" text="deux mains" color={PIGMENT.hand} a={win(t, TT.hand + 0.3, R1, 0.6)} align="right" />
       <Label x={1240} y={840} zh="子" text="l'enfant" color={PIGMENT.child} a={win(t, TT.child + 0.4, vase - 0.4, 0.6)} />
+      </Cam>
+      {/* cartes : Anyang, capitale des Shang ; Hao, capitale des Zhou */}
+      <MapPanel from={A3 - 0.3} to={DEV_START + 1.0} draw={(ctx, u, E, tt) => peinte(ctx, u, E, tt, 'anyang', A3 + 0.6)} />
+      <MapPanel from={A4 - 0.5} to={at('b04', 'bronze') + 0.1} draw={(ctx, u, E, tt) => peinte(ctx, u, E, tt, 'hao', A4 + 0.3)} />
+      {/* les devins (clip), puis le tir à l'arc au 學宮 (clip) */}
+      <DevinsClip />
+      <Clip src="arc1" from={vase - 0.3} len={R2 - vase + 0.6} entry="glyphe" />
+      <EraTag {...cartouche('shang', 'Anyang · v. 1250 av. J.-C.')} a={win(t, A3 + 0.3, R1 + 0.4, 0.8) * (1 - win(t, DEV_START + 0.6, DEV_END + 0.2, 0.5))} />
+      <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4)) * (1 - win(t, vase - 0.3, R2 - 0.2, 0.5))} />
       <Caption text="estampage d'un plastron de tortue · fissures de divination 卜" a={win(t, TT.plastronIn[0] + 0.6, TT.plastronOut[1])} />
       <Caption text="inscription coulée dans le bronze · vase rituel, Zhou de l'Ouest" a={win(t, TT.bronzeIn[1], TT.bronzeOut[1])} />
       <Caption text="le tir à l'arc enseigné dans la salle d'étude 學宮 · Jing gui 靜簋" a={win(t, vase + 1.5, R2 - 0.6)} />
@@ -334,6 +371,8 @@ const Qin: React.FC = () => {
   const roy = at('b05', 'royaumes'), min = at('b05', 'ministre'), sym = at('b05', 'symetrie'), mains = at('b05', 'mains');
   return (
     <AbsoluteFill>
+      <Cam keys={[[R2, 960, 540, 1.0], [roy + 0.5, 960, 540, 1.03, 1.6], [min + 0.9, 960, 560, 1.06, 1.2], [sym - 0.2, 960, 520, 1.12, 1.6], [mains - 0.3, 960, 420, 1.16, 1.2], [A6 - 1.4, 960, 540, 1.02, 0.8]]}
+        punch={[mains]} calm={[[R2 - 0.6, R2 + TR2.duration! + 0.4]]}>
       <TimeScrollStage cfg={TR2} defaultCursor fromLandscape={{ seed: 9, since: R2 - 3 }} toLandscape={{ seed: 21, until: A6 + 1.5 }}>
         <Draw draw={(ctx, tt, E) => {
           // variantes régionales (forme des Royaumes combattants) posées en désordre, puis balayées
@@ -365,6 +404,7 @@ const Qin: React.FC = () => {
           }
         }} />
       </TimeScrollStage>
+      </Cam>
       <MapPanel from={A5 - 0.3} to={at('b05', 'royaumes') + 0.3} draw={(ctx, u, E, tt) => peinte(ctx, u, E, tt, 'xianyang', A5 + 0.5)} />
       <EraTag {...cartouche('qin', '221 av. J.-C. · le petit sceau')} a={tagIn(TR2, t) * (1 - seg(t, A6 - 0.6, A6))} />
       <Caption text="Li Si 李斯 · le petit sceau 小篆" a={win(t, min + 1.0, sym + 2)} />
@@ -387,11 +427,13 @@ const XuShen: React.FC = () => {
         if (g > 0) {
           // « Et le toit ? C'est l'obscurité qui couvre encore l'esprit » : le toit s'allume en malachite
           const roofLit = win(tt, toit - 0.1, A7 - 0.4, 0.5);
-          E.drawRealGlyph(ctx, 'xiaozhuan', { x: 1300, y: 360, size: 400, opacity: g, color: (c: string) => (c === 'roof' && roofLit > 0 ? rgb(PIGMENT.roof) : inkCss), alpha: (c: string) => (c === 'roof' ? 1 : 1 - 0.55 * roofLit), glow: 22 * roofLit, glowColor: rgb(PIGMENT.roof, 0.5) });
+          const mv = ease(seg(tt, lettre - 1.2, lettre + 1.0)); // du centre vers la droite, quand le portrait se peint
+          E.drawRealGlyph(ctx, 'xiaozhuan', { x: 960 + 340 * mv, y: 470 - 110 * mv, size: 540 - 140 * mv, opacity: g, color: (c: string) => (c === 'roof' && roofLit > 0 ? rgb(PIGMENT.roof) : inkCss), alpha: (c: string) => (c === 'roof' ? 1 : 1 - 0.55 * roofLit), glow: 22 * roofLit, glowColor: rgb(PIGMENT.roof, 0.5) });
         }
       }} />
       </Cam>
       <EraTag {...cartouche('han', 'v. 100 · Xu Shen 許慎')} a={seg(t, A6 + 0.2, A6 + 1.2) * (1 - seg(t, R3, R3 + 0.4))} />
+      <Caption text="expliquer la forme de chaque caractère" a={win(t, A6 + 2.6, lettre - 0.4, 0.5)} y={850} size={44} />
       <Caption text="portrait imaginé" a={win(t, lettre + 1.2, A7 - 0.5)} y={920} size={44} left={160} width={800} />
       <div style={{ position: 'absolute', left: 1020, top: 590, width: 760, background: 'rgba(246,241,231,0.78)', borderRadius: 14, padding: '6px 0', textAlign: 'center', opacity: win(t, livre, A7 - 0.3) }}>
         <div style={{ fontFamily: 'ShuimoKai', fontSize: 56, color: inkCss }}>說文解字</div>
@@ -428,17 +470,17 @@ const Retournement: React.FC = () => {
           }
         }
         // écriture des clercs : les mains vermillon pâlissent et se figent en bloc gris
-        const li = seg(tt, apl + 0.6, apl + 1.6) * (1 - seg(tt, reg - 0.6, reg));
+        const li = seg(tt, apl + 0.6, apl + 1.6) * (1 - seg(tt, reg - 0.5, reg + 0.3));
         if (li > 0) {
           const k = seg(tt, fig, fig + 2.2);
           const col = (c: string) => (c === 'hand' ? rgb(VERM.map((v, i) => Math.round(v + (GRAY[i] - v) * k))) : inkCss);
           E.drawRealGlyph(ctx, 'lishu', { x: 960, y: 540, size: 600, opacity: li, color: col });
         }
         // écriture régulière : 16 traits
-        const ka = seg(tt, reg - 0.2, reg + 0.4) * (1 - seg(tt, cop + 1.0, cop + 2.4));
+        const ka = seg(tt, reg - 0.4, reg + 0.1) * (1 - seg(tt, cop + 1.0, cop + 2.4));
         if (ka > 0) {
           ctx.save(); ctx.globalAlpha = ka;
-          E.drawStrokes(ctx, 'xue_trad', { x: 960, y: 540, size: 600, progress: 16 * seg(tt, reg, reg + 3.6), brush: false, color: (c: string) => (c === 'hand' ? rgb(GRAY) : inkCss) });
+          E.drawStrokes(ctx, 'xue_trad', { x: 960, y: 540, size: 600, progress: 16 * seg(tt, reg - 0.3, reg + 2.6), brush: false, color: (c: string) => (c === 'hand' ? rgb(GRAY) : inkCss) });
           ctx.restore();
         }
         // au fil des copies : le haut se resserre en trois petits traits (fondu, pas de cursive)
@@ -464,13 +506,16 @@ const Retournement: React.FC = () => {
 const FORMS: [string, string, string][] = [['real:jiaguwen', '甲骨文', 'Shang'], ['real:jinwen', '金文', 'Zhou'], ['real:xiaozhuan', '小篆', 'Qin'], ['real:lishu', '隸書', 'Han'], ['font:kai_xue_trad', '楷書', 'Tang'], ['font:kai_xue_simp', '学', 'XXe s.']];
 const CUE_OF: Record<string, string> = { yao: 'baguettes', roof: 'toit', hand: 'mains', child: 'enfant' };
 const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) => {
-  const y = 380, x0 = 320, dx = 250, sz = 220;
+  const y = 380, x0 = 370, dx = 245, sz = 220;
   // composante en vedette : la dernière citée (jusqu'à « Ainsi naît »)
   const order = ['yao', 'roof', 'hand', 'child'];
   let hi = '', k = 0;
   for (const c of order) { const s0 = at('b08', CUE_OF[c]); if (tt >= s0 - 0.05) { hi = c; k = seg(tt, s0 - 0.05, s0 + 0.3); } }
   if (tt > at('b08', 'nait') - 0.3) k *= 1 - seg(tt, at('b08', 'nait') - 0.3, at('b08', 'nait') + 0.2);
   const GREY = [168, 160, 150];
+  ctx.save(); ctx.globalAlpha = 0.85 * a;
+  const gv = ctx.createLinearGradient(0, 640, 0, 720); gv.addColorStop(0, 'rgba(246,241,231,0)'); gv.addColorStop(1, 'rgba(246,241,231,1)');
+  ctx.fillStyle = gv; ctx.fillRect(0, 640, 1920, 440); ctx.restore();
   const mixc = (c1: number[], c2: number[], u: number) => c1.map((v, i) => Math.round(v + (c2[i] - v) * u));
   FORMS.forEach(([key, zh, fr], i) => {
     const t0 = at('b08', 'baguettes') - 0.7;
@@ -515,7 +560,8 @@ const Today: React.FC = () => {
   const autre = at('b09', 'autre'), baton = at('b09', 'baton');
   return (
     <AbsoluteFill>
-      <>
+      <Cam keys={[[R3 + 5.3, 960, 540, 1.0], [huit - 0.3, 960, 520, 1.06, 1.4], [at('b08', 'baguettes') - 1.0, 960, 540, 1.0, 0.8], [nait + 0.5, 960, 540, 1.0, 0.6], [rec - 0.2, 960, 500, 1.1, 1.2], [A9, 960, 540, 1.02, 1.0], [autre, 960, 540, 1.0, 0.8], [baton - 0.3, 960, 500, 1.08, 1.2]]}
+        punch={[nait, baton]} calm={[[R3 - 0.5, R3 + r3Seconds(R3A) + 0.4]]}>
         <Landscape seed={30} from={R3 + r3Seconds(R3A) - 0.3} to={XUE_V2_SECONDS + 1} move="push" mood="aube" />
         <Draw draw={(ctx, tt, E) => {
           const out = 1 - seg(tt, autre - 0.3, autre + 0.6);
@@ -525,8 +571,8 @@ const Today: React.FC = () => {
           const syn = win(tt, at('b08', 'baguettes') - 0.7, nait + 0.5, 0.6); // après le tracé complet de 学
           if (syn > 0) drawBand(ctx, E, tt, syn);
           const childGlow = win(tt, rec + 2.2, autre, 0.5) + 0.6 * win(tt, nait, nait + 2, 0.4);
-          const x = 960, s = 560;
-          ctx.save(); ctx.globalAlpha = out * (1 - syn);
+          const fk = ease(win(tt, A9 + 0.2, autre - 0.2, 0.8)), x = 960 - 260 * fk, s = 560; // fiche caractère à droite
+          ctx.save(); ctx.globalAlpha = out * Math.max(0, 1 - 3.3 * syn); // 学 revient quand le bandeau est presque effacé
           E.drawStrokes(ctx, 'xue_simp', {
             x, y: 520, size: s, progress: 8 * seg(tt, huit - 0.2, huit + 2.2), brush: false,
             color: (c: string) => (c === 'child' ? rgb(childGlow > 0 ? PIGMENT.child : INK) : c === 'roof' && win(tt, rec + 1.1, rec + 2.4, 0.3) > 0 ? rgb(PIGMENT.roof) : c === 'fusion' && win(tt, rec, rec + 1.3, 0.3) > 0 ? rgb(FUSION) : inkCss),
@@ -536,7 +582,7 @@ const Today: React.FC = () => {
         }} />
         {/* passerelle : 教, la main tient un bâton */}
         <div style={{ position: 'absolute', width: '100%', top: 260, textAlign: 'center', fontFamily: 'ShuimoKai', fontSize: 480, lineHeight: 1, color: inkCss, opacity: seg(t, autre + 0.2, autre + 1.4), textShadow: `0 0 ${40 * seg(t, baton, baton + 0.6)}px ${rgb(VERM, 0.8)}` }}>教</div>
-      </>
+      </Cam>
       <MapPanel from={A8 - 0.3} to={at('b08', 'huit') + 0.2} draw={(ctx, u, E, tt) => {
         const v = { lon: 126, lat: 36, k: 40 + 6 * u }, vb = { lon: 126, lat: 36, k: 40 };
         E.mapLayer(ctx, v, vb, 60, 'xue_japon_chine', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
@@ -545,11 +591,21 @@ const Today: React.FC = () => {
         E.marker(ctx, tt, v, E.CITIES.beijing, 'Chine · 1956', '汉字简化方案', seg(u, 0.45, 0.55), '#c0392b', -1);
       }} />
       <EraTag {...cartouche('aujourdhui', 'Japon 1949 · Chine 1956 · 8 traits')} a={r3TagIn(R3A, t) * (1 - seg(t, A9, A9 + 0.6))} />
-      <Caption text="xué · apprendre" a={win(t, nait, ecole)} y={720} size={44} />
+      <Caption text="xué · apprendre" a={win(t, nait + 0.5, ecole)} y={720} size={44} />
       <div style={{ position: 'absolute', width: '100%', top: 790, display: 'flex', justifyContent: 'center', gap: 120, fontFamily: 'ShuimoKai', fontSize: 80, color: inkCss }}>
         <span style={{ opacity: win(t, mots + 0.2, rec + 0.3) }}>学生<div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, textAlign: 'center' }}>l'élève</div></span>
         <span style={{ opacity: win(t, ecole + 0.2, rec + 0.3) }}>学校<div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, textAlign: 'center' }}>l'école</div></span>
         <span style={{ opacity: win(t, mots + 1.4, rec + 0.3) }}>大学<div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, textAlign: 'center' }}>l'université</div></span>
+      </div>
+      {/* fiche caractère : sceau 學, pinyin, nombre de traits */}
+      <div style={{ position: 'absolute', left: 1080, top: 300, opacity: win(t, A9 + 0.6, autre - 0.2, 0.7), display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <div style={{ width: 100, height: 100, background: rgb(VERM, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 66, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>學</div>
+          <div style={{ fontFamily: 'ShuimoLatin', fontSize: 104, fontWeight: 600, color: inkCss, lineHeight: 1 }}>xué</div>
+        </div>
+        <div style={{ fontFamily: 'ShuimoLatin', fontSize: 56, fontWeight: 600, color: rgb(VERM) }}>8 traits</div>
+        <div style={{ fontFamily: 'ShuimoLatin, ShuimoLegende', fontSize: 46, color: '#4b4038' }}>學 avant : 16 traits</div>
+        <div style={{ fontFamily: 'ShuimoLatin', fontSize: 50, fontStyle: 'italic', color: '#4b4038' }}>apprendre</div>
       </div>
       <Caption text="Les mains se sont effacées du signe. Pas du geste." a={win(t, A9 + 0.3, autre - 0.2, 0.7)} y={900} size={44} />
     </AbsoluteFill>
@@ -605,7 +661,7 @@ export const XueV2: React.FC = () => {
       <Win from={R2} to={A6 - 0.4}><Qin /></Win>
       <Win fade={0.8} from={A6 - 0.4} to={A7 - 0.3}><XuShen /></Win>
       <Win fade={0.8} from={A7 - 0.3} to={R3 + 0.3}><Retournement /></Win>
-      <Win from={R3 + r3Seconds(R3A) - 0.5} to={END}><Today /></Win>
+      <Win from={R3 + r3Seconds(R3A) - 0.5} to={END + 0.9}><Today /></Win>
       <Win from={END} to={XUE_V2_SECONDS + 1}><EndCard /></Win>
       </Shake>}
       {ready && <Win from={R3 - 1.5} to={R3 + r3Seconds(R3A) + 3.5}><Rouleau3DStage cfg={R3A} /></Win>}
