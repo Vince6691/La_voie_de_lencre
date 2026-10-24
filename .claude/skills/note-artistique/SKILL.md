@@ -42,6 +42,7 @@ Chaque point manquant est une correction, **sans limite de nombre** (la limite d
 11. **Schéma de dossier** : `PROPOSITION.md`, `VOIX.md`, `SOURCES.md`, `NOTES.md`, `episode.json`, `voix/`, `clips/`, `images/`, `audio/`, `apercus/`.
 12. **Cartes** : cartes peintes de la bibliothèque (`carte-peinte`) quand la vue existe ; sinon `E.mapLayer` (fond mis en cache), **jamais `E.drawMap` à chaque image** ; texte du cachet contenu dans son cartouche.
 13. **Propreté du code** : `npx tsc --noEmit` sans erreur ; images fixes aux moments-clés rendues et regardées avant tout rendu long.
+14. **Grain** : grain de papier fixe (aucun bruit qui change d'une image à l'autre) ; vérifier sur un aplat sombre du rendu, image par image.
 
 ## Quand la lancer
 | Étape | Ce qu'on regarde | Matière à lire |

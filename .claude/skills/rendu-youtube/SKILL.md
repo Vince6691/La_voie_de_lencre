@@ -61,6 +61,7 @@ Sortie : `episodes/<pinyin>/rendu/<pinyin>_<hauteur>p.mp4` (ne pas commiter la v
   titres (skill `voix-off-modo` / `youtube-title-creator`), miniature.
 
 ## Pièges rencontrés
+- **Grain : jamais animé.** Le grain de papier (`GrainVignette`, `src/commun/Effets.tsx`) est **fixe et fin** : une seule image de bruit en pleine définition (1920×1080), opacité 0,1, mode overlay. Refusé (validé sur le 學, 10/2026) : un bruit qui change à chaque image, ou de basse définition agrandi — il scintille comme de la « neige » sur les lavis gris, les cartes, les clips et surtout les aplats sombres (estampages), invisible dans le Studio (image réduite) mais flagrant dans le rendu 1440p, et il mange le débit (−25 % de poids sans lui). Diagnostic : la neige était déjà dans les PNG sans perte, l'encodage n'y était pour rien (49,5 dB) ; mesure = écart moyen entre images voisines (`tblend=all_mode=difference,signalstats`) sur un aplat immobile.
 - **Windows** : `python3` peut être le raccourci du Windows Store (le script cherche `python3` puis `python`) ;
   une commande ffmpeg avec 50+ bruitages dépasse la limite de ligne de commande → `bande_son.py` écrit son graphe
   dans un fichier (`-filter_complex_script`). Ne jamais `rm -rf <dossier>/*` (bloqué par la sécurité) : écrire dans
