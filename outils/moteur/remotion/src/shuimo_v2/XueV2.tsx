@@ -90,6 +90,17 @@ const useSetup = () => {
 };
 
 // canvas plein cadre redessiné à chaque image par draw(ctx, t, E)
+// le canvas est dessiné à la définition du rendu (--scale = devicePixelRatio, 1,33 en 1440p), avec une marge de 15 % pour
+// les zooms de caméra : en 1920×1080 fixe, le caractère était agrandi ×1,33 à ×1,5 et ses bords devenaient mous.
+// Les flous d'ombre (shadowBlur, shadowOffset) ne suivent pas la transformation du canvas : ils sont multipliés d'autant.
+const DRAW_K = Math.min(2, Math.max(1, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) * 1.15);
+const echelleOmbres = (ctx: CanvasRenderingContext2D, k: number) => {
+  const P = CanvasRenderingContext2D.prototype;
+  for (const n of ['shadowBlur', 'shadowOffsetX', 'shadowOffsetY'] as const) {
+    const d = Object.getOwnPropertyDescriptor(P, n)!;
+    Object.defineProperty(ctx, n, { get() { return d.get!.call(this) / k; }, set(v: number) { d.set!.call(this, v * k); } });
+  }
+};
 const Draw: React.FC<{ draw: (ctx: CanvasRenderingContext2D, t: number, E: any) => void }> = ({ draw }) => {
   const t = useT();
   const ref = useRef<HTMLCanvasElement>(null);
@@ -97,10 +108,12 @@ const Draw: React.FC<{ draw: (ctx: CanvasRenderingContext2D, t: number, E: any) 
     const E = W().E;
     if (!E || !ref.current) return;
     const ctx = ref.current.getContext('2d')!;
+    if (!(ctx as any).__k) { echelleOmbres(ctx, DRAW_K); (ctx as any).__k = true; }
+    ctx.setTransform(DRAW_K, 0, 0, DRAW_K, 0, 0);
     ctx.clearRect(0, 0, 1920, 1080);
     draw(ctx, t, E);
   });
-  return <canvas ref={ref} width={1920} height={1080} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;
+  return <canvas ref={ref} width={Math.round(1920 * DRAW_K)} height={Math.round(1080 * DRAW_K)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;
 };
 
 // paysage shuimo en fondu sur [from, to]

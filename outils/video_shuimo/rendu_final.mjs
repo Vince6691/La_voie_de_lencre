@@ -75,7 +75,7 @@ const rendre = (m, fichier = nom(m), plage = `${m.a}-${m.b}`) => new Promise((ok
   const gl = m.gl ?? GL;
   const log = fs.openSync(fichier.replace(/\.mp4$/, '.log'), 'w');
   const p = spawn(npx, ['remotion', 'render', BUNDLE, C, fichier, `--frames=${plage}`, `--scale=${H / 1080}`, '--crf=10', '--x264-preset=veryfast', `--gl=${gl}`,
-    '--jpeg-quality=95', '--color-space=bt709', '--pixel-format=yuv420p', `--concurrency=${m.fils}`, `--timeout=${m.delai}`, '--muted'], { cwd: REM, stdio: ['ignore', log, log], shell: true });
+    '--image-format=png', '--color-space=bt709', '--pixel-format=yuv420p', `--concurrency=${m.fils}`, `--timeout=${m.delai}`, '--muted'], { cwd: REM, stdio: ['ignore', log, log], shell: true });
   p.on('close', (code) => ok(code === 0));
 });
 
@@ -118,7 +118,7 @@ const video = ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(CRF), '-vf',
 journal(`encodage final (crf ${CRF}, slow)${pleine ? ' avec conversion pleine plage → plage TV' : ''}`);
 const asm = ff(['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', liste, '-i', sonYT, '-map', '0:v', '-map', '1:a', ...video,
   '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
-  '-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-ac', '2', '-movflags', '+faststart', '-shortest', final]);
+  '-af', 'apad', '-frames:v', String(N), '-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-ac', '2', '-movflags', '+faststart', '-shortest', final]);
 if (asm.status !== 0) { journal(`ÉCHEC de l'assemblage : ${asm.stderr.slice(-400)}`); process.exit(1); }
 
 // ── 6. contrôle : images, format, noirs, plans figés, silences, niveau ; planches toutes les 3 s pour la note
