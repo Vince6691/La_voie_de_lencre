@@ -18,7 +18,7 @@ tenue sur le sceau après l'impact, glissando de guzheng discret, inscriptions r
   compteur ; les cartouches de la vidéo **doivent** en tirer les leurs (`cartouche(id, précision?)`), pour que le
   rouleau et le papier disent la même chose.
 - Sons : `outils/moteur/assets/rouleau/rouleau3d_liushui_1..3.wav` (complète) et `rouleau3d_court_liushui_1..3.wav` (courte),
-  mixés par `tools/build_sfx_3d.py` avec les 流水拂 de `assets/rouleau3d/liushui_1..3.wav` (souffle moyen 0,38).
+  faits **exactement comme le son du rouleau 2D** (validé) par `tools/build_sfx_3d_comme_2d.py` : souffle synthétisé qui suit la vitesse (0,38), le 流水拂 sans réverbération (0,42), silence, impact grave, recalés sur les temps du 3D (impact 3,5 s / 2,3 s), puis la cloche bianzhong quand le sceau s'envole. (Essais refusés : 流水拂 trop fort sur le souffle enregistré, vent synthétisé ajouté, écho de guzheng-sound.)
   **Glissando de guzheng (validé, tous les épisodes)** : un des trois 流水拂 *liúshuǐ fú* (« l'eau qui coule » : petites vagues de
   5 cordes qui remontent l'instrument en se chevauchant), rendus avec le paquet npm `guzheng-sound` (MIT) :
   1 lent (7 vagues, 55 → 45 ms par corde, note vibrée) · 2 très lent (6 vagues, 75 → 62 ms, note vibrée) · 3 lent et chevauché

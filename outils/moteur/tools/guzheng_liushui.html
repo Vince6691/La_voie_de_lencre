@@ -6,7 +6,7 @@
   Karplus-Strong, 21 cordes en ré pentatonique, ré2 → ré6 ; corde 0 = la plus grave, loin du joueur).
   Pour les régénérer : `npm pack guzheng-sound@0.1.1` dans un dossier à part, extraire `package/`, servir ce dossier avec ce
   fichier (python -m http.server), ouvrir la page dans le navigateur intégré ; elle rend les sons hors ligne
-  (OfflineAudioContext, 48 kHz) et les propose en .wav ; les ranger dans assets/rouleau3d/liushui_1..3.wav, puis
+  (OfflineAudioContext, 48 kHz, sans réverbération : l'écho a été refusé) et les propose en .wav ; les ranger dans assets/rouleau3d/liushui_1..3.wav, puis
   `python3 tools/build_sfx_3d.py` (3D) et le mixage 2D (souffle 0,38, voir tools/build_glissandos.py, base_rouleau).
 -->
 <p id="etat">rendu…</p>
@@ -39,7 +39,7 @@ const wav = (buf) => {
 const liens = [];
 for (const [nom, f] of Object.entries(SONS)) {
   const ctx = new OfflineAudioContext(2, Math.round(SR * DUR), SR);
-  f(new Guzheng({ audioContext: ctx, reverb: true, reverbMix: 0.3, sustainSeconds: 4 }), 0.05);
+  f(new Guzheng({ audioContext: ctx, reverb: false, sustainSeconds: 4 }), 0.05);
   liens.push(`<a download="${nom}.wav" href="${URL.createObjectURL(wav(await ctx.startRendering()))}">${nom}.wav</a>`);
 }
 document.getElementById('etat').innerHTML = liens.join(' · ');

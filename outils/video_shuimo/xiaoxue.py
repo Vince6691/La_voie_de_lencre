@@ -20,5 +20,5 @@ for i, (src, lab) in enumerate(cells):
 shuowen = re.search(r'《說文》：(.*?)</dd>', s, re.S)
 json.dump({'char': zi, 'source': '小學堂字形演變資料庫, 中央研究院 (https://xiaoxue.iis.sinica.edu.tw/yanbian)',
            'license': 'CC0 1.0', 'shuowen': shuowen and html.unescape(shuowen.group(1)), 'forms': forms},
-          open(os.path.join(out, 'index.json'), 'w'), ensure_ascii=False, indent=1)
+          open(os.path.join(out, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 os.remove(cj); print(len(forms), 'formes')

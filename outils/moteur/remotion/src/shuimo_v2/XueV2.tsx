@@ -83,6 +83,7 @@ const useSetup = () => {
       new FontFace('ShuimoPinceau', `url(${staticFile('fonts/MaShanZheng-Regular.ttf')})`).load(),
       new FontFace('ShuimoLegende', `url(${staticFile('fonts/ZhuqueFangsong-Regular.ttf')})`).load().catch(() => new FontFace('ShuimoLegende', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load()),
       chargerCartes(['chine_centre_nord']),
+      ...ZHANGUO.map((z) => new Promise<void>((res) => { const im = new Image(); im.onload = () => { ZG_IMG[z.f] = im; res(); }; im.onerror = () => res(); im.src = staticFile(`episodes/xue/images/${z.f}.png`); })),
     ]).then((fs) => { fs.slice(0, 5).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
   }, [h]);
   return ready;
@@ -193,6 +194,14 @@ const DevinsClip: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+const ZHANGUO = [
+  { f: 'zhanguo_chu_bambou', roi: 'Chu 楚', sup: 'bambou · Guodian', x: 330, y: 440, r: -4 },
+  { f: 'zhanguo_zhongshan', roi: 'Zhongshan 中山', sup: 'bronze', x: 760, y: 470, r: 3 },
+  { f: 'zhanguo_chu_bronze', roi: 'Chu 楚', sup: 'bronze', x: 1160, y: 440, r: -2 },
+  { f: 'zhanguo_qin', roi: 'Qin 秦', sup: 'bambou · Shuihudi', x: 1590, y: 470, r: 4 },
+];
+const ZG_IMG: Record<string, HTMLImageElement> = {};
 
 // emplacement d'un clip à fournir : papier, cadre en pointillé, intitulé ; remplacé au montage
 const Placeholder: React.FC<{ title: string; sub: string; a: number }> = ({ title, sub, a }) => (
@@ -366,7 +375,6 @@ const ShangZhou: React.FC = () => {
       <EraTag {...cartouche('shang', 'Anyang · v. 1250 av. J.-C.')} a={win(t, A3 + 0.3, R1 + 0.4, 0.8) * (1 - win(t, DEV_START + 0.6, DEV_END + 0.2, 0.5))} />
       <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={tagIn(TR1, t) * (1 - seg(t, R2, R2 + 0.4)) * (1 - win(t, vase - 0.3, R2 - 0.2, 0.5))} />
       <Caption text="estampage d'un plastron de tortue · fissures de divination 卜" a={win(t, TT.plastronIn[0] + 0.6, TT.plastronOut[1])} />
-      <Caption text="vase Jing gui 靜簋 · le tir à l'arc enseigné au 學宮" a={win(t, vase + 1.5, R2 - 0.6)} />
     </AbsoluteFill>
   );
 };
@@ -381,16 +389,18 @@ const Qin: React.FC = () => {
         punch={[mains]} calm={[[R2 - 0.6, R2 + TR2.duration! + 0.4]]}>
       <TimeScrollStage cfg={TR2} defaultCursor fromLandscape={{ seed: 9, since: R2 - 3 }} toLandscape={{ seed: 21, until: A6 + 1.5 }}>
         <Draw draw={(ctx, tt, E) => {
-          // variantes régionales (forme des Royaumes combattants) posées en désordre, puis balayées
+          // « d'un royaume à l'autre, le même mot changeait de visage » : les vraies formes de 學 de chaque écriture régionale
+          // (小學堂 : Chu sur bambou et sur bronze, Zhongshan, Qin), chacune avec son royaume, puis balayées par le pinceau
           const sweep = seg(tt, min - 0.2, min + 0.9);
           const vIn = seg(tt, roy, roy + 1.2) * (1 - sweep);
           if (vIn > 0) {
-            const spots = [[520, 380, -12, 230], [1420, 360, 9, 210], [760, 740, 6, 190], [1220, 760, -7, 240], [960, 470, 2, 260], [330, 760, 14, 170]];
-            spots.forEach(([x, y, r, s], i) => {
-              const a = vIn * seg(tt, roy + i * 0.25, roy + i * 0.25 + 0.5);
-              ctx.save(); ctx.translate(x, y); ctx.rotate((r * Math.PI) / 180); ctx.scale(i % 2 ? -1 : 1, 1); ctx.translate(-x, -y);
-              E.drawRealGlyph(ctx, 'zhanguo', { x, y, size: s, opacity: a * 0.85, color: () => inkCss });
-              ctx.restore();
+            ZHANGUO.forEach((z, i) => {
+              const im = ZG_IMG[z.f], a = vIn * seg(tt, roy + i * 0.35, roy + i * 0.35 + 0.5), S = 300;
+              if (!im || a <= 0) return;
+              ctx.save(); ctx.globalAlpha = a; ctx.translate(z.x, z.y); ctx.rotate((z.r * Math.PI) / 180);
+              ctx.drawImage(im, -S / 2, -S / 2, S, S); ctx.restore();
+              E.text(ctx, z.roi, z.x, z.y + 205, { font: 'Cormorant', size: 46, weight: 700, color: '#3b322b', alpha: a, glow: 10, glowColor: 'rgba(246,241,231,1)' });
+              E.text(ctx, z.sup, z.x, z.y + 250, { font: 'Cormorant', size: 34, color: '#5e5044', alpha: a, glow: 8, glowColor: 'rgba(246,241,231,1)' });
             });
           }
           // coup de pinceau qui balaie

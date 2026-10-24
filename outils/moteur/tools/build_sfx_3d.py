@@ -37,16 +37,19 @@ def build(out, dur, souffle, gliss, impact, cloche, bell_shift=1.0, liushui=None
     wh = load('souffle.wav'); put(mix, wh / np.abs(wh).max(), souffle, souffle_g)
     mix *= duck
     g0, gd = gliss
-    if liushui:  # glissando enregistré (流水拂) à la place des cordes synthétisées
-        gl = np.zeros(n); x = load(liushui); put(gl, x / np.abs(x).max(), g0, 1.0)
-        mix += 0.42 * gl * duck
+    # glissando d'origine (cordes synthétisées), au niveau validé (GUZHENG) : c'est aussi la référence de niveau du 流水拂
+    times = g0 + gd * (1 - 0.86 ** np.arange(len(NOTES))) / (1 - 0.86 ** len(NOTES))  # de plus en plus serré
+    gs = np.zeros(n)
+    for f, at in zip(NOTES, times): put(gs, pluck(rng, f), at, 0.6)
+    gs = signal.lfilter(*signal.butter(2, 5500 / (SR / 2)), gs)  # adoucit l'attaque métallique
+    gs += 0.3 * signal.fftconvolve(gs, rng.standard_normal(int(0.6 * SR)) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.25))[:n] / 40
+    gs = GUZHENG * gs / (np.abs(gs).max() + 1e-9)
+    if liushui:  # un des trois 流水拂 retenus, à la même énergie que le glissando d'origine (le souffle d'origine reste devant)
+        gl = np.zeros(n); x = load(liushui); put(gl, x, g0, 1.0)
+        actif = lambda y: np.sqrt(np.mean(y[np.abs(y) > 1e-4] ** 2))
+        mix += gl * (actif(gs) / (actif(gl) + 1e-9)) * duck
     else:
-        times = g0 + gd * (1 - 0.86 ** np.arange(len(NOTES))) / (1 - 0.86 ** len(NOTES))  # de plus en plus serré
-        gl = np.zeros(n)
-        for f, at in zip(NOTES, times): put(gl, pluck(rng, f), at, 0.6)
-        gl = signal.lfilter(*signal.butter(2, 5500 / (SR / 2)), gl)  # adoucit l'attaque métallique
-        gl += 0.3 * signal.fftconvolve(gl, rng.standard_normal(int(0.6 * SR)) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.25))[:n] / 40
-        mix += GUZHENG * gl * duck / (np.abs(gl).max() + 1e-9)
+        mix += gs * duck
     # impact : le premier coup du bruitage (1,97–2,32 s), un grave bref sous lui, une courte réverbération de pièce
     imp = load('impact.wav'); i0 = int(1.975 * SR); hit = imp[i0:i0 + int(0.35 * SR)].copy()
     hit *= np.minimum(1, np.linspace(6, 0, len(hit))); hit /= np.abs(hit).max()
@@ -70,5 +73,5 @@ def build(out, dur, souffle, gliss, impact, cloche, bell_shift=1.0, liushui=None
 build('rouleau3d.wav', 7.1, souffle=0.2, gliss=(0.35, 1.65), impact=3.5, cloche=5.3)
 build('rouleau3d_court.wav', 5.0, souffle=-0.35, gliss=(0.05, 1.5), impact=2.3, cloche=3.15, bell_shift=0.75)
 for k in (1, 2, 3):  # les trois 流水拂, souffle moyen
-    build(f'rouleau3d_liushui_{k}.wav', 7.1, souffle=0.2, gliss=(0.3, 1.65), impact=3.5, cloche=5.3, liushui=f'liushui_{k}.wav', souffle_g=0.38)
-    build(f'rouleau3d_court_liushui_{k}.wav', 5.0, souffle=-0.35, gliss=(0.0, 1.5), impact=2.3, cloche=3.15, bell_shift=0.75, liushui=f'liushui_{k}.wav', souffle_g=0.38)
+    build(f'rouleau3d_liushui_{k}.wav', 7.1, souffle=0.2, gliss=(0.3, 1.65), impact=3.5, cloche=5.3, liushui=f'liushui_{k}.wav')
+    build(f'rouleau3d_court_liushui_{k}.wav', 5.0, souffle=-0.35, gliss=(0.0, 1.5), impact=2.3, cloche=3.15, bell_shift=0.75, liushui=f'liushui_{k}.wav')

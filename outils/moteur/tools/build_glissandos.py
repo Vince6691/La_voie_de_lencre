@@ -110,7 +110,7 @@ def travel_m(u):
     return 1.0
 
 
-def base_rouleau():
+def base_rouleau(DUR=DUR):  # DUR : durée du son (l'impact tombe à 0,8 de la durée)
     rng = np.random.default_rng(4)
     n = int(SR * DUR); t = np.arange(n) / SR; u = t / DUR
     m = np.array([travel_m(x) for x in u[::64]]); m = np.interp(np.arange(n), np.arange(0, n, 64), m)
