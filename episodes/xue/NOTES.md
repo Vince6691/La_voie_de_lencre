@@ -74,3 +74,12 @@ Corrections : caméra dans Shang/Zhou, Qin et aujourd'hui (plus de plan figé su
 - Rouleaux : un des trois 流水拂 (guzheng-sound), varié d'un rouleau à l'autre, 2D et 3D ; souffle moyen.
 - Fin : bamboo grove (Pixabay), 2 s avant la fin de la dernière phrase, discret, puis porte l'écran de fin.
 - « Pour les retrouver… » : glissando du morceau flashback (5–8 s), 0,1 s après le début de la phrase, volume 0,5.
+
+## Passe 5 — après les corrections sons / rouleaux / Royaumes combattants (code, images fixes, extraits sonores ; pas de nouveau rendu complet)
+| Domaine | Note | En bref |
+|---|---|---|
+| Technique | 8 | sons des rouleaux unifiés (2D et 3D identiques, sans écho), musique de fin et flashback branchés partout (composition + bande son) ; mouvement non revu depuis le rendu de la passe 4 |
+| Artistique | 8 | rouleau 2D au niveau du 3D, vrai son de guzheng, fin portée par bamboo grove ; reste le même paysage de Xu Shen aux Tang |
+| Historique | 7,5 | Royaumes combattants en vraies formes (Chu, Zhongshan, Qin) ; restent 斆 → 學, « tige de bronze », date des formes abrégées (voix) |
+| Design | 8 | 7 légendes utiles, poèmes discrets, fiche lisible |
+| Storytelling | 8 | le flashback marque le retour au départ, la fin respire sur l'écran de fin |
