@@ -9,11 +9,13 @@
 //   cartouche('zhou') → { zh: '周', name: 'DYNASTIE ZHOU', dates: '1046 – 256 av. J.-C.' }
 //   cartouche('han', 'vers l\'an 100 · Xu Shen') → la précision remplace la ligne des dates
 //   periodesEntre(-1046, -221) → [周, 戰, 秦] (compteur d'années du rouleau)
-export type Periode = { id: string; zh: string; sceau: string; nom: string; debut: number; fin: number | null; ecriture?: string };
+export type Periode = { id: string; zh: string; sceau: string; nom: string; debut: number; fin: number | null; ecriture?: string; compteur?: false };
 
 export const PERIODES: Periode[] = [
   { id: 'shang', zh: '商', sceau: '商', nom: 'DYNASTIE SHANG', debut: -1600, fin: -1046, ecriture: 'os oraculaires 甲骨文 (Anyang, v. 1250 av. J.-C.)' },
   { id: 'zhou', zh: '周', sceau: '周', nom: 'DYNASTIE ZHOU', debut: -1046, fin: -256, ecriture: 'bronzes 金文' },
+  // royaume de Lu (Confucius) : cartouche et frise du rouleau 2D, hors du compteur des rouleaux 3D (compteur: false)
+  { id: 'lu', zh: '魯', sceau: '魯', nom: 'ROYAUME DE LU', debut: -1042, fin: -249, ecriture: 'bronzes 金文, écriture de Lu', compteur: false },
   { id: 'royaumes', zh: '戰國', sceau: '戰', nom: 'ROYAUMES COMBATTANTS', debut: -475, fin: -221, ecriture: 'écritures régionales (Chu : bambou, soie)' },
   { id: 'qin', zh: '秦', sceau: '秦', nom: 'DYNASTIE QIN', debut: -221, fin: -206, ecriture: 'petit sceau 小篆, écriture unifiée' },
   { id: 'han', zh: '漢', sceau: '漢', nom: 'DYNASTIE HAN', debut: -206, fin: 220, ecriture: 'écriture des clercs 隸書' },
@@ -44,5 +46,5 @@ export const cartouche = (id: string, precision?: string) => { const p = periode
 // celles qui commencent avant l'arrivée
 export const periodesEntre = (y0: number, y1: number, de?: string) => {
   const D = de ? periode(de) : [...PERIODES].reverse().find((p) => p.debut <= y0) ?? PERIODES[0];
-  return [D, ...PERIODES.filter((p) => p.id !== D.id && p.debut > D.debut && p.debut > y0 && p.debut <= y1)];
+  return [D, ...PERIODES.filter((p) => p.compteur !== false && p.id !== D.id && p.debut > D.debut && p.debut > y0 && p.debut <= y1)];
 };

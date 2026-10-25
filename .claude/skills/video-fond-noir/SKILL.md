@@ -1,9 +1,9 @@
 ---
 name: video-fond-noir
-description: Chef d'orchestre d'une vidéo longue 墨道 « fond noir » à partir d'un seul caractère chinois — le style de la première vidéo du 學 (moteur Canvas sur fond sombre, glyphes réels lumineux, métamorphoses par composante, cartes, objets 3D, portrait) — recherche étymologique, angle et question, voix off (voix-off-modo v2), choix motivé des éléments, storyboard, voix ElevenLabs, montage Remotion, aperçus téléphone, rendu final et paquet YouTube, avec questions et propositions à chaque étape. Utiliser quand l'utilisateur veut une vidéo complète sur fond noir (« version fond noir », « comme la première vidéo du 學 ») ; pour une vidéo sur papier et paysages à l'encre, utiliser video-shuimo.
+description: Chef d'orchestre d'une vidéo longue 墨之道 « fond noir » à partir d'un seul caractère chinois — le style de la première vidéo du 學 (moteur Canvas sur fond sombre, glyphes réels lumineux, métamorphoses par composante, cartes, objets 3D, portrait) — recherche étymologique, angle et question, voix off (voix-off-modo v2), choix motivé des éléments, storyboard, voix ElevenLabs, montage Remotion, aperçus téléphone, rendu final et paquet YouTube, avec questions et propositions à chaque étape. Utiliser quand l'utilisateur veut une vidéo complète sur fond noir (« version fond noir », « comme la première vidéo du 學 ») ; pour une vidéo sur papier et paysages à l'encre, utiliser video-shuimo.
 ---
 
-# Vidéo 墨道 « fond noir » — de l'input (un caractère) à la vidéo publiée
+# Vidéo 墨之道 « fond noir » — de l'input (un caractère) à la vidéo publiée
 
 Style de référence : `outils/moteur/remotion/src/Xue.tsx` (rendu `episodes/xue/fond_noir/rendu/xue_remotion.mp4`). Pour le style papier / paysages
 à l'encre, voir la skill `video-shuimo` (validée sur le 學, composition `XueV2`).

@@ -44,6 +44,8 @@ for name, p in PAIRS.items():
 SUBJECTS = {
     # silhouette prise dans la version encre : boîte (x0, y0, x1, y1), zones à exclure, cœur (x, y, rx, ry) en pixels
     'vieil_homme': {'box': (690, 120, 1080, 705), 'cut': [(1005, 625, 1376, 768)], 'core': (915, 300, 140, 230)},
+    # Xu Shen (教, bloc 6) : personnage, table et rouleau ; le sceau rouge à droite et la natte lointaine restent hors de la boîte
+    'xushen': {'box': (100, 30, 850, 740), 'cut': [(0, 655, 1376, 768)], 'core': (440, 300, 135, 210)},
 }
 sm = lambda a, b, v: (lambda u: u * u * (3 - 2 * u))(np.clip((v - a) / (b - a), 0, 1))
 for name, s in SUBJECTS.items():

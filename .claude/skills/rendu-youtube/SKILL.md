@@ -1,9 +1,9 @@
 ---
 name: rendu-youtube
-description: Rendu final d'une vidéo 墨道 pour YouTube (Remotion) — 1440p par défaut (YouTube réencode mieux une vidéo envoyée en 1440p, même vue en 1080p ; idéal pour le papier xuan et les lavis), morceaux en parallèle en gardant 3 cœurs libres, rouleaux 3D rendus à part avec un long délai, reprise automatique d'un morceau en échec, son à −14 LUFS, couleurs bt709 en plage TV, assemblage sans second encodage, rapport de contrôle et planches d'images pour la note artistique. Utiliser quand l'utilisateur demande le rendu final, le rendu YouTube, un rendu 1080p ou 1440p, « la version à publier », ou veut savoir comment rendre une vidéo de bonne qualité ; pour un aperçu rapide (720p, 360p), voir l'étape 5 de video-shuimo.
+description: Rendu final d'une vidéo 墨之道 pour YouTube (Remotion) — 1440p par défaut (YouTube réencode mieux une vidéo envoyée en 1440p, même vue en 1080p ; idéal pour le papier xuan et les lavis), morceaux en parallèle en gardant 3 cœurs libres, rouleaux 3D rendus à part avec un long délai, reprise automatique d'un morceau en échec, son à −14 LUFS, couleurs bt709 en plage TV, assemblage sans second encodage, rapport de contrôle et planches d'images pour la note artistique. Utiliser quand l'utilisateur demande le rendu final, le rendu YouTube, un rendu 1080p ou 1440p, « la version à publier », ou veut savoir comment rendre une vidéo de bonne qualité ; pour un aperçu rapide (720p, 360p), voir l'étape 5 de video-shuimo.
 ---
 
-# Rendu final YouTube (série 墨道)
+# Rendu final YouTube (série 墨之道)
 
 Validé sur le 學 (`XueV2`). Outil : `outils/video_shuimo/rendu_final.mjs`. Toujours dialoguer en français.
 

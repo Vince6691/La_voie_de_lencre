@@ -1,6 +1,6 @@
 ---
 name: rouleau-3d
-description: Rouleau du temps en 3D (série 墨道) dans une vidéo Remotion — le paysage plein cadre se révèle être une peinture sur un rouleau posé sur une table en zitan verni ; la caméra bascule en vue rasante, le rouleau défile entre ses bâtons (poèmes calligraphiés, sceaux de collection, frise des années sur la soie, pétales de prunier), le compteur d'années doré nomme les périodes traversées ; ralenti, un sceau de pierre descend et frappe le sceau de l'époque d'arrivée, tenue, puis retour au plan 2D et envol du sceau vers le cartouche d'époque. Deux versions : complète (5,3 s) et courte (3,6 s). Utiliser quand l'utilisateur demande le rouleau 3D, une transition d'époque « premium » ou « signature », un passage d'une dynastie à l'autre en 3D, ou veut un rouleau pour une nouvelle vidéo ; pour la frise 2D au-dessus des paysages, utiliser rouleau-du-temps.
+description: Rouleau du temps en 3D (série 墨之道) dans une vidéo Remotion — le paysage plein cadre se révèle être une peinture sur un rouleau posé sur une table en zitan verni ; la caméra bascule en vue rasante, le rouleau défile entre ses bâtons (poèmes calligraphiés, sceaux de collection, frise des années sur la soie, pétales de prunier), le compteur d'années doré nomme les périodes traversées ; ralenti, un sceau de pierre descend et frappe le sceau de l'époque d'arrivée, tenue, puis retour au plan 2D et envol du sceau vers le cartouche d'époque. Deux versions : complète (5,3 s) et courte (3,6 s). Utiliser quand l'utilisateur demande le rouleau 3D, une transition d'époque « premium » ou « signature », un passage d'une dynastie à l'autre en 3D, ou veut un rouleau pour une nouvelle vidéo ; pour la frise 2D au-dessus des paysages, utiliser rouleau-du-temps.
 ---
 
 # Rouleau du temps en 3D (Remotion, three.js)
@@ -25,6 +25,8 @@ tenue sur le sceau après l'impact, glissando de guzheng discret, inscriptions r
   (9 vagues, deux mains en alternance, sans note finale). Souffle moyen (0,38). Choix **varié d'un rouleau à l'autre** :
   `sonRouleau(at)` = (⌊at⌋ mod 3) + 1 (`TimeScroll.tsx`, même calcul dans `bande_son.py`), ou imposé par `son: 1 | 2 | 3` dans
   la configuration du rouleau. Ne plus utiliser les glissandos synthétisés (jugés « harpe ») ni ceux d'ElevenLabs (refusés).
+  Exemple validé : 教 (rouleau 3D complet à 187,6 s, Han → Song) prend le **n° 2** (très lent). Variantes explorées et catalogue des
+  techniques de guzheng : voir la skill `rouleau-du-temps` (section « quel 流水拂 sur quel rouleau »).
 - Anciens sons : `outils/moteur/assets/rouleau/rouleau3d.wav` (complète) et `rouleau3d_court.wav` (courte, cloche une quarte
   plus bas), mixés par `python3 tools/build_sfx_3d.py` (depuis `outils/moteur/`) à partir des bruitages ElevenLabs de
   `assets/rouleau3d/` (souffle, coup de pierre, cloche bianzhong) et d'un glissando de guzheng synthétisé.

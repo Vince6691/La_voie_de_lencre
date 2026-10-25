@@ -1,9 +1,9 @@
 ---
 name: description-youtube
-description: Rédige la description YouTube d'un épisode 墨道 (« La voie de l'encre ») sur le modèle de la chaîne — phrase d'accroche fixe avec le niveau HSK, récit du caractère en 3–4 paragraphes tiré de la voix off, chapitres minutés calés sur la ligne de temps du montage, liste fixe des chaînes amies, « Repères linguistiques » (caractère, pinyin, sens, composition, niveau HSK, 4–5 mots courants). Utiliser quand l'utilisateur demande la description YouTube, le texte sous la vidéo, les chapitres, les horodatages, ou « la description sur le modèle » pour un épisode.
+description: Rédige la description YouTube d'un épisode 墨之道 (« La voie de l'encre ») sur le modèle de la chaîne — phrase d'accroche fixe avec le niveau HSK, récit du caractère en 3–4 paragraphes tiré de la voix off, chapitres minutés calés sur la ligne de temps du montage, liste fixe des chaînes amies, « Repères linguistiques » (caractère, pinyin, sens, composition, niveau HSK, 4–5 mots courants). Utiliser quand l'utilisateur demande la description YouTube, le texte sous la vidéo, les chapitres, les horodatages, ou « la description sur le modèle » pour un épisode.
 ---
 
-# Description YouTube d'un épisode 墨道
+# Description YouTube d'un épisode 墨之道
 
 Validé sur le 學 (`episodes/xue/rendu/description_youtube.txt`, 10/2026 : c'est l'exemple à suivre). Toujours en français.
 

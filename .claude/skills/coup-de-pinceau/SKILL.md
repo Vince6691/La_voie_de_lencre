@@ -1,6 +1,6 @@
 ---
 name: coup-de-pinceau
-description: Ajoute des coups de pinceau animés (série 墨道) dans une vidéo Remotion — traits d'encre lisses qui se tracent avec le profil d'un vrai pinceau (attaque oblique, plein, longue sortie effilée), ou larges lavis gris, posés le long des bords du cadre, puis qui sèchent et pâlissent. Utiliser quand l'utilisateur demande des coups de pinceau, traits d'encre, « le tracé des traits » du fond shuimo, une animation d'encre qui accompagne un plan, un caractère ou la voix off, ou veut « remettre les coups de pinceau de la démo shuimo ».
+description: Ajoute des coups de pinceau animés (série 墨之道) dans une vidéo Remotion — traits d'encre lisses qui se tracent avec le profil d'un vrai pinceau (attaque oblique, plein, longue sortie effilée), ou larges lavis gris, posés le long des bords du cadre, puis qui sèchent et pâlissent. Utiliser quand l'utilisateur demande des coups de pinceau, traits d'encre, « le tracé des traits » du fond shuimo, une animation d'encre qui accompagne un plan, un caractère ou la voix off, ou veut « remettre les coups de pinceau de la démo shuimo ».
 ---
 
 # Coups de pinceau (encre lisse, Remotion)

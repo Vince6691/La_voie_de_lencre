@@ -1,6 +1,6 @@
 ---
 name: encre-3d
-description: Fondu entre une image 3D (style Pixar) et sa version peinte à l'encre shuimo (série 墨道), dans Remotion — révélation de la couleur depuis un point focal, encre qui gagne depuis les bords et s'arrête autour du sujet, ou « délavé » où le personnage garde sa couleur au cœur et la perd irrégulièrement vers ses extrémités (bouts des manches, pieds, objets tenus), comme une photo passée qui se fond dans le lavis. Utiliser quand l'utilisateur veut passer de la 3D au shuimo (ou l'inverse), faire se fondre un personnage dans un décor à l'encre, un morphing ou une transition encre/3D, ou « refaire l'effet du vieil homme / du pavillon ».
+description: Fondu entre une image 3D (style Pixar) et sa version peinte à l'encre shuimo (série 墨之道), dans Remotion — révélation de la couleur depuis un point focal, encre qui gagne depuis les bords et s'arrête autour du sujet, ou « délavé » où le personnage garde sa couleur au cœur et la perd irrégulièrement vers ses extrémités (bouts des manches, pieds, objets tenus), comme une photo passée qui se fond dans le lavis. Utiliser quand l'utilisateur veut passer de la 3D au shuimo (ou l'inverse), faire se fondre un personnage dans un décor à l'encre, un morphing ou une transition encre/3D, ou « refaire l'effet du vieil homme / du pavillon ».
 ---
 
 # Fondu encre ↔ 3D (Remotion)

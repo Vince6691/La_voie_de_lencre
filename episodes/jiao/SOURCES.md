@@ -37,3 +37,11 @@
   ancêtres » est une glose : à reformuler (« l'enseignement des origines ») ou couper.
 - Frontières des royaumes des Printemps et Automnes (historical-basemaps, approximatives) ; itinéraire de Confucius
   (Lu → Wei → Cao → Song → Zheng → Chen → Cai → Chu marges → Wei → Lu), simplifié à l'écran.
+
+## Ajouts (passe du 2026-10-24)
+- **Citations des rouleaux** : 論語 述而 7.2 「默而識之，學而不厭，誨人不倦」 et 7.22 「三人行，必有我師焉」 ; 論語 衛靈公 15.39 ; 禮記 學記 「故曰：教學相長也」 ; 孟子 盡心上 「得天下英才而教育之，三樂也」.
+- **Tablette de la Grotte du Cerf blanc** : 「博學之，審問之，慎思之，明辨之，篤行之」 (Zhongyong 20, repris par Zhu Xi dans 白鹿洞書院揭示 pour « 為學之序 »). La disposition exacte de la tablette « au-dessus de la porte » est une mise en scène ; le titre 白鹿洞書院揭示 est celui du texte.
+- **Cerf blanc (白鹿)** : le nom de la grotte est traditionnellement rapporté à Li Bo (李渤, Tang), qui y aurait élevé un cerf blanc : tradition locale, **non attestée de façon sûre** — ne pas l'affirmer à l'écran.
+- **Carapace** : clip généré (Veo), illustration de la pyromancie sur carapace de tortue (Shang) ; filigrane recadré.
+- **Carte** : « carte peinte d'après Natural Earth » (bibliothèque `chine_centre_nord`) ; le fleuve Jaune est au cours actuel (à l'époque de Confucius il se jetait plus au nord) ; frontières des royaumes approximatives (historical-basemaps).
+- **Royaume de Lu** : ajouté à `periodes.ts` (1042–249 av. J.-C., hors compteur) pour le cartouche ; la frise du rouleau 2D le date « v. 520 av. J.-C. » (Confucius, Printemps et Automnes).

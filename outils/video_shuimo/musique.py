@@ -35,7 +35,9 @@ scale = [62, 64, 66, 69, 71, 74, 76, 78, 81]
 tt = 2.0
 while tt < END - 2:
     m = scale[rng.integers(0, len(scale))]
-    for k, dm in enumerate([0] + ([scale[min(len(scale) - 1, scale.index(m) + 1)] - m] if rng.random() < 0.3 else [])):
+    notes = [0] + ([scale[min(len(scale) - 1, scale.index(m) + 1)] - m] if rng.random() < 0.3 else [])
+    if any(a <= tt <= b for a, b in cfg.get('sans_arpege', [])): notes = notes[:1]  # episode.json « sans_arpege » : [[début, fin]…] sans la 2e note (pas de glissando)
+    for k, dm in enumerate(notes):
         p = pluck(f(m + dm)); i = int((tt + 0.32 * k) * SR); j = min(N, i + len(p)); bed[i:j] += 0.09 * p[:j - i]
     tt += rng.uniform(2.5, 5.0)
 

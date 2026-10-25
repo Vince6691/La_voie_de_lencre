@@ -30,7 +30,7 @@ import { edgeStrokes } from './InkEvents';
 
 // options : clouds (bandes de nuages du ciel et soleil voilé, activés par défaut), mist (nappes de brouillard entre
 // les plans et au premier plan, désactivées par défaut), strokes (coups de pinceau du skill coup-de-pinceau, désactivés)
-export type ComposeOptions = { move: Move; mood: Mood; duration: number; dir?: 1 | -1; clouds?: boolean; mist?: boolean; strokes?: boolean };
+export type ComposeOptions = { move: Move; mood: Mood; duration: number; dir?: 1 | -1; clouds?: boolean; mist?: boolean; strokes?: boolean; front?: boolean /* premiers plans en coin, activés par défaut */ };
 export function compose(seed: number, o: ComposeOptions): Shot {
   const R = rng(seed);
   const r = (a: number, b: number) => a + (b - a) * R();
@@ -106,6 +106,7 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   // premiers plans dans un ou deux coins
   const sides: ('l' | 'r')[] = R() < 0.4 ? ['l', 'r'] : [R() < 0.5 ? 'l' : 'r'];
   sides.forEach((s) => {
+    if (o.front === false) return;
     const el = pickNew(of('premier'));
     const top = el.edges.includes('t');
     const h = top ? r(440, 580) : r(470, 680), w = (h * el.w) / el.h;

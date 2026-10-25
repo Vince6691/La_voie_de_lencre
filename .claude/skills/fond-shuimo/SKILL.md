@@ -1,6 +1,6 @@
 ---
 name: fond-shuimo
-description: Crée le fond animé « shuimo moderne » de la série 墨道 dans une vidéo Remotion — papier xuan clair, paysage à l'encre composé à partir d'une banque d'éléments (montagnes lointaines, pics, premiers plans en coin, barque, pavillon, oiseaux, soleil vermillon ou lune), parallaxe selon la profondeur, mouvements de caméra et ambiances, avec un halo de papier au centre pour le contenu. Utiliser quand l'utilisateur demande un fond shuimo, papier de riz, paysage à l'encre, lavis, « le fond de la démo », un arrière-plan chinois animé pour un plan ou une vidéo, ou de nouveaux éléments pour la banque.
+description: Crée le fond animé « shuimo moderne » de la série 墨之道 dans une vidéo Remotion — papier xuan clair, paysage à l'encre composé à partir d'une banque d'éléments (montagnes lointaines, pics, premiers plans en coin, barque, pavillon, oiseaux, soleil vermillon ou lune), parallaxe selon la profondeur, mouvements de caméra et ambiances, avec un halo de papier au centre pour le contenu. Utiliser quand l'utilisateur demande un fond shuimo, papier de riz, paysage à l'encre, lavis, « le fond de la démo », un arrière-plan chinois animé pour un plan ou une vidéo, ou de nouveaux éléments pour la banque.
 ---
 
 # Fond shuimo (Remotion)

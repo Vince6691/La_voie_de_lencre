@@ -1,9 +1,9 @@
 ---
 name: video-shuimo
-description: Chef d'orchestre d'une vidéo longue 墨道 « tout shuimo » à partir d'un seul caractère chinois — papier xuan et paysages à l'encre, estampages et glyphes réels en pigments minéraux, voyage d'époque en époque avec rouleaux du temps variés, cartes sur papier, portrait peint, clips 3D (Seedance) révélés par les nuages ou à travers le caractère et refermés au pinceau, bandeau comparatif des écritures à la synthèse — voix off v2 (voix-off-modo), voix ElevenLabs synchronisée mot à mot, montage Remotion, aperçus téléphone, avec questions et propositions à chaque étape. Utiliser quand l'utilisateur donne un caractère et veut la vidéo « en shuimo », « sur papier », « comme la version shuimo du 學 », ou lance un nouvel épisode dans ce style ; pour le style fond noir, utiliser video-fond-noir.
+description: Chef d'orchestre d'une vidéo longue 墨之道 « tout shuimo » à partir d'un seul caractère chinois — papier xuan et paysages à l'encre, estampages et glyphes réels en pigments minéraux, voyage d'époque en époque avec rouleaux du temps variés, cartes sur papier, portrait peint, clips 3D (Seedance) révélés par les nuages ou à travers le caractère et refermés au pinceau, bandeau comparatif des écritures à la synthèse — voix off v2 (voix-off-modo), voix ElevenLabs synchronisée mot à mot, montage Remotion, aperçus téléphone, avec questions et propositions à chaque étape. Utiliser quand l'utilisateur donne un caractère et veut la vidéo « en shuimo », « sur papier », « comme la version shuimo du 學 », ou lance un nouvel épisode dans ce style ; pour le style fond noir, utiliser video-fond-noir.
 ---
 
-# Vidéo 墨道 « tout shuimo » — de l'input (un caractère) à la vidéo
+# Vidéo 墨之道 « tout shuimo » — de l'input (un caractère) à la vidéo
 
 **Input : un caractère.** Modèle validé par l'utilisateur : le 學 en shuimo, composition `XueV2`
 (`outils/moteur/remotion/src/shuimo_v2/XueV2.tsx`), proposition, textes et configuration dans `episodes/xue/`
@@ -121,7 +121,7 @@ ajouter pour chaque nouveau visuel, puis `reperes.py` → `musique.py` (la duré
 | **Clips 3D (Seedance 8–15 s)** | plein cadre, jamais de fenêtre partielle. **Entrée** : à travers le caractère (`VideoReveal mode="glyphe"`) **si un caractère est à l'écran juste avant**, sinon mer de nuages (`CloudReveal`, nuages aquarelle de la banque). **Sortie** : coups de pinceau (`outMode="pinceau"`) dans tous les cas. Ralentir le clip si le plan est plus long (`rate = min(0.9, durée_clip / durée_plan)`) |
 | **Synthèse** | **obligatoire, voir « Scène récapitulative » ci-dessous** (bandeau horizontal de toutes les formes, chaque composante clignote dans toutes les formes sur son mot) |
 | **Fin** (repère, pas un modèle) | éviter de casser l'élan entre la révélation et la chute par un long bloc pédagogique ; l'ordre se décide pour chaque épisode (dans le 美 : révélation → traits → récap → mots courants et humour → chute) |
-| **Fin** | chute, passerelle vers le caractère suivant (esquissé), puis **écran de fin sur papier ≈ 10 s** (`"queue": 10`) : marque 墨道 et « Prochain caractère » dans le **tiers gauche**, les deux tiers droits libres pour les éléments de fin YouTube ; fondu depuis le dernier plan, jamais de fond noir |
+| **Fin** | chute, passerelle vers le caractère suivant (esquissé), puis **écran de fin sur papier ≈ 10 s** (`"queue": 10`) : marque 墨之道 (sceau en colonne, « Mò zhī dào » sous « LA VOIE DE L'ENCRE ») et « Prochain caractère » dans le **tiers gauche**, les deux tiers droits libres pour les éléments de fin YouTube ; fondu depuis le dernier plan, jamais de fond noir |
 | **Textes** | lisibles sur téléphone : étiquettes ≥ 66 px (caractère ≥ 100 px), **légendes ≥ 44 px**, rubans ≥ 56 px, dates des cartouches 36 px ; aucune légende dans les **8 % du bas** (barre de progression YouTube : le composant `Caption` les remonte) ; jamais deux textes qui se touchent |
 | **Exactitude** | à juger au cas par cas avec la note artistique (expert Historique) ; quand une image ou une légende risque d'induire en erreur, une précision discrète suffit (ex. du 美 : « lecture la plus répandue », « note à son édition du Shuowen ») |
 | **Musique** | `musique.py` : bourdon + guzheng, creux sous les rouleaux et la pause avant la révélation, coupure nette |
@@ -180,4 +180,9 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
 - Vidéo dans un canvas (`onVideoFrame`) : retenir la capture jusqu'au premier dessin (`delayRender`), sinon images
   vides aléatoires.
 - `src/data/` est ignoré par git : les données générées vivent dans le dossier de l'épisode et `sync.mjs` les copie.
+- **Python sous Windows** : `python` (pas `python3`) ; dépendances des outils : `python -m pip install potracer scikit-image scipy numpy pillow imageio-ffmpeg` (`portrait.py`, `reperes.py`).
+- **Éditions de la composition** : les fichiers `.tsx` sont en CRLF ; un remplacement multi-lignes par script doit normaliser les fins de ligne.
+- **Période manquante (ex. `lu`, royaume de Lu)** : l'ajouter à `periodes.ts` avec `compteur: false` pour qu'elle serve au cartouche et à la frise 2D sans apparaître dans le compteur des rouleaux 3D des autres épisodes.
+- **Clip fourni avec filigrane (Veo)** : recadrage `CLIP_ZOOM` 1,12 avec `transformOrigin: '10% 20%'` ; clip trop court pour le plan : `debut` (départ dans le clip) et vitesse 1 plutôt qu'un ralenti.
+- **Dessin 白描 animé par `portraits`** (`portrait.py`) : un cerf, un personnage, un arbre, avec des zones (tête, corps, arbre) qui se peignent dans l'ordre ; modèle : `cerf` dans `episodes/jiao/episode.json`.
 - Ne jamais `pkill -f` un motif présent dans sa propre commande (tue le shell) : `TaskStop` ou `ps | grep "[m]otif"`.

@@ -10,7 +10,7 @@
   },
   {
    "clip": "b02",
-   "apres": 1.0
+   "apres": 1
   },
   {
    "clip": "b03",
@@ -26,7 +26,7 @@
   },
   {
    "clip": "b05",
-   "apres": 0.6
+   "apres": 11
   },
   {
    "rouleau": 3.5,
@@ -46,23 +46,23 @@
    "apres": 0.8
   },
   {
-   "rouleau": 6,
+   "rouleau3d": "complet",
    "apres": 0.4
   },
   {
    "clip": "b08",
-   "apres": 2.0
+   "apres": 2
   },
   {
    "clip": "b09",
-   "apres": 1.0
+   "apres": 1
   },
   {
    "clip": "b10",
    "apres": 0.5
   }
  ],
- "queue": 3.2,
+ "queue": 10,
  "reperes_cles": {
   "b01": {
    "xiao": "À gauche",
@@ -71,6 +71,7 @@
   },
   "b02": {
    "assemblages": "des assemblages",
+   "retrouver": "retrouver",
    "dessin": "tout premier",
    "os": "gravé sur"
   },
@@ -120,7 +121,10 @@
    "academies": "Partout naissent",
    "zhuxi": "En mille",
    "grotte": "la Grotte",
+   "principes": "ses principes",
    "refus": "Mais il refuse",
+   "punitions": "punitions",
+   "compris": "a compris",
    "baton": "Le bâton n'a"
   },
   "b09": {
@@ -505,15 +509,15 @@
       0.08,
       0.46,
       0.8,
-      1.0
+      1
      ]
     ],
     [
      "arbre",
      0.2,
      [
-      0.0,
-      0.0,
+      0,
+      0,
       0.53,
       0.62
      ]
@@ -526,6 +530,49 @@
    ],
    "seuil": 190,
    "epaissir": 2
+  },
+  "cerf": {
+   "img": "images/cerf_baimiao_1.jpg",
+   "largeur": 1376,
+   "zones": [
+    [
+     "tête",
+     0.15,
+     [
+      0.44,
+      0.08,
+      0.6,
+      0.44
+     ]
+    ],
+    [
+     "corps",
+     0.4,
+     [
+      0.12,
+      0.3,
+      0.62,
+      0.98
+     ]
+    ],
+    [
+     "pin",
+     0.25,
+     [
+      0,
+      0,
+      0.42,
+      0.36
+     ]
+    ],
+    [
+     "reste",
+     0.2,
+     null
+    ]
+   ],
+   "seuil": 215,
+   "epaissir": 1
   }
  },
  "bruitages": [
@@ -549,20 +596,6 @@
    "dessin",
    0.4,
    0.55
-  ],
-  [
-   "gravure",
-   "b03",
-   "maitre",
-   0.3,
-   0.4
-  ],
-  [
-   "gravure",
-   "b03",
-   "eleve",
-   -3.0,
-   0.35
   ],
   [
    "sceau",
@@ -691,11 +724,272 @@
    0.7
   ],
   [
-   "sceau",
-   "R3",
-   "impact",
-   0,
-   0.7
+   "grave_a",
+   "b03",
+   "ateliers",
+   0.65,
+   0.3
+  ],
+  [
+   "grave_b",
+   "b03",
+   "ateliers",
+   1.45,
+   0.3
+  ],
+  [
+   "grave_c",
+   "b03",
+   "ateliers",
+   2.25,
+   0.3
+  ],
+  [
+   "grave_d",
+   "b03",
+   "ateliers",
+   3.05,
+   0.3
+  ],
+  [
+   "grave_a",
+   "b03",
+   "ateliers",
+   3.85,
+   0.3
+  ],
+  [
+   "grave_b",
+   "b03",
+   "ateliers",
+   4.65,
+   0.3
+  ],
+  [
+   "grave_c",
+   "b03",
+   "ateliers",
+   5.45,
+   0.3
+  ],
+  [
+   "grave_d",
+   "b03",
+   "ateliers",
+   6.25,
+   0.3
+  ],
+  [
+   "grave_a",
+   "b03",
+   "ateliers",
+   7.05,
+   0.3
+  ],
+  [
+   "grave_b",
+   "b03",
+   "ateliers",
+   7.85,
+   0.3
+  ],
+  [
+   "grave_c",
+   "b03",
+   "ateliers",
+   8.65,
+   0.3
+  ],
+  [
+   "grave_d",
+   "b03",
+   "ateliers",
+   9.45,
+   0.3
+  ],
+  [
+   "grave_c",
+   "b03",
+   "eleve",
+   -3,
+   0.17
+  ],
+  [
+   "grave_d",
+   "b03",
+   "eleve",
+   -2.86,
+   0.17
+  ],
+  [
+   "grave_a",
+   "b03",
+   "eleve",
+   -2.72,
+   0.17
+  ],
+  [
+   "grave_b",
+   "b03",
+   "eleve",
+   -2.58,
+   0.17
+  ],
+  [
+   "grave_c",
+   "b03",
+   "eleve",
+   -2.44,
+   0.17
+  ],
+  [
+   "grave_d",
+   "b03",
+   "eleve",
+   -2.3,
+   0.17
+  ],
+  [
+   "grave_a",
+   "b03",
+   "eleve",
+   -2.16,
+   0.17
+  ],
+  [
+   "grave_b",
+   "b03",
+   "eleve",
+   -2.02,
+   0.17
+  ],
+  [
+   "grave_c",
+   "b03",
+   "eleve",
+   -1.88,
+   0.17
+  ],
+  [
+   "grave_d",
+   "b03",
+   "eleve",
+   -1.74,
+   0.17
+  ],
+  [
+   "grave_a",
+   "b03",
+   "eleve",
+   -1.6,
+   0.17
+  ],
+  [
+   "grave_b",
+   "b03",
+   "eleve",
+   -1.46,
+   0.17
+  ],
+  [
+   "baguette",
+   "b05",
+   "frapper",
+   0.75,
+   1
+  ]
+ ],
+ "musique_fin": {
+  "fichier": "bamboo_grove_434735.mp3",
+  "avance": 2,
+  "volume_voix": 0.12,
+  "volume": 0.3,
+  "montee": 1.5,
+  "fondu": 2.5,
+  "depart": 0
+ },
+ "coupures": [
+  [
+   "b05",
+   "frapper",
+   0.6,
+   "b05",
+   "frapper",
+   10.8
+  ]
+ ],
+ "sous_titres_remplacements": [
+  [
+   "/tɕjâʊ/",
+   "jiào"
+  ],
+  [
+   "/ɕjâʊ/",
+   "xiào"
+  ],
+  [
+   "安阳",
+   "Anyang"
+  ],
+  [
+   "商",
+   "Shang"
+  ],
+  [
+   "周",
+   "Zhou"
+  ],
+  [
+   "鲁",
+   "Lu"
+  ],
+  [
+   "许慎",
+   "Xu Shen"
+  ],
+  [
+   "汉",
+   "Han"
+  ],
+  [
+   "宋",
+   "Song"
+  ],
+  [
+   "书院",
+   "shūyuàn"
+  ],
+  [
+   "朱熹",
+   "Zhu Xi"
+  ],
+  [
+   "庐山",
+   "mont Lu"
+  ],
+  [
+   "文",
+   "wén (文)"
+  ],
+  [
+   "\\btiào shì\\b",
+   "jiàoshì (教室)"
+  ],
+  [
+   "\\btiào yǔ\\b,?",
+   "jiàoyù (教育),"
+  ],
+  [
+   "\\btiào\\b",
+   "jiào"
+  ],
+  [
+   "\\bhàn\\b",
+   "Han"
+  ],
+  [
+   "\\bxiāo\\b",
+   "xiào"
   ]
  ]
 }

@@ -45,7 +45,7 @@ export const creditCarte = (ctx: CanvasRenderingContext2D, E: any, id: string, a
 
 // lieu : petit cachet vermillon au point, nom en fangsong, transcription en Cormorant (à gauche ou à droite)
 export const lieu = (ctx: CanvasRenderingContext2D, E: any, q: number[], zh: string, fr: string, a: number,
-  o: { cote?: 'g' | 'd'; arrivee?: number; taille?: number; seed?: number } = {}) => {
+  o: { cote?: 'g' | 'd'; arrivee?: number; taille?: number; seed?: number; fond?: boolean } = {}) => {
   if (a <= 0) return;
   const d = o.arrivee ?? 1, sz = (o.taille ?? 26) * (1 + 0.5 * (1 - d));
   ctx.save(); ctx.globalAlpha = a; ctx.translate(q[0], q[1]); ctx.rotate(-0.05 + 0.02 * ((o.seed ?? 0) % 4));
@@ -53,6 +53,11 @@ export const lieu = (ctx: CanvasRenderingContext2D, E: any, q: number[], zh: str
   ctx.strokeStyle = SOIE; ctx.lineWidth = 2; ctx.strokeRect(-sz / 2 + 4, -sz / 2 + 4, sz - 8, sz - 8);
   ctx.restore();
   const g = o.cote === 'g', lx = q[0] + (g ? -24 : 24), al = g ? 'right' : 'left';
+  if (o.fond) { // pastille de papier : le nom reste lisible sur les fleuves et les reliefs de la carte
+    ctx.save(); ctx.font = '62px ShuimoLegende'; const w1 = ctx.measureText(zh).width; ctx.font = '700 36px Cormorant'; const w2 = fr ? ctx.measureText(fr).width : 0;
+    const w = Math.max(w1, w2) + 28, x0 = g ? lx - w + 14 : lx - 14;
+    ctx.globalAlpha = a * 0.8; ctx.fillStyle = 'rgba(239,227,200,1)'; ctx.beginPath(); ctx.roundRect(x0, q[1] - 66, w, fr ? 128 : 84, 12); ctx.fill(); ctx.restore();
+  }
   E.text(ctx, zh, lx, q[1] - 8, { font: 'ShuimoLegende', size: 62, color: rgb(ENCRE), alpha: a, align: al });
   if (fr) E.text(ctx, fr, lx, q[1] + 40, { font: 'Cormorant', size: 36, weight: 700, color: BRUN, alpha: a, align: al });
 };

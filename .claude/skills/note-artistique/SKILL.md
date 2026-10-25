@@ -1,9 +1,9 @@
 ---
 name: note-artistique
-description: « La note artistique » de la chaîne 墨道 (La voie de l'encre) — contrôle qualité à la fin de chaque grande étape d'une vidéo (plan, voix, rendu image, rendu vidéo) par cinq experts simulés, très exigeants, qui notent sur 10 la Technique (niveau des animations, respect du style choisi : shuimo, fond noir…), l'Artistique (direction artistique, beauté, univers), l'Historique (exactitude historique, paléographique et des sources), le Design (composition, typographie, lisibilité téléphone, habillage YouTube) et le Storytelling (accroche, tension, rythme, rétention). Les corrections proposées pour atteindre 8/10 partout ne sont jamais appliquées sans validation. Utiliser quand l'utilisateur demande « la note artistique », une note, un audit, une critique ou un contrôle qualité d'un plan, d'une voix, d'images fixes ou d'un rendu, et proposer de la lancer d'office à la fin de chaque grande étape d'un épisode (video-shuimo, video-fond-noir).
+description: « La note artistique » de la chaîne 墨之道 (La voie de l'encre) — contrôle qualité à la fin de chaque grande étape d'une vidéo (plan, voix, rendu image, rendu vidéo) par cinq experts simulés, très exigeants, qui notent sur 10 la Technique (niveau des animations, respect du style choisi : shuimo, fond noir…), l'Artistique (direction artistique, beauté, univers), l'Historique (exactitude historique, paléographique et des sources), le Design (composition, typographie, lisibilité téléphone, habillage YouTube) et le Storytelling (accroche, tension, rythme, rétention). Les corrections proposées pour atteindre 8/10 partout ne sont jamais appliquées sans validation. Utiliser quand l'utilisateur demande « la note artistique », une note, un audit, une critique ou un contrôle qualité d'un plan, d'une voix, d'images fixes ou d'un rendu, et proposer de la lancer d'office à la fin de chaque grande étape d'un épisode (video-shuimo, video-fond-noir).
 ---
 
-# La note artistique (série 墨道)
+# La note artistique (série 墨之道)
 
 Cinq experts regardent l'étape qui vient de se terminer, la notent, et proposent le strict nécessaire pour atteindre
 **8/10 dans chaque domaine**. **Aucune correction sans validation de l'utilisateur** : on note, on propose, on

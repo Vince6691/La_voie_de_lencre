@@ -1,6 +1,6 @@
 ---
 name: fiche-caractere
-description: Génère la « fiche caractère » de la série 墨道 pour n'importe quel caractère chinois — le caractère tracé à l'encre noire dans l'ordre de ses traits sur papier xuan clair, avec étiquette d'époque, pinyin, nombre de traits en vermillon et sceau rouge — en image PNG et, si demandé, en vidéo MP4 du tracé. Utiliser dès que l'utilisateur demande une fiche, une carte, un plan « caractère sur fond blanc », le layout du 學, l'ordre des traits animé d'un caractère, ou dit « refais ce layout pour 福 / 茶 / 道 ».
+description: Génère la « fiche caractère » de la série 墨之道 pour n'importe quel caractère chinois — le caractère tracé à l'encre noire dans l'ordre de ses traits sur papier xuan clair, avec étiquette d'époque, pinyin, nombre de traits en vermillon et sceau rouge — en image PNG et, si demandé, en vidéo MP4 du tracé. Utiliser dès que l'utilisateur demande une fiche, une carte, un plan « caractère sur fond blanc », le layout du 學, l'ordre des traits animé d'un caractère, ou dit « refais ce layout pour 福 / 茶 / 道 ».
 ---
 
 # Fiche caractère (layout papier xuan)

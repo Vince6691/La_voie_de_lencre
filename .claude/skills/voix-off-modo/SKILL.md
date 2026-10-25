@@ -1,9 +1,9 @@
 ---
 name: voix-off-modo
-description: Écrire ou réviser la voix off française d'une vidéo de la chaîne 墨道 (« La voie de l'encre ») dans le style réel de la chaîne — accroche froide, une composante par tableau (scène → signe décrit en traits → évolution os/bronze/bambou/pinceau), synthèse « Alors le pinceau unit… Ainsi naît + pinyin », chute en maxime. Utiliser quand l'utilisateur demande un script, une voix off, une narration, un texte pour une vidéo sur un caractère chinois, un format mystère (« Serait-ce alors… »), ou de réécrire/raccourcir un texte « dans le style de la chaîne ».
+description: Écrire ou réviser la voix off française d'une vidéo de la chaîne 墨之道 (« La voie de l'encre ») dans le style réel de la chaîne — accroche froide, une composante par tableau (scène → signe décrit en traits → évolution os/bronze/bambou/pinceau), synthèse « Alors le pinceau unit… Ainsi naît + pinyin », chute en maxime. Utiliser quand l'utilisateur demande un script, une voix off, une narration, un texte pour une vidéo sur un caractère chinois, un format mystère (« Serait-ce alors… »), ou de réécrire/raccourcir un texte « dans le style de la chaîne ».
 ---
 
-# Voix off 墨道
+# Voix off 墨之道
 
 Style extrait des 10 dernières vidéos longues (analyse complète : `outils/voix-off/STYLE.md`, textes de référence :
 `outils/voix-off/TRANSCRIPTIONS.md`). Relire au moins deux transcriptions avant d'écrire.

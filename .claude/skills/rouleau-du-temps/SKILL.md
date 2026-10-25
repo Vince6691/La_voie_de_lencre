@@ -1,6 +1,6 @@
 ---
 name: rouleau-du-temps
-description: Transition « premium » d'une époque à l'autre (série 墨道) dans une vidéo Remotion — la caméra recule et montre le rouleau peint (table de bois, montage de soie, bâtons qui tournent), le paysage shuimo défile en parallaxe avec une accélération franche, jours et nuits passent, une frise de sceaux d'époques se trace au centre et un curseur (le caractère étudié, ou un point d'encre) glisse d'un sceau à l'autre sous un compteur d'années ; ralenti, silence, impact, le sceau d'arrivée scintille et s'envole vers le cartouche d'époque. Utiliser quand l'utilisateur demande une transition entre époques, entre dynasties, « le rouleau du temps », « la frise des sceaux », un passage Shang → Zhou, Zhou → Qin, etc., ou une animation qui montre qu'on se déplace dans le temps.
+description: Transition « premium » d'une époque à l'autre (série 墨之道) dans une vidéo Remotion — la caméra recule et montre le rouleau peint (table de bois, montage de soie, bâtons qui tournent), le paysage shuimo défile en parallaxe avec une accélération franche, jours et nuits passent, une frise de sceaux d'époques se trace au centre et un curseur (le caractère étudié, ou un point d'encre) glisse d'un sceau à l'autre sous un compteur d'années ; ralenti, silence, impact, le sceau d'arrivée scintille et s'envole vers le cartouche d'époque. Utiliser quand l'utilisateur demande une transition entre époques, entre dynasties, « le rouleau du temps », « la frise des sceaux », un passage Shang → Zhou, Zhou → Qin, etc., ou une animation qui montre qu'on se déplace dans le temps.
 ---
 
 # Rouleau du temps (Remotion)
@@ -26,6 +26,17 @@ en curseur, rythme spectaculaire, **un seul mouvement de caméra à la fin** (pa
   la configuration du rouleau. Ne plus utiliser les glissandos synthétisés (jugés « harpe ») ni ceux d'ElevenLabs (refusés).
   Anciens sons : `rouleau.wav`, `gong.wav`,
   générés par `python3 tools/build_sfx.py` (depuis `outils/moteur/`), copiés par `node sync.mjs`.
+- **Glissando : quel 流水拂 sur quel rouleau.** `sonRouleau(at)` = (⌊at⌋ mod 3) + 1, donc l'attribution dépend de l'instant du rouleau.
+  Exemple validé, 教 (rouleaux à 71,3 s, 123,3 s et 187,6 s) : **n° 3** (lent, chevauché, deux mains, sans note finale) sur le 2D de
+  Shang → Lu, **n° 1** (lent, note vibrée) sur le 2D de Lu → Han, **n° 2** (très lent) sur le rouleau 3D Han → Song : trois
+  colorations différentes d'un même geste. Pour imposer un son : `son: 1 | 2 | 3` dans la configuration.
+  **Variantes explorées, non retenues** (`outils/moteur/assets/rouleau/variantes/`, à réécouter avant d'en proposer une nouvelle) :
+  `guzheng_A` (刮奏 montant sur deux octaves et demie, note finale glissée 滑音 et vibrée 揉弦) et `guzheng_B` (aller-retour sur un
+  harmonique 泛音), synthétisés par `tools/build_guzheng.py` ; `rouleau_4` à `rouleau_7` (harpe en ré, aller-retour, pluie, note
+  tenue ; `tools/build_glissandos_salve2.py`) ; les `npm_*` (guzheng-sound, variantes de vitesse) ; `techniques/t01…t14`
+  (14 techniques de guzheng en pinyin : huazhi, fu, chanfu, zhuangshifu, neifu, liyin, fucuo, **liushuifu**, huafu, fanhuafu, saofu,
+  shanfu, guazou, fuyin ; `t08_liushuifu` porte le nom du geste retenu) : catalogue pour choisir un nouveau geste, toujours en
+  gardant le souffle moyen (0,38) et l'impact grave du rouleau. Je n'ai pas écouté ces fichiers : à réécouter avant tout choix.
 - Dépend du fond shuimo (skill `fond-shuimo`) : paysages `compose(seed…)`, papier, éléments du ciel.
 
 ## Utilisation

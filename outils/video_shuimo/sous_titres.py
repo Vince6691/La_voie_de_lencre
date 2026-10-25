@@ -3,7 +3,7 @@
 (silence de tête rogné, tempo, pause insérée dans un clip). Une réplique ≤ 2 lignes de 42 caractères, ≤ 6 s, coupée
 de préférence sur la ponctuation. Écrit episodes/<p>/rendu/<p>_fr.srt.
 Usage : python sous_titres.py episode.json"""
-import json, os, re, subprocess, sys
+import json, os, re, unicodedata, subprocess, sys
 import imageio_ffmpeg
 from episode import charger
 
@@ -41,6 +41,14 @@ for i, m in enumerate(mots):
         repliques.append(cur); cur = []
 
 
+REMPL = cfg.get('sous_titres_remplacements', [])  # [[motif regex, remplacement]…] : prononciations IPA, noms chinois → texte lisible
+def nettoie(t):
+    t = unicodedata.normalize('NFC', t)  # Scribe rend parfois les accents en caractères combinants
+    t = re.sub(r'\[[a-z ]+\]\s*', '', t)  # balises d'émotion eleven_v4 transcrites comme des mots
+    for motif, rep in REMPL: t = re.sub(motif, rep, t)
+    return re.sub(r' {2,}', ' ', t).strip()
+
+
 def lignes(t):  # deux lignes équilibrées si trop long
     if len(t) <= LIGNE: return t
     sp = [k for k, ch in enumerate(t) if ch == ' ' and k <= LIGNE and len(t) - k - 1 <= LIGNE] or [k for k, ch in enumerate(t) if ch == ' ']
@@ -55,7 +63,7 @@ for k, r in enumerate(repliques):
     a, b = r[0][1], r[-1][2] + 0.3
     if k + 1 < len(repliques): b = min(b, repliques[k + 1][0][1] - 0.05)
     b = max(b, a + 1.0)
-    out.append(f'{k + 1}\n{hms(a)} --> {hms(b)}\n{lignes(" ".join(x[0] for x in r))}\n')
+    out.append(f'{k + 1}\n{hms(a)} --> {hms(b)}\n{lignes(nettoie(" ".join(x[0] for x in r)))}\n')
 p = os.path.join(os.path.dirname(os.path.abspath(sys.argv[1])), 'rendu')
 os.makedirs(p, exist_ok=True)
 f = os.path.join(p, f"{os.path.basename(os.path.dirname(os.path.abspath(sys.argv[1])))}_fr.srt")
