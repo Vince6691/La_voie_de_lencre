@@ -229,7 +229,13 @@
   "plages": {},
   "fin": 298.02,
   "total": 308.02,
-  "bruitages": [],
+  "bruitages": [
+   [
+    "fresque_shang",
+    39.38,
+    0.28
+   ]
+  ],
   "musique_fin": {
    "fichier": "bamboo_grove_434735.mp3",
    "debut": 296.22,

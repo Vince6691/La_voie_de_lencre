@@ -58,7 +58,7 @@ const pig = (k: number | ((c: string) => number)) => (c: string) => rgb(mixc(INK
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
 // ── images de l'épisode (facultatives : emplacement marqué tant qu'elles manquent)
-const IMGSRC = { egypte: 'episodes/shi/images/fresque_egypte.jpg', shang: 'episodes/shi/images/fresque_shang.jpg', shikuang: 'episodes/shi/images/shikuang_baimiao.png', hanyu: 'episodes/shi/images/hanyu_lampe.jpg' };
+const IMGSRC = { os: 'objets/os_oracle_omoplate.png', egypte: 'episodes/shi/images/fresque_egypte.jpg', shang: 'episodes/shi/images/fresque_shang.jpg', shikuang: 'episodes/shi/images/shikuang_baimiao.png', hanyu: 'episodes/shi/images/hanyu_lampe.jpg' };
 const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
 const useSetup = () => {
   const [h] = useState(() => delayRender('polices + moteur'));
@@ -217,6 +217,32 @@ const SealStamps: React.FC = () => <Draw draw={(ctx, tt, E) => { for (const s of
 // ── l'essaim : soldats de l'épisode (positions mémorisées)
 const butteSil = (E: any) => memo('butte', () => silhouette(260, [960, 520], 520, (g, s) => E.drawStrokes(g, 'shi_kai', { x: s / 2, y: s / 2, size: s, brush: false, color: () => '#000', alpha: (c: string) => (c === 'butte' ? 1 : 0) }), 'butte'));
 
+// signe gravé dans l'os : creux en mode « multiply » (la texture de l'os reste visible au fond du trait), paroi d'ombre en
+// haut à gauche, arête éclairée en bas à droite ; la gravure avance de haut en bas (rv)
+let gv1: HTMLCanvasElement | null = null, gv2: HTMLCanvasElement | null = null;
+const graver = (ctx: CanvasRenderingContext2D, E: any, key: string, G: { x: number; y: number; size: number }, rv: number, col: number[], a: number) => {
+  if (a <= 0 || rv <= 0) return;
+  const S = Math.ceil(G.size * 1.1);
+  gv1 ??= document.createElement('canvas'); gv2 ??= document.createElement('canvas');
+  for (const c of [gv1, gv2]) { c.width = S; c.height = S; }
+  const g1 = gv1.getContext('2d')!, g2 = gv2.getContext('2d')!;
+  E.drawRealGlyph(g1, key, { x: S / 2, y: S / 2, size: G.size, reveal: () => rv, color: () => '#000' });
+  const k = G.size / 470, d = 3 * k;
+  // paroi d'ombre : le trait moins lui-même décalé vers le bas-droite
+  g2.drawImage(gv1, 0, 0); g2.globalCompositeOperation = 'destination-out'; g2.drawImage(gv1, d, d); g2.globalCompositeOperation = 'source-in';
+  g2.fillStyle = 'rgba(30,20,12,0.85)'; g2.fillRect(0, 0, S, S); g2.globalCompositeOperation = 'source-over';
+  const x0 = G.x - S / 2, y0 = G.y - S / 2;
+  ctx.save(); ctx.globalAlpha *= a;
+  // arête éclairée (os poli) en bas à droite du creux
+  const lit = document.createElement('canvas'); lit.width = S; lit.height = S; const gl = lit.getContext('2d')!;
+  gl.drawImage(gv1, 0, 0); gl.globalCompositeOperation = 'source-in'; gl.fillStyle = 'rgba(250,238,210,0.7)'; gl.fillRect(0, 0, S, S);
+  ctx.drawImage(lit, x0 + 1.6 * d, y0 + 1.6 * d);
+  // fond du creux, teinté (brun du trait, puis ocre de la butte), la texture de l'os passe au travers
+  g1.globalCompositeOperation = 'source-in'; g1.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},0.9)`; g1.fillRect(0, 0, S, S);
+  ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(gv1, x0, y0); ctx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(gv2, x0, y0);
+  ctx.restore();
+};
 // le camp en 3D (mètres) : la butte au fond, trois carrés (à droite, au centre, à gauche), trois chars devant le carré du centre
 const MOUND3: V2 = [0, 16];
 const SQ3: V2[] = [[34, 6], [0, -14], [-34, 6]];
@@ -353,7 +379,7 @@ const Shang: React.FC = () => {
           }
           // la plus ancienne forme : estampage, signe révélé en blanc, puis à l'encre ; les deux bosses en ocre
           const ga0 = seg(tt, fo - 0.2, fo + 0.6) * (1 - seg(tt, R1 - 0.5, R1));
-          const ink = seg(tt, bs - 0.2, bs + 0.6), oc = seg(tt, bu - 0.1, bu + 0.5);
+          const oc = seg(tt, bu - 0.1, bu + 0.5);
           const up = ease(seg(tt, ro - 0.4, ro + 0.6)) * (1 - ease(seg(tt, sc - 0.2, sc + 0.8)));
           // le camp, en perspective : la butte, le lavis sous chaque troupe, les soldats qui sortent du signe, les chars
           const campA = win(tt, ro - 0.5, R1 - 0.2, 0.6);
@@ -372,9 +398,24 @@ const Shang: React.FC = () => {
             ctx.restore();
           }
           if (ga0 > 0) {
-            const G = { x: 960, y: 520 - 320 * up, size: 600 - 380 * up };
-            rubbing(ctx, 960, 520, 520, 720, ga0 * (1 - ink) * (1 - up), 11);
-            E.drawRealGlyph(ctx, 'shi_jiaguwen', { ...G, reveal: () => seg(tt, fo, fo + 1.0), opacity: ga0, color: () => rgb(mixc(mixc(PAPER, INK, ink), OCRE, oc)), glow: 22 * win(tt, bu, cp + 0.6, 0.3) + 14 * up, glowColor: up > 0.5 ? 'rgba(246,241,231,0.95)' : rgb(OCRE, 0.6) });
+            // l'omoplate (asset commun objets/os_oracle_omoplate.png) se pose sur la fresque ; le signe y est gravé au couteau
+            // de bronze, de haut en bas, avec des éclats d'os au front de la gravure ; il quitte l'os quand le roi forme ses armées
+            const os = IMG.os, osA = ga0 * (1 - ease(seg(tt, ro - 0.5, ro + 0.4)));
+            if (os && osA > 0) {
+              const H = 740, Wd = (H * os.width) / os.height, dy = 40 * (1 - ease(seg(tt, fo - 0.2, fo + 0.6)));
+              ctx.save(); ctx.globalAlpha = osA; ctx.shadowColor = 'rgba(40,28,18,0.45)'; ctx.shadowBlur = 36; ctx.shadowOffsetY = 18;
+              ctx.drawImage(os, 990 - Wd / 2, 575 - H / 2 + dy, Wd, H); ctx.restore();
+            } else if (!os) rubbing(ctx, 960, 520, 520, 720, ga0 * (1 - up), 11);
+            const g0 = fo + 0.8, g1 = g0 + 1.8, rv = seg(tt, g0, g1);
+            const G = { x: 1000, y: 585 - 385 * up, size: 430 - 190 * up };
+            const grave = [58, 42, 29], col = mixc(mixc(grave, INK, up), OCRE, oc);
+            const ga = ga0 * seg(tt, g0, g0 + 0.15);
+            if (up < 0.5) graver(ctx, E, 'shi_jiaguwen', G, rv, col, ga * (1 - 2 * up));
+            if (up > 0) E.drawRealGlyph(ctx, 'shi_jiaguwen', { ...G, opacity: ga * Math.min(1, 2 * up), color: () => rgb(col), glow: 22 * win(tt, bu, cp + 0.6, 0.3) + 14 * up, glowColor: 'rgba(246,241,231,0.95)' });
+            if (rv > 0 && rv < 1) { // éclats d'os au front de la gravure
+              const fy = G.y - G.size * 0.42 + G.size * 0.84 * rv, r = rng(Math.floor(tt * 24));
+              for (let i = 0; i < 14; i++) { const x = G.x + (r() - 0.5) * G.size * 0.35, y = fy + (r() - 0.3) * 18 + 30 * r() * r(); ctx.fillStyle = `rgba(236,222,190,${(0.5 + 0.5 * r()).toFixed(2)})`; ctx.fillRect(x, y, 1.5 + 2.5 * r(), 1.5 + 2 * r()); }
+            }
           }
         }} />
       </Cam>

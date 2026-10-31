@@ -44,6 +44,8 @@ for (const f of fs.readdirSync(`${X}/assets/exemples_videos`)) cp(`${X}/assets/e
 // cartes peintes réutilisables (skill carte-peinte) : images et guides, catalogue
 for (const d of ['peintes', 'guides', 'sommets', 'decoupes']) for (const f of fs.readdirSync(`${X}/assets/cartes/${d}`)) if (f.includes('.')) cp(`${X}/assets/cartes/${d}/${f}`, `${here}/public/cartes/${d}/${f}`);
 cp(`${X}/assets/cartes/cartes.json`, `${here}/src/data/cartes.json`);
+// objets communs à tous les épisodes (os de divination…) : assets/objets → public/objets
+if (fs.existsSync(`${X}/assets/objets`)) for (const f of fs.readdirSync(`${X}/assets/objets`)) if (/\.(png|jpe?g)$/.test(f)) cp(`${X}/assets/objets/${f}`, `${here}/public/objets/${f}`);
 // épisodes shuimo (episodes/<pinyin>/, outils/video_shuimo) : voix, musique, clips, images → public/episodes/<pinyin>/ ;
 // repères → src/data/episodes/<pinyin>.json ; glyphes de tous les épisodes → public/legacy/episodes.js (chargé par legacy.ts)
 const EP = path.resolve(X, '../..', 'episodes');
