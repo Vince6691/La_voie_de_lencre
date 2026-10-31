@@ -72,6 +72,13 @@ appliquer, recalculer la durée).
 
 ## Étape 2 — Voix (ElevenLabs)
 - Voix **« Chinese narration »** (`KpnSJfGwFIPSRbO89Nsr`), modèle `eleven_v4`, un clip par bloc, un flow par vidéo.
+- **Prononciation : lire d'abord `outils/video_shuimo/PRONONCIATION.md`** (règles + lexique des noms validés et ratés,
+  commun à tous les épisodes) et **vérifier chaque nom chinois du bloc avec ses 6 règles avant d'envoyer** ; après chaque
+  écoute, y ajouter une ligne par nom validé ou raté (contexte exact). En résumé : simplifié propre au chinois ; nom au
+  milieu d'une phrase qui continue, entre deux virgules, jamais isolé par une ponctuation, jamais après « On l'appelle … : »,
+  jamais juste après un nombre ; mots composés rares (京师) laissés à l'écran ; réécrire un bloc sans toucher à
+  l'entourage d'un nom déjà validé ; pour un seul nom risqué, une **phrase-test** courte à variantes plutôt que deux
+  prises du bloc entier.
 - **Noms chinois écrits en caractères** dans le texte envoyé (la voix bascule en mandarin). Pièges vérifiés :
   - caractères **simplifiés partagés avec le japonais** (学, 学校, 学生, 大学…) → lus en japonais : écrire en
     **traditionnel** (學, 學校, 學生, 大學) même si l'écran montre le simplifié ;
@@ -130,6 +137,7 @@ ajouter pour chaque nouveau visuel, puis `reperes.py` → `musique.py` (la duré
 | **Variantes régionales (Royaumes combattants)** | quand la voix dit que l'écriture variait d'un royaume à l'autre, montrer de **vraies formes différentes** par système d'écriture (楚系, 齊系, 燕系, 晉系, 秦系 ; 小學堂 via `xiaoxue.py`), chacune avec le nom de son royaume — jamais la même forme dupliquée, tournée ou en miroir (défaut relevé sur le 學) |
 | **Glissando des rouleaux** | un des trois 流水拂 (skill `rouleau-du-temps`), varié d'un rouleau à l'autre, 2D comme 3D |
 | **Dynamisme (validé sur le 教)** | **caméra** `Cam` (JiaoV1) dans chaque scène : clés `[t, cx, cy, échelle, durée]` calées sur les repères (poussée sur le détail cité, panoramique d'un élément à l'autre, retour au plan large), respiration lente permanente, **punch** +3,5 % sur chaque révélation, neutre pendant les rouleaux (`calm`) ; fonds, glyphes, étiquettes dans la caméra, légendes et cartouches hors caméra. **Un changement visuel toutes les 6–8 s** au plus ; dans un long bloc sur un même glyphe, une clé de caméra par phrase (poussée sur la partie citée, retour) ; **jamais plus de 2 s de papier vide** (après une cassure : goutte d'encre qui s'épanouit en lavis). Rythme de la voix et des silences : inchangé (resserrage refusé par l'utilisateur ; `"tempo"` dans episode.json reste disponible sur demande) |
+| **Livre de lattes de bambou 3D (validé sur le 語)** | `src/lattes/LattesBambou3D.tsx` : rouleau de lattes liées par trois cordons, déroulé en plan 3/4 dans un espace vide (papier, lointains en lavis, brume), caméra qui passe au-dessus ; `texte` facultatif (texte suivi en colonnes de petit sceau 崇羲篆體, blancs au passage des cordons, vedettes plus grandes), `citee` = passage surligné à l'or sur la latte centrale (les autres s'assombrissent). Exemple : `shuimo_yu/YuLattes.tsx` ; aperçu vide : composition `LattesBambou3D` |
 | **Bruitages** | ElevenLabs text-to-sound (`creative_generate_in_flow`, type sfx) → `audio/sfx_*.wav` (−20 LUFS, fondu) : pinceau sur les tracés, sceau sur les révélations / coups, gravure sur l'os, gong (≤ 3) sur les moments-clés ; volumes 0,35–0,6, liste `bruitages` d'episode.json. **Leitmotiv** (validé sur le 美) : tonnerre à l'ouverture du récit ancien, tambour grave pendant la scène rituelle, qui **revient discrètement** (0,25–0,3) sur chaque révélation liée ; **cascade frappée** : sur la phrase-révélation, les formes successives (os → bronze → sceau) frappées en colonne, un coup de sceau par mot fort, gong sur le dernier ; feuilletage rapide qui s'arrête net sur la bonne page. Un bruitage ne couvre jamais la voix : le poser dans le silence qui précède (mesurer : jamais plus fort que la voix pendant qu'elle parle). Les bruitages ElevenLabs sortent en ≈ 1 s quel que soit le prompt : un son long (tonnerre, roulement) se **synthétise** dans `audio/sfx_src/fabriquer_<pinyin>.py` (sources gardées dans `sfx_src/`) |
 
 Révélations disponibles mais non retenues (sur demande) : lavis + taches, rouleau suspendu (`VideoReveal`), brume

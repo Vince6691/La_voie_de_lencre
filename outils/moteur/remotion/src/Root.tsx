@@ -7,6 +7,9 @@ import { TIYING_SECONDS, TiyingReveal } from './shuimo_wen/TiyingReveal';
 import { WEN_SECONDS, WenV1 } from './shuimo_wen/WenV1';
 import { MEI_SECONDS, MeiV1 } from './shuimo_mei/MeiV1';
 import { YU_SECONDS, YuV1 } from './shuimo_yu/YuV1';
+import { SHI_SECONDS, ShiV1 } from './shuimo_shi/ShiV1';
+import { BAMBOU3D_SECONDS, Bambou3DDemo } from './shuimo_yu/YuLattes';
+import { LATTES_SECONDS, LattesBambou3DDemo } from './lattes/LattesBambou3D';
 import { INTRO_SECONDS, YuIntroEncre, YuIntroLaque, YuIntroOmbres } from './shuimo_yu/IntroTests';
 import { CARTES_GUIDES, CartesGuides } from './cartes/CartesGuides';
 import { EssaiPekin3D, PEKIN3D_SECONDS } from './cartes/Pekin3D';
@@ -56,6 +59,9 @@ export const RemotionRoot: React.FC = () => (
  <Composition id="JiaoV1" component={JiaoV1} durationInFrames={Math.round(JIAO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="MeiV1" component={MeiV1} durationInFrames={Math.round(MEI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuV1" component={YuV1} durationInFrames={Math.round(YU_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="ShiV1" component={ShiV1} durationInFrames={Math.round(SHI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="Bambou3D" component={Bambou3DDemo} durationInFrames={Math.round(BAMBOU3D_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="LattesBambou3D" component={LattesBambou3DDemo} durationInFrames={Math.round(LATTES_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuIntroEncre" component={YuIntroEncre} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuIntroOmbres" component={YuIntroOmbres} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="EssaiPekin3D" component={EssaiPekin3D} durationInFrames={Math.round(PEKIN3D_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
