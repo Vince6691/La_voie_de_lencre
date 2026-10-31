@@ -19,3 +19,13 @@ ils restent dans l'historique git (commits b9bf5b6 → 0468e4e) et dans le flow 
 Total voix : 254,2 s (4 min 14). Minutage Scribe : `voix/mots/bNN.json`.
 Historique : v01 (10 blocs), v02 (b02 « wén », b03 « trois 师 », b04 京师, b10 proverbe en chinois), v03 (b02 rappel
 du 语, b03 et b04 sans 师 / 京师 prononcés).
+
+## Prises v04 (VOIX.md v4, storytelling) — comparaison `apercus/comparaison_prises_v04.mp3`
+| Bloc | Nœud | Prise 1 | Prise 2 | Retenue |
+|---|---|---|---|---|
+| b01 | `zbvfhRbXvdGX5yhXvBY3` | `nbQPst19oORGm7Wa9YYU` | `fP3TaJgNd3W24gm3S2NW` | ? |
+| b02 | `HYhbwuCqnvk75T3yxtuv` | `dH6J6gSYUkS6Qr12JG1O` | `InHlzJGEnK45cBOWMTv7` | ? |
+| b04 | `bZYodchAdkhdrUpwRf68` | `v5nLvvoYWVrpQGCaiBNt` | `yCD0wbLgH7bOWndAiwrn` | ? |
+| b05 | `FquMWzZJukOJzkJgnt2P` | `KwUY51pl9K93kWH3SzCy` | `D7PVZkA4HJcb8lwRE85n` | ? |
+| b07 | `sFoOg1Z9s6ROgIp8L7pD` | `3n8MYUX54dio2Sejnke5` | `JkYvaoddvaTuEiRETDmu` | ? |
+| b08 | `YDWaobWbNApVpIB1iNIx` | `MdfUqC3nQJxwt5Dc8f2p` | `QZKBO5de9Uj7vAI1v47P` | ? |

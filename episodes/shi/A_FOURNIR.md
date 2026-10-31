@@ -38,27 +38,36 @@ mettre en pause.
 > in the plaster but colours still vivid. 16:9, no Latin letters, no signature, no outer border.
 
 ### Fresque B — `fresque_shang.jpg`
-> A luminous Chinese blue-green landscape painting (qinglü shanshui, 青綠山水) on aged silk, in the manner of the great
-> court painters: mineral azurite blue and malachite green on the mountains, warm ochre on the earth, touches of
-> vermilion and gold, fine ink outlines, soft ink washes and mist, generous empty silk.
-> Subject: Anyang, capital of the Shang, on the Huan River at sunrise, around 1250 BC.
-> Left third: a great rammed-earth terrace with a long hall of timber posts and a thick steep thatched roof (no tiles,
-> no curved eaves, no pagoda); in front of it, a diviner in a knee-length cross-collar robe of red-brown silk kneels on a
-> mat before a small bronze brazier, holding a polished ox shoulder blade and a glowing bronze rod; a thin blue thread
-> of smoke rises; a scribe kneels beside him with a bronze knife, ready to engrave the cracks.
-> Centre: two bronze ritual vessels (a large ding cauldron with taotie masks, green-gold patina) on the terrace steps.
-> Lower band: a file of Shang soldiers walking to the right along the riverbank — leather helmets, bronze dagger-axes
-> (ge) on long wooden shafts, small rectangular shields painted red and black, one narrow vermilion banner — followed by
-> a two-horse war chariot with large spoked wheels.
-> The Huan River crosses the bottom in pale azurite wash with reeds and two white egrets.
-> Background: distant blue-green hills, a red rising sun half veiled by mist.
-> Right third: calmer — mist and empty silk, a few flying geese.
-> Horizon line at 60 % of the image height. 16:9, high detail, no Latin letters, no calligraphy, no seal, no signature,
-> no outer border.
+> An epic, magnificent Chinese court painting on a monumental scale, in the jewel-toned blue-and-green manner
+> (qinglü, 青綠) with gold outlines: dense mineral pigments — azurite blue, malachite green, cinnabar vermilion, gold
+> leaf, lacquer black and red, polished-jade green, warm ochre — on golden aged silk, crisp fine ink lines, dramatic
+> morning light. As rich and festive as a royal Egyptian tomb painting.
+> Subject: the triumphant return of the Shang army to Anyang, the great capital on the Huan River, around 1250 BC, at
+> sunrise, as the court gathers for the divination.
+> Left third: the royal palace on a high rammed-earth terrace reached by a broad stairway — long halls on rows of
+> painted timber columns under thick, steep thatched roofs (no tiles, no curved eaves), vermilion lacquered beams and
+> doors, banners of red and black silk; on the terrace, the king in a richly embroidered robe with a jade-inlaid belt,
+> surrounded by courtiers, watches a diviner kneeling before a bronze brazier, who holds an ox shoulder blade over the
+> fire while a scribe waits with a bronze graver; rising smoke glowing gold.
+> Centre: on the stairway, rows of gleaming new bronze ritual vessels — huge ding cauldrons and fangyi with taotie
+> masks — still golden as freshly cast bronze, inlaid with turquoise, catching the sunlight; musicians with bronze
+> bells and stone chimes.
+> Lower register: the army marching to the right in an endless column along the river — ranks of soldiers with
+> turquoise-inlaid bronze dagger-axes (ge) on long shafts, red-and-black lacquered shields, leather helmets; archers
+> with great recurved bows; tall vermilion banners and feathered standards streaming in the wind; at its head, the queen
+> and general Fu Hao in a red war chariot drawn by two horses with gleaming bronze harness, raising a bronze axe; more
+> chariots with large spoked wheels behind her; drums on poles.
+> The Huan River crosses the bottom in bright azurite with gold-flecked ripples, reeds, egrets and lotus.
+> Background: majestic blue-green mountains outlined in gold, a huge red rising sun, flights of cranes.
+> Right third: the end of the column fading into luminous golden mist and open sky, calmer.
+> Horizon line at 60 % of the image height. 16:9, extremely detailed, grand and festive, no Latin letters, no
+> calligraphy, no seal, no signature, no outer border.
 
 > Notes historiques : les hiéroglyphes de la fresque A sont **décoratifs** (l'IA ne sait pas écrire un vrai texte
 > égyptien) — c'est une « vue d'artiste », légende à l'écran ; la fresque B est une **peinture d'aujourd'hui** dans un
 > style ancien (il n'existe pas de peinture Shang connue) : pas de tuiles ni de toits relevés (anachroniques), les chars
-> sont bien attestés à Anyang vers 1200 av. J.-C.
+> sont bien attestés à Anyang vers 1200 av. J.-C. ; le bronze neuf était doré (le vert est la patine des siècles) ; Fu Hao,
+> reine et générale du roi Wu Ding, a commandé des armées (sa tombe d'Anyang, fouillée en 1976, contenait ses haches de
+> bronze) ; les toits restent en chaume.
 
 Prompts du clip et des deux autres images : à générer avec `seedance-prompt-generator` et `nano-banana-prompt-generator` (sur demande).
