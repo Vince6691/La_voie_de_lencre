@@ -16,6 +16,7 @@ export const PERIODES: Periode[] = [
   { id: 'zhou', zh: '周', sceau: '周', nom: 'DYNASTIE ZHOU', debut: -1046, fin: -256, ecriture: 'bronzes 金文' },
   // royaume de Lu (Confucius) : cartouche et frise du rouleau 2D, hors du compteur des rouleaux 3D (compteur: false)
   { id: 'lu', zh: '魯', sceau: '魯', nom: 'ROYAUME DE LU', debut: -1042, fin: -249, ecriture: 'bronzes 金文, écriture de Lu', compteur: false },
+  { id: 'jin', zh: '晉', sceau: '晉', nom: 'ROYAUME DE JIN', debut: -1033, fin: -376, ecriture: 'bronzes 金文, écriture de Jin', compteur: false },
   { id: 'royaumes', zh: '戰國', sceau: '戰', nom: 'ROYAUMES COMBATTANTS', debut: -475, fin: -221, ecriture: 'écritures régionales (Chu : bambou, soie)' },
   { id: 'qin', zh: '秦', sceau: '秦', nom: 'DYNASTIE QIN', debut: -221, fin: -206, ecriture: 'petit sceau 小篆, écriture unifiée' },
   { id: 'han', zh: '漢', sceau: '漢', nom: 'DYNASTIE HAN', debut: -206, fin: 220, ecriture: 'écriture des clercs 隸書' },

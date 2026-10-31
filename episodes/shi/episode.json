@@ -195,5 +195,277 @@
   "fondu": 2.5,
   "depart": 0
  },
- "bruitages": []
+ "bruitages": [],
+ "glyphes": {
+  "reels": {
+   "shi_jiaguwen": {
+    "img": "glyphes/shi_xiaoxue/01.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "前2.13.3",
+    "defaut": "butte",
+    "polys": []
+   },
+   "shi_jinwen": {
+    "img": "glyphes/shi_xiaoxue/03.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "令鼎",
+    "defaut": "tour",
+    "polys": [
+     [
+      "butte",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        180,
+        0
+       ],
+       [
+        180,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "shi_jinwen2": {
+    "img": "glyphes/shi_xiaoxue/04.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "師𩛥鼎",
+    "defaut": "tour",
+    "polys": [
+     [
+      "butte",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        168,
+        0
+       ],
+       [
+        168,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "shi_xiaozhuan": {
+    "img": "glyphes/shi_xiaoxue/12.png",
+    "label": "小篆",
+    "era": "Qin",
+    "piece": "說文·帀部",
+    "defaut": "tour",
+    "polys": [
+     [
+      "butte",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        168,
+        0
+       ],
+       [
+        168,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "shi_qin": {
+    "img": "glyphes/shi_xiaoxue/13.png",
+    "label": "秦簡",
+    "era": "Qin",
+    "piece": "睡虎地 16.111",
+    "defaut": "tour",
+    "polys": [
+     [
+      "butte",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        165,
+        0
+       ],
+       [
+        165,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "shi_lishu": {
+    "img": "glyphes/shi_xiaoxue/18.png",
+    "label": "隸書",
+    "era": "Han",
+    "piece": "曹全碑",
+    "defaut": "tour",
+    "polys": [
+     [
+      "butte",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        105,
+        0
+       ],
+       [
+        105,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   },
+   "shi_za_jiaguwen": {
+    "img": "glyphes/za_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "後2.30.8 (帀)",
+    "defaut": "tour",
+    "polys": []
+   },
+   "shi_za_jinwen": {
+    "img": "glyphes/za_xiaoxue/01.png",
+    "label": "金文",
+    "era": "Zhou",
+    "piece": "師㝨簋 (帀)",
+    "defaut": "tour",
+    "polys": []
+   },
+   "shi_zhi_jiaguwen": {
+    "img": "glyphes/zhi_xiaoxue/00.png",
+    "label": "甲骨文",
+    "era": "Shang",
+    "piece": "鐵16.1 (之)",
+    "defaut": "tour",
+    "polys": []
+   },
+   "shi_fu_jinwen": {
+    "img": "glyphes/fu_xiaoxue/01.png",
+    "label": "金文",
+    "era": "Shang",
+    "piece": "父癸方鼎 (父)",
+    "defaut": "main",
+    "polys": [
+     [
+      "hache",
+      [
+       [
+        0,
+        0
+       ],
+       [
+        140,
+        0
+       ],
+       [
+        140,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ]
+     ]
+    ]
+   }
+  },
+  "traits": {
+   "shi_simp": {
+    "src": "glyphes/traits/shi.json",
+    "comp": [
+     "butte",
+     "butte",
+     "tour",
+     "tour",
+     "tour",
+     "tour"
+    ]
+   },
+   "shi_kai": {
+    "src": "glyphes/traits/shi_trad.json",
+    "comp": [
+     "butte",
+     "butte",
+     "butte",
+     "butte",
+     "butte",
+     "butte",
+     "tour",
+     "tour",
+     "tour",
+     "tour"
+    ]
+   },
+   "shi_za_kai": {
+    "src": "glyphes/traits/za.json",
+    "comp": [
+     "tour",
+     "tour",
+     "tour",
+     "tour"
+    ]
+   },
+   "shi_za2_kai": {
+    "src": "glyphes/traits/za2.json",
+    "comp": [
+     "cadre",
+     "tour",
+     "tour",
+     "tour",
+     "cadre"
+    ]
+   },
+   "shi_fu_kai": {
+    "src": "glyphes/traits/fu.json",
+    "comp": [
+     "main",
+     "main",
+     "main",
+     "main"
+    ]
+   }
+  }
+ }
 }
