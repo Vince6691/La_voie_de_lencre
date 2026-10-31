@@ -4,6 +4,7 @@
 // de sa distance au point de départ de la vague, d'où le mouvement « qui se propage ». Positions déterministes (graine),
 // sprites dessinés une seule fois (4 poses) : rien n'est recalculé d'une image à l'autre sauf les positions.
 import { rng } from '../shuimo/common';
+import { peindre, sorteParDefaut } from './Essaim3D';
 
 export type Pt = [number, number];
 export type Pose = 'debout' | 'marche' | 'assis' | 'dos';
@@ -112,8 +113,9 @@ export const dessinerEssaim = (ctx: CanvasRenderingContext2D, A: Pt[], B: Pt[], 
     const k = smooth((u - del) / (1 - sp));
     const bob = o.ondule && k > 0 && k < 1 ? Math.sin((o.t ?? 0) * 9 + i) * o.ondule : 0;
     const x = p[0] + (q[0] - p[0]) * k, y = p[1] + (q[1] - p[1]) * k + bob;
-    const im = sprite(o.pose(i, k), col);
-    ctx.drawImage(im, x - w / 2, y - h * 0.62, w, h);
+    // soldat peint au pinceau (Essaim3D) ; le personnage peint fait 44 unités, l'ancien gabarit 30
+    const im = peindre(sorteParDefaut(i), o.pose(i, k), col, 0, Math.floor((o.t ?? 0) * 3.2 + i * 0.37) % 2), z = (0.7 * h) / SH;
+    ctx.drawImage(im, x - 20 * z, y - 56 * z + h * 0.38, 40 * z, 64 * z);
   }
   ctx.restore();
 };
