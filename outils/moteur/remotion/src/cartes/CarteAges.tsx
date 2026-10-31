@@ -92,8 +92,9 @@ const distanceFleuves = () => {
 
 type Res = { img: Record<string, HTMLImageElement>; n: Float32Array; df: Float32Array; mask: HTMLCanvasElement; off: HTMLCanvasElement };
 
-export const EssaiCarteAges: React.FC = () => {
-  const f = useCurrentFrame(), { fps } = useVideoConfig(), t = f / fps, ref = useRef<HTMLCanvasElement>(null);
+// vitesse : 1 = 7,5 s ; > 1 accélère tout le plan (durée AGES_SECONDS / vitesse)
+export const EssaiCarteAges: React.FC<{ vitesse?: number }> = ({ vitesse = 1 }) => {
+  const f = useCurrentFrame(), { fps } = useVideoConfig(), t = (f / fps) * vitesse, ref = useRef<HTMLCanvasElement>(null);
   const [h] = useState(() => delayRender('cartes et polices'));
   const [R, setR] = useState<Res | null>(null);
   useEffect(() => {

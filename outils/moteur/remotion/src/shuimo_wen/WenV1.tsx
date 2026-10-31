@@ -8,7 +8,9 @@
 // sens) → maxime et passerelle 语 par 语文 (seule la bouche 口 s'allume, le sens n'est pas dévoilé). Cartouches des quatre sens en
 // haut à droite. Ligne de temps lue dans les repères (episodes/wen/voix/reperes.json, « _ligne »), jamais recalculée
 // ici. Pigments : l'homme en azurite, la marque en vermillon, 化 en malachite.
-// En attente : clip Seedance A (Taibo) — clip d'exemple en place.
+// En attente (emplacements marqués à l'écran) : clip Seedance A (Taibo), portraits 白描 des rois Wen et Wu
+// (images/wenwang_trace.png, wuwang_trace.png : prompts dans A_FOURNIR.md).
+// Rouleaux : 1 et 2 en 2D (frise de sceaux), le 3e (Han → aujourd'hui, le plus grand saut) en 3D complet.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AbsoluteFill, Audio, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
@@ -17,13 +19,18 @@ import { INK, PIGMENT } from '../shuimo_xue/InkStage';
 import { Era, TimeScrollConfig, TimeScrollStage, arrivePose, cursorPose, morphK, tagIn } from '../rouleau/TimeScroll';
 import { VideoReveal } from '../video_encre/VideoReveal';
 import { CloudReveal } from '../video_encre/CloudReveal';
+import { Rouleau3DConfig, Rouleau3DStage, r3Seconds, r3TagIn } from '../rouleau3d/Rouleau3D';
+import { GrainVignette, Shake } from '../commun/Effets';
+import { capitale, carte, chargerCartes, creditCarte, fondCarte, lieu, routePinceau } from '../cartes/CartePeinte';
+import { cartouche } from '../periodes';
 import { loadLegacy, W } from '../legacy';
 import { TiyingReveal } from './TiyingReveal';
 import rep from '../data/episodes/wen.json';
 
 type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07';
 type Rep = Record<Clip, { duration: number; cues: Record<string, number> }> & {
-  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; fin: number; total: number; bruitages?: [string, number, number][] };
+  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; fin: number; total: number; bruitages?: [string, number, number][];
+    musique_fin?: { fichier: string; debut: number; fin_voix: number; fin: number; volume_voix: number; volume: number; montee: number; fondu: number; depart: number } };
 };
 const R = rep as unknown as Rep;
 const L = R._ligne;
@@ -38,18 +45,30 @@ const at = (k: Clip, n: string) => {
 const pauseAt = (k: Clip) => L.clips[k].debut + L.clips[k].pause!.coupe;
 export const WEN_SECONDS = Math.ceil(L.total * 10) / 10;
 const END = L.fin;
+const MF = L.musique_fin;
 
 // époques du 文 (sceaux de la frise des rouleaux)
-const ERAS: Era[] = [
-  { zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '楚', date: '−300' }, { zh: '秦', date: '−221' },
+const ERAS: Era[] = [ // sceaux de src/periodes.ts (戰 = royaumes combattants, dont Chu)
+  { zh: '商', date: '−1200' }, { zh: '周', date: '−1046' }, { zh: '戰', date: '−300' }, { zh: '秦', date: '−221' },
   { zh: '漢', date: '−167' }, { zh: '今', date: '2026' },
 ];
-const [R1, , R3] = L.rouleaux.map((r) => r.debut); // le 2e rouleau (楚 → 秦) est joué pendant une pause de b04
+const [R1, , R3] = L.rouleaux.map((r) => r.debut); // le 2e rouleau (戰 → 秦) est joué pendant une pause de b04 ; le 3e est en 3D
 const P4 = pauseAt('b04'), P4D = L.clips.b04.pause!.duree;
+// clip Taibo (5,96 s, ralenti à 0,8) : il se termine avec la phrase « … et renoncer à son rang », juste avant « Sur les bronzes »
+const CLIP_RATE = 0.8;
+const clipEnd = () => at('b03', 'rang') + 0.95;
 const TR1: TimeScrollConfig = { at: R1, duration: L.rouleaux[0].duree, eras: ERAS, from: 0, to: 1, years: [-1200, -1046] };
 const TR2: TimeScrollConfig = { at: P4, duration: P4D, eras: ERAS, from: 2, to: 3, years: [-300, -221] };
-const TR3: TimeScrollConfig = { at: R3, duration: L.rouleaux[2].duree, eras: ERAS, from: 4, to: 5, years: [-20, 2026] };
-const R1E = R1 + TR1.duration!, P4E = P4 + P4D, R3E = R3 + TR3.duration!;
+// rouleau 3D complet (Han → aujourd'hui) : vers cités qui contiennent 文 (易·賁卦 ; 論語·子罕), paysages des plans 2D voisins
+const R3C: Rouleau3DConfig = {
+  at: R3, de: 'han', vers: 'aujourdhui', annees: [-167, 2026], variant: 'complet', stone: 'miel',
+  fromLand: { seed: 22, mood: 'aube' }, toLand: { seed: 30, mood: 'aube' }, midSeeds: [17, 26],
+  inscriptions: [
+    { x: 1500, y: 200, size: 74, font: 'ShuimoKai', cols: ['觀乎人文', '以化成天下'], sig: '周易賁卦', seal: '雲水', ink: 0.9 },
+    { x: 5500, y: 170, size: 80, font: 'ShuimoKai', cols: ['文王既沒', '文不在茲乎'], sig: '論語子罕', seal: '長樂', ink: 0.92 },
+  ],
+};
+const R1E = R1 + TR1.duration!, P4E = P4 + P4D, R3E = R3 + r3Seconds(R3C);
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const seg = (t: number, a: number, b: number) => { const u = clamp((t - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -65,6 +84,11 @@ const P: Record<string, number[]> = { tete: AZ, bras: AZ, jambes: AZ, homme: AZ,
 const GREY = [168, 160, 150], PAPERWHITE = [240, 233, 219], CARVE = [96, 62, 34];
 const useT = () => useCurrentFrame() / useVideoConfig().fps;
 
+// ── images facultatives de l'épisode : portraits 白描 des rois Wen et Wu (trace_baimiao.py : R = instant d'arrivée du
+// trait, A = encre). Tant qu'elles manquent, un emplacement marqué (pointillés) tient la place.
+const IMGSRC = { wen: 'episodes/wen/images/wenwang_trace.png', wu: 'episodes/wen/images/wuwang_trace.png' };
+const IMG: Partial<Record<keyof typeof IMGSRC, HTMLImageElement>> = {};
+
 // ── polices et moteur Canvas
 const useSetup = () => {
   const [h] = useState(() => delayRender('polices + moteur'));
@@ -73,11 +97,24 @@ const useSetup = () => {
     Promise.all([
       new FontFace('ShuimoKai', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load(),
       new FontFace('ShuimoLatin', `url(${staticFile('fonts/Cormorant.ttf')})`, { weight: '300 700' }).load(),
-    ]).then((fs) => { fs.forEach((f) => document.fonts.add(f)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
+      // police des légendes et des noms de la carte ; absente → repli sur le kai
+      new FontFace('ShuimoLegende', `url(${staticFile('fonts/ZhuqueFangsong-Regular.ttf')})`).load().catch(() => new FontFace('ShuimoLegende', `url(${staticFile('fonts/LXGWWenKaiTC-Bold.ttf')})`).load()),
+      chargerCartes(['chine_centre_nord']),
+      ...Object.entries(IMGSRC).map(([k, src]) => new Promise<void>((res) => { const im = new Image(); im.onload = () => { IMG[k as keyof typeof IMGSRC] = im; res(); }; im.onerror = () => res(); im.src = staticFile(src); })),
+    ]).then((fs) => { fs.slice(0, 3).forEach((f) => document.fonts.add(f as FontFace)); return loadLegacy({ three: false, captions: false }); }).then(() => { setReady(true); continueRender(h); });
   }, [h]);
   return ready;
 };
 
+// canvas de dessin en pleine définition (1440p net) : 1920 × 1080 × DRAW_K, flous d'ombre multipliés d'autant (modèle : XueV2)
+const DRAW_K = Math.min(2, Math.max(1, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) * 1.15);
+const echelleOmbres = (ctx: CanvasRenderingContext2D, k: number) => {
+  const P = CanvasRenderingContext2D.prototype;
+  for (const n of ['shadowBlur', 'shadowOffsetX', 'shadowOffsetY'] as const) {
+    const d = Object.getOwnPropertyDescriptor(P, n)!;
+    Object.defineProperty(ctx, n, { get() { return d.get!.call(this) / k; }, set(v: number) { d.set!.call(this, v * k); } });
+  }
+};
 const Draw: React.FC<{ draw: (ctx: CanvasRenderingContext2D, t: number, E: any) => void }> = ({ draw }) => {
   const t = useT();
   const ref = useRef<HTMLCanvasElement>(null);
@@ -85,10 +122,12 @@ const Draw: React.FC<{ draw: (ctx: CanvasRenderingContext2D, t: number, E: any) 
     const E = W().E;
     if (!E || !ref.current) return;
     const ctx = ref.current.getContext('2d')!;
+    if (!(ctx as any).__k) { echelleOmbres(ctx, DRAW_K); (ctx as any).__k = true; }
+    ctx.setTransform(DRAW_K, 0, 0, DRAW_K, 0, 0);
     ctx.clearRect(0, 0, 1920, 1080);
     draw(ctx, t, E);
   });
-  return <canvas ref={ref} width={1920} height={1080} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;
+  return <canvas ref={ref} width={Math.round(1920 * DRAW_K)} height={Math.round(1080 * DRAW_K)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;
 };
 
 const Fade: React.FC<{ len: number; faint: number; children: React.ReactNode }> = ({ len, faint, children }) => {
@@ -108,30 +147,42 @@ const Landscape: React.FC<{ seed: number; from: number; to: number; move?: 'pan'
 const FadeIn: React.FC<{ d: number; children: React.ReactNode }> = ({ d, children }) => <AbsoluteFill style={{ opacity: seg(useT(), 0, d) }}>{children}</AbsoluteFill>;
 const Paper: React.FC = () => <AbsoluteFill style={{ background: `#f3eee4 url(${staticFile('shuimo/paper.jpg')}) center/cover` }} />;
 
-// clip 3D plein cadre (clip d'exemple en attendant le clip Seedance A) : entrée par les nuages, ou à travers
-// le caractère quand il est à l'écran juste avant ; sortie par les coups de pinceau
-const CLIPS = { taibo: 'exemples_videos/exemple_plan_fixe.mp4' };
-const CLIP_SRC_SECONDS = 7.8;
-const ClipShot: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry: 'nuages' | 'glyphe'; glyph?: string; inDur?: number }> = ({ src, from, len, entry, glyph = '文', inDur = 3.2 }) => {
+// clip 3D plein cadre (Seedance) : entrée par les nuages, ou à travers le caractère quand il est à l'écran juste avant ;
+// sortie par les coups de pinceau. Tant que le clip n'est pas livré (CLIPS.taibo = null), un emplacement marqué tient la
+// place (aucun clip d'exemple dans le rendu). Livré : déposer episodes/wen/clips/01_taibo.mp4, fixer CLIPS.taibo.
+const CLIPS: { taibo: string | null } = { taibo: 'episodes/wen/clips/01_taibo.mp4' }; // Seedance 10 s, 1re prise de caméra (0–4,09 s) coupée : 5,96 s
+const CLIP_SRC_SECONDS = 5.96;
+// emplacement d'un élément à fournir (clip Seedance, image) : papier, cadre en pointillé, intitulé ; remplacé au montage
+const Placeholder: React.FC<{ title: string; sub: string; a: number }> = ({ title, sub, a }) => (
+  <AbsoluteFill style={{ opacity: a, alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ width: 1200, height: 560, border: `4px dashed ${rgb(VER, 0.6)}`, borderRadius: 18, background: 'rgba(246,241,231,0.72)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18 }}>
+      <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 60, color: inkCss }}>{title}</div>
+      <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: '#5e5044' }}>{sub}</div>
+    </div>
+  </AbsoluteFill>
+);
+const ClipShot: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; entry: 'nuages' | 'glyphe'; glyph?: string; inDur?: number; speed?: number; outDur?: number }> = ({ src, from, len, entry, glyph = '文', inDur = 3.2, speed, outDur = 2.4 }) => {
   const { fps } = useVideoConfig();
-  const rate = Math.min(0.9, (0.85 * CLIP_SRC_SECONDS) / len);
+  const t = useT();
+  const file = CLIPS[src];
+  if (!file) return <Placeholder title="Clip A · Taibo renonce au trône" sub="Seedance, 10 s (prompt : A_FOURNIR.md) — entrée par la mer de nuages" a={win(t, from + 0.2, from + len - 0.2, 0.5)} />;
+  const rate = speed ?? Math.min(0.9, (0.85 * CLIP_SRC_SECONDS) / len);
   if (entry === 'glyphe') {
     return (
       <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(len * fps)}>
-        <VideoReveal src={CLIPS[src]} mode="glyphe" glyph={glyph} outMode="pinceau" inDur={inDur} outDur={2.4} playbackRate={rate} zoom={1} />
+        <VideoReveal src={file} mode="glyphe" glyph={glyph} outMode="pinceau" inDur={inDur} outDur={outDur} playbackRate={rate} zoom={1} />
       </Sequence>
     );
   }
-  const cl = inDur + 0.4;
+  // un seul morceau, sans raccord : les nuages arrivent, s'ouvrent sur le clip, qui joue en entier (vitesse `rate`) dans sa version
+  // coupée avant 4,09 s ; la scène suivante apparaît en fondu enchaîné sous les dernières 0,4 s (jamais d'écran noir)
+  const tot = inDur + CLIP_SRC_SECONDS / rate;
   return (
-    <>
-      <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(cl * fps)}>
-        <CloudReveal src={CLIPS[src]} inDur={inDur} exit={false} playbackRate={rate} />
-      </Sequence>
-      <Sequence from={Math.round((from + cl) * fps)} durationInFrames={Math.round((len - cl) * fps)}>
-        <VideoReveal src={CLIPS[src]} mode="pinceau" inDur={0.001} outDur={2.4} startFrom={cl * rate} playbackRate={rate} zoom={1} />
-      </Sequence>
-    </>
+    <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(tot * fps)}>
+      <AbsoluteFill style={{ opacity: 1 - seg(t - from, tot - 0.4, tot) }}>
+        <CloudReveal src={file} inDur={inDur} exit={false} playbackRate={rate} videoAt={inDur} />
+      </AbsoluteFill>
+    </Sequence>
   );
 };
 
@@ -148,26 +199,65 @@ const MapPanel: React.FC<{ from: number; to: number; draw: (ctx: CanvasRendering
 };
 
 // ── cartouches, étiquettes, textes (tailles lisibles sur téléphone)
-const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number }> = ({ zh, name, dates, a }) => (
-  <div style={{ position: 'absolute', left: 96, top: 76, display: 'flex', alignItems: 'center', gap: 26, opacity: a, background: 'rgba(246,241,231,0.86)', borderRadius: 16, padding: '12px 28px 12px 14px', boxShadow: '0 0 24px rgba(246,241,231,0.6)' }}>
-    <div style={{ width: 92, height: 92, background: rgb(VER, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 64, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>{zh}</div>
+const EraTag: React.FC<{ zh: string; name: string; dates: string; a: number; plate?: boolean }> = ({ zh, name, dates, a, plate }) => (
+  <div style={{ position: 'absolute', left: plate ? 86 : 110, top: plate ? 70 : 90, display: 'flex', alignItems: 'center', gap: 26, opacity: a, ...(plate ? { padding: '16px 30px 16px 24px', borderRadius: 18, background: 'rgba(246,241,231,0.86)' } : {}) }}>
+    <div style={{ width: 92, height: 92, background: rgb(VER, 0.92), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: [...zh].length > 1 ? 38 : 64, writingMode: [...zh].length > 1 ? 'vertical-rl' : undefined, lineHeight: 1, color: '#f6eee0', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>{zh}</div>
     <div>
       <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss }}>{name}</div>
-      <div style={{ fontFamily: 'ShuimoLatin', fontSize: 30, color: '#6b5d50' }}>{dates}</div>
+      <div style={{ fontFamily: 'ShuimoLatin', fontSize: 36, fontWeight: 500, color: '#5e5044' }}>{dates}</div>
     </div>
   </div>
 );
-const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: number[]; a: number; align?: 'left' | 'right' }> = ({ x, y, zh, text, color, a, align = 'left' }) => (
-  <div style={{ position: 'absolute', top: y - 50, ...(align === 'left' ? { left: x } : { right: 1920 - x }), opacity: a, display: 'flex', alignItems: 'baseline', gap: 14, flexDirection: align === 'left' ? 'row' : 'row-reverse' }}>
+const Label: React.FC<{ x: number; y: number; zh: string; text: string; color: number[]; a: number; align?: 'left' | 'right' | 'center' }> = ({ x, y, zh, text, color, a, align = 'left' }) => (
+  <div style={{ position: 'absolute', top: y - 50, ...(align === 'center' ? { left: x - 400, width: 800, justifyContent: 'center' } : align === 'left' ? { left: x } : { right: 1920 - x }), opacity: a, display: 'flex', alignItems: 'baseline', gap: 14, flexDirection: align === 'right' ? 'row-reverse' : 'row' }}>
     <span style={{ fontFamily: 'ShuimoKai', fontSize: 100, color: rgb(color) }}>{zh}</span>
-    <span style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 66, fontWeight: 600, color: '#3b322b', textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{text}</span>
+    <span style={{ fontFamily: 'ShuimoLatin, ShuimoLegende', fontSize: 66, fontWeight: 600, color: '#3b322b', textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{text}</span>
   </div>
 );
-const Caption: React.FC<{ text: string; a: number; y?: number; size?: number }> = ({ text, a, y = 990, size = 38 }) => (
-  <div style={{ position: 'absolute', width: '100%', top: y, display: 'flex', justifyContent: 'center', opacity: a }}>
-    <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: size, color: '#4a3f36', background: 'rgba(246,241,231,0.78)', borderRadius: 12, padding: '2px 22px', boxShadow: '0 0 22px rgba(246,241,231,0.7)' }}>{text}</div>
+// légende : pastille de papier, ≥ 44 px, jamais dans les 8 % du bas (barre de progression YouTube)
+const Caption: React.FC<{ text: React.ReactNode; a: number; y?: number; size?: number; left?: number; width?: number }> = ({ text, a, y = 900, size = 44, left = 0, width = 1920 }) => (
+  <div style={{ position: 'absolute', left, width, top: Math.min(y, 975 - 1.7 * Math.max(size, 44)), textAlign: 'center', opacity: a }}>
+    <span style={{ display: 'inline-block', padding: '4px 22px', borderRadius: 14, background: 'rgba(246,241,231,0.8)', fontFamily: 'ShuimoLatin, ShuimoLegende', fontSize: Math.max(size, 44), color: '#4b4038', textShadow: '0 0 10px rgba(246,241,231,0.9)' }}>{text}</span>
   </div>
 );
+// un baimiao qui se trace (trace_baimiao.py : R = instant d'arrivée, A = encre), dessiné dans le rectangle (x, y, w, h)
+const bmCache: Record<string, { data: Uint8ClampedArray; cv: HTMLCanvasElement; last: number }> = {};
+const drawBaimiao = (ctx: CanvasRenderingContext2D, key: keyof typeof IMGSRC, p: number, x: number, y: number, w: number, h: number) => {
+  const im = IMG[key];
+  if (!im || p <= 0) return;
+  if (!bmCache[key]) { const cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height; const c = cv.getContext('2d', { willReadFrequently: true })!; c.drawImage(im, 0, 0); bmCache[key] = { data: c.getImageData(0, 0, im.width, im.height).data.slice(), cv, last: -1 }; }
+  const bm = bmCache[key], thr = p * 262;
+  if (Math.abs(thr - bm.last) > 0.01) {
+    const c = bm.cv.getContext('2d', { willReadFrequently: true })!, out = c.createImageData(im.width, im.height), o = out.data, d = bm.data;
+    for (let i = 0; i < d.length; i += 4) { const al = d[i + 3]; if (!al) continue; const hd = Math.min(1, Math.max(0, (thr - d[i]) / 8)); if (hd <= 0) continue; o[i] = INK[0]; o[i + 1] = INK[1]; o[i + 2] = INK[2]; o[i + 3] = al * hd; }
+    c.putImageData(out, 0, 0); bm.last = thr;
+  }
+  ctx.drawImage(bm.cv, x, y, w, h);
+};
+// pastille de papier sous les trois lignes de légende d'un roi (le nom reste lisible sur les branches de prunier)
+const plaqueRoi = (ctx: CanvasRenderingContext2D, cx: number, a: number) => {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a * 0.82; ctx.fillStyle = 'rgb(246,241,231)'; ctx.beginPath(); ctx.roundRect(cx - 290, 748, 580, 196, 18); ctx.fill(); ctx.restore();
+};
+// cartouche arrondi d'un portrait 白描 (papier clair, liseré vermillon) : (w, h) la taille, crop = [u, v, H] le point de
+// l'image (fractions) placé au centre et la hauteur de l'image en px ; image manquante : emplacement en pointillés
+const medaillon = (ctx: CanvasRenderingContext2D, key: keyof typeof IMGSRC, cx: number, cy: number, a: number, p: number, titre: string,
+  w: number, h: number, crop: [number, number, number]) => {
+  if (a <= 0) return;
+  const rr = (m: number) => { ctx.beginPath(); ctx.roundRect(cx - w / 2 + m, cy - h / 2 + m, w - 2 * m, h - 2 * m, 46 - m); };
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.shadowColor = 'rgba(40,30,20,0.28)'; ctx.shadowBlur = 30; ctx.fillStyle = '#f6f0e4'; rr(0); ctx.fill(); ctx.shadowBlur = 0;
+  if (!IMG[key]) {
+    ctx.strokeStyle = rgb(VER, 0.6); ctx.lineWidth = 4; ctx.setLineDash([16, 12]); rr(14); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = '600 40px ShuimoLatin'; ctx.fillStyle = '#5e5044'; ctx.textAlign = 'center'; ctx.fillText(titre, cx, cy - 6); ctx.font = '34px ShuimoLatin'; ctx.fillText('白描 à fournir', cx, cy + 40);
+    ctx.restore(); return;
+  }
+  ctx.strokeStyle = rgb(VER, 0.75); ctx.lineWidth = 4; rr(14); ctx.stroke(); ctx.clip();
+  const [u, v, H] = crop, W2 = H * 1376 / 768;
+  drawBaimiao(ctx, key, p, cx - u * W2, cy - v * H, W2, H);
+  ctx.restore();
+};
+
 // glyphe réel : l'homme à l'encre (ou en azurite selon man), la marque en vermillon selon mark
 const manCol = (man: number, mark: number, dim = 0) => (c: string) => rgb(mixc(c === 'marque' ? mixc(INK, VER, mark) : mixc(INK, AZ, man), GREY, dim));
 
@@ -222,7 +312,7 @@ const Senses: React.FC = () => {
         return (
           <div key={i} style={{ transform: `scale(${1 + 0.16 * p})`, transformOrigin: '50% 0', padding: '8px 18px', borderRadius: 12,
             border: `3px ${lit > 0.5 ? 'solid' : 'dashed'} ${rgb(VER, 0.35 + 0.6 * lit)}`, background: `rgba(246,241,231,${0.55 + 0.4 * lit})`,
-            boxShadow: p > 0 ? `0 0 ${24 * p}px ${rgb(VER, 0.6)}` : 'none', fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 34, whiteSpace: 'nowrap', color: inkCss }}>
+            boxShadow: p > 0 ? `0 0 ${24 * p}px ${rgb(VER, 0.6)}` : 'none', fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 36, whiteSpace: 'nowrap', color: inkCss }}>
             <span style={{ color: rgb(VER) }}>{i + 1}</span>
             <span style={{ opacity: lit, marginLeft: 10 * lit, display: 'inline-block', maxWidth: 260 * lit, overflow: 'hidden', verticalAlign: 'bottom' }}>· {s}</span>
           </div>
@@ -520,13 +610,11 @@ const Opening: React.FC = () => {
         }} />
       </Cam>
       {/* compteur d'années et nom de l'écriture, à chaque forme */}
-      <div style={{ position: 'absolute', width: '100%', top: 860, textAlign: 'center', opacity: win(t, C0, h0 + 0.3, 0.15) }}>
+      <div style={{ position: 'absolute', width: '100%', top: 790, textAlign: 'center', opacity: win(t, C0, h0 + 0.3, 0.15) }}>
         <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 92, color: rgb(VER), lineHeight: 1 }}>{CASC[idx][3]}</div>
-        <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontWeight: 600, fontSize: 40, color: '#4a3f36' }}>{`${CASC[idx][1]} · ${CASC[idx][2]}`}</div>
+        <div style={{ fontFamily: 'ShuimoLatin, ShuimoLegende', fontWeight: 600, fontSize: 46, color: '#4a3f36' }}>{`${CASC[idx][1]} · ${CASC[idx][2]}`}</div>
       </div>
-      <Caption text="un homme, debout, de face" a={win(t, h0 + 0.3, tat - 0.2, 0.4)} y={900} size={50} />
-      <Caption text="et sur la poitrine… une marque" a={win(t, tat + 0.4, pr - 0.2, 0.4)} y={985} size={50} />
-      <Caption text="王 · roi" a={win(t, pr + 0.4, com + 0.4, 0.4)} y={985} size={50} />
+      <Caption text="王 · roi" a={win(t, pr + 0.4, com + 0.4, 0.4)} y={890} size={50} />
     </AbsoluteFill>
   );
 };
@@ -544,8 +632,8 @@ const Shang: React.FC = () => {
           fromLandscape={{ seed: 5, since: pun - 1 }} toLandscape={{ seed: 9, until: A('b03') + 2 }}>
           <Draw draw={(ctx, tt, E) => {
             // l'os oraculaire (photo), puis le signe passe à l'encre sur le papier
-            const plate = win(tt, os - 0.6, R1 + 0.2, 0.7) * (1 - seg(tt, pun, pun + 1.2));
-            if (bone && plate > 0) coverImg(ctx, bone, plate, 1.0 + 0.04 * seg(tt, os - 0.6, pun));
+            const plate = win(tt, A2 + 0.5, R1 + 0.2, 1.1) * (1 - seg(tt, pun, pun + 1.2));
+            if (bone && plate > 0) coverImg(ctx, bone, plate, 1.0 + 0.05 * seg(tt, A2 + 0.5, pun));
             const reveal = seg(tt, os + 0.3, os + 1.5);
             if (reveal <= 0 || tt > R1E + 0.1) return;
             const dry = seg(tt, pun - 0.4, pun + 0.8); // le signe passe du blanc (estampage) à l'encre
@@ -566,12 +654,9 @@ const Shang: React.FC = () => {
       </Cam>
       <Label x={1290} y={300} zh="大" text="bras ouverts" color={AZ} a={win(t, bras + 0.2, mq - 0.2, 0.4)} />
       <Label x={1290} y={480} zh="×" text="une marque" color={VER} a={win(t, mq + 0.2, cx - 0.1, 0.4)} />
-      <Caption text={['une croix', 'un V', 'un nœud, parfois un cœur'][t < cx + 0.8 ? 0 : t < cx + 1.7 ? 1 : 2]} a={win(t, cx, cx + 3.0, 0.3)} y={900} size={50} />
-      <Caption text="pas une punition : un honneur" a={win(t, pun + 0.2, rois - 0.2, 0.5)} y={960} size={46} />
-      <Caption text="文丁 · Wen Ding, roi défunt de la dynastie Shang, honoré du nom de 文" a={win(t, rois + 0.2, sens - 0.3, 0.5)} y={960} size={42} />
-      <Caption text="premier sens : la marque sur la peau" a={win(t, sens + 0.2, R1 - 0.2, 0.5)} y={960} size={50} />
-      <EraTag zh="商" name="DYNASTIE SHANG" dates="v. 1200 av. J.-C." a={win(t, A2 + 0.3, R1 + 0.4, 0.8)} />
-      <EraTag zh="周" name="DYNASTIE ZHOU" dates="XIe siècle av. J.-C." a={tagIn(TR1, t) * (1 - seg(t, R1E + 1.5, R1E + 2.2))} />
+      <Caption text="文丁 · Wen Ding, roi défunt des Shang" a={win(t, rois + 0.2, sens - 0.3, 0.5)} y={900} size={48} />
+      <EraTag plate {...cartouche('shang', 'Anyang · v. 1200 av. J.-C.')} a={win(t, A2 + 0.3, R1 + 0.4, 0.8)} />
+      <EraTag {...cartouche('zhou')} a={tagIn(TR1, t) * (1 - seg(t, R1E + 1.5, R1E + 2.2))} />
     </AbsoluteFill>
   );
 };
@@ -620,46 +705,48 @@ const Zhou: React.FC = () => {
           if (wa <= 0) return;
           const split = ease(seg(tt, fils - 0.2, fils + 0.8)), wu = seg(tt, fils + 0.2, fils + 1.0);
           const rouge = seg(tt, at('b03', 'caractere') - 0.1, at('b03', 'caractere') + 0.5), wang = 1 - seg(tt, duo - 0.3, duo + 0.2);
-          const xw = 960 - 330 * split, xu = 960 + 330;
-          E.text(ctx, '文', xw, 470, { font: 'Kai', size: 330, color: rgb(mixc(INK, VER, rouge)), alpha: wa, glow: 20 * rouge, glowColor: rgb(VER, 0.5) });
-          E.text(ctx, '王', xw, 790, { font: 'Kai', size: 200, color: inkCss, alpha: wa * wang });
+          // portraits 白描 : affichés seulement pendant que la voix cite le roi (Wen : « Un roi en fait son nom » ; Wu : « Son fils… le
+          // guerrier »), ni avant ni après ; 文 et 武 prennent la place des portraits quand ils partent
+          const pw = win(tt, roi - 0.1, fils - 0.1, 0.4), pu = win(tt, fils + 0.1, duo - 0.3, 0.4);
+          const xp = 762 - 532 * split, xw = 1157 - 517 * split, xu = 1110 + 170 * seg(tt, duo - 0.4, duo + 0.2), xq = 1620, yy = 470;
+          medaillon(ctx, 'wen', xp, yy + 20, wa * pw, clamp((tt - (roi + 0.2)) / 2.8), 'Roi Wen', 380, 470, [0.51, 0.47, 540]);
+          plaqueRoi(ctx, xp, wa * pw * seg(tt, roi + 0.5, roi + 1.0));
+          E.text(ctx, '文王', xp, 790, { font: 'Kai', size: 64, color: inkCss, alpha: wa * pw * seg(tt, roi + 0.6, roi + 1.1) });
+          E.text(ctx, "le roi Wen · « l'orné »", xp, 852, { font: 'Cormorant', size: 52, weight: 700, color: '#3b322b', alpha: wa * pw * seg(tt, roi + 0.7, roi + 1.2) });
+          E.text(ctx, 'portrait imaginé', xp, 912, { font: 'Cormorant', size: 40, weight: 600, color: '#5b4f44', alpha: wa * pw * seg(tt, roi + 0.9, roi + 1.4) });
+          E.text(ctx, '文', xw, yy, { font: 'Kai', size: 330, color: rgb(mixc(INK, VER, rouge)), alpha: wa * seg(tt, roi - 0.1, roi + 0.5), glow: 20 * rouge, glowColor: rgb(VER, 0.5) });
+          E.text(ctx, '王', xw, 790, { font: 'Kai', size: 200, color: inkCss, alpha: wa * wang * seg(tt, roi - 0.1, roi + 0.5) });
           if (wu > 0) {
-            E.text(ctx, '武', xu, 470, { font: 'Kai', size: 330, color: inkCss, alpha: wa * wu });
+            E.text(ctx, '武', xu, yy, { font: 'Kai', size: 330, color: inkCss, alpha: wa * wu });
             E.text(ctx, '王', xu, 790, { font: 'Kai', size: 200, color: inkCss, alpha: wa * wu * wang });
+            medaillon(ctx, 'wu', xq, yy + 20, wa * pu, clamp((tt - (fils + 0.25)) / 2.8), 'Roi Wu', 560, 470, [0.49, 0.5, 455]);
+            plaqueRoi(ctx, xq, wa * pu * seg(tt, fils + 0.7, fils + 1.2));
+            E.text(ctx, '武王', xq, 790, { font: 'Kai', size: 64, color: inkCss, alpha: wa * pu * seg(tt, fils + 0.8, fils + 1.3) });
+            E.text(ctx, 'le roi Wu · « le guerrier »', xq, 852, { font: 'Cormorant', size: 52, weight: 700, color: '#3b322b', alpha: wa * pu * seg(tt, fils + 0.9, fils + 1.4) });
+            E.text(ctx, 'portrait imaginé · v. 1046 av. J.-C.', xq, 912, { font: 'Cormorant', size: 40, weight: 600, color: '#5b4f44', alpha: wa * pu * seg(tt, fils + 1.1, fils + 1.6) });
           }
           E.text(ctx, 'le raffinement', xw, 760, { font: 'Cormorant', size: 76, weight: 700, color: rgb(VER), alpha: wa * seg(tt, raff - 0.2, raff + 0.3) });
           E.text(ctx, 'la force', xu, 760, { font: 'Cormorant', size: 76, weight: 700, color: inkCss, alpha: wa * seg(tt, force - 0.2, force + 0.3) });
         }} />
       </Cam>
-      <MapPanel from={A3 - 0.4} to={mapTo} draw={(ctx, u, E, tt) => {
-        const z = ease(seg(tt, A3, taibo + 1.5)), v = { lon: 113.8 + 0.4 * z, lat: 33.0 - 0.2 * z, k: 62 + 18 * z };
-        const vb = { lon: 113.8, lat: 33.0, k: 60 };
-        E.mapLayer(ctx, v, vb, 90, 'wen_taibo', (c: CanvasRenderingContext2D, w: any) => E.drawMap(c, 0, w, { paper: true, rivers: 1, deco: false }));
-        E.mapDeco(ctx, { paper: true });
-        E.marker(ctx, tt, v, ZHOUYUAN, 'Zhou', 'vallée de la Wei', seg(tt, A3 + 0.2, A3 + 0.8), '#c0392b', -1);
-        // la fuite vers le sud-est, tracée au pinceau (pointillé), jusqu'au bas Yangzi (futur royaume de Wu)
-        const k = seg(tt, taibo - 0.2, mapTo - 0.6) * (FUITE.length - 1);
-        if (k > 0) {
-          ctx.save(); ctx.strokeStyle = rgb(VER, 0.85); ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.setLineDash([18, 14]);
-          ctx.beginPath();
-          for (let i = 0; i <= Math.min(Math.floor(k), FUITE.length - 1); i++) { const q = E.proj(v, FUITE[i]); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }
-          const i0 = Math.floor(k), f = k - i0;
-          if (i0 < FUITE.length - 1 && f > 0) {
-            const a0 = FUITE[i0], a1 = FUITE[i0 + 1];
-            const q = E.proj(v, [a0[0] + (a1[0] - a0[0]) * f, a0[1] + (a1[1] - a0[1]) * f]); ctx.lineTo(q[0], q[1]);
-          }
-          ctx.stroke(); ctx.restore();
-        }
-        E.marker(ctx, tt, v, WU, 'Taibo', 'bas Yangzi (futur Wu)', seg(tt, mapTo - 1.0, mapTo - 0.6), '#348462', 1);
+      <MapPanel from={A3 - 0.4} to={clipEnd() - CLIP_SRC_SECONDS / CLIP_RATE - 0.6} draw={(ctx, u, E, tt) => {
+        // carte peinte de la bibliothèque (chine_centre_nord) : lente poussée vers le sud-est, d'où Taibo part du haut de la Wei
+        // vers le bas Yangzi (Shiji, 吳太伯世家 : il s'enfuit chez les Jingman et s'appelle 句吳)
+        const v = carte('chine_centre_nord').vue, zp = E.proj(v, ZHOUYUAN), wp = E.proj(v, WU);
+        const z = 1 + 0.09 * ease(seg(tt, A3, mapTo)), cx0 = (zp[0] + wp[0]) / 2, cy0 = (zp[1] + wp[1]) / 2;
+        ctx.save(); ctx.translate(cx0, cy0); ctx.scale(z, z); ctx.translate(-cx0, -cy0);
+        fondCarte(ctx, E, 'chine_centre_nord');
+        lieu(ctx, E, zp, '周', 'Zhou · vallée de la Wei', seg(tt, A3 + 0.2, A3 + 0.8), { cote: 'g', arrivee: seg(tt, A3 + 0.2, A3 + 0.5), fond: true });
+        routePinceau(ctx, zp, wp, ease(seg(tt, taibo - 0.2, mapTo - 1.0)), seg(tt, taibo - 0.3, taibo), { courbe: -0.14, marge0: 40, marge1: 70, largeur: 9, seed: 5 });
+        capitale(ctx, E, wp, '吳', 'Taibo', 'futur royaume de Wu', tt, mapTo - 1.6, [mapTo - 1.2, mapTo - 0.3]);
+        ctx.restore();
+        creditCarte(ctx, E, 'chine_centre_nord');
+        void u;
       }} />
-      <ClipShot src="taibo" from={reg - 0.8} len={br - 0.3 - (reg - 0.8)} entry="nuages" inDur={2.4} />
-      <Caption text="Taibo 太伯, l'aîné, s'enfuit vers le sud et se fait tatouer (Shiji, 吳太伯世家)" a={win(t, taibo + 0.2, mapTo - 0.1, 0.5)} y={980} size={38} />
-      <Caption text="inscription fondue dans un vase gui (師害簋) : un vrai cœur sur la poitrine" a={win(t, coeur + 0.3, orne - 0.2, 0.5)} y={980} size={44} />
-      <Caption text="os (Shang) → bronze (Zhou) : la marque devient un ornement" a={win(t, orne + 0.4, sens - 0.2, 0.5)} y={980} size={44} />
-      <Caption text="deuxième sens : l'ornement, le raffinement" a={win(t, sens + 0.2, roi - 0.3, 0.5)} y={980} size={50} />
-      <Caption text="文王 · le roi Wen, comme notre caractère : « l'orné »" a={win(t, roi + 0.4, fils - 0.2, 0.5)} y={980} size={48} />
-      <Caption text="武王 · le roi Wu, son fils, renverse la dynastie Shang (v. 1046 av. J.-C.)" a={win(t, fils + 1.0, duo - 0.3, 0.5)} y={980} size={42} />
-      <EraTag zh="周" name="DYNASTIE ZHOU" dates="XIe siècle av. J.-C." a={seg(t, A3 - 0.6, A3 + 0.2) * (1 - seg(t, A('b04') - 0.6, A('b04')))} />
+      <ClipShot src="taibo" from={clipEnd() - CLIP_SRC_SECONDS / CLIP_RATE - 1.2} len={0} entry="nuages" inDur={1.2} speed={CLIP_RATE} />
+      <Caption text="簋 gui · vase rituel en bronze (dons de nourriture aux ancêtres)" a={win(t, br - 0.1, coeur - 0.3, 0.4)} y={900} size={46} />
+      <Caption text="vase gui 師害簋 · un vrai cœur sur la poitrine" a={win(t, coeur + 0.3, orne - 0.2, 0.5)} y={940} size={46} />
+      <EraTag {...cartouche('zhou', 'XIe siècle av. J.-C.')} a={seg(t, A3 - 0.6, A3 + 0.2) * (1 - seg(t, A('b04') - 0.6, A('b04')))} />
     </AbsoluteFill>
   );
 };
@@ -705,13 +792,9 @@ const Bambou: React.FC = () => {
           }} />
         </TimeScrollStage>
       </Cam>
-      <Caption text="les motifs que l'homme trace le plus : l'écriture" a={win(t, ecr - 0.2, bam - 0.2, 0.4)} y={1000} size={44} />
-      <Caption text="des traits qui se croisent : eux aussi, des 文" a={win(t, bam + 0.3, sens - 0.1, 0.4)} y={1000} size={46} />
-      <Caption text="troisième sens : l'écriture" a={win(t, sens + 0.2, quitte - 0.2, 0.4)} y={1000} size={50} />
-      <Caption text="la marque quitte la poitrine" a={win(t, quitte + 0.3, chuT - 0.1, 0.4)} y={1000} size={46} />
-      <Caption text="royaume de Chu : le cœur 心 sort du corps et se pose à côté (上博·孔子詩論)" a={win(t, sort + 0.4, P4 - 0.2, 0.4)} y={1000} size={40} />
-      <EraTag zh="楚" name="ROYAUME DE CHU" dates="Royaumes combattants · IVe s. av. J.-C." a={win(t, chuT - 0.3, P4 + 0.4, 0.5)} />
-      <EraTag zh="秦" name="DYNASTIE QIN" dates="221 av. J.-C. · le petit sceau" a={tagIn(TR2, t) * (1 - seg(t, P4E + 1.5, P4E + 2.2))} />
+      <Caption text="le cœur 心 sort du corps (上博·孔子詩論)" a={win(t, sort + 0.4, P4 - 0.2, 0.4)} y={900} size={46} />
+      <EraTag {...cartouche('royaumes', 'royaume de Chu · IVe s. av. J.-C.')} a={win(t, chuT - 0.3, P4 + 0.4, 0.5)} />
+      <EraTag {...cartouche('qin', '221 av. J.-C. · le petit sceau')} a={tagIn(TR2, t) * (1 - seg(t, P4E + 1.5, P4E + 2.2))} />
     </AbsoluteFill>
   );
 };
@@ -727,8 +810,8 @@ const Qin: React.FC = () => {
         <Landscape seed={3} from={P4E - 0.5} to={A5 + 1} move="still" mood="brume" faint={0.5} />
         <Draw draw={(ctx, tt, E) => {
           const o = { x: 960, y: 520, size: 620 };
-          const s1 = seg(tt, sc - 0.4, sc + 1.4) * (1 - seg(tt, scr, scr + 0.5));
-          if (s1 > 0) E.drawRealGlyph(ctx, 'wen_xiaozhuan', { ...o, reveal: () => seg(tt, sc - 0.4, sc + 1.4), opacity: 1 - seg(tt, scr, scr + 0.5), color: () => inkCss });
+          const s1 = seg(tt, Math.min(sc - 0.4, P4E + 0.4), sc + 1.4) * (1 - seg(tt, scr, scr + 0.5));
+          if (s1 > 0) E.drawRealGlyph(ctx, 'wen_xiaozhuan', { ...o, reveal: () => seg(tt, Math.min(sc - 0.4, P4E + 0.4), sc + 1.4), opacity: 1 - seg(tt, scr, scr + 0.5), color: () => inkCss });
           // torse vide : un cercle pointillé vermillon, vide
           const hv = win(tt, vide + 0.1, scr, 0.4);
           if (hv > 0) {
@@ -749,12 +832,11 @@ const Qin: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="petit sceau 小篆 : un corps symétrique, les jambes croisées, le torse vide" a={win(t, sc + 0.6, scr - 0.2, 0.5)} y={960} size={42} />
-      <Caption text="lattes des scribes Qin (睡虎地) → écriture des clercs Han (熹平石經)" a={win(t, scr + 0.4, q4 - 0.1, 0.5)} y={960} size={40} />
-      <div style={{ position: 'absolute', right: 180, top: 380, fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 120, color: rgb(VER), opacity: win(t, q4 - 0.2, ne, 0.3) }}>{Math.max(1, Math.min(4, 1 + Math.floor((t - q4) / 0.25)))}</div>
-      <Caption text="4 traits : le 文 d'aujourd'hui" a={win(t, q4 + 0.2, A5 - 0.3, 0.4)} y={960} size={48} />
-      <EraTag zh="秦" name="DYNASTIE QIN" dates="221 av. J.-C. · le petit sceau" a={seg(t, P4E - 0.6, P4E) * (1 - seg(t, scr + 0.3, scr + 0.9))} />
-      <EraTag zh="漢" name="DYNASTIE HAN" dates="l'écriture des clercs" a={seg(t, scr + 0.6, scr + 1.2) * (1 - seg(t, A5 - 0.5, A5))} />
+      <Caption text="小篆 · le petit sceau (說文)" a={win(t, sc + 0.6, scr - 0.2, 0.5)} y={900} size={46} />
+      <Caption text="scribes Qin (睡虎地) → clercs Han (熹平石經)" a={win(t, scr + 0.4, q4 - 0.1, 0.5)} y={900} size={46} />
+      <div style={{ position: 'absolute', right: 180, top: 380, fontFamily: 'ShuimoLatin', fontWeight: 700, fontSize: 120, color: rgb(VER), opacity: win(t, q4 - 0.2, ne + 0.6, 0.3) }}>{Math.max(1, Math.min(4, 1 + Math.floor((t - q4) / 0.25)))}</div>
+      <EraTag {...cartouche('qin', '221 av. J.-C. · le petit sceau')} a={seg(t, P4E - 0.6, P4E) * (1 - seg(t, scr + 0.3, scr + 0.9))} />
+      <EraTag {...cartouche('han', "l'écriture des clercs")} a={seg(t, scr + 0.6, scr + 1.2) * (1 - seg(t, A5 - 0.5, A5))} />
     </AbsoluteFill>
   );
 };
@@ -778,8 +860,9 @@ const Culture: React.FC = () => {
     <AbsoluteFill style={{ opacity: seg(t, T_CULT, T_CULT + 0.6) }}>
       <Cam keys={[[T_CULT, 960, 540, 1.02], [mot - 0.2, 960, 500, 1.1, 1.0], [tr - 0.1, 1120, 480, 1.22, 1.0], [hom, 960, 540, 1.04, 1.0], [R3 - 0.6, 960, 540, 1, 0.6]]}
         punch={[mot + 0.3, tr + 0.2, sens + 0.2]} calm={[[R3 - 0.6, R3E + 0.4]]}>
-        <TimeScrollStage cfg={TR3} under={<><Paper /><Landscape seed={22} from={T_CULT - 0.5} to={sens + 1} move="rise" mood="aube" faint={0.6} /></>}
-          fromLandscape={{ seed: 22, since: sens - 1, mood: 'aube' }} toLandscape={{ seed: 30, until: A('b06') + 2, mood: 'aube' }}>
+        <Paper />
+        <Landscape seed={22} from={T_CULT - 0.5} to={R3 + 0.8} move="still" mood="aube" faint={0.6} />
+        <>
           <Draw draw={(ctx, tt, E) => {
             // une lettre (文, vermillon) plutôt que la force (武, gris)
             const lw = win(tt, simple - 0.4, mot + 0.1, 0.5);
@@ -805,17 +888,11 @@ const Culture: React.FC = () => {
               }
             }
           }} />
-        </TimeScrollStage>
+        </>
       </Cam>
-      <Caption text="une simple lettre… plutôt que la force" a={win(t, simple + 0.2, mot - 0.3, 0.5)} y={920} size={46} />
-      <Caption text="文化 · wénhuà : un mot de la dynastie Han (劉向, 說苑, Ier s. av. J.-C.)" a={win(t, mot + 0.3, tr - 0.2, 0.5)} y={920} size={42} />
-      <Caption text="化 · huà · transformer" a={win(t, tr, hom + 0.4, 0.4)} y={920} size={54} />
-      <Caption text="…plutôt que par les armes" a={win(t, armes, elv - 0.1, 0.4)} y={920} size={48} />
-      <Caption text="élever les esprits, au lieu de soumettre les corps" a={win(t, elv, app + 0.2, 0.4)} y={920} size={48} />
-      <Caption text="文化 · wénhuà · la culture" a={win(t, app + 0.5, sens - 0.1, 0.4)} y={920} size={56} />
-      <Caption text="quatrième sens : la culture" a={win(t, sens + 0.2, R3 - 0.2, 0.4)} y={920} size={54} />
-      <EraTag zh="漢" name="DYNASTIE HAN" dates="Ier s. av. J.-C." a={win(t, T_CULT, R3 + 0.4, 0.5)} />
-      <EraTag zh="今" name="AUJOURD'HUI" dates="2026" a={tagIn(TR3, t) * (1 - seg(t, R3E + 1.5, R3E + 2.2))} />
+      <Caption text="文化 · wénhuà · 劉向, 說苑 (Ier s. av. J.-C.)" a={win(t, mot + 0.3, tr - 0.2, 0.5)} y={900} size={46} />
+      <Caption text="化 · huà · transformer" a={win(t, tr, hom + 0.4, 0.4)} y={900} size={54} />
+      <EraTag {...cartouche('han', 'Ier s. av. J.-C.')} a={win(t, T_CULT, R3 + 0.4, 0.5)} />
     </AbsoluteFill>
   );
 };
@@ -875,7 +952,7 @@ const Today: React.FC = () => {
       <Cam keys={[[A6 - 0.3, 960, 540, 1.02], [A6 + 0.2, 960, 500, 1.12, 2.0], [fo - 0.9, 960, 540, 1.02, 0.9], [nait + 0.4, 960, 500, 1.1, 1.2], [A7 - 0.5, 960, 540, 1.02, 1.0], [cote, 960, 520, 1.0, 1.0], [autre, 780, 520, 1.15, 1.2], [dit - 0.2, 750, 580, 1.3, 0.8]]}
         punch={[at('b06', 'tete'), at('b06', 'bras'), at('b06', 'jambes'), at('b06', 'marque'), nait, dit + 0.3]}>
         <Paper />
-        <Landscape seed={30} from={A6 - 1.5} to={END + 0.5} move="pan" mood="aube" faint={0.6} />
+        <Landscape seed={30} from={R3E - 0.3} to={END + 0.5} move="pan" mood="aube" faint={0.6} />
         <Draw draw={(ctx, tt, E) => {
           const syn = win(tt, fo - 0.8, nait + 0.8, 0.6);
           if (syn > 0) drawBand(ctx, E, tt, syn);
@@ -902,15 +979,12 @@ const Today: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="un seul dessin, dans toutes les formes : un homme de face" a={win(t, fo, at('b06', 'tete') - 0.1, 0.4)} y={1010} size={40} />
-      <Caption text="wén · la marque, l'ornement, l'écriture, la culture" a={win(t, nait + 0.6, chi - 0.2, 0.4)} y={880} size={50} />
       {/* le nom des écritures : 甲骨文 (os), 金文 (bronzes), 文字 (caractères) — le 文 de chaque mot en vermillon */}
-      <Caption text="jusque dans le nom des écritures" a={win(t, chi - 0.2, jg - 0.3, 0.4)} y={880} size={50} />
-      <div style={{ position: 'absolute', width: '100%', top: 800, display: 'flex', justifyContent: 'center', gap: 120, fontFamily: 'ShuimoKai', fontSize: 84, color: inkCss }}>
+      <div style={{ position: 'absolute', width: '100%', top: 780, display: 'flex', justifyContent: 'center', gap: 120, fontFamily: 'ShuimoKai', fontSize: 84, color: inkCss }}>
         {([['甲骨文', "l'écriture des os", jg], ['金文', 'celle des bronzes', jw], ['文字', 'les caractères', wz]] as [string, string, number][]).map(([w, fr, t0]) => (
           <span key={w} style={{ opacity: win(t, t0 - 0.6, A7 - 0.3) }}>
             {[...w].map((ch, k) => <span key={k} style={{ color: ch === '文' ? rgb(VER) : inkCss }}>{ch}</span>)}
-            <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, textAlign: 'center' }}>{fr}</div>
+            <div style={{ fontFamily: 'ShuimoLatin, ShuimoLegende', fontSize: 46, textAlign: 'center' }}>{fr}</div>
           </span>
         ))}
       </div>
@@ -920,29 +994,48 @@ const Today: React.FC = () => {
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 96, fontWeight: 600, color: inkCss }}>wén</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 44, color: rgb(VER) }}>4 traits</div>
       </div>
-      <Caption text="Avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau." a={win(t, A7 + 0.1, cote - 0.2, 0.6)} y={900} size={46} />
+      <Caption text="Avant d'écrire sur l'os, le bronze et le papier, les hommes se sont écrits sur la peau." a={win(t, A7 + 0.1, cote - 0.2, 0.6)} y={890} size={46} />
       <Caption text="语文 · yǔwén · le cours de chinois" a={win(t, yw + 0.3, autre - 0.1, 0.4)} y={880} size={50} />
-      <Caption text="la parole, avant l'écriture" a={win(t, dit + 0.3, END + 0.1, 0.4)} y={900} size={48} />
+      <EraTag {...cartouche('aujourdhui', '2026')} a={r3TagIn(R3C, t) * (1 - seg(t, R3E + 1.5, R3E + 2.2))} />
     </AbsoluteFill>
   );
 };
 
-const EndCard: React.FC = () => (
-  <AbsoluteFill style={{ background: '#1d1915', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24 }}>
-    <div style={{ width: 120, height: 120, background: rgb(VER, 0.95), borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 52, color: '#f6eee0', writingMode: 'vertical-rl' }}>墨道</div>
-    <div style={{ fontFamily: 'ShuimoLatin', fontSize: 40, letterSpacing: 8, color: '#efe6d6' }}>LA VOIE DE L'ENCRE</div>
-    <div style={{ fontFamily: 'ShuimoLatin, ShuimoKai', fontSize: 34, color: '#b9ab98' }}>prochain caractère : 语</div>
-  </AbsoluteFill>
-);
+// écran de fin (≈ 10 s) sur papier : la marque et le prochain caractère dans le tiers gauche ; les deux tiers droits
+// restent libres pour les éléments de fin YouTube
+const EndCard: React.FC = () => {
+  const t = useT(), a = seg(t, END, END + 0.8);
+  return (
+    <AbsoluteFill style={{ opacity: a }}>
+      <Paper />
+      <Landscape seed={30} from={END - 1} to={WEN_SECONDS + 1} move="still" mood="aube" faint={0.35} />
+      <div style={{ position: 'absolute', left: 120, top: 150, width: 520, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 22 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 26 }}>
+          <div style={{ width: 100, height: 150, background: rgb(VER, 0.95), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 40, letterSpacing: 4, color: '#f6eee0', writingMode: 'vertical-rl', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>墨之道</div>
+          <div>
+            <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss, lineHeight: 1.15 }}>LA VOIE<br />DE L'ENCRE</div>
+            <div style={{ marginTop: 8, fontFamily: 'ShuimoLatin', fontSize: 38, fontStyle: 'italic', color: '#5e5044' }}>Mò zhī dào</div>
+          </div>
+        </div>
+        <div style={{ marginTop: 70, fontFamily: 'ShuimoLatin', fontSize: 46, color: '#5e5044', opacity: seg(t, END + 0.8, END + 1.6) }}>Prochain caractère</div>
+        <div style={{ fontFamily: 'ShuimoKai', fontSize: 260, lineHeight: 1, color: inkCss, opacity: seg(t, END + 1.2, END + 2.2) }}>语</div>
+        <div style={{ fontFamily: 'ShuimoLatin', fontSize: 60, fontWeight: 600, color: '#3b322b', opacity: seg(t, END + 1.6, END + 2.6) }}>yǔ · la parole</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
 
-const Win: React.FC<{ from: number; to: number; children: React.ReactNode }> = ({ from, to, children }) => {
+const Win: React.FC<{ from: number; to: number; fade?: number; children: React.ReactNode }> = ({ from, to, fade = 0, children }) => {
   const t = useT();
-  return t >= from && t < to ? <>{children}</> : null;
+  if (t < from - fade || t >= to) return null;
+  return fade > 0 ? <AbsoluteFill style={{ opacity: ease(seg(t, from - fade, from)) }}>{children}</AbsoluteFill> : <>{children}</>;
 };
 
 // bruitages discrets (ElevenLabs text-to-sound, episodes/wen/audio/sfx_*.wav) : liste dans episode.json « bruitages »,
 // résolue en temps absolus par reperes.py (_ligne.bruitages) — la même liste sert au mixage de bande_son.py
 const SFX = (L.bruitages ?? []) as [string, number, number][];
+// coups de sceau forts : le cadre tremble (4 px, 0,3 s)
+const SEALS = SFX.filter(([n, , v]) => n === 'sceau' && v >= 0.5).map(([, tt]) => tt);
 
 export const WenV1: React.FC = () => {
   const ready = useSetup();
@@ -962,24 +1055,32 @@ export const WenV1: React.FC = () => {
   };
   return (
     <AbsoluteFill style={{ background: '#f3eee4' }}>
-      {ready && <>
-        <Win from={0} to={A('b02') - 0.01}><Mosaic /><Opening /></Win>
-        <Win from={A('b02') - 0.01} to={R1E + 0.05}><Shang /></Win>
+      {ready && <Shake impacts={SEALS}>
+        <Win from={0} to={A('b02') - 0.1}><Mosaic /><Opening /></Win>
+        <Win fade={0.8} from={A('b02') - 0.1} to={R1E + 0.05}><Shang /></Win>
         <Win from={R1E + 0.05} to={A('b04') - 0.5}><Zhou /></Win>
-        <Win from={A('b04') - 0.5} to={P4E + 0.05}><Bambou /></Win>
+        <Win fade={0.8} from={A('b04') - 0.5} to={P4E + 0.05}><Bambou /></Win>
         <Win from={P4E + 0.05} to={T_IN + 1.2}><Qin /></Win>
         <Tiying />
-        <EraTag zh="漢" name="DYNASTIE HAN" dates="167 av. J.-C. · l'empereur Wen" a={seg(t, T_IN + 0.4, T_IN + 1.0) * (1 - seg(t, A('b05') + 3.5, A('b05') + 4.1))} />
-        <Win from={T_CULT} to={R3E + 0.05}><Culture /></Win>
-        <Win from={R3E + 0.05} to={END}><Today /></Win>
+        <EraTag {...cartouche('han', "167 av. J.-C. · l'empereur Wen")} a={seg(t, T_IN + 0.4, T_IN + 1.0) * (1 - seg(t, A('b05') + 3.5, A('b05') + 4.1))} />
+        <Win from={T_CULT} to={R3 + 0.6}><Culture /></Win>
+        <Win from={R3 + 0.6} to={END}><Today /></Win>
         <Win from={END} to={WEN_SECONDS + 1}><EndCard /></Win>
         <Senses />
-      </>}
+      </Shake>}
+      {/* 3e rouleau (Han → aujourd'hui) en 3D, plein cadre au-dessus de la scène ; le sceau volant se pose dans le cartouche de Today */}
+      {ready && <Win from={R3 - 1.5} to={R3 + r3Seconds(R3C) + 3.5}><Rouleau3DStage cfg={R3C} /></Win>}
+      {ready && <GrainVignette />}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/wen/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
       ))}
       {clips.map(voice)}
-      <Audio src={staticFile('episodes/wen/audio/musique.wav')} volume={0.55} />
+      <Audio src={staticFile('episodes/wen/audio/musique.wav')} volume={(f) => 0.55 * (MF ? Math.max(0, Math.min(1, 1 - (f / fps - MF.debut) / 2)) : 1)} />
+      {/* musique de fin (bamboo grove) : discrète sous la dernière phrase, pleine sur l'écran de fin, puis fondu */}
+      {MF && <Sequence from={Math.round(MF.debut * fps)}><Audio src={staticFile(`musique/${MF.fichier}`)} startFrom={Math.round(MF.depart * fps)}
+        volume={(f) => { const s = f / fps, fv = MF.fin_voix - MF.debut, lg = MF.fin - MF.debut;
+          const v = s < fv ? MF.volume_voix * Math.min(1, s / MF.montee) : MF.volume_voix + (MF.volume - MF.volume_voix) * Math.min(1, (s - fv) / MF.montee);
+          return v * Math.max(0, Math.min(1, (lg - s) / MF.fondu)); }} /></Sequence>}
     </AbsoluteFill>
   );
 };

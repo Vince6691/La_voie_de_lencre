@@ -175,22 +175,73 @@ export const lavisSol = (ctx: CanvasRenderingContext2D, b: Basis, coins: V2[], a
   ctx.beginPath(); P.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))); ctx.closePath(); ctx.fill();
   ctx.restore();
 };
-export const butte3D = (ctx: CanvasRenderingContext2D, b: Basis, c: V2, r: number, a: number, col: number[]) => {
+// la butte (𠂤) : un vrai relief de terre à deux bosses, peint comme une colline de shuimo — champ de hauteurs projeté en
+// perspective et ombré selon la lumière (venue de la gauche et de l'arrière), contours et rides au pinceau (皴), points de
+// mousse (苔點), ombre et lavis au sol, et l'étendard du commandant planté au sommet de la grande bosse
+let bcv: HTMLCanvasElement | null = null;
+const BOSSES = [[-0.42, 0.05, 0.62, 0.55], [0.4, -0.08, 0.5, 0.42]]; // [x, z, rayon, hauteur] en fractions de r
+const hauteur = (r: number, x: number, z: number) => BOSSES.reduce((h, [bx, bz, br, bh]) => h + bh * r * Math.exp(-((x - bx * r) ** 2 + (z - bz * r) ** 2) / (br * r) ** 2), 0);
+export const butte3D = (ctx: CanvasRenderingContext2D, b: Basis, c: V2, r: number, a: number, col: number[], t = 0) => {
   if (a <= 0) return;
-  lavisSol(ctx, b, Array.from({ length: 24 }, (_, i): V2 => [c[0] + Math.cos((i / 24) * 6.283) * r * 1.3, c[1] + Math.sin((i / 24) * 6.283) * r * 1.1]), a * 1.6, col);
-  // deux bosses de terre (𠂤), lumière venue de la gauche : flanc éclairé ocre clair, flanc d'ombre plus dense
-  for (const [dx, dz, s, h] of [[-0.35 * r, 0.1 * r, 0.62, 0.34], [0.32 * r, -0.12 * r, 0.56, 0.3]] as number[][]) {
-    const base = proj(b, c[0] + dx, 0, c[1] + dz), top = proj(b, c[0] + dx, r * h, c[1] + dz);
-    if (!base || !top) continue;
-    const R = r * s * base.s, hh = base.y - top.y;
-    ctx.save(); ctx.globalAlpha *= a; ctx.filter = `blur(${Math.max(3, R * 0.06).toFixed(0)}px)`;
-    const g = ctx.createRadialGradient(base.x - R * 0.3, base.y - hh * 0.8, R * 0.05, base.x, base.y - hh * 0.3, R * 1.1);
-    g.addColorStop(0, `rgba(${col[0] + 40},${col[1] + 40},${col[2] + 30},0.45)`); g.addColorStop(0.55, `rgba(${col[0]},${col[1]},${col[2]},0.32)`); g.addColorStop(1, `rgba(${col[0] - 40},${col[1] - 30},${col[2] - 20},0)`);
-    ctx.fillStyle = g; ctx.beginPath();
-    ctx.moveTo(base.x - R, base.y); ctx.bezierCurveTo(base.x - R * 0.6, base.y - hh * 1.3, base.x + R * 0.4, base.y - hh * 1.3, base.x + R, base.y);
-    ctx.ellipse(base.x, base.y, R, R * 0.35 * Math.max(0.2, Math.sin(b.f[1] * -1)), 0, 0, Math.PI); ctx.fill();
-    ctx.restore();
+  // ombre portée et lavis au sol
+  lavisSol(ctx, b, Array.from({ length: 28 }, (_, i): V2 => [c[0] + 0.25 * r + Math.cos((i / 28) * 6.283) * r * 1.45, c[1] - 0.2 * r + Math.sin((i / 28) * 6.283) * r * 1.05]), a * 2.2, [60, 48, 38]);
+  ctx.save(); ctx.globalAlpha *= a;
+  // relief : facettes peintes d'un bloc dans un canevas à part (sans recouvrements ni damier), puis posées avec un léger
+  // flou ; teintes de lavis (ocre pâle au soleil, terre brune à l'ombre), bord qui se fond dans le papier
+  if (!bcv) { bcv = document.createElement('canvas'); bcv.width = 1920; bcv.height = 1080; }
+  const g = bcv.getContext('2d')!;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1920, 1080);
+  const N = 72, ext = r * 1.25, L = [-0.6, 0.75, 0.3], ll = Math.hypot(...L), cell = (2 * ext) / N;
+  const clair = [236, 206, 160], sombre = [126, 88, 60];
+  for (let j = N - 1; j >= 0; j--) {
+    for (let i = 0; i < N; i++) {
+      const x = -ext + i * cell, z = -ext + j * cell;
+      const hs = [hauteur(r, x, z), hauteur(r, x + cell, z), hauteur(r, x + cell, z + cell), hauteur(r, x, z + cell)];
+      const hm = Math.max(...hs);
+      if (hm < 0.04 * r) continue;
+      const nx = -(hs[1] - hs[0]) / cell, nz = -(hs[3] - hs[0]) / cell, nl = Math.hypot(nx, 1, nz);
+      const lum = Math.max(0, (nx * L[0] + L[1] + nz * L[2]) / (nl * ll)), k = Math.min(1, Math.max(0, (lum - 0.35) / 0.6));
+      const P = [proj(b, c[0] + x, hs[0], c[1] + z), proj(b, c[0] + x + cell, hs[1], c[1] + z), proj(b, c[0] + x + cell, hs[2], c[1] + z + cell), proj(b, c[0] + x, hs[3], c[1] + z + cell)];
+      if (P.some((p) => !p)) continue;
+      const m = (q: number) => Math.round(sombre[q] + (clair[q] - sombre[q]) * k) * 0.7 + col[q] * 0.3;
+      const edge = Math.min(1, (hm - 0.04 * r) / (0.14 * r));
+      g.globalAlpha = 0.25 + 0.7 * edge;
+      g.fillStyle = `rgb(${m(0) | 0},${m(1) | 0},${m(2) | 0})`;
+      g.beginPath(); P.forEach((p, n) => (n ? g.lineTo(p!.x, p!.y) : g.moveTo(p!.x, p!.y))); g.closePath(); g.fill();
+    }
   }
+  ctx.save(); ctx.setTransform(ctx.getTransform()); ctx.filter = 'blur(2.2px)'; ctx.drawImage(bcv, 0, 0, 1920, 1080); ctx.restore();
+  // rides au pinceau (皴) : courbes de niveau brisées sur le flanc d'ombre, plus serrées vers le bas
+  const rg = rng(19);
+  ctx.strokeStyle = 'rgba(40,32,26,0.55)'; ctx.lineCap = 'round';
+  for (const [bx, bz, br, bh] of BOSSES) {
+    for (const lev of [0.18, 0.38, 0.6, 0.8]) {
+      const rad = br * r * Math.sqrt(-Math.log(lev)), y = lev * bh * r;
+      for (let s = 0; s < 3; s++) {
+        const a0 = 0.6 + s * 0.9 + rg() * 0.4, a1 = a0 + 0.5 + rg() * 0.5;
+        ctx.beginPath();
+        for (let q = 0; q <= 12; q++) { const an = a0 + ((a1 - a0) * q) / 12, p = proj(b, c[0] + bx * r + Math.cos(an) * rad, y, c[1] + bz * r + Math.sin(an) * rad); if (p) (q ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); }
+        const p0 = proj(b, c[0] + bx * r, y, c[1] + bz * r); ctx.lineWidth = Math.max(1, (p0?.s ?? 4) * 0.12 * (1 - lev * 0.5)); ctx.stroke();
+      }
+    }
+  }
+  // points de mousse sur les sommets
+  for (let i = 0; i < 70; i++) {
+    const [bx, bz, br] = BOSSES[i % 2], an = rg() * 6.283, d = br * r * 0.7 * Math.sqrt(rg());
+    const x = bx * r + Math.cos(an) * d, z = bz * r + Math.sin(an) * d, p = proj(b, c[0] + x, hauteur(r, x, z), c[1] + z);
+    if (!p) continue;
+    ctx.fillStyle = `rgba(34,30,26,${(0.5 + 0.4 * rg()).toFixed(2)})`; ctx.beginPath(); ctx.ellipse(p.x, p.y, 0.11 * p.s, 0.07 * p.s, rg() * 3, 0, 7); ctx.fill();
+  }
+  // l'étendard du commandant au sommet de la grande bosse
+  const [bx, bz, , bh] = BOSSES[0], base = proj(b, c[0] + bx * r, bh * r, c[1] + bz * r), top = proj(b, c[0] + bx * r, bh * r + 5, c[1] + bz * r);
+  if (base && top) {
+    ctx.strokeStyle = 'rgba(40,32,26,0.9)'; ctx.lineWidth = Math.max(1.2, base.s * 0.12); ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(top.x, top.y); ctx.stroke();
+    const w = base.s * 2.4, wv = Math.sin(t * 5);
+    ctx.fillStyle = 'rgba(170,52,32,0.92)'; ctx.beginPath(); ctx.moveTo(top.x, top.y);
+    ctx.quadraticCurveTo(top.x + w * 0.5, top.y - w * 0.12 * wv, top.x + w, top.y + w * 0.06 * wv); ctx.lineTo(top.x + w * 0.8, top.y + w * 0.3); ctx.lineTo(top.x + w, top.y + w * 0.55);
+    ctx.quadraticCurveTo(top.x + w * 0.5, top.y + w * 0.62 - w * 0.12 * wv, top.x, top.y + w * 0.6); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
 };
 export const empreintes3D = (ctx: CanvasRenderingContext2D, b: Basis, c: V2, R: number, p: number, a: number, col: string) => {
   if (a <= 0 || p <= 0) return;

@@ -29,9 +29,9 @@ export const couvrir = (ctx: CanvasRenderingContext2D, im: CanvasImageSource & {
   const cov = Math.max(1920 / im.width, 1080 / im.height) * zoom, w = im.width * cov, h = im.height * cov;
   ctx.drawImage(im, 960 - w / 2 + dx, 540 - h / 2, w, h);
 };
-export const sableEst = (ctx: CanvasRenderingContext2D, A: CanvasImageSource & { width: number; height: number }, B: CanvasImageSource & { width: number; height: number }, u: number, t: number, key: string, zoomA = 1, zoomB = 1) => {
+export const sableEst = (ctx: CanvasRenderingContext2D, A: CanvasImageSource & { width: number; height: number }, B: (CanvasImageSource & { width: number; height: number }) | null, u: number, t: number, key: string, zoomA = 1, zoomB = 1) => {
   if (u <= 0) { couvrir(ctx, A, zoomA); return; }
-  couvrir(ctx, B, zoomB);
+  if (B) couvrir(ctx, B, zoomB); // B absent : ce qui est dessous (une vidéo, par exemple) apparaît à travers
   if (u >= 1) return;
   const P = preparer(A, key);
   // ce qui reste de A : cellules dont le front n'est pas encore passé (le front va de l'ouest à l'est, et un peu de bas en haut)

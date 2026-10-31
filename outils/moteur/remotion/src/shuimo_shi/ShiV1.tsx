@@ -9,7 +9,7 @@
 // Pigments constants : la butte 𠂤 en ocre rouge (赭石), le pied qui fait le tour 帀 en malachite, le maître en vermillon.
 // En attente (emplacements marqués à l'écran) : clip Seedance (ronde de nuit), 白描 de 師曠, image de Han Yu.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
@@ -238,19 +238,21 @@ const Opening: React.FC = () => {
       <Cam keys={[[0, 960, 540, 1.0], [au, 960, 540, 1.0, 1.0], [la - 0.2, 960, 540, 1.0, 1.0], [qu - 0.3, 960, 540, 1.0, 1.0]]} punch={[c1, la + 0.2, qu + 0.4]}>
         <Draw draw={(ctx, tt, E) => {
           // l'armée, vue de haut : le camp autour de la butte, puis la silhouette de 師 (même taille que le caractère à l'écran)
-          const army = 1 - seg(tt, c1 - 0.3, c1 + 0.6);
+          const ink = seg(tt, c1 - 0.5, c1 + 1.3), army = 1 - ink;
           if (army > 0) {
             const b = camBasis(camAt(CAM, tt));
             const S = garde3('silkai', () => silhouette3(N3, [0, 0], 26, (g, s) => E.drawStrokes(g, 'shi_kai', { x: s / 2, y: s / 2, size: s, brush: false, color: () => '#000' }), 'kai'));
             ctx.save(); ctx.globalAlpha = army * seg(tt, 0, 0.6);
-            butte3D(ctx, b, MOUND3, 9, 1 - seg(tt, c0, c0 + 0.8), OCRE);
+            butte3D(ctx, b, MOUND3, 7.5, 1 - seg(tt, c0, c0 + 0.8), OCRE, tt);
             SQ3.forEach((c) => lavisSol(ctx, b, coins(c, 12, 11), 1 - seg(tt, c0, c0 + 0.8)));
-            armee(ctx, b, camp3(), S, seg(tt, c0, c1), { t: tt, pose: (_, k) => (k > 0 && k < 1 ? 'marche' : 'debout'), vague: { origine: [0, 0], etalement: 0.5 }, poussiere: true });
+            armee(ctx, b, camp3(), S, seg(tt, c0, c1), { t: tt, pose: (_, k) => (k > 0 && k < 1 ? 'marche' : 'debout'), vague: { origine: [0, 0], etalement: 0.5 }, poussiere: true, hauteur: 1.75 * (1 - 0.55 * ink), encres: ink > 0 ? ['rgb(20,17,15)'] : undefined });
             ctx.restore();
           }
           // 師 apparaît là où l'armée l'a dessiné (la butte en ocre) ; « Aujourd'hui » : fondu net vers 师, tracé trait par trait
-          const g1 = seg(tt, c1 - 0.6, c1 + 0.2) * (1 - seg(tt, au - 0.1, au + 0.25));
+          const g1 = seg(tt, c1 - 0.4, c1 + 1.2) * (1 - seg(tt, au - 0.1, au + 0.25));
+          if (g1 > 0) { ctx.save(); ctx.filter = `blur(${(7 * (1 - seg(tt, c1 - 0.2, c1 + 1.3))).toFixed(1)}px)`; } 
           if (g1 > 0) E.drawStrokes(ctx, 'shi_kai', { x: 960, y: 540, size: 722, brush: false, color: (c: string) => (c === 'butte' ? rgb(OCRE) : inkCss), alpha: () => g1, glow: 18 * win(tt, c1 - 0.3, au, 0.3), glowColor: rgb(OCRE, 0.5) });
+          if (g1 > 0) ctx.restore();
           const slide = ease(seg(tt, la - 0.3, la + 0.5)) * (1 - ease(seg(tt, sh - 0.2, sh + 0.6)));
           const s1 = seg(tt, au - 0.1, au + 0.2);
           if (s1 > 0) E.drawStrokes(ctx, 'shi_simp', { x: 960 + 230 * slide, y: 520, size: 580, brush: false, progress: 6 * seg(tt, au, la - 0.3), color: () => inkCss, alpha: () => s1 * (1 - seg(tt, B('b01') + 0.2, A('b02'))) });
@@ -265,29 +267,30 @@ const Opening: React.FC = () => {
   );
 };
 
-// ════════════════ 2. Rappel du 語 (VOIX v4) : un assemblage de petits dessins → 語 → « pas né dans une salle de classe » →
-// « né dans un camp militaire »
+// ════════════════ 2. « Un caractère, c'est un assemblage de petits dessins » : le 師 se sépare en ses deux dessins (la
+// butte en ocre, le pied qui fait le tour en malachite), qui s'écartent puis se rassemblent ; « né dans un camp
+// militaire » : il se rétracte en point d'encre et le paysage des Shang se peint autour
 const Rappel: React.FC = () => {
   const t = useT();
-  const A2 = A('b02'), de = at('b02', 'dessins'), yu = at('b02', 'yu'), cl = at('b02', 'classe'), ca = at('b02', 'camp');
+  const A2 = A('b02'), de = at('b02', 'dessins'), ma = at('b02', 'maitre'), cl = at('b02', 'classe'), ca = at('b02', 'camp');
   return (
     <AbsoluteFill>
       <Paper />
       <Landscape seed={14} from={ca - 0.6} to={A('b03') + 3} move="push" mood="aube" faint={0.55} />
-      <Cam keys={[[A2 - 0.3, 960, 540, 1.0], [yu - 0.3, 900, 540, 1.06, 1.0], [cl - 0.3, 1100, 520, 1.04, 1.0], [ca - 0.2, 960, 540, 1.0, 1.0]]} punch={[de + 0.3, yu + 0.4, cl + 0.3]}>
+      <Cam keys={[[A2 - 0.3, 960, 540, 1.0], [de + 0.6, 960, 540, 1.04, 1.0], [ma - 0.2, 960, 520, 1.0, 1.0], [ca - 0.2, 960, 540, 1.0, 1.0]]} punch={[de + 1.0, ma + 0.3, ca + 0.3]}>
         <Draw draw={(ctx, tt, E) => {
-          // un caractère = un assemblage de petits dessins : les deux moitiés de 師 prennent leurs pigments
-          const d0 = win(tt, A2 - 0.3, yu - 0.1, 0.4), dk = seg(tt, de + 0.3, de + 1.0);
-          if (d0 > 0) E.drawStrokes(ctx, 'shi_kai', { x: 960, y: 500, size: 520, brush: false, color: pig(dk), alpha: () => d0 });
-          // 語 de bronze, ses pigments ; les deux bouches s'allument
-          const ya = win(tt, yu - 0.2, cl + 0.6, 0.4), sl = ease(seg(tt, cl - 0.3, cl + 0.6));
-          if (ya > 0) E.drawRealGlyph(ctx, 'yu_jinwen', { x: 960 - 380 * sl, y: 520, size: 560, opacity: ya * (1 - 0.6 * sl), color: pig(1), glow: 22 * win(tt, yu + 0.3, cl, 0.3), glowColor: rgb(AZ, 0.6) });
-          // le maître : 師 (bronze) à droite ; sur « camp militaire », il se rétracte en point d'encre
-          const ra = seg(tt, cl - 0.1, cl + 0.5), sh = 1 - ease(seg(tt, ca + 0.2, ca + 1.2));
-          if (ra > 0 && sh > 0.02) E.drawRealGlyph(ctx, 'shi_jinwen', { x: 960 + 340 * sl * sh, y: 520, size: 560 * sh, opacity: ra, color: pig(1) });
+          const apart = ease(seg(tt, de + 0.3, de + 1.4)) * (1 - ease(seg(tt, ma - 0.4, ma + 0.6)));
+          const col = seg(tt, de + 0.3, de + 1.0), sh = 1 - ease(seg(tt, ca + 0.2, ca + 1.2)), a = seg(tt, A2 - 0.4, A2 + 0.2);
+          if (sh <= 0.02) return;
+          for (const [c, dx, rot] of [['butte', -260, -0.06], ['tour', 260, 0.06]] as [string, number, number][]) {
+            ctx.save(); ctx.translate(960 + dx * apart * sh, 520); ctx.rotate(rot * apart); ctx.translate(-960, -520);
+            E.drawStrokes(ctx, 'shi_kai', { x: 960, y: 520, size: 560 * sh, brush: false, color: (k: string) => rgb(mixc(INK, P[k], col)), alpha: (k: string) => (k === c ? a : 0), glow: 20 * apart, glowColor: rgb(P[c], 0.5) });
+            ctx.restore();
+          }
         }} />
       </Cam>
-      <Label x={960} y={150} zh="語" text="l'épisode précédent" color={AZ} a={win(t, yu - 0.1, cl, 0.4)} align="center" />
+      <Label x={560} y={880} zh="𠂤" text="" color={OCRE} a={win(t, de + 1.0, ma - 0.3, 0.4)} align="center" />
+      <Label x={1360} y={880} zh="帀" text="" color={MAL} a={win(t, de + 1.2, ma - 0.3, 0.4)} align="center" />
     </AbsoluteFill>
   );
 };
@@ -305,6 +308,21 @@ const carton = (titre: string, fond: string, encre: string) => {
   return c;
 };
 let CARTONS: { eg: HTMLCanvasElement; sh: HTMLCanvasElement } | null = null;
+// fresque B : animation de la peinture d'Anyang (Nano Banana animée, stabilisée : vidstab + atadenoise, voir NOTES.md),
+// jouée sans son sous la fresque égyptienne ; légère poussée de caméra
+const FresqueShang: React.FC<{ from: number; to: number; fade: [number, number] }> = ({ from, to, fade }) => {
+  const { fps } = useVideoConfig();
+  const t = useT();
+  const a = seg(t, from, from + 0.2) * (1 - seg(t, fade[0], fade[1]));
+  if (t < from || t > to) return null;
+  return (
+    <AbsoluteFill style={{ opacity: a, transform: `scale(${1.02 + 0.03 * seg(t, from, to)})` }}>
+      <Sequence from={Math.round(from * fps)} durationInFrames={Math.round((to - from) * fps)} layout="none">
+        <OffthreadVideo src={staticFile('episodes/shi/clips/01_fresque_shang.mp4')} muted playbackRate={0.92} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </Sequence>
+    </AbsoluteFill>
+  );
+};
 const fresques = () => {
   CARTONS ??= { eg: carton('Fresque A — l’Égypte de Ramsès II', '#d8bd88', '#5a4026'), sh: carton('Fresque B — Anyang, dynastie Shang', '#ebe6dc', '#2f2a26') };
   return { eg: IMG.egypte ?? CARTONS.eg, sh: IMG.shang ?? CARTONS.sh, vraies: !!(IMG.egypte && IMG.shang) };
@@ -323,13 +341,14 @@ const Shang: React.FC = () => {
       <Landscape seed={14} from={fo - 1} to={R1 + 1} move="pan" mood="aube" faint={0.45} />
       <Cam keys={[[A3 - 0.3, 960, 540, 1.0], [fo, 960, 520, 1.0, 1.0], [bs - 0.2, 960, 470, 1.12, 1.0], [ro - 0.4, 960, 540, 1.0, 1.2]]}
         punch={[bs + 0.3, dr + 0.3, ce + 0.3, ga + 0.3, cm + 0.3]} calm={[[R1 - 0.6, R1 + 1]]}>
+        <FresqueShang from={ch - 0.6} to={bs + 0.2} fade={[fo + 0.4, bs]} />
         <Draw draw={(ctx, tt, E) => {
           // les deux fresques : poussée lente sur l'Égypte ; à « Au même moment », le sable s'envole vers l'est et découvre Anyang
           const fr = 1 - seg(tt, fo + 0.4, bs);
           if (fr > 0) {
             const F = fresques();
             ctx.save(); ctx.globalAlpha = fr * seg(tt, A3 - 0.6, A3 + 0.4);
-            sableEst(ctx, F.eg, F.sh, seg(tt, ch - 0.4, ch + 1.7), tt, F.vraies ? 'fresques' : 'cartons', 1.04 + 0.05 * seg(tt, A3, ch), 1.02 + 0.03 * seg(tt, ch, fo));
+            sableEst(ctx, F.eg, null, seg(tt, ch - 0.4, ch + 1.7), tt, F.vraies ? 'fresques' : 'cartons', 1.04 + 0.05 * seg(tt, A3, ch));
             ctx.restore();
           }
           // la plus ancienne forme : estampage, signe révélé en blanc, puis à l'encre ; les deux bosses en ocre
@@ -341,7 +360,7 @@ const Shang: React.FC = () => {
           if (campA > 0) {
             const b = camBasis(camAt(CAM, tt)), C = camp3(), dim = 1 - 0.5 * seg(tt, sc - 0.2, sc + 0.6);
             ctx.save(); ctx.globalAlpha = campA * dim;
-            butte3D(ctx, b, MOUND3, 9, 1, OCRE);
+            butte3D(ctx, b, MOUND3, 7.5, 1, OCRE, tt);
             [dr, ce, ga].forEach((cue, k) => {
               const u = seg(tt, cue - 0.35, cue + 1.9);
               if (u <= 0) return;
@@ -474,7 +493,7 @@ const Za: React.FC = () => {
             const b = camBasis(camAt([[bu - 0.6, { tx: 0, tz: 4, dist: 128, pitch: 52, yaw: -24, fov: 40 }], [vo, { tx: 0, tz: 4, dist: 112, pitch: 46, yaw: 14, fov: 40 }], [ex, { tx: 0, tz: 6, dist: 125, pitch: 62, yaw: 2, fov: 40 }], [lo - 0.4, { tx: 0, tz: 6, dist: 140, pitch: 58, yaw: -10, fov: 40 }], [B('b05') + 1.0, { tx: 0, tz: 30, dist: 70, pitch: 16, yaw: 0, fov: 40 }]], tt));
             ctx.save(); ctx.globalAlpha = rn;
             ctx.fillStyle = 'rgba(22,26,40,0.22)'; ctx.fillRect(-100, -100, 2120, 1280);
-            butte3D(ctx, b, MOUND3, 9, 1, OCRE);
+            butte3D(ctx, b, MOUND3, 7.5, 1, OCRE, tt);
             SQ3.forEach((c) => lavisSol(ctx, b, coins(c, 12, 11), 1));
             armee(ctx, b, camp3(), camp3(), 1, { t: tt, pose: () => 'debout', brume: 0.5, alpha: 0.8 });
             chars(ctx, b, CHARS3, 0.8);
@@ -520,7 +539,7 @@ const Shishi: React.FC = () => {
   const t = useT();
   const A6 = A('b06'), of = at('b06', 'officier'), fi = at('b06', 'fils'), pr = at('b06', 'precepteur'), am = at('b06', 'armee'), as = at('b06', 'assise');
   const MAS0: V2 = [0, 8], MAS1: V2 = [0, 12];
-  const sit0 = as + 0.1, sit1 = sit0 + 1.9, con0 = sit1 + 0.2, con1 = con0 + 1.5;
+  const sit0 = as + 0.1, sit1 = sit0 + 1.9, con0 = sit1 + 0.2, con1 = con0 + 1.5, ink = (tt: number) => seg(tt, con1 - 0.5, con1 + 1.1);
   const CAM: [number, Cam3][] = [
     [A6 - 0.3, { tx: -24, tz: -10, dist: 52, pitch: 16, yaw: -30, fov: 40 }], [of + 0.4, { tx: -6, tz: 4, dist: 58, pitch: 18, yaw: -12, fov: 40 }],
     [fi + 0.6, { tx: 9, tz: 12, dist: 50, pitch: 20, yaw: 14, fov: 40 }], [pr + 0.4, { tx: 0, tz: 6, dist: 72, pitch: 26, yaw: 0, fov: 40 }],
@@ -537,13 +556,13 @@ const Shishi: React.FC = () => {
           const G = garde3('garde', () => carres3(N_SHI, [[-30, -2], [-30, -24]], 20, 1.3));
           const C = garde3('classe', () => rangs3(N_SHI, MAS1, 24, 1.45));
           const S = garde3('silshi', () => silhouette3(N_SHI, [0, 0], 26, (g, s) => E.drawRealGlyph(g, 'shi_jinwen', { x: s / 2, y: s / 2, size: s, color: () => '#000' }), 'shi'));
-          const sitK = seg(tt, sit0, sit1), conK = seg(tt, con0, con1), fade = 1 - seg(tt, con1 - 0.2, con1 + 0.7);
+          const sitK = seg(tt, sit0, sit1), conK = seg(tt, con0, con1), fade = 1 - ink(tt);
           const door = 1 - seg(tt, as - 0.3, as + 0.8);
           porte3(ctx, b, door);
           lavisSol(ctx, b, coins([-30, -13], 15, 23), (1 - sitK) * 0.9);
           lavisSol(ctx, b, coins([0, -6], 18, 20), sitK * (1 - conK) * 0.9);
           if (conK <= 0) armee(ctx, b, G, C, sitK, { t: tt, pose: (_, k) => (k >= 1 ? 'assis' : k > 0 ? 'marche' : 'debout'), vague: { origine: MAS1, etalement: 0.7 }, poussiere: true });
-          else armee(ctx, b, C, S, conK, { t: tt, pose: (_, k) => (k > 0 && k < 1 ? 'marche' : 'debout'), vague: { origine: [0, 0], etalement: 0.5 }, alpha: fade, brume: 0.15 });
+          else armee(ctx, b, C, S, conK, { t: tt, pose: (_, k) => (k > 0 && k < 1 ? 'marche' : 'debout'), vague: { origine: [0, 0], etalement: 0.5 }, alpha: fade, brume: 0.15, hauteur: 1.75 * (1 - 0.55 * ink(tt)), encres: ink(tt) > 0 ? ['rgb(20,17,15)'] : undefined });
           // le 師氏 (vermillon) devant la porte, puis devant la classe ; les trois fils du roi (azurite), à genoux, derrière
           const ma = seg(tt, of - 0.3, of + 0.3) * (1 - seg(tt, con0, con0 + 0.6));
           const mp: V2 = [MAS0[0] + (MAS1[0] - MAS0[0]) * ease(sitK), MAS0[1] + (MAS1[1] - MAS0[1]) * ease(sitK)];
@@ -551,8 +570,10 @@ const Shishi: React.FC = () => {
           const pa = seg(tt, fi - 0.3, fi + 0.3) * door;
           for (let i = 0; i < 3; i++) figure(ctx, b, [10 + i * 2.2, 18], 'prince', 'assis', pa, 1.7);
           // le caractère prend la place des hommes
-          const gA = seg(tt, con1 - 0.6, con1 + 0.3);
+          const gA = seg(tt, con1 - 0.4, con1 + 1.0);
+          if (gA > 0) { ctx.save(); ctx.filter = `blur(${(7 * (1 - seg(tt, con1 - 0.2, con1 + 1.1))).toFixed(1)}px)`; }
           if (gA > 0) E.drawRealGlyph(ctx, 'shi_jinwen', { x: 960, y: 540, size: 720, opacity: gA * (1 - seg(tt, B('b06') + 2.2, B('b06') + 2.9)), color: pig(1), glow: 24 * win(tt, con1 - 0.3, con1 + 1.4, 0.3), glowColor: 'rgba(246,241,231,0.95)' });
+          if (gA > 0) ctx.restore();
         }} />
       </Cam>
       <Caption text="師氏 · le maître de la garde, précepteur des princes (selon les Rites des Zhou)" a={win(t, of + 0.2, am - 1.0, 0.4)} y={880} size={44} />

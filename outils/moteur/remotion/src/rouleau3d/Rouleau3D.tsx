@@ -226,7 +226,7 @@ const rollCanvas = (paper: HTMLImageElement) => {
   return cv;
 };
 // plateau en bois de zitan (planches, fil serré, pores) sous un vernis : couleur et relief
-const woodCanvas = (bump = false) => {
+export const woodCanvas = (bump = false) => {
   const cv = document.createElement('canvas'); cv.width = 2048; cv.height = 2048; const g = cv.getContext('2d')!;
   const R0 = rng(31);
   g.fillStyle = bump ? '#808080' : '#2a120e'; g.fillRect(0, 0, 2048, 2048);
@@ -248,7 +248,7 @@ const woodCanvas = (bump = false) => {
   }
   return cv;
 };
-const feltCanvas = () => {
+export const feltCanvas = () => {
   const cv = document.createElement('canvas'); cv.width = cv.height = 512; const g = cv.getContext('2d')!;
   g.fillStyle = '#25262b'; g.fillRect(0, 0, 512, 512);
   const R0 = rng(5);
@@ -279,7 +279,7 @@ const petalCanvas = () => {
   g.bezierCurveTo(4, 44, 2, 12, 22, 4); g.quadraticCurveTo(32, 12, 42, 4); g.bezierCurveTo(62, 12, 60, 44, 32, 62); g.fill();
   return cv;
 };
-const tex = (cv: HTMLCanvasElement) => { const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; };
+export const tex = (cv: HTMLCanvasElement) => { const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; };
 
 // ── caméra : une seule trajectoire lisse (Catmull-Rom) parcourue à vitesse continue (interpolation monotone du
 // temps), sans arrêt aux étapes : verticale → s'élève → rasante, de trois quarts (≈ 20°) → glisse → remonte → plonge

@@ -1,7 +1,7 @@
 // 語 (yǔ), version tout shuimo — episodes/yu/PROPOSITION.md (v5), textes episodes/yu/VOIX.md.
 // « Deux mots pour parler » : 食不語，寢不言 → les pièces (言 la parole, 吾 « moi ») → la dynastie Shang (言, 五 en
 // cinq traits puis en croix, 吾) → rouleau 3D court → la cloche (le premier 語) → les Royaumes combattants (on se
-// dispute ; sceaux de Jin) → coups de pinceau + sceau → la dynastie Han (直言曰言，論難曰語 ; cascade frappée) → Yang
+// dispute ; sceaux de Jin) → coups de pinceau + sceau → la dynastie Han (livre de lattes 3D, 直言曰言，論難曰語 en surbrillance) → Yang
 // Xiong et les soldats (carte des parlers, clip B) → rouleau 3D complet → aujourd'hui (讠, mosaïque, carte des
 // dialectes) → scène récapitulative (deux bouches face à face) → maxime et passerelle 師 → écran de fin.
 // Ligne de temps lue dans les repères (episodes/yu/voix/reperes.json, « _ligne »).
@@ -9,7 +9,7 @@
 // En attente (emplacements marqués à l'écran) : clips Seedance A (carillon) et B (Yang Xiong), conseillers en papier
 // découpé, image classique, médaillon de Yang Xiong.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, Freeze, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
@@ -21,11 +21,14 @@ import { cartouche } from '../periodes';
 import { loadLegacy, W } from '../legacy';
 import { AGES_SECONDS, EssaiCarteAges } from '../cartes/CarteAges';
 import { capitale, carte, chargerCartes, creditCarte, fondCarte, lieu, routePinceau } from '../cartes/CartePeinte';
+import { LattesBambou3D } from '../lattes/LattesBambou3D';
+import { YU_LATTES } from './YuLattes';
+import { CloudReveal } from '../video_encre/CloudReveal';
 import rep from '../data/episodes/yu.json';
 
-type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b08' | 'b09' | 'b10';
+type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b08' | 'b09' | 'b10' | 'b11';
 type Rep = Record<Clip, { duration: number; cues: Record<string, number> }> & {
-  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; plages: Record<string, { debut: number; duree: number }>; fin: number; total: number; bruitages?: [string, number, number][] };
+  _ligne: { clips: Record<Clip, { debut: number; duree: number; pause?: { coupe: number; duree: number } }>; rouleaux: { debut: number; duree: number }[]; plages: Record<string, { debut: number; duree: number }>; fin: number; total: number; bruitages?: [string, number, number][]; musique_fin?: { fichier: string; debut: number; fin_voix: number; fin: number; volume_voix: number; volume: number; montee: number; fondu: number; depart: number } };
 };
 const R = rep as unknown as Rep;
 const L = R._ligne;
@@ -38,6 +41,8 @@ const at = (k: Clip, n: string) => {
 };
 export const YU_SECONDS = Math.ceil(L.total * 10) / 10;
 const END = L.fin;
+const MF = L.musique_fin;
+const PB = { debut: A('b06') - 0.4, duree: 0 }; // raccord Royaumes → Han : fondu enchaîné (plus de transition au pinceau)
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const seg = (t: number, a: number, b: number) => { const u = clamp((t - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -103,6 +108,42 @@ const Landscape: React.FC<{ seed: number; from: number; to: number; move?: 'pan'
   );
 };
 const Paper: React.FC = () => <AbsoluteFill style={{ background: `#f3eee4 url(${staticFile('shuimo/paper.jpg')}) center/cover` }} />;
+// clips plein cadre (Seedance) : entrée par les nuages, sortie au pinceau ; zhou = carillon (premier plan 0–2 s entier, second plan à
+// partir de 3 s : 9,04 s), qing = l'empereur et les deux gouverneurs (15,1 s, entier, son d'origine, sans voix off)
+const CLIPS = { zhou: 'episodes/yu/clips/01_zhou.mp4', qing: 'episodes/yu/clips/02_qing.mp4' };
+// lecture continue du clip : entrée par les nuages (la vidéo démarre à sa première image quand les nuages sont refermés, puis ils
+// s'écartent : aucune image n'est perdue) ou image fixe de départ en fondu ; image fixe de fin qui s'efface (fm s)
+const FadeBox: React.FC<{ up: boolean; fm: number; children: React.ReactNode }> = ({ up, fm, children }) => {
+  const f = useCurrentFrame() / useVideoConfig().fps;
+  return <AbsoluteFill style={{ opacity: up ? clamp(f / fm) : 1 - clamp(f / fm) }}>{children}</AbsoluteFill>;
+};
+// la vidéo démarre seulement une fois les nuages ouverts : pendant l'ouverture, sa première image reste figée dessous (rien n'est coupé) ;
+// un seul lecteur du début à la fin (Freeze actif au début et à la fin), donc aucun remontage ni clignotement au départ
+const clipV0 = (from: number, nuages?: number) => (nuages ? from + nuages + 0.4 : from);
+const ClipBody: React.FC<{ src: keyof typeof CLIPS; hold: number; len: number; fm: number; fadeIn: boolean }> = ({ src, hold, len, fm, fadeIn }) => {
+  const { fps } = useVideoConfig();
+  const f = useCurrentFrame(), t = f / fps, hF = Math.round(hold * fps), lF = Math.round(len * fps);
+  const op = (fadeIn ? clamp(t / hold) : 1) * (1 - clamp((t - hold - len) / fm));
+  return (
+    <AbsoluteFill style={{ opacity: op }}>
+      <Freeze frame={hF + lF - 2} active={(x) => x >= hF + lF - 1}>
+        <Freeze frame={hF} active={(x) => x < hF}>
+          <Sequence from={hF} layout="none"><OffthreadVideo src={staticFile(CLIPS[src])} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></Sequence>
+        </Freeze>
+      </Freeze>
+    </AbsoluteFill>
+  );
+};
+const ClipShot: React.FC<{ src: keyof typeof CLIPS; from: number; len: number; fm?: number; nuages?: number }> = ({ src, from, len, fm = 0.4, nuages }) => {
+  const { fps } = useVideoConfig();
+  const cl = nuages ? nuages + 0.4 : 0, s0 = nuages ? from + 0.47 * nuages + 0.02 : from - fm, v0 = clipV0(from, nuages);
+  return (
+    <>
+      <Sequence from={Math.round(s0 * fps)} durationInFrames={Math.round((v0 + len + fm - s0) * fps)}><ClipBody src={src} hold={v0 - s0} len={len} fm={fm} fadeIn={!nuages} /></Sequence>
+      {nuages && <Sequence from={Math.round(from * fps)} durationInFrames={Math.round(cl * fps)}><CloudReveal src={CLIPS[src]} inDur={nuages} exit={false} videoAt={cl + 60} /></Sequence>}
+    </>
+  );
+};
 const MapPanel: React.FC<{ from: number; to: number; draw: (ctx: CanvasRenderingContext2D, u: number, E: any, t: number) => void }> = ({ from, to, draw }) => {
   const t = useT();
   const a = win(t, from, to, 0.6);
@@ -243,8 +284,21 @@ const SEALS = () => [
   { t: at('b03', 'pourquoi') - 0.6, zh: '商' },
   { t: at('b04', 'rencontre') + 0.4, zh: '周' },
   { t: at('b05', 'empile') + 1.2, zh: '戰' },
+  { t: at('b11', 'annee') + 0.2, zh: '清' },
 ];
 const SealStamps: React.FC = () => <Draw draw={(ctx, tt, E) => { for (const s of SEALS()) drawSeal(ctx, E, 1810, 860, 128, s.zh, tt - s.t); }} />;
+// un vol d'oiseaux d'encre qui traverse le cadre (meuble un plan de paysage sans voix ni signe)
+const birds = (ctx: CanvasRenderingContext2D, tt: number, t0: number, t1: number, y0: number, dir = 1, n = 5, seed = 3) => {
+  const r = rng(seed);
+  for (let i = 0; i < n; i++) {
+    const u = (tt - t0 - 0.22 * i) / (t1 - t0), o = r(), p = r();
+    if (u < 0 || u > 1) continue;
+    const x = dir > 0 ? -90 + 2100 * u : 2010 - 2100 * u, y = y0 + 38 * Math.sin(u * 5 + i) - 130 * u + (o - 0.5) * 150;
+    const s = 20 + 14 * p, wing = 0.5 + 0.5 * Math.sin(tt * 7 + i * 1.9), lift = s * (0.15 + 0.65 * wing);
+    ctx.save(); ctx.globalAlpha = 0.8 * seg(u, 0, 0.08) * (1 - seg(u, 0.92, 1)); ctx.strokeStyle = inkCss; ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(x - s, y - lift); ctx.quadraticCurveTo(x - s * 0.45, y - lift - 5, x, y); ctx.quadraticCurveTo(x + s * 0.45, y - lift - 5, x + s, y - lift); ctx.stroke(); ctx.restore();
+  }
+};
 // goutte d'encre qui tombe et s'épanouit en lavis (jamais plus de 2 s de papier vide entre deux tableaux)
 const inkBloom = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number, t1: number, tt: number) => {
   // une goutte tombe, l'encre se dilue et gagne tout le cadre (cœur sombre qui pâlit, plusieurs lobes, bords flous) ;
@@ -386,13 +440,13 @@ const splash = (ctx: CanvasRenderingContext2D, x: number, y: number, t0: number,
   ctx.restore();
 };
 // caractère au pinceau (police ShuimoPinceau) qui naît d'une tache d'encre : révélé depuis le centre, flou qui se résorbe
-const brushChar = (ctx: CanvasRenderingContext2D, ch: string, x: number, y: number, size: number, t0: number, tt: number, a: number) => {
+const brushChar = (ctx: CanvasRenderingContext2D, ch: string, x: number, y: number, size: number, t0: number, tt: number, a: number, color = inkCss) => {
   const u = seg(tt, t0, t0 + 0.7);
   if (u <= 0 || a <= 0) return;
   ctx.save(); ctx.globalAlpha = a;
   ctx.beginPath(); ctx.arc(x, y, size * 0.85 * (1 - Math.pow(1 - u, 3)), 0, 7); ctx.clip();
   ctx.filter = `blur(${(6 * (1 - u)).toFixed(1)}px)`;
-  ctx.font = `${size}px ShuimoPinceau`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = inkCss;
+  ctx.font = `${size}px ShuimoPinceau`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = color;
   ctx.fillText(ch, x, y + size * 0.04);
   ctx.restore();
 };
@@ -566,7 +620,6 @@ const Opening: React.FC = () => {
           });
         }} />
       </Cam>
-      <Caption text="Entretiens de Confucius 論語 · livre X" a={win(t, wEnd + 1.0, it - 0.2, 0.4)} y={110} size={44} />
       <Caption text="« À table, on ne converse pas. Au lit, on ne parle pas. »" a={win(t, ci + 0.3, it - 0.2, 0.5)} y={905} size={46} />
       {!OMBRES && <Label x={640} y={830} zh="" text="yǔ" color={VER} a={win(t, y1 + 0.5, pr + 0.4, 0.3)} align="center" />}
       {!OMBRES && <Label x={1280} y={830} zh="" text="yán" color={VER} a={win(t, n1 + 0.5, pr + 0.4, 0.3)} align="center" />}
@@ -666,12 +719,8 @@ const Shang: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="lecture la plus répandue · autre hypothèse : un instrument à vent" a={win(t, so - 0.1, ci - 0.2, 0.4)} y={860} size={44} left={1060} width={780} />
       <Label x={1240} y={180} zh="五" text="cinq" color={MAL} a={win(t, ci + 0.2, po, 0.4)} align="center" />
       <Label x={1240} y={180} zh="吾" text="« moi »" color={AZ} a={win(t, po + 0.9, pq + 0.2, 0.4)} align="center" />
-      <Caption text="吾 = « moi » : sens attesté plus tard, sous les Zhou" a={win(t, po + 1.6, pq - 0.2, 0.4)} y={940} size={44} />
-      <Caption text="chinois archaïque : 五 et 吾, tous deux « nga » (reconstruction Baxter-Sagart)" a={win(t, pq + 0.4, R1 - 0.3, 0.4)} y={940} size={44} />
-      <Caption text="Anyang · vue imaginée" a={IMG.anyang ? win(t, A3 + 0.4, dv + 0.3, 0.4) : 0} y={955} size={44} />
       <EraTag {...cartouche('shang', 'Anyang · v. 1200 av. J.-C.')} a={seg(t, A3 + 0.2, A3 + 1.0) * (1 - win(t, dv - 0.3, sg + 1.8, 0.3)) * (1 - seg(t, R1 - 0.3, R1))} />
     </AbsoluteFill>
   );
@@ -708,12 +757,11 @@ const Cloche: React.FC = () => {
             color: (c: string) => rgb(mixc(mixc([240, 233, 219], INK, ink), P[c], c === 'parole' ? pv : c === 'bouche' ? bw : cw)), glow: 26 * win(tt, re - 0.1, re + 1.2, 0.3), glowColor: 'rgba(246,241,231,0.9)' });
         }} />
       </Cam>
-      <Placeholder title="Clip A · le carillon de bronze" sub="Seedance, 10 s (prompt : A_FOURNIR.md) — entrée par la mer de nuages" a={win(t, PL.debut + 0.2, fl - 0.1, 0.5)} />
-      <Caption text="cloche 余贎乘兒鐘 · fin des Printemps et Automnes" a={win(t, fl + 0.4, ga - 0.3, 0.4)} y={940} size={44} />
+            <ClipShot src="zhou" from={PL.debut - 0.2} len={8.0} nuages={1.6} />
       <Label x={240} y={300} zh="言" text="la parole" color={VER} a={win(t, ga, re + 0.6, 0.3)} align="center" />
       <Label x={240} y={760} zh="口" text="la bouche" color={AZ} a={win(t, de, re + 0.6, 0.3)} align="center" />
       <Label x={1600} y={520} zh="五" text="le cinq" color={MAL} a={win(t, co, re + 0.6, 0.3)} align="center" />
-      <EraTag {...cartouche('zhou', 'fin des Printemps et Automnes')} a={r3TagIn(R3A, t) * (1 - win(t, fl - 0.4, fl + 2.6, 0.3)) * (1 - seg(t, B('b04'), B('b04') + 0.5))} />
+      <EraTag {...cartouche('zhou', 'fin des Printemps et Automnes')} a={r3TagIn(R3A, t) * (1 - win(t, fl - 0.4, fl + 2.6, 0.3)) * (1 - win(t, PL.debut - 0.1, clipV0(PL.debut - 0.2, 1.6) + 8.3, 0.3)) * (1 - seg(t, B('b04'), B('b04') + 0.5))} />
     </AbsoluteFill>
   );
 };
@@ -723,12 +771,12 @@ const STATES = ['秦', '楚', '齊', '燕', '韓', '趙', '魏'];
 const Royaumes: React.FC = () => {
   const t = useT();
   const A5 = A('b05'), co = at('b05', 'conseillers'), ar = at('b05', 'argumente'), he = at('b05', 'hesite'), sc = at('b05', 'sceaux'), em = at('b05', 'empile');
-  const PB = L.plages.pinceau;
+  const st0 = at('b05', 'sept');
   return (
     <AbsoluteFill>
       <Paper />
       <Landscape seed={26} from={A5 - 1} to={PB.debut + 0.8} move="pan" mood="brume" faint={0.6} />
-      <Cam keys={[[A5 - 0.3, 960, 540, 1.0], [sc - 0.3, 760, 540, 1.06, 1.0], [em - 0.2, 830, 520, 1.2, 1.0]]} punch={[sc + 0.3, sc + 1.1, em + 0.3]}>
+      <Cam keys={[[A5 - 0.3, 1060, 540, 1.0], [st0 - 0.6, 900, 540, 1.04, 1.4], [sc - 0.3, 760, 540, 1.06, 1.0], [em - 0.2, 830, 520, 1.2, 1.0]]} punch={[sc + 0.3, sc + 1.1, em + 0.3]}>
         <Draw draw={(ctx, tt, E) => {
           // « Sept États » : sept sceaux vermillon se posent l'un après l'autre en arc, puis s'effacent devant les conseillers
           const st = at('b05', 'sept'), so = 1 - seg(tt, co - 0.3, co + 0.2);
@@ -749,6 +797,7 @@ const Royaumes: React.FC = () => {
           });
         }} />
       </Cam>
+      <Draw draw={(ctx, tt) => birds(ctx, tt, A5 - 0.3, st0 + 0.2, 400, -1, 6, 11)} />
       {/* deux conseillers en papier découpé, face à face : ils se renvoient la parole (un balancement chacun son tour) */}
       <Draw draw={(ctx, tt) => {
         const a = win(tt, co, sc + 0.3, 0.5);
@@ -770,64 +819,59 @@ const Royaumes: React.FC = () => {
     </AbsoluteFill>
   );
 };
-// transition sans rouleau : de larges coups de pinceau gris balaient le paysage vers le papier nu
-const BrushSweep: React.FC = () => {
-  const PB = L.plages.pinceau, t = useT();
-  const out = 1 - ease(seg(t, PB.debut + PB.duree - 0.1, PB.debut + PB.duree + 0.9));
-  if (t < PB.debut || out <= 0) return null;
+// ════════════════ 6. La dynastie Han : le dictionnaire tranche (直言曰言，論難曰語)
+const QUOTE = '直言曰言論難曰語'.split('');
+// lecture du passage cité, sous les lattes : chaque caractère s'inscrit (kaishu, pinyin) quand l'or l'atteint sur la latte,
+// puis le sens de chaque groupe ; 言 et 語 en vermillon
+const LECTURE: { g: string; py: string; sens: string; ver?: boolean }[][] = [
+  [{ g: '直言', py: 'zhí yán', sens: 'parler droit' }, { g: '曰', py: 'yuē', sens: 'se dit' }, { g: '言', py: 'yán', sens: '', ver: true }],
+  [{ g: '論難', py: 'lùn nàn', sens: 'débattre, objecter' }, { g: '曰', py: 'yuē', sens: 'se dit' }, { g: '語', py: 'yǔ', sens: '', ver: true }],
+];
+const Lecture: React.FC<{ t: number; t0: number; a: number }> = ({ t, t0, a }) => {
+  let q = 0;
   return (
-    <AbsoluteFill style={{ opacity: out }}><Draw draw={(ctx, tt) => {
-      const u = (tt - PB.debut) / (PB.duree + 0.3);
-      ctx.save();
-      [[260, 0], [560, 0.12], [840, 0.24]].forEach(([y, d]) => {
-        const k = ease(clamp((u - d) / 0.55));
-        if (k <= 0) return;
-        const x1 = -200 + 2400 * k;
-        // un large coup de pinceau gris (lavis), bord d'attaque plus sombre, poils secs en traînée
-        const r = rng(Math.round(y * 7));
-        ctx.save();
-        const g = ctx.createLinearGradient(x1 - 1100, 0, x1, 0); g.addColorStop(0, 'rgba(120,112,104,0.0)'); g.addColorStop(0.35, 'rgba(120,112,104,0.32)'); g.addColorStop(0.92, 'rgba(96,88,80,0.5)'); g.addColorStop(1, 'rgba(60,54,48,0.62)');
-        ctx.fillStyle = g; ctx.filter = 'blur(3px)';
-        ctx.beginPath(); ctx.moveTo(-200, y - 150); ctx.bezierCurveTo(x1 * 0.4, y - 175, x1 * 0.8, y - 160, x1, y - 130); ctx.quadraticCurveTo(x1 + 70, y, x1, y + 130); ctx.bezierCurveTo(x1 * 0.8, y + 165, x1 * 0.4, y + 170, -200, y + 150); ctx.closePath(); ctx.fill();
-        ctx.filter = 'none'; ctx.strokeStyle = 'rgba(243,238,228,0.55)'; ctx.lineCap = 'round';
-        for (let i = 0; i < 18; i++) { const yy = y - 130 + 260 * r(); ctx.lineWidth = 1.5 + 3 * r(); ctx.beginPath(); ctx.moveTo(x1 - 1000 * (0.3 + 0.7 * r()), yy); ctx.lineTo(x1 - 120 - 200 * r(), yy + (r() - 0.5) * 8); ctx.stroke(); }
-        ctx.restore();
-      });
-      ctx.restore();
-    }} /></AbsoluteFill>
+    <div style={{ position: 'absolute', left: 0, width: 1920, top: 652, display: 'flex', justifyContent: 'center', opacity: a }}>
+      <div style={{ display: 'flex', gap: 70, padding: '8px 46px 4px', borderRadius: 22, background: 'rgba(246,241,231,0.9)', boxShadow: '0 0 40px rgba(246,241,231,0.9)' }}>
+        {LECTURE.map((ph, i) => (
+          <div key={i} style={{ display: 'flex', gap: 26, alignItems: 'flex-start' }}>
+            {ph.map((w, j) => {
+              const k0 = q; q += [...w.g].length;
+              const ap = (n: number) => seg(t, t0 + n * 0.24, t0 + n * 0.24 + 0.35), as = seg(t, t0 + (q - 1) * 0.24 + 0.3, t0 + (q - 1) * 0.24 + 0.8);
+              return (
+                <div key={j} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 110 }}>
+                  <div style={{ fontFamily: 'ShuimoLatin', fontStyle: 'italic', fontSize: 44, color: '#6b5a4a', opacity: ap(k0) }}>{w.py}</div>
+                  <div style={{ display: 'flex' }}>
+                    {[...w.g].map((c, n) => <span key={n} style={{ fontFamily: 'ShuimoKai', fontSize: 92, lineHeight: 1.08, color: w.ver ? rgb(VER) : inkCss, opacity: ap(k0 + n), textShadow: `0 0 ${18 * (1 - ap(k0 + n))}px rgba(255,190,90,0.9)` }}>{c}</span>)}
+                  </div>
+                  <div style={{ fontFamily: 'ShuimoLatin, ShuimoLegende', fontSize: 44, color: '#4b4038', opacity: as, minHeight: 52 }}>{w.sens}</div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
-// ════════════════ 6. La dynastie Han : le dictionnaire tranche (直言曰言，論難曰語)
-const QUOTE = '直言曰言論難曰語'.split('');
 const Han: React.FC = () => {
   const t = useT();
   const A6 = A('b06'), di = at('b06', 'dico'), qu = at('b06', 'question'), rp = at('b06', 'reponse'), dc = at('b06', 'discuter'), tb = at('b06', 'table'), pl = at('b06', 'pleine'), li = at('b06', 'lit');
-  const pz = L.clips.b06.pause!, p0 = A6 + pz.coupe, q0 = qu + 0.9, q1 = p0 - 0.1;
+  const pz = L.clips.b06.pause!, p0 = A6 + pz.coupe, q0 = qu + 0.9, q1 = p0 - 0.1, S3 = at('b06', 'bambou') - 0.5;
+  // l'or parcourt la citation sur la latte pendant que la voix la lit (直言曰言，论难曰语, ~1,4 s après « notre question »)
+  const EC = q0 + 0.5;
   return (
     <AbsoluteFill>
       <Paper />
       <Landscape seed={3} from={A6 - 0.5} to={B('b06') + 0.6} move="pan" mood="brume" faint={0.35} />
+      {/* le livre de lattes de bambou en 3D : déroulé en plan 3/4 (≤ 4 s), la caméra passe au-dessus, la citation s'inscrit */}
+      <Sequence from={Math.round(S3 * useVideoConfig().fps)} durationInFrames={Math.round((rp + 0.4 - S3) * useVideoConfig().fps)}>
+        <AbsoluteFill style={{ opacity: seg(t, S3, S3 + 0.5) * (1 - seg(t, rp - 0.3, rp + 0.3)) }}>
+          <LattesBambou3D texte={YU_LATTES} hlAt={p0 + 0.2 - S3} ecrit={EC - S3} />
+        </AbsoluteFill>
+      </Sequence>
       <Cam keys={[[A6 - 0.3, 960, 540, 1.0], [q0 - 0.2, 760, 540, 1.06, 1.0], [rp - 0.3, 600, 520, 1.1, 1.0], [dc - 0.2, 1200, 520, 1.1, 1.2], [tb - 0.3, 960, 540, 1.0, 1.0]]} punch={[rp + 0.2, dc + 0.3, pl + 0.6]}>
         <Draw draw={(ctx, tt, E) => {
-          // deux lattes du Shuowen ; la phrase s'écrit caractère par caractère pendant la citation
-          const sa = seg(tt, A6 - 0.2, A6 + 0.8) * (1 - seg(tt, rp - 0.3, rp + 0.3));
-          slip(ctx, 820, 110, 760, sa); slip(ctx, 960, 110, 760, sa);
-          QUOTE.forEach((c, i) => {
-            const t0 = q0 + (i * (q1 - q0)) / QUOTE.length, k = seg(tt, t0, t0 + 0.3);
-            const x = i < 4 ? 960 : 820, y = 230 + (i % 4) * 190;
-            const hl = c === '言' && i === 1 ? 0 : c === '語' ? seg(tt, p0, p0 + 0.6) : 0;
-            E.text(ctx, c, x, y, { font: 'Zhuan', size: 124, color: rgb(mixc(INK, VER, hl)), alpha: sa * k });
-          });
-          // cascade frappée pendant le silence : bronze, sceau de Jin, petit sceau, un coup chacun
-          const cas = 1 - seg(tt, rp + 0.4, rp + 0.9);
-          ([['yu_jinwen', 0.0], ['yu_xi', 0.45], ['yu_xiaozhuan', 0.9]] as [string, number][]).forEach(([g, d], i) => {
-            const u = tt - (p0 + 0.15 + d), a = clamp(u / 0.08) * cas;
-            if (a <= 0) return;
-            const k = 1 + 0.25 * (1 - seg(u, 0, 0.14)), y = 250 + i * 290;
-            ctx.save(); ctx.globalAlpha = a; ctx.translate(1450, y); ctx.scale(k, k); ctx.strokeStyle = rgb(VER, 0.85); ctx.lineWidth = 5; ctx.strokeRect(-125, -125, 250, 250); ctx.restore();
-            E.drawRealGlyph(ctx, g, { x: 1450, y, size: 220 * k, opacity: a, color: pig(1) });
-          });
           // la réponse : 言, une bouche tournée vers le vide ; 語, deux bouches et la parole qui fait l'aller-retour
           const ra = seg(tt, rp - 0.2, rp + 0.4) * (1 - seg(tt, tb - 0.4, tb));
           if (ra > 0) {
@@ -851,8 +895,10 @@ const Han: React.FC = () => {
           }
         }} />
       </Cam>
-      <Caption text="Shuowen jiezi 說文解字 · Xu Shen, vers l'an 100" a={win(t, di, q0 + 0.6, 0.4)} y={955} size={44} />
-      <Caption text="« Parler tout droit : 言. Discuter, répliquer : 語. »" a={win(t, p0 + 0.2, rp + 0.2, 0.4)} y={940} size={46} />
+      <Caption text="Shuowen jiezi 說文解字 · Xu Shen, vers l'an 100" a={win(t, di, EC - 0.2, 0.4)} y={955} size={44} />
+      <Caption text="ici, le chapitre 言 : tous les mots de la parole" a={win(t, EC - 2.6, EC - 0.2, 0.4)} y={812} size={44} />
+      <Lecture t={t} t0={EC} a={seg(t, EC - 0.3, EC) * (1 - seg(t, rp - 0.7, rp - 0.2))} />
+      <Caption text="« Parler tout droit se dit 言 ; débattre, se répondre, se dit 語. »" a={win(t, p0 + 0.2, rp - 0.1, 0.4)} y={940} size={46} />
       <Label x={560} y={880} zh="言" text="yán" color={VER} a={win(t, rp, tb - 0.4, 0.4)} align="center" />
       <Label x={1320} y={880} zh="語" text="yǔ" color={VER} a={win(t, dc, tb - 0.4, 0.4)} align="center" />
       {/* le banquet silencieux : estampage (image recomposée), révélé sur « Voilà pourquoi on ne 語 pas à table » */}
@@ -864,9 +910,8 @@ const Han: React.FC = () => {
           ctx.save(); ctx.globalAlpha = a; ctx.shadowColor = 'rgba(30,20,10,0.4)'; ctx.shadowBlur = 40; ctx.drawImage(im, x0 - 30 * k - w / 2, 520 - h / 2, w, h); ctx.restore();
         });
       }} />
-      <Caption text="banquet · estampage d'un relief de pierre (image recomposée)" a={win(t, tb + 0.4, at('b06', 'lit'), 0.4)} y={940} size={44} />
       <Caption text="寢不言 · « au lit, on ne parle pas »" a={win(t, at('b06', 'lit') + 0.2, B('b06') + 0.3, 0.4)} y={940} size={46} />
-      <EraTag {...cartouche('han', "vers l'an 100 · le dictionnaire")} a={seg(t, A6 - 0.5, A6 + 0.3) * (1 - seg(t, tb - 0.3, tb + 0.2))} />
+      <EraTag {...cartouche('han', "vers l'an 100 · le dictionnaire")} a={seg(t, A6 - 0.5, A6 + 0.3) * (1 - seg(t, tb - 0.3, tb + 0.2)) * (1 - win(t, S3 - 0.1, rp - 0.2, 0.4))} />
       {void li}
     </AbsoluteFill>
   );
@@ -880,7 +925,7 @@ const BOOK = '輶軒使者絕代語釋別國方言'.split('');
 const YangXiong: React.FC = () => {
   const t = useT();
   const A7 = A('b07'), vo = at('b07', 'voix'), so = at('b07', 'soldats'), cf = at('b07', 'confins'), pi = at('b07', 'pinceau'), an = at('b07', 'annees'), lv = at('b07', 'livre');
-  const mapFrom = vo - 0.2, mapTo = pi - 0.1;
+  const mapFrom = vo - 0.2, mapTo = lv - 0.3;
   return (
     <AbsoluteFill>
       <Paper />
@@ -935,18 +980,88 @@ const YangXiong: React.FC = () => {
         creditCarte(ctx, E, 'chine_centre_nord');
         void u;
       }} />
-      <Caption text="selon une lettre qui lui est attribuée · d'autres parlers encore" a={win(t, so, mapTo, 0.4)} y={955} size={44} />
-      <Placeholder title="Clip B · Yang Xiong et les soldats" sub="Seedance, 12 s (prompt : A_FOURNIR.md) — entrée à travers 語" a={win(t, pi - 0.1, lv - 0.2, 0.5)} />
-      <Caption text={<>« Vingt-sept ans » · <i>Fangyan</i> 方言, vers l'an 1</>} a={win(t, an - 0.1, lv - 0.2, 0.4)} y={955} size={44} />
-      <Caption text="« les mots des époques passées et les parlers des pays »" a={win(t, lv + 1.2, R2 - 0.3, 0.4)} y={955} size={44} />
+      <Caption text={<>« Vingt-sept ans » · 方言 <i>Fāngyán</i></>} a={win(t, an - 0.1, lv - 0.2, 0.4)} y={955} size={44} />
       <EraTag {...cartouche('han', "vers l'an 1 · Yang Xiong")} a={seg(t, A7 - 0.4, A7 + 0.4) * (1 - seg(t, R2 - 0.3, R2))} />
       {void an}
     </AbsoluteFill>
   );
 };
 
+
+// ════════════════ 8 bis. La dynastie Qing : l'empereur Yongzheng reçoit deux gouverneurs et ne comprend rien (1728)
+// sous-titres français du dialogue du clip (secondes depuis la première image du clip)
+const QING_SUBS: [number, number, string][] = [
+  // transcription Whisper (episodes/yu/voix/mots/qing_dialogue_whisper.json) : les deux gouverneurs parlent un chinois volontairement
+  // confus (accents du Fujian et de Canton) ; l'empereur : 停，朕一句也聽不懂 ; les gouverneurs : 皇上恕罪
+  [0.15, 2.4, "« Sire… » — avec l’accent du Fujian"],
+  [2.5, 5.7, "« Sire… » — avec l’accent de Canton"],
+  [7.85, 10.5, "« Assez ! Je n’en comprends pas un mot. »"],
+  [13.2, 15.05, '« Pardonnez-nous, Majesté ! »'],
+];
+const Qing: React.FC = () => {
+  const t = useT();
+  const PQ = L.plages.qing, Q0 = clipV0(PQ.debut - 0.2, 1.6), A11 = A('b11'), rc = at('b11', 'recoit'), ri = at('b11', 'rien'), od = at('b11', 'ordonne'), co = at('b11', 'cour');
+  const pa = at('b11', 'papier'), pr = at('b11', 'parole'), rq = at('b11', 'republique'), gy = at('b11', 'guoyu'), av = at('b11', 'avec');
+  const E11 = B('b11');
+  const FJ: [number, number] = [119.3, 26.1], GD: [number, number] = [113.3, 23.1], PK: [number, number] = [116.4, 39.9];
+  return (
+    <AbsoluteFill>
+      <Paper />
+      <Landscape seed={41} from={R2E - 1} to={E11 + 0.8} move="push" mood="jour" faint={0.5} />
+      {/* le clip, entier : l'empereur reçoit deux gouverneurs et ne comprend rien (la voix off se tait) */}
+      <ClipShot src="qing" from={PQ.debut - 0.2} len={15.104} nuages={1.6} />
+      {QING_SUBS.map(([a, b, txt], i) => <Caption key={i} text={txt} a={win(t, Q0 + a, Q0 + b, 0.15)} y={900} size={50} />)}
+      {/* puis la voix revient : la carte des deux provinces, et l'ordre de l'empereur */}
+      <MapPanel from={A11 - 0.2} to={pr - 0.5} draw={(ctx, u, E, tt) => {
+        const v = carte('chine_centre_sud').vue, ca = E.proj(v, PK);
+        const z = 1 + 0.05 * ease(seg(tt, A11, od));
+        ctx.save(); ctx.translate(960, 560); ctx.scale(z, z); ctx.translate(-960, -560);
+        fondCarte(ctx, E, 'chine_centre_sud');
+        [['福建', 'Fujian', FJ, rc, 3], ['廣東', 'Guangdong', GD, rc + 1.2, 7]].forEach(([zh, fr, p, t0, sd]) => {
+          const a = seg(tt, (t0 as number) - 0.3, (t0 as number) + 0.2), q = E.proj(v, p as [number, number]);
+          if (a <= 0) return;
+          routePinceau(ctx, q, ca, ease(seg(tt, (t0 as number) + 0.3, (t0 as number) + 1.6)), a, { seed: sd as number });
+          lieu(ctx, E, q, zh as string, fr as string, a, { cote: 'd', arrivee: seg(tt, (t0 as number) - 0.3, (t0 as number) - 0.1), seed: sd as number });
+        });
+        lieu(ctx, E, ca, '京師', 'Pékin', seg(tt, rc - 0.3, rc + 0.2), { cote: 'g', arrivee: seg(tt, rc - 0.3, rc - 0.1), seed: 11 });
+        ctx.restore();
+        creditCarte(ctx, E, 'chine_centre_sud');
+        void u;
+      }} />
+      <Draw draw={(ctx, tt, E) => {
+        // caractères tracés trait par trait (Make Me a Hanzi, encre lisse, comme le 語 du reste de l'épisode)
+        const st = (key: string, x: number, y: number, size: number, t0: number, dur: number, a: number, col: string) => {
+          const D = (W() as any).STROKES?.[key];
+          if (!D || a <= 0 || tt < t0) return;
+          ctx.save(); ctx.globalAlpha = a;
+          E.drawStrokes(ctx, key, { x, y, size, brush: false, progress: D.strokes.length * clamp((tt - t0) / dur), color: () => col });
+          ctx.restore();
+        };
+        // le 語 qui « ne passe plus » : il s'écrit, puis pâlit
+        const ay = win(tt, pr - 0.4, co - 0.3, 0.4), fd = seg(tt, pr + 2.2, pr + 3.0);
+        st('yu_kai', 960, 480, 470, pr - 0.4, 1.1, ay * (1 - 0.6 * fd), rgb(VER));
+        // l'ordre impérial : 官話, la langue de la cour
+        const aa = win(tt, co - 0.1, rq + 0.2, 0.4);
+        st('yu_p_guan', 760, 490, 380, co - 0.1, 0.8, aa, inkCss);
+        st('yu_p_hua', 1160, 490, 380, co + 0.75, 1.1, aa, inkCss);
+        // sous la République, la même langue prend le nom de 國語 : « la langue du pays », avec 語
+        const ag = win(tt, rq + 0.1, E11 + 0.6, 0.4), pu = Math.sin(Math.PI * seg(tt, av - 0.2, av + 0.8));
+        st('yu_p_guo', 760, 490, 380, rq + 0.1, 1.0, ag, inkCss);
+        st('yu_kai', 1160, 490, 380 * (1 + 0.08 * pu), gy - 0.2, 1.1, ag, rgb(VER));
+      }} />
+      <Draw draw={(ctx, tt) => birds(ctx, tt, od, co + 0.8, 430, -1, 5, 31)} />
+      <Caption text="語 · la parole qu'on échange… ne passe plus" a={win(t, pr + 0.1, od, 0.4)} y={880} size={50} />
+      <Caption text="官話 guānhuà · la langue de la cour" a={win(t, co + 0.4, rq + 0.1, 0.4)} y={880} size={50} />
+      <Caption text="國語 guóyǔ · « la langue du pays » : nommée en 1911, diffusée par la République" a={win(t, gy - 0.1, E11 + 0.5, 0.4)} y={880} size={50} />
+      <EraTag {...cartouche('qing', '1728 · Yongzheng')} a={Math.max(win(t, PQ.debut - 0.2, PQ.debut + 1.6, 0.4), seg(t, A11 - 0.4, A11 + 0.4) * (1 - seg(t, rq - 0.3, rq + 0.2)))} />
+      {void ri}{void pa}
+    </AbsoluteFill>
+  );
+};
+
 // ════════════════ 8. Aujourd'hui : 言 → 讠, la mosaïque des mots en 语, la carte des dialectes
-const R2E = R2 + AGES_SECONDS;
+const AGES_V = 1.35; // carte au fil des âges accélérée (7,5 s → 5,6 s)
+const R2E = R2 + AGES_SECONDS / AGES_V;
 const MOS0 = at('b08', 'partout') - 0.3;
 const MOS: MosaicConfig = {
   glyph: '语',
@@ -961,16 +1076,16 @@ const MOS: MosaicConfig = {
 };
 const Today: React.FC = () => {
   const t = useT();
-  const A8 = A('b08'), tr = at('b08', 'traits'), pa = at('b08', 'partout'), li = at('b08', 'lois'), ri = at('b08', 'rien'), ec = at('b08', 'ecriture'), ca = at('b08', 'canton');
+  const T8 = A('b08') - 0.4, A8 = A('b08'), tr = at('b08', 'traits'), pa = at('b08', 'partout'), li = at('b08', 'lois'), ri = at('b08', 'rien'), ec = at('b08', 'ecriture'), ca = at('b08', 'canton');
   const mosEnd = MOS0 + mosaicSeconds(MOS);
   const { fps } = useVideoConfig();
   return (
     <AbsoluteFill>
       <Paper />
-      <Cam keys={[[R2E, 960, 540, 1.0], [tr - 0.3, 760, 520, 1.16, 1.2], [pa - 0.6, 960, 540, 1.0, 0.6]]} punch={[tr + 0.8]} calm={[[R2 - 0.6, R2E + 0.4]]}>
+      <Cam keys={[[T8, 960, 540, 1.0], [tr - 0.3, 760, 520, 1.16, 1.2], [pa - 0.6, 960, 540, 1.0, 0.6]]} punch={[tr + 0.8]}>
         <Draw draw={(ctx, tt, E) => {
           // 語 → 语 : 言 se resserre en deux traits (讠), en vermillon
-          const a = seg(tt, R2E - 0.2, R2E + 0.6) * (1 - seg(tt, pa - 0.6, pa - 0.1));
+          const a = seg(tt, T8 - 0.2, T8 + 0.6) * (1 - seg(tt, pa - 0.6, pa - 0.1));
           if (a <= 0) return;
           const s = seg(tt, tr - 0.1, tr + 0.5);
           E.drawStrokes(ctx, 'yu_kai', { x: 960, y: 500, size: 600, brush: false, color: pig((c) => (c === 'parole' ? 1 : 0.35)), alpha: () => a * (1 - s) });
@@ -1004,7 +1119,7 @@ const Today: React.FC = () => {
         creditCarte(ctx, E, 'chine_centre_sud');
         void u;
       }} />
-      <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={seg(t, R2E - 0.2, R2E + 0.6) * (1 - seg(t, pa - 0.6, pa - 0.1))} />
+      <EraTag {...cartouche('aujourdhui', 'depuis 1956')} a={seg(t, T8 - 0.2, T8 + 0.6) * (1 - seg(t, pa - 0.6, pa - 0.1))} />
     </AbsoluteFill>
   );
 };
@@ -1071,7 +1186,7 @@ const drawBand = (ctx: CanvasRenderingContext2D, E: any, tt: number, a: number) 
 };
 const Recap: React.FC = () => {
   const t = useT();
-  const A9 = A('b09'), fo = at('b09', 'formes'), fa = at('b09', 'face'), na = at('b09', 'naissance'), mo = at('b09', 'mots'), ch = at('b09', 'chengyu');
+  const A9 = A('b09'), ci = at('b09', 'cinq'), bo = at('b09', 'bouche'), fo = at('b09', 'formes'), fa = at('b09', 'face'), na = at('b09', 'naissance'), mo = at('b09', 'mots'), ch = at('b09', 'chengyu');
   return (
     <AbsoluteFill>
       <Paper />
@@ -1086,6 +1201,7 @@ const Recap: React.FC = () => {
           }
         }} />
       </Cam>
+      <Caption text="五 : le son, à l'origine · plus aujourd'hui" a={win(t, ci + 0.2, bo - 0.4, 0.4)} y={950} size={44} />
       <Caption text="吾 donne le son : les « deux bouches » sont un moyen de s'en souvenir" a={win(t, fa + 0.3, na - 0.1, 0.4)} y={950} size={44} />
       <div style={{ position: 'absolute', width: '100%', top: 650, display: 'flex', justifyContent: 'center', gap: 220, opacity: seg(t, mo - 0.1, mo + 0.4) * (1 - seg(t, B('b09') + 0.3, B('b09') + 0.9)) }}>
         {[['語言', 'yǔyán · la langue', mo], ['成語', 'chéngyǔ · expression figée', ch]].map(([zh, fr, a0]) => (
@@ -1120,12 +1236,9 @@ const Chute: React.FC = () => {
             const rep2 = seg(tt, cv, cv + 0.5);
             E.drawRealGlyph(ctx, 'yu_wu_jiaguwen', { x: 1380, y: 500, size: 460, opacity: fa * (0.35 + 0.65 * rep2), color: pig(1), glow: 18 * win(tt, cv + 0.4, ma, 0.4), glowColor: rgb(AZ, 0.5) });
           }
-          // 師 : le tertre 𠂤 de l'os, esquissé en vermillon, puis 師 calligraphié
+          // 师 : le caractère simplifié d'aujourd'hui, au pinceau ; il rougit quand la voix dit « une armée »
           const sa = seg(tt, ma - 0.2, ma + 0.6);
-          if (sa > 0) {
-            E.drawRealGlyph(ctx, 'yu_shi_jiaguwen', { x: 1300, y: 500, size: 560, reveal: () => seg(tt, ma, ma + 1.4), opacity: sa, color: () => rgb(mixc(INK, VER, seg(tt, ar, ar + 0.6))) });
-            E.drawStrokes(ctx, 'yu_shi_kai', { x: 1680, y: 500, size: 300, progress: 10 * seg(tt, ma + 0.6, ma + 2.4), brush: false, color: () => inkCss, alpha: () => sa * 0.85 });
-          }
+          if (sa > 0) brushChar(ctx, '师', 1380, 500, 520, ma - 0.1, tt, sa, rgb(mixc(INK, VER, seg(tt, ar, ar + 0.6))));
         }} />
       </Cam>
       <div style={{ position: 'absolute', left: 180, top: 260, opacity: win(t, A10 - 0.2, ma + 0.2, 0.6) }}>
@@ -1133,8 +1246,7 @@ const Chute: React.FC = () => {
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 90, fontWeight: 600, color: inkCss }}>yǔ</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 54, fontWeight: 600, color: rgb(VER) }}>14 traits · 语 9 traits</div>
       </div>
-      <Caption text="師 · shī · le maître" a={win(t, ma + 0.3, ar, 0.4)} y={880} size={58} />
-      <Caption text="à l'origine : une troupe en campagne (二千五百人為師)" a={win(t, ar + 0.2, END + 0.2, 0.4)} y={955} size={44} />
+      <Caption text="师 · shī · le maître" a={win(t, ma + 0.3, ar, 0.4)} y={880} size={58} />
     </AbsoluteFill>
   );
 };
@@ -1156,7 +1268,7 @@ const EndCard: React.FC = () => {
           </div>
         </div>
         <div style={{ marginTop: 70, fontFamily: 'ShuimoLatin', fontSize: 46, color: '#5e5044', opacity: seg(t, END + 0.8, END + 1.6) }}>Prochain caractère</div>
-        <div style={{ fontFamily: 'ShuimoKai', fontSize: 260, lineHeight: 1, color: inkCss, opacity: seg(t, END + 1.2, END + 2.2) }}>師</div>
+        <div style={{ fontFamily: 'ShuimoPinceau', fontSize: 260, lineHeight: 1, color: inkCss, opacity: seg(t, END + 1.2, END + 2.2) }}>师</div>
         <div style={{ fontFamily: 'ShuimoLatin', fontSize: 60, fontWeight: 600, color: '#3b322b', opacity: seg(t, END + 1.6, END + 2.6) }}>shī · le maître</div>
       </div>
     </AbsoluteFill>
@@ -1174,7 +1286,7 @@ export const YuV1: React.FC = () => {
   const ready = useSetup();
   const { fps } = useVideoConfig();
   const t = useT();
-  const clips: Clip[] = ['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b08', 'b09', 'b10'];
+  const clips: Clip[] = ['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b11', 'b08', 'b09', 'b10'];
   const voice = (k: Clip) => {
     const c = L.clips[k];
     if (!c.pause) return <Sequence key={k} from={Math.round(c.debut * fps)}><Audio src={staticFile(`episodes/yu/voix/${k}.wav`)} /></Sequence>;
@@ -1185,7 +1297,6 @@ export const YuV1: React.FC = () => {
       </React.Fragment>
     );
   };
-  const PB = L.plages.pinceau;
   return (
     <AbsoluteFill style={{ background: '#f3eee4' }}>
       {ready && <Shake impacts={SEALS().map((x) => x.t)}>
@@ -1196,26 +1307,34 @@ export const YuV1: React.FC = () => {
         <Win fade={0.8} from={A('b05') - 0.3} to={PB.debut + PB.duree}><Royaumes /></Win>
         <Win fade={0.8} from={PB.debut + PB.duree} to={A('b07') - 0.3}><Han /></Win>
         <Win fade={0.8} from={A('b07') - 0.3} to={R2 + 0.6}><YangXiong /></Win>
-        <Win from={R2E - 0.8} to={A('b09') - 0.3}><Today /></Win>
+        <Win from={R2E - 0.8} to={A('b08') - 0.3}><Qing /></Win>
+        <Win fade={0.8} from={A('b08') - 0.3} to={A('b09') - 0.3}><Today /></Win>
         <Win fade={0.8} from={A('b09') - 0.3} to={A('b10') - 0.3}><Recap /></Win>
         <Win fade={0.8} from={A('b10') - 0.3} to={END + 0.8}><Chute /></Win>
         <Win from={END} to={YU_SECONDS + 1}><EndCard /></Win>
-        <BrushSweep />
         <SealStamps />
       </Shake>}
       {ready && <Win from={R1 - 1.5} to={R1 + r3Seconds(R3A) + 3.5}><Rouleau3DStage cfg={R3A} /></Win>}
       {/* Han → Qing : la carte traverse les âges ; fondu d'entrée sur Yang Xiong, fondu de sortie sur 1956 */}
       {ready && <Win fade={0.5} from={R2 - 0.1} to={R2E + 0.7}>
         <AbsoluteFill style={{ opacity: 1 - seg(t, R2E - 0.1, R2E + 0.7) }}>
-          <Sequence from={Math.round(R2 * fps)} durationInFrames={Math.round((AGES_SECONDS + 1) * fps)}><EssaiCarteAges /></Sequence>
+          <Sequence from={Math.round(R2 * fps)} durationInFrames={Math.round((AGES_SECONDS / AGES_V + 1) * fps)}><EssaiCarteAges vitesse={AGES_V} /></Sequence>
         </AbsoluteFill>
       </Win>}
       {ready && <GrainVignette />}
       {SFX.map(([n, tt, v], i) => (
         <Sequence key={`sfx${i}`} from={Math.round(tt * fps)}><Audio src={staticFile(`episodes/yu/audio/sfx_${n}.wav`)} volume={v} /></Sequence>
       ))}
+      {Object.values(L.plages as Record<string, { debut: number; son?: string; son_volume?: number; son_decalage?: number }>).filter((p) => p.son).map((p, i) => (
+        <Sequence key={`pl${i}`} from={Math.round((p.debut + (p.son_decalage ?? 0)) * fps)}><Audio src={staticFile(`episodes/yu/${p.son}`)} volume={p.son_volume ?? 1} /></Sequence>
+      ))}
       {clips.map(voice)}
-      <Audio src={staticFile('episodes/yu/audio/musique.wav')} volume={0.55} />
+      <Audio src={staticFile('episodes/yu/audio/musique.wav')} volume={(f) => 0.55 * (MF ? Math.max(0, Math.min(1, 1 - (f / fps - MF.debut) / 2)) : 1)} />
+      {/* musique de fin (bamboo grove) : discrète sous la dernière phrase, pleine sur l'écran de fin, puis fondu */}
+      {MF && <Sequence from={Math.round(MF.debut * fps)}><Audio src={staticFile(`musique/${MF.fichier}`)} startFrom={Math.round(MF.depart * fps)}
+        volume={(f) => { const s = f / fps, fv = MF.fin_voix - MF.debut, lg = MF.fin - MF.debut;
+          const v = s < fv ? MF.volume_voix * Math.min(1, s / MF.montee) : MF.volume_voix + (MF.volume - MF.volume_voix) * Math.min(1, (s - fv) / MF.montee);
+          return v * Math.max(0, Math.min(1, (lg - s) / MF.fondu)); }} /></Sequence>}
     </AbsoluteFill>
   );
 };

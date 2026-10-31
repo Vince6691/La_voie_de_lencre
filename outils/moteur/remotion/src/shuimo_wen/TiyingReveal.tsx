@@ -54,7 +54,7 @@ const Colonne: React.FC<{ zh: string; t: number; at: number; x: number; y: numbe
         </div>
       );
     })}
-    <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 40, lineHeight: 1.1, color: '#4a3f36', marginTop: 4, width: 230, textAlign: 'center',
+    <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, lineHeight: 1.1, color: '#4a3f36', marginTop: 4, width: 260, textAlign: 'center',
       opacity: clamp((t - at - zh.length * 0.45 - 0.2) / 0.5), textShadow: '0 0 10px rgba(246,241,231,0.95)' }}>{legende}</div>
   </div>
 );
