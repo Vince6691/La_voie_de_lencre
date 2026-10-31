@@ -31,3 +31,8 @@ du 语, b03 et b04 sans 师 / 京师 prononcés).
 | b08 | `YDWaobWbNApVpIB1iNIx` | `MdfUqC3nQJxwt5Dc8f2p` | (échec) | **1** |
 
 b07 : en attendant la nouvelle version, `voix/b07.mp3` est encore la prise v01 (les grues).
+
+## Prises v05 (b07 version B) — `apercus/comparaison_prises_v05.mp3` (prise 1, 2 s de silence, prise 2)
+| Bloc | Nœud | Prise 1 | Prise 2 | Retenue |
+|---|---|---|---|---|
+| b07 | `ngoeoR1hFZuSZsZZxV25` | `Sf1pam4oi1U5sPG3JJ7v` | `zGpRaHdoB20rHqFZtV2q` | ? |
