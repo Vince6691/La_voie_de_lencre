@@ -323,7 +323,7 @@ const Shang: React.FC = () => {
   const ro = at('b03', 'roi'), dr = at('b03', 'droite'), ce = at('b03', 'centre'), ga = at('b03', 'gauche'), sc = at('b03', 'scribe'), cm = at('b03', 'campe');
   const R1 = L.rouleaux[0].debut;
   const CAM: [number, Cam3][] = [
-    [ro - 0.6, { tx: 0, tz: 2, dist: 80, pitch: 68, yaw: 0, fov: 40 }], [dr + 0.6, { tx: 14, tz: 4, dist: 82, pitch: 58, yaw: -6, fov: 40 }],
+    [ro - 0.6, { tx: 4, tz: 12, dist: 80, pitch: 66, yaw: 0, fov: 40 }], [dr + 0.6, { tx: 2, tz: 10, dist: 88, pitch: 56, yaw: -2, fov: 40 }],
     [ga + 1.8, { tx: 0, tz: 0, dist: 98, pitch: 40, yaw: -12, fov: 40 }], [sc + 0.6, { tx: 0, tz: 2, dist: 112, pitch: 50, yaw: -4, fov: 40 }], [R1 + 1, { tx: 0, tz: 2, dist: 118, pitch: 52, yaw: 0, fov: 40 }]];
   return (
     <AbsoluteFill>
