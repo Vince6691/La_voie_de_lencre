@@ -15,6 +15,17 @@
   des os ; le lion supprimé, son temps donné à 帀 (nouveau bloc 5) ; le clip du tir à l'arc (déjà utilisé dans le 學)
   remplacé par la ronde de nuit.
 
+- **v4 (31/10, storytelling)** — textes exacts dans `VOIX.md` v4, à enregistrer :
+  1. **b01, ouverture à froid** : image et son d'abord (tambour, l'essaim vu de très haut qui se resserre en 師), puis
+     « Deux mille cinq cents soldats, rangés autour d'une butte de terre… » ; le retournement vers 老师 vient ensuite.
+  2. **b02 raccourci** (≈ 8 s) : « Celui du maître, on l'a croisé à la fin de l'épisode sur 语… »
+  3. **b04, la marche manquante armée → homme** : les officiers titrés 師 (師虎, 師酉 à l'écran, sur l'estampage du bronze).
+  4. **b05, relance avant le pivot** : « On est encore très loin d'une salle de classe. Et pourtant, la porte n'est plus
+     très loin. » (la caméra glisse vers la porte du palais, raccord avec le b06).
+  5. **b07, la bougie de 師曠** au lieu des grues : le maître aveugle, le duc de 70 ans, « allumez une bougie » ; plan :
+     白描 de 師曠, une flamme peinte qui s'allume entre les deux hommes et éclaire peu à peu le papier ; légende
+     « selon le Shuoyuan ». **b08** : « Et l'inverse ? Faut-il être vieux pour être maître ? »
+
 ---
 
 **Question du début :** comment le mot « professeur » peut-il cacher deux mille cinq cents soldats ?
