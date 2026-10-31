@@ -1,0 +1,237 @@
+{
+ "b01": {
+  "duration": 18.49,
+  "cues": {
+   "laoshi": 3.63,
+   "shi": 4.83,
+   "pourtant": 6.83,
+   "classe": 10.99,
+   "deux_mille": 12.43,
+   "ennemi": 15.15,
+   "question": 16.68
+  }
+ },
+ "b02": {
+  "duration": 17.73,
+  "cues": {
+   "dessins": 0.0,
+   "yu": 5.47,
+   "bouches": 6.27,
+   "reponse": 9.07,
+   "maitre": 11.63,
+   "classe": 12.91,
+   "camp": 16.03
+  }
+ },
+ "b03": {
+  "duration": 34.53,
+  "cues": {
+   "egypte": 2.12,
+   "ramses": 3.24,
+   "simbel": 5.96,
+   "chine": 7.4,
+   "forme": 9.72,
+   "bosses": 14.84,
+   "butte": 16.2,
+   "camp": 18.72,
+   "textes": 20.12,
+   "roi": 23.16,
+   "droite": 25.22,
+   "centre": 26.08,
+   "gauche": 26.96,
+   "scribe": 28.26,
+   "signe": 30.6,
+   "campe": 33.32
+  }
+ },
+ "b04": {
+  "duration": 22.96,
+  "cues": {
+   "zhou": 0.0,
+   "quatorze": 4.01,
+   "six": 5.33,
+   "huit": 7.77,
+   "luoyi": 9.97,
+   "capitale": 11.09,
+   "ville": 14.53,
+   "bronzes": 17.17,
+   "second": 21.53
+  }
+ },
+ "b05": {
+  "duration": 33.03,
+  "cues": {
+   "pied": 1.49,
+   "ligne": 4.89,
+   "partir": 6.45,
+   "retourne": 9.49,
+   "tete": 10.29,
+   "revient": 11.41,
+   "tour": 13.33,
+   "garde": 15.01,
+   "nuit": 18.57,
+   "ronde": 20.21,
+   "butte": 22.05,
+   "cercle": 23.29,
+   "voila": 25.53,
+   "existe": 27.09,
+   "za": 29.54,
+   "untour": 32.42
+  }
+ },
+ "b06": {
+  "duration": 21.36,
+  "cues": {
+   "porte": 0.74,
+   "officier": 2.06,
+   "qui": 4.42,
+   "fils": 9.5,
+   "instruit": 10.64,
+   "vertu": 13.58,
+   "conduire": 14.62,
+   "precepteur": 17.98,
+   "armee": 19.26,
+   "assise": 20.62
+  }
+ },
+ "b07": {
+  "duration": 26.64,
+  "cues": {
+   "question": 0.03,
+   "art": 4.14,
+   "jin": 7.99,
+   "aveugle": 14.55,
+   "soir": 15.87,
+   "qin": 17.2,
+   "grues": 19.47,
+   "nom": 24.11
+  }
+ },
+ "b08": {
+  "duration": 27.43,
+  "cues": {
+   "question": 0.38,
+   "tang": 2.78,
+   "honte": 6.3,
+   "discours": 14.22,
+   "citation": 17.18,
+   "transmet": 18.78,
+   "metier": 20.06,
+   "doutes": 21.34,
+   "age": 23.06,
+   "voie": 25.1
+  }
+ },
+ "b09": {
+  "duration": 24.51,
+  "cues": {
+   "reprenons": 0.03,
+   "deux": 2.99,
+   "butte": 4.51,
+   "pied": 6.59,
+   "date": 8.83,
+   "tasse": 12.03,
+   "naissance": 13.95,
+   "laoshi": 18.31,
+   "shifu": 21.31,
+   "taxi": 23.23
+  }
+ },
+ "b10": {
+  "duration": 27.52,
+  "cues": {
+   "classe": 0.0,
+   "rassembler": 4.12,
+   "guerre": 6.28,
+   "comprendre": 9.0,
+   "proverbe": 11.32,
+   "chinois": 12.92,
+   "traduction": 15.88,
+   "fu": 18.52,
+   "main": 21.52,
+   "baton": 23.88,
+   "hache": 24.84,
+   "bientot": 26.28
+  }
+ },
+ "_ligne": {
+  "clips": {
+   "b01": {
+    "debut": 0.6,
+    "duree": 18.49
+   },
+   "b02": {
+    "debut": 19.99,
+    "duree": 17.73
+   },
+   "b03": {
+    "debut": 38.52,
+    "duree": 34.53
+   },
+   "b04": {
+    "debut": 77.65,
+    "duree": 22.96
+   },
+   "b05": {
+    "debut": 101.21,
+    "duree": 33.03
+   },
+   "b06": {
+    "debut": 135.04,
+    "duree": 21.36,
+    "pause": {
+     "coupe": 19.14,
+     "duree": 2.0
+    }
+   },
+   "b07": {
+    "debut": 160.9,
+    "duree": 26.64
+   },
+   "b08": {
+    "debut": 193.44,
+    "duree": 27.43
+   },
+   "b09": {
+    "debut": 221.67,
+    "duree": 24.51
+   },
+   "b10": {
+    "debut": 247.18,
+    "duree": 27.52
+   }
+  },
+  "rouleaux": [
+   {
+    "debut": 73.35,
+    "duree": 4
+   },
+   {
+    "debut": 187.84,
+    "duree": 5.3,
+    "modele": "3d-complet"
+   }
+  ],
+  "pauses": [
+   [
+    154.18,
+    2.0
+   ]
+  ],
+  "plages": {},
+  "fin": 275.0,
+  "total": 285.0,
+  "bruitages": [],
+  "musique_fin": {
+   "fichier": "bamboo_grove_434735.mp3",
+   "debut": 273.2,
+   "fin_voix": 274.7,
+   "fin": 285.0,
+   "volume_voix": 0.12,
+   "volume": 0.3,
+   "montee": 1.5,
+   "fondu": 2.5,
+   "depart": 0
+  }
+ }
+}

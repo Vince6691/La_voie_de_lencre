@@ -10,53 +10,190 @@
   },
   {
    "clip": "b02",
-   "apres": 1
+   "apres": 0.8
   },
   {
    "clip": "b03",
-   "apres": 0.7
+   "apres": 0.3
   },
   {
-   "rouleau": 5,
+   "rouleau": 4,
    "apres": 0.3
   },
   {
    "clip": "b04",
-   "apres": 0.8
+   "apres": 0.6
   },
   {
    "clip": "b05",
-   "pause": {
-    "repere": "reponse",
-    "decalage": -0.12,
-    "duree": 1.7
-   },
-   "apres": 1
+   "apres": 0.8
   },
   {
    "clip": "b06",
-   "apres": 0.5
+   "pause": {
+    "repere": "armee",
+    "decalage": -0.12,
+    "duree": 2.0
+   },
+   "apres": 2.5
+  },
+  {
+   "clip": "b07",
+   "apres": 0.3
+  },
+  {
+   "rouleau3d": "complet",
+   "apres": 0.3
+  },
+  {
+   "clip": "b08",
+   "apres": 0.8
+  },
+  {
+   "clip": "b09",
+   "apres": 1.0
+  },
+  {
+   "clip": "b10",
+   "apres": 0.3
   }
  ],
  "queue": 10,
  "reperes_cles": {
   "b01": {
-   "mains": "deux mains"
+   "laoshi": "老师",
+   "shi": "Shī c'est",
+   "pourtant": "Pourtant il y a",
+   "classe": "devant une classe",
+   "deux_mille": "mais deux mille",
+   "ennemi": "devant l'ennemi",
+   "question": "Comment une armée"
+  },
+  "b02": {
+   "dessins": "Un caractère chinois",
+   "yu": "语",
+   "bouches": "deux bouches",
+   "reponse": "celui dont",
+   "maitre": "le maître",
+   "classe": "Mais ce maître-là",
+   "camp": "Il est né dans un camp"
   },
   "b03": {
-   "signe": "C'est là"
+   "egypte": "en Égypte",
+   "ramses": "Ramsès",
+   "simbel": "d'Abou Simbel",
+   "chine": "Au même moment",
+   "forme": "la plus ancienne",
+   "bosses": "à deux bosses",
+   "butte": "Une butte",
+   "camp": "dresse son camp",
+   "textes": "Et dans les plus",
+   "roi": "Le roi forme",
+   "droite": "à droite",
+   "centre": "au centre",
+   "gauche": "à gauche",
+   "scribe": "Et pour écrire",
+   "signe": "trace notre signe",
+   "campe": "c'est l'armée qui campe"
+  },
+  "b04": {
+   "zhou": "La dynastie",
+   "quatorze": "quatorze armées",
+   "six": "six à l'ouest",
+   "huit": "et huit",
+   "luoyi": "洛邑",
+   "capitale": "La capitale elle-même",
+   "ville": "la grande ville",
+   "bronzes": "Mais sur les bronzes",
+   "second": "un second dessin"
   },
   "b05": {
-   "reponse": "Les mains n'ont pas"
+   "pied": "la tradition voit",
+   "ligne": "un pied posé",
+   "partir": "veut dire",
+   "retourne": "Retournez-le",
+   "tete": "tête en bas",
+   "revient": "le pied revient",
+   "tour": "Il fait le tour",
+   "garde": "Car deux mille",
+   "nuit": "Chaque nuit",
+   "ronde": "font la ronde",
+   "butte": "La butte au centre",
+   "cercle": "le cercle des pas",
+   "voila": "voilà le",
+   "existe": "Ce pied qui tourne",
+   "za": "on le prononce",
+   "untour": "un tour"
+  },
+  "b06": {
+   "porte": "à la porte",
+   "officier": "un officier",
+   "qui": "Et qui mieux",
+   "fils": "ses fils",
+   "instruit": "Alors chaque jour",
+   "vertu": "la vertu",
+   "conduire": "la manière",
+   "precepteur": "précepteur",
+   "armee": "Et l'armée",
+   "assise": "s'est assise"
+  },
+  "b07": {
+   "question": "Mais si le maître",
+   "art": "Peu à peu",
+   "jin": "Au royaume",
+   "aveugle": "Il est aveugle",
+   "soir": "On raconte",
+   "qin": "quand il joua",
+   "grues": "seize paires",
+   "nom": "chez lui"
+  },
+  "b08": {
+   "question": "faut-il être vieux",
+   "tang": "Sous la dynastie",
+   "honte": "presque honteux",
+   "discours": "le Discours",
+   "citation": "écrit-il",
+   "transmet": "transmet la Voie",
+   "metier": "enseigne le métier",
+   "doutes": "dissipe les doutes",
+   "age": "qu'importe son âge",
+   "voie": "là où est"
+  },
+  "b09": {
+   "reprenons": "Reprenons",
+   "deux": "garde deux dessins",
+   "butte": "La butte",
+   "pied": "Et le pied",
+   "date": "En mille neuf",
+   "tasse": "tasse la butte",
+   "naissance": "Ainsi naît",
+   "laoshi": "老师",
+   "shifu": "师傅",
+   "taxi": "Ou le chauffeur"
+  },
+  "b10": {
+   "classe": "De l'armée",
+   "rassembler": "rassembler des hommes",
+   "guerre": "Seulement",
+   "comprendre": "Il les mène à comprendre",
+   "proverbe": "Un proverbe",
+   "chinois": "一日为师，终身为父",
+   "traduction": "Maître un jour",
+   "fu": "Et le père",
+   "main": "c'est une main",
+   "baton": "Un bâton",
+   "hache": "Une hache",
+   "bientot": "Nous le découvrirons"
   }
  },
  "musique_fin": {
   "fichier": "bamboo_grove_434735.mp3",
-  "avance": 2,
+  "avance": 1.5,
   "volume_voix": 0.12,
   "volume": 0.3,
   "montee": 1.5,
   "fondu": 2.5,
   "depart": 0
- }
+ },
+ "bruitages": []
 }
