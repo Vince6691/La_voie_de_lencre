@@ -1,0 +1,6 @@
+0:00.0  b02 prise 1
+0:19.2  b02 prise 2
+0:40.0  b03 prise 1
+1:15.9  b03 prise 2
+1:52.9  b04 prise 1
+2:17.3  b04 prise 2

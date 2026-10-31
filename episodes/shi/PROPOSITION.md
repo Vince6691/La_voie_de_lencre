@@ -9,7 +9,7 @@
 - **Carte** : une seule — les quatorze armées des Zhou (西六師 / 成周八師).
 - **白描** : 師曠 au qin.
 - **Clips 3D** : 1 — la ronde de nuit autour du camp (illustre 帀).
-- **Durée** : ≈ 5 min. **Passerelle** : rappel du **文** (épisode précédent) au début ; fin sur **父**
+- **Durée** : ≈ 5 min. **Passerelle** : rappel du **語** (épisode précédent, dont la fin annonce déjà le maître et l'armée) au début ; fin sur **父**
   (« 一日為師，終身為父 »).
 - **v2 (retours du 31/10)** : rappel du 文 au lieu du 教 ; la date repositionnée par rapport à l'Égypte, sans parler
   des os ; le lion supprimé, son temps donné à 帀 (nouveau bloc 5) ; le clip du tir à l'arc (déjà utilisé dans le 學)
@@ -58,19 +58,19 @@ l'ennemi. ⏸ [curious] Comment une armée est-elle devenue un maître ?
 > « deux mille cinq cents », la moitié gauche 𠂤 s'allume en ocre et une poussière de minuscules soldats
 > grouille un instant dans ses traits ; à « un maître », retour au 师.
 
-## 2. L'enjeu et le rappel du 文 — 0:18
-Un caractère chinois, c'est un assemblage de petits dessins. Dans l'épisode précédent, 文, l'homme tatoué, est devenu
-la culture : l'art de changer les hommes par l'écriture plutôt que par les armes. ⏸ Notre caractère, lui, a fait ce
-chemin tout seul. Il est parti des armes.
-> plan : 文 ancien en pigments (l'homme azurite, la marque vermillon) ; à « plutôt que par les armes », une lance
-> au trait se pose à côté de lui puis s'efface ; 文 glisse et cède la place à 師 ; « parti des armes » : 師 se
-> rétracte en point d'encre ; paysage shuimo de la dynastie Shang (aube, brume, plaine) qui se peint autour.
+## 2. L'enjeu et le rappel du 語 — 0:18
+Un caractère chinois, c'est un assemblage de petits dessins. Dans l'épisode précédent, 语, deux bouches face à face,
+nous a menés jusqu'à celui dont on attend toujours la réponse : le maître. ⏸ Mais ce maître-là n'est pas né dans une
+salle de classe. Il est né dans un camp militaire.
+> plan : 語 de bronze en pigments (les deux bouches face à face, comme dans l'épisode du 語) ; sur « le maître », les
+> bouches s'éteignent et 師 se pose à côté ; sur « camp militaire », 師 se rétracte en point d'encre ; paysage
+> shuimo de la dynastie Shang (aube, brume, plaine) qui se peint autour.
 
 ## 3. La dynastie Shang : les trois 師 — 0:35
 Il y a trois mille deux cents ans… en Égypte, Ramsès II fait tailler ses colosses dans la falaise d'Abou Simbel. ⏸
 Au même moment, en Chine, apparaît la plus ancienne forme connue de notre caractère. ⏸ Elle ne tient qu'en un seul dessin,
 à deux bosses. Une butte de terre, peut-être, là où la troupe dresse son camp. ⏸ Et dans les plus anciens textes
-chinois, on lit : « Le roi forme trois 師 : à droite, au centre, à gauche. » Le 師, c'est l'armée qui campe.
+chinois, on lit : « Le roi forme trois armées : à droite, au centre, à gauche. » Et pour écrire « armée », le scribe trace notre signe. Le 師, c'est l'armée qui campe.
 > plan : **frise des civilisations** au trait sur le papier : une bande horizontale où l'Égypte (silhouette des
 > colosses d'Abou Simbel en lavis ocre pâle) et la Chine sont alignées sur la même date — une ligne verticale
 > vermillon relie les deux ; **deux étiquettes au plus** : « Ramsès II » puis, à sa place, « vers 1250 av. J.-C. »
@@ -83,8 +83,8 @@ chinois, on lit : « Le roi forme trois 師 : à droite, au centre, à gauche. �
 
 ## 4. La dynastie Zhou : les quatorze armées — 1:25
 La dynastie Zhou renverse les Shang. Sa puissance tient en quatorze armées : six à l'ouest, autour de la capitale,
-et huit à l'est, dans la nouvelle ville de Luoyi. ⏸ La capitale elle-même prend un nom : 京師, la grande ville où
-campe l'armée. ⏸ Mais sur les bronzes, notre signe a changé : à côté de la butte, un second dessin est apparu.
+et huit à l'est, dans la nouvelle ville de Luoyi. ⏸ La capitale elle-même porte notre caractère dans son nom : la grande
+ville où campe l'armée (京師 à l'écran, jamais prononcé). ⏸ Mais sur les bronzes, notre signe a changé : à côté de la butte, un second dessin est apparu.
 > plan : **carte 1** (papier ; chercher d'abord dans `assets/cartes`) : Zongzhou et Luoyi, 6 puis 8 petits sceaux
 > de camps qui s'allument sur « six » et « huit » ; 京師 en ruban ; bronze tamponné, 師 de bronze révélé en blanc
 > puis à l'encre, la butte en ocre, 帀 encore gris sur « un second dessin ».

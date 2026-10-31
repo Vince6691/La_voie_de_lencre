@@ -18,10 +18,17 @@ Voix « Chinese narration » (`KpnSJfGwFIPSRbO89Nsr`), eleven_v4, 2 prises par b
 ## Prises v02 (VOIX.md v2) — comparaison `apercus/comparaison_prises_v02.mp3`
 | Bloc | Nœud | Prise 1 | Prise 2 | Retenue |
 |---|---|---|---|---|
-| b02 | `pZZKA9iI3adbz75YndaX` | `nV1BvxsCAd1r4khBCzSm` | `0f1qXZQ7uG652fTYHt22` | ? |
-| b03 | `axLJE1LRbwIdbI4u6uh9` | `Odnfm9xiENG2hI12spPz` | `0F0DaAdzMjtgyZmm4On2` | ? |
-| b04 | `86S2HwPZ28vBYGeZ602N` | `CBZyamVfkOZFYtjzW2uN` | `2lMCqUdppxgHEH2BrGEq` | ? |
-| b10 | `ej5rKHPhzBuuxq45Q70N` | `O9jAzujEcJtEFzDhooIV` | `AvOn8rEjcBsU3vfxoMsn` | ? |
+| b02 | `pZZKA9iI3adbz75YndaX` | `nV1BvxsCAd1r4khBCzSm` | `0f1qXZQ7uG652fTYHt22` | non (rappel du 文 : l'épisode précédent est 语) |
+| b03 | `axLJE1LRbwIdbI4u6uh9` | `Odnfm9xiENG2hI12spPz` | `0F0DaAdzMjtgyZmm4On2` | non (« trois shī » toujours mauvais) |
+| b04 | `86S2HwPZ28vBYGeZ602N` | `CBZyamVfkOZFYtjzW2uN` | `2lMCqUdppxgHEH2BrGEq` | non (« Jīngshī » toujours faux) |
+| b10 | `ej5rKHPhzBuuxq45Q70N` | `O9jAzujEcJtEFzDhooIV` | `AvOn8rEjcBsU3vfxoMsn` | **1** |
+
+## Prises v03 (VOIX.md v3) — comparaison `apercus/comparaison_prises_v03.mp3`
+| Bloc | Nœud | Prise 1 | Prise 2 | Retenue |
+|---|---|---|---|---|
+| b02 | `tSZd4nXWn4yy92hl3Gjj` | `sJxKeKhuUEl5h9QekdMq` | `x56n03ZV0tJEquk2TAd3` | ? |
+| b03 | `SB5zxJwepJFPZE5GrGEn` | `8NlgCq5h7yowolaJQgF0` | `IP9ZgLxjhW1Re5Kt2N76` | ? |
+| b04 | `ne6bppGwe35HE6BurAvj` | `YR1xirFeSmIpJcSIIwyb` | `SCesCo0MU8Rj1l95OKbO` | ? |
 
 Minutage Scribe des retenues v01 : `voix/mots/bNN.json` (+ `bNN_v01_takeN.json`) ; fichiers `voix/bNN.mp3`.
 
