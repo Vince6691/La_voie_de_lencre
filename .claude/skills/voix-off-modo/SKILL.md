@@ -49,7 +49,9 @@ citation finale.
   ans »).
 - Pas d'appel à l'abonnement, pas de « dans cette vidéo », pas de méta-commentaire.
 - Écrire pour l'oreille : pas de parenthèses, pas de chiffres romains, nombres en lettres si la voix de synthèse
-  hésite ; noms chinois en orthographe que la voix prononce bien (tester).
+  hésite ; noms chinois en orthographe que la voix prononce bien : règles et lexique des noms validés ou ratés dans
+  `outils/video_shuimo/PRONONCIATION.md` (nom au milieu d'une phrase qui continue, jamais isolé par une ponctuation ni
+  juste après un nombre ; mots composés rares laissés à l'écran) — à vérifier dès l'écriture du texte.
 
 ## Mouture v2 — rétention (par défaut pour les nouvelles vidéos)
 Validée avec l'utilisateur : garder le ton, les signes décrits en traits, le pinceau, la maxime, et **le voyage**

@@ -214,19 +214,6 @@ const SEALS = () => [
   { t: at('b08', 'tang') + 0.4, zh: '唐' },
 ];
 const SealStamps: React.FC = () => <Draw draw={(ctx, tt, E) => { for (const s of SEALS()) drawSeal(ctx, E, 1810, 860, 128, s.zh, tt - s.t); }} />;
-// vol d'oiseaux (ou de grues) d'encre
-const birds = (ctx: CanvasRenderingContext2D, tt: number, t0: number, t1: number, y0: number, dir = 1, n = 5, seed = 3, size = 1) => {
-  const r = rng(seed);
-  for (let i = 0; i < n; i++) {
-    const u = (tt - t0 - 0.22 * i) / (t1 - t0), o = r(), p = r();
-    if (u < 0 || u > 1) continue;
-    const x = dir > 0 ? -90 + 2100 * u : 2010 - 2100 * u, y = y0 + 38 * Math.sin(u * 5 + i) - 130 * u + (o - 0.5) * 150;
-    const s = (20 + 14 * p) * size, wing = 0.5 + 0.5 * Math.sin(tt * 5 + i * 1.9), lift = s * (0.15 + 0.65 * wing);
-    ctx.save(); ctx.globalAlpha = 0.8 * seg(u, 0, 0.08) * (1 - seg(u, 0.92, 1)); ctx.strokeStyle = inkCss; ctx.lineWidth = 3.5 * size; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.beginPath(); ctx.moveTo(x - s, y - lift); ctx.quadraticCurveTo(x - s * 0.45, y - lift - 5, x, y); ctx.quadraticCurveTo(x + s * 0.45, y - lift - 5, x + s, y - lift); ctx.stroke(); ctx.restore();
-  }
-};
-
 // ── l'essaim : soldats de l'épisode (positions mémorisées)
 const butteSil = (E: any) => memo('butte', () => silhouette(260, [960, 520], 520, (g, s) => E.drawStrokes(g, 'shi_kai', { x: s / 2, y: s / 2, size: s, brush: false, color: () => '#000', alpha: (c: string) => (c === 'butte' ? 1 : 0) }), 'butte'));
 
@@ -573,28 +560,54 @@ const Shishi: React.FC = () => {
   );
 };
 
-// ════════════════ 7. Jin : le maître aveugle 師曠, les grues
+// ════════════════ 7. Jin : le maître aveugle 師曠 et la bougie (說苑·建本) — « c'est déjà le soir » : le jour baisse ; le
+// soleil du matin, celui de midi, puis la flamme d'une bougie, seule lumière dans le noir qui gagne
+const flamme = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, t: number, a: number) => {
+  if (a <= 0) return;
+  const fl = 1 + 0.06 * Math.sin(t * 13) * Math.sin(t * 5.3), h = 46 * s * fl, w = 15 * s;
+  ctx.save(); ctx.globalAlpha *= a;
+  const halo = ctx.createRadialGradient(x, y - h * 0.4, 0, x, y - h * 0.4, 360 * s);
+  halo.addColorStop(0, 'rgba(255,214,150,0.55)'); halo.addColorStop(1, 'rgba(255,214,150,0)');
+  ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(x, y - h * 0.4, 360 * s, 0, 7); ctx.fill();
+  ctx.fillStyle = rgb(INK, 0.85); ctx.fillRect(x - 9 * s, y, 18 * s, 120 * s); // la chandelle, à l'encre
+  const g = ctx.createLinearGradient(x, y - h, x, y);
+  g.addColorStop(0, 'rgba(255,240,200,0.95)'); g.addColorStop(0.6, 'rgba(250,170,70,0.95)'); g.addColorStop(1, 'rgba(200,70,30,0.9)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x, y - h);
+  ctx.bezierCurveTo(x + w, y - h * 0.45, x + w * 0.8, y, x, y); ctx.bezierCurveTo(x - w * 0.8, y, x - w, y - h * 0.45, x, y - h); ctx.fill();
+  ctx.restore();
+};
 const Jin: React.FC = () => {
   const t = useT();
-  const A7 = A('b07'), qu = at('b07', 'question'), ar = at('b07', 'art'), ji = at('b07', 'jin'), so = at('b07', 'soir'), gr = at('b07', 'grues'), no = at('b07', 'nom');
+  const A7 = A('b07'), qu = at('b07', 'question'), ar = at('b07', 'art'), ji = at('b07', 'jin'), sk = at('b07', 'shikuang'), du = at('b07', 'duc'), so = at('b07', 'soir');
+  const rp = at('b07', 'repond'), ma = at('b07', 'matin'), mi = at('b07', 'midi'), bo = at('b07', 'bougie'), no = at('b07', 'noir');
   const R3 = L.rouleaux[1].debut;
   const im = IMG.shikuang;
   return (
     <AbsoluteFill>
       <Paper />
       <Landscape seed={21} from={A7 - 1} to={R3 + 1} move="pan" mood="brume" faint={0.5} />
-      <Cam keys={[[A7 - 0.3, 960, 540, 1.0], [ar - 0.2, 960, 520, 1.04, 1.0], [ji - 0.2, 960, 540, 1.0, 1.0], [so - 0.2, 960, 520, 1.06, 2.0], [gr - 0.2, 960, 480, 1.0, 1.2]]} punch={[qu + 0.4, ji + 0.4, gr + 0.4]} calm={[[R3 - 0.6, R3 + 1]]}>
+      <Cam keys={[[A7 - 0.3, 960, 540, 1.0], [ar - 0.2, 960, 520, 1.04, 1.0], [ji - 0.2, 960, 540, 1.0, 1.0], [du - 0.2, 960, 520, 1.05, 2.0], [rp - 0.2, 960, 540, 1.0, 1.0], [bo - 0.2, 1240, 560, 1.12, 1.4]]} punch={[qu + 0.4, sk + 0.3, so + 0.3, bo + 0.3]} calm={[[R3 - 0.6, R3 + 1]]}>
         <Draw draw={(ctx, tt, E) => {
           const q = win(tt, A7 - 0.3, ji + 0.3, 0.5);
           if (q > 0) { const k0 = seg(tt, A7 + 0.6, A7 + 1.8); E.drawRealGlyph(ctx, 'shi_jinwen', { x: 960, y: 540 - 40 * k0, size: 720 - 160 * k0 - 180 * seg(tt, ar, ar + 0.8), opacity: q, color: pig(1) }); }
           if (im) { const a = win(tt, ji - 0.2, R3 - 0.2, 0.6), h = 760, w = (h * im.width) / im.height; ctx.save(); ctx.globalAlpha = a; ctx.drawImage(im, 960 - w / 2, 520 - h / 2, w, h); ctx.restore(); }
-          birds(ctx, tt, gr, gr + 6.5, 380, 1, 6, 7, 2.2);
-          birds(ctx, tt, gr + 1.4, gr + 7.5, 520, -1, 5, 9, 2.0);
+          // « c'est déjà le soir » : un voile de crépuscule ; puis le soleil du matin, celui de midi ; puis le noir et la bougie
+          const dusk = seg(tt, so - 0.6, so + 0.6) * (1 - seg(tt, ma - 0.6, ma)) + 0.85 * seg(tt, bo - 0.3, bo + 1.2);
+          if (dusk > 0) {
+            const g = ctx.createRadialGradient(1240, 600, 40, 1240, 600, 1500);
+            const hole = seg(tt, bo, bo + 0.8);
+            g.addColorStop(0, `rgba(30,24,40,${(0.5 * dusk * (1 - hole)).toFixed(3)})`); g.addColorStop(0.18, `rgba(30,24,40,${(0.5 * dusk * (1 - 0.6 * hole)).toFixed(3)})`); g.addColorStop(1, `rgba(30,24,40,${(0.62 * dusk).toFixed(3)})`);
+            ctx.fillStyle = g; ctx.fillRect(-100, -100, 2120, 1280);
+          }
+          const sun = (p: number, a: number) => { if (a <= 0) return; const x = 420 + 1080 * p, y = 760 - 520 * Math.sin(Math.PI * Math.min(0.5, p)); const g = ctx.createRadialGradient(x, y, 0, x, y, 120); g.addColorStop(0, rgb(VER, 0.85 * a)); g.addColorStop(0.55, rgb(VER, 0.55 * a)); g.addColorStop(1, rgb(VER, 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 120, 0, 7); ctx.fill(); };
+          sun(0.08 + 0.42 * ease(seg(tt, ma - 0.2, mi + 0.6)), win(tt, ma - 0.4, bo + 0.2, 0.5));
+          flamme(ctx, 1240, 640, 1.6, tt, seg(tt, bo - 0.1, bo + 0.6) * (1 - seg(tt, R3 - 0.6, R3)));
         }} />
       </Cam>
-      {!im && <Placeholder title="白描 : 師曠 au qin" sub="le maître de musique aveugle — dessin à fournir" a={win(t, ji - 0.2, R3 - 0.2, 0.6)} />}
-      <Label x={960} y={160} zh="師曠" text="le maître Kuang" color={VER} a={win(t, ji + 0.6, so + 0.4, 0.4)} align="center" />
-      <Caption text="seize paires de grues noires · selon le Han Feizi" a={win(t, gr + 0.2, no + 0.2, 0.4)} y={880} size={44} />
+      {!im && <Placeholder title="白描 : 師曠, la bougie et le vieux duc" sub="le maître de musique aveugle — dessin à fournir" a={win(t, ji - 0.2, rp, 0.6)} />}
+      <Label x={960} y={160} zh="師曠" text="le maître Kuang" color={VER} a={win(t, sk - 0.1, du, 0.4)} align="center" />
+      <Caption text="« c'est déjà le soir » · selon le Shuoyuan (Ier s. av. J.-C.)" a={win(t, so - 0.2, ma - 0.3, 0.4)} y={880} size={46} />
+      <Caption text="少而好學，如日出之陽 · 老而好學，如炳燭之明" a={win(t, ma, no + 0.4, 0.4)} y={880} size={48} />
       <EraTag {...cartouche('jin', 'VIe s. av. J.-C.')} a={win(t, ji - 0.2, R3 - 0.3, 0.5)} />
     </AbsoluteFill>
   );

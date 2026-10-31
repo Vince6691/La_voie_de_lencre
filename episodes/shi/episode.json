@@ -143,13 +143,17 @@
   },
   "b07": {
    "question": "Mais si le maître",
-   "art": "Peu à peu",
+   "art": "D'un art",
    "jin": "Au royaume",
+   "shikuang": "师旷",
    "aveugle": "Il est aveugle",
-   "soir": "On raconte",
-   "qin": "quand il joua",
-   "grues": "seize paires",
-   "nom": "chez lui"
+   "duc": "Un jour",
+   "soir": "c'est déjà le soir",
+   "repond": "Le maître répond",
+   "matin": "soleil du matin",
+   "midi": "Adulte",
+   "bougie": "Vieux",
+   "noir": "C'est peu"
   },
   "b08": {
    "question": "faut-il être vieux",

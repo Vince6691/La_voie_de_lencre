@@ -40,4 +40,4 @@ b07 : en attendant la nouvelle version, `voix/b07.mp3` est encore la prise v01 (
 ## Prises v06 (b07, tournure v01 pour 晋 / 师旷) — `apercus/comparaison_prises_v06.mp3`
 | Bloc | Nœud | Prise 1 | Prise 2 | Retenue |
 |---|---|---|---|---|
-| b07 | `AnyUt3L1smCaXa9ncug2` | `YkaNku83dtBbO2cc35mQ` | `7vcjdsPUMTdYC1DDJBnf` | ? |
+| b07 | `AnyUt3L1smCaXa9ncug2` | `YkaNku83dtBbO2cc35mQ` | `7vcjdsPUMTdYC1DDJBnf` | **1** |

@@ -99,16 +99,20 @@
   }
  },
  "b07": {
-  "duration": 26.64,
+  "duration": 32.24,
   "cues": {
    "question": 0.03,
-   "art": 4.14,
-   "jin": 7.99,
-   "aveugle": 14.55,
-   "soir": 15.87,
-   "qin": 17.2,
-   "grues": 19.47,
-   "nom": 24.11
+   "art": 4.49,
+   "jin": 5.71,
+   "shikuang": 9.23,
+   "aveugle": 11.71,
+   "duc": 13.07,
+   "soir": 18.35,
+   "repond": 19.94,
+   "matin": 23.31,
+   "midi": 24.67,
+   "bougie": 26.99,
+   "noir": 29.47
   }
  },
  "b08": {
@@ -190,18 +194,18 @@
    },
    "b07": {
     "debut": 177.17,
-    "duree": 26.64
+    "duree": 32.24
    },
    "b08": {
-    "debut": 209.71,
+    "debut": 215.31,
     "duree": 28.58
    },
    "b09": {
-    "debut": 239.09,
+    "debut": 244.69,
     "duree": 24.51
    },
    "b10": {
-    "debut": 264.6,
+    "debut": 270.2,
     "duree": 27.52
    }
   },
@@ -211,7 +215,7 @@
     "duree": 4
    },
    {
-    "debut": 204.11,
+    "debut": 209.71,
     "duree": 5.3,
     "modele": "3d-complet"
    }
@@ -223,14 +227,14 @@
    ]
   ],
   "plages": {},
-  "fin": 292.42,
-  "total": 302.42,
+  "fin": 298.02,
+  "total": 308.02,
   "bruitages": [],
   "musique_fin": {
    "fichier": "bamboo_grove_434735.mp3",
-   "debut": 290.62,
-   "fin_voix": 292.12,
-   "fin": 302.42,
+   "debut": 296.22,
+   "fin_voix": 297.72,
+   "fin": 308.02,
    "volume_voix": 0.12,
    "volume": 0.3,
    "montee": 1.5,
