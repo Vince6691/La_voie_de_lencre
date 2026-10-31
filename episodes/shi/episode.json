@@ -61,21 +61,20 @@
  "queue": 10,
  "reperes_cles": {
   "b01": {
+   "soldats": "Deux mille",
+   "butte": "rangés autour",
+   "caractere": "C'est ce que",
+   "aujourdhui": "Aujourd'hui",
+   "classe": "en entrant en classe",
    "laoshi": "老师",
-   "shi": "Shī c'est",
-   "pourtant": "Pourtant il y a",
-   "classe": "devant une classe",
-   "deux_mille": "mais deux mille",
-   "ennemi": "devant l'ennemi",
+   "shi": "Shī",
    "question": "Comment une armée"
   },
   "b02": {
    "dessins": "Un caractère chinois",
+   "maitre": "Celui du maître",
    "yu": "语",
-   "bouches": "deux bouches",
-   "reponse": "celui dont",
-   "maitre": "le maître",
-   "classe": "Mais ce maître-là",
+   "classe": "et il n'est pas né",
    "camp": "Il est né dans un camp"
   },
   "b03": {
@@ -104,7 +103,10 @@
    "luoyi": "洛邑",
    "capitale": "La capitale elle-même",
    "ville": "la grande ville",
-   "bronzes": "Mais sur les bronzes",
+   "officiers": "À la tête",
+   "noms": "on lit encore",
+   "homme": "mais l'homme",
+   "bronzes": "Et sur ces bronzes",
    "second": "un second dessin"
   },
   "b05": {
@@ -123,7 +125,9 @@
    "voila": "voilà le",
    "existe": "Ce pied qui tourne",
    "za": "on le prononce",
-   "untour": "un tour"
+   "untour": "un tour",
+   "loin": "On est encore",
+   "porte": "la porte n'est"
   },
   "b06": {
    "porte": "à la porte",

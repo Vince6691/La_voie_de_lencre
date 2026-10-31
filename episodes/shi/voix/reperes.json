@@ -2,25 +2,24 @@
  "b01": {
   "duration": 18.49,
   "cues": {
-   "laoshi": 3.63,
-   "shi": 4.83,
-   "pourtant": 6.83,
-   "classe": 10.99,
-   "deux_mille": 12.43,
-   "ennemi": 15.15,
-   "question": 16.68
+   "soldats": 0.0,
+   "butte": 1.74,
+   "caractere": 4.14,
+   "aujourdhui": 7.54,
+   "classe": 11.54,
+   "laoshi": 13.18,
+   "shi": 14.7,
+   "question": 16.78
   }
  },
  "b02": {
-  "duration": 17.73,
+  "duration": 11.79,
   "cues": {
    "dessins": 0.0,
-   "yu": 5.47,
-   "bouches": 6.27,
-   "reponse": 9.07,
-   "maitre": 11.63,
-   "classe": 12.91,
-   "camp": 16.03
+   "maitre": 3.61,
+   "yu": 6.81,
+   "classe": 7.81,
+   "camp": 10.17
   }
  },
  "b03": {
@@ -45,38 +44,43 @@
   }
  },
  "b04": {
-  "duration": 22.96,
+  "duration": 35.75,
   "cues": {
    "zhou": 0.0,
-   "quatorze": 4.01,
-   "six": 5.33,
-   "huit": 7.77,
-   "luoyi": 9.97,
-   "capitale": 11.09,
-   "ville": 14.53,
-   "bronzes": 17.17,
-   "second": 21.53
+   "quatorze": 4.08,
+   "six": 5.56,
+   "huit": 8.12,
+   "luoyi": 10.44,
+   "capitale": 11.48,
+   "ville": 14.84,
+   "officiers": 17.36,
+   "noms": 22.28,
+   "homme": 28.16,
+   "bronzes": 30.04,
+   "second": 34.32
   }
  },
  "b05": {
-  "duration": 33.03,
+  "duration": 42.45,
   "cues": {
-   "pied": 1.49,
-   "ligne": 4.89,
-   "partir": 6.45,
-   "retourne": 9.49,
-   "tete": 10.29,
-   "revient": 11.41,
-   "tour": 13.33,
-   "garde": 15.01,
-   "nuit": 18.57,
-   "ronde": 20.21,
-   "butte": 22.05,
-   "cercle": 23.29,
-   "voila": 25.53,
-   "existe": 27.09,
-   "za": 29.54,
-   "untour": 32.42
+   "pied": 1.56,
+   "ligne": 4.96,
+   "partir": 6.6,
+   "retourne": 9.68,
+   "tete": 10.48,
+   "revient": 11.56,
+   "tour": 13.48,
+   "garde": 15.08,
+   "nuit": 18.68,
+   "ronde": 20.36,
+   "butte": 22.2,
+   "cercle": 23.52,
+   "voila": 25.76,
+   "existe": 27.48,
+   "za": 29.93,
+   "untour": 32.95,
+   "loin": 37.56,
+   "porte": 41.16
   }
  },
  "b06": {
@@ -108,18 +112,18 @@
   }
  },
  "b08": {
-  "duration": 27.43,
+  "duration": 28.58,
   "cues": {
-   "question": 0.38,
-   "tang": 2.78,
-   "honte": 6.3,
-   "discours": 14.22,
-   "citation": 17.18,
-   "transmet": 18.78,
-   "metier": 20.06,
-   "doutes": 21.34,
-   "age": 23.06,
-   "voie": 25.1
+   "question": 1.08,
+   "tang": 3.4,
+   "honte": 7.12,
+   "discours": 15.16,
+   "citation": 18.12,
+   "transmet": 19.8,
+   "metier": 21.08,
+   "doutes": 22.32,
+   "age": 24.0,
+   "voie": 26.28
   }
  },
  "b09": {
@@ -162,22 +166,22 @@
    },
    "b02": {
     "debut": 19.99,
-    "duree": 17.73
+    "duree": 11.79
    },
    "b03": {
-    "debut": 38.52,
+    "debut": 32.58,
     "duree": 34.53
    },
    "b04": {
-    "debut": 77.65,
-    "duree": 22.96
+    "debut": 71.71,
+    "duree": 35.75
    },
    "b05": {
-    "debut": 101.21,
-    "duree": 33.03
+    "debut": 108.06,
+    "duree": 42.45
    },
    "b06": {
-    "debut": 135.04,
+    "debut": 151.31,
     "duree": 21.36,
     "pause": {
      "coupe": 19.14,
@@ -185,48 +189,48 @@
     }
    },
    "b07": {
-    "debut": 160.9,
+    "debut": 177.17,
     "duree": 26.64
    },
    "b08": {
-    "debut": 193.44,
-    "duree": 27.43
+    "debut": 209.71,
+    "duree": 28.58
    },
    "b09": {
-    "debut": 221.67,
+    "debut": 239.09,
     "duree": 24.51
    },
    "b10": {
-    "debut": 247.18,
+    "debut": 264.6,
     "duree": 27.52
    }
   },
   "rouleaux": [
    {
-    "debut": 73.35,
+    "debut": 67.41,
     "duree": 4
    },
    {
-    "debut": 187.84,
+    "debut": 204.11,
     "duree": 5.3,
     "modele": "3d-complet"
    }
   ],
   "pauses": [
    [
-    154.18,
+    170.45,
     2.0
    ]
   ],
   "plages": {},
-  "fin": 275.0,
-  "total": 285.0,
+  "fin": 292.42,
+  "total": 302.42,
   "bruitages": [],
   "musique_fin": {
    "fichier": "bamboo_grove_434735.mp3",
-   "debut": 273.2,
-   "fin_voix": 274.7,
-   "fin": 285.0,
+   "debut": 290.62,
+   "fin_voix": 292.12,
+   "fin": 302.42,
    "volume_voix": 0.12,
    "volume": 0.3,
    "montee": 1.5,

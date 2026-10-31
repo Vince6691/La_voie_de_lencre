@@ -230,65 +230,77 @@ const birds = (ctx: CanvasRenderingContext2D, tt: number, t0: number, t1: number
 // ── l'essaim : soldats de l'épisode (positions mémorisées)
 const butteSil = (E: any) => memo('butte', () => silhouette(260, [960, 520], 520, (g, s) => E.drawStrokes(g, 'shi_kai', { x: s / 2, y: s / 2, size: s, brush: false, color: () => '#000', alpha: (c: string) => (c === 'butte' ? 1 : 0) }), 'butte'));
 
-// ════════════════ 1. Accroche : 师 se trace, 老师 ; 師 traditionnel, la butte grouille de soldats ; « Comment une armée… »
+// le camp en 3D (mètres) : la butte au fond, trois carrés (à droite, au centre, à gauche), trois chars devant le carré du centre
+const MOUND3: V2 = [0, 16];
+const SQ3: V2[] = [[34, 6], [0, -14], [-34, 6]];
+const N3 = 720, PER3 = N3 / 3;
+const camp3 = () => garde3('camp3', () => carres3(N3, SQ3, 16, 1.35));
+const CHARS3: V2[] = [[-9, -31], [0, -33], [9, -31]];
+const coins = (c: V2, w: number, d: number): V2[] => [[c[0] - w, c[1] - d], [c[0] + w, c[1] - d], [c[0] + w, c[1] + d], [c[0] - w, c[1] + d]];
+// ════════════════ 1. Accroche, ouverture à froid (VOIX v4) : vu de très haut, l'armée campe autour de la butte, puis se
+// resserre et dessine 師 ; « Aujourd'hui… » : 師 devient 师, tracé trait par trait, et 老师 ; « Comment une armée… »
 const Opening: React.FC = () => {
   const t = useT();
-  const la = at('b01', 'laoshi'), sh = at('b01', 'shi'), po = at('b01', 'pourtant'), dm = at('b01', 'deux_mille'), en = at('b01', 'ennemi'), qu = at('b01', 'question');
+  const bu = at('b01', 'butte'), ca = at('b01', 'caractere'), au = at('b01', 'aujourdhui'), la = at('b01', 'laoshi'), sh = at('b01', 'shi'), qu = at('b01', 'question');
   const out = seg(t, B('b01') + 0.3, A('b02') - 0.1);
+  const c0 = ca - 0.2, c1 = ca + 1.6; // l'armée se resserre en 師
+  const CAM: [number, Cam3][] = [[0, { tx: 0, tz: 6, dist: 150, pitch: 72, yaw: -14, fov: 40 }], [c0, { tx: 0, tz: 4, dist: 118, pitch: 80, yaw: -4, fov: 40 }], [c1, { tx: 0, tz: 0, dist: 95, pitch: 89.5, yaw: 0, fov: 40 }]];
   return (
     <AbsoluteFill style={{ opacity: 1 - out }}>
       <Paper />
-      <Cam keys={[[0, 960, 540, 1.04], [la - 0.2, 960, 540, 1.0, 1.0], [po - 0.2, 960, 530, 1.02, 1.0], [dm - 0.2, 860, 520, 1.12, 1.0], [qu - 0.3, 960, 540, 1.0, 1.0]]} punch={[la + 0.2, dm + 0.2, qu + 0.4]}>
+      <Cam keys={[[0, 960, 540, 1.0], [au, 960, 540, 1.0, 1.0], [la - 0.2, 960, 540, 1.0, 1.0], [qu - 0.3, 960, 540, 1.0, 1.0]]} punch={[c1, la + 0.2, qu + 0.4]}>
         <Draw draw={(ctx, tt, E) => {
-          // 师 tracé trait par trait (sans texture de pinceau), puis 老 à sa gauche
-          const s1 = 1 - seg(tt, po - 0.2, po + 0.15);
-          const back = seg(tt, qu - 0.1, qu + 0.25);
-          const slide = ease(seg(tt, la - 0.3, la + 0.5)) * (1 - ease(seg(tt, sh - 0.2, sh + 0.6)));
-          if (s1 > 0) E.drawStrokes(ctx, 'shi_simp', { x: 960 + 230 * slide, y: 500, size: 560, brush: false, progress: 6 * seg(tt, 0.5, la - 0.3), color: () => inkCss, alpha: () => s1 });
-          const lao = win(tt, la - 0.2, sh + 0.3, 0.35);
-          if (lao > 0) E.text(ctx, '老', 960 - 330, 500, { font: 'ShuimoKai', size: 470, color: inkCss, alpha: lao });
-          // 師 : fondu net ; à « deux mille cinq cents », la butte en ocre et de minuscules soldats grouillent dans ses traits
-          const s2 = seg(tt, po - 0.1, po + 0.25) * (1 - seg(tt, qu - 0.1, qu + 0.2));
-          if (s2 > 0) {
-            const k = seg(tt, dm - 0.1, dm + 0.6) * (1 - seg(tt, qu - 0.6, qu));
-            ctx.save(); ctx.globalAlpha = s2;
-            E.drawStrokes(ctx, 'shi_kai', { x: 960, y: 520, size: 520, brush: false, color: (c: string) => rgb(mixc(INK, c === 'butte' ? OCRE : INK, k)), alpha: (c: string) => (c === 'butte' ? 1 - 0.45 * k : 1), glow: 18 * k, glowColor: rgb(OCRE, 0.5) });
+          // l'armée, vue de haut : le camp autour de la butte, puis la silhouette de 師 (même taille que le caractère à l'écran)
+          const army = 1 - seg(tt, c1 - 0.3, c1 + 0.6);
+          if (army > 0) {
+            const b = camBasis(camAt(CAM, tt));
+            const S = garde3('silkai', () => silhouette3(N3, [0, 0], 26, (g, s) => E.drawStrokes(g, 'shi_kai', { x: s / 2, y: s / 2, size: s, brush: false, color: () => '#000' }), 'kai'));
+            ctx.save(); ctx.globalAlpha = army * seg(tt, 0, 0.6);
+            butte3D(ctx, b, MOUND3, 9, 1 - seg(tt, c0, c0 + 0.8), OCRE);
+            SQ3.forEach((c) => lavisSol(ctx, b, coins(c, 12, 11), 1 - seg(tt, c0, c0 + 0.8)));
+            armee(ctx, b, camp3(), S, seg(tt, c0, c1), { t: tt, pose: (_, k) => (k > 0 && k < 1 ? 'marche' : 'debout'), vague: { origine: [0, 0], etalement: 0.5 }, poussiere: true });
             ctx.restore();
-            const sw = win(tt, dm + 0.1, qu - 0.2, 0.5) * s2;
-            if (sw > 0) { const S = butteSil(E); dessinerEssaim(ctx, S, S, 1, { pose: (i) => (i % 3 ? 'marche' : 'debout'), echelle: 0.62, alpha: sw, ondule: 2.2, t: tt }); }
           }
-          if (back > 0) E.drawStrokes(ctx, 'shi_simp', { x: 960, y: 500, size: 560, brush: false, color: () => inkCss, alpha: () => back * (1 - seg(tt, B('b01') + 0.2, A('b02'))) });
+          // 師 apparaît là où l'armée l'a dessiné (la butte en ocre) ; « Aujourd'hui » : fondu net vers 师, tracé trait par trait
+          const g1 = seg(tt, c1 - 0.6, c1 + 0.2) * (1 - seg(tt, au - 0.1, au + 0.25));
+          if (g1 > 0) E.drawStrokes(ctx, 'shi_kai', { x: 960, y: 540, size: 722, brush: false, color: (c: string) => (c === 'butte' ? rgb(OCRE) : inkCss), alpha: () => g1, glow: 18 * win(tt, c1 - 0.3, au, 0.3), glowColor: rgb(OCRE, 0.5) });
+          const slide = ease(seg(tt, la - 0.3, la + 0.5)) * (1 - ease(seg(tt, sh - 0.2, sh + 0.6)));
+          const s1 = seg(tt, au - 0.1, au + 0.2);
+          if (s1 > 0) E.drawStrokes(ctx, 'shi_simp', { x: 960 + 230 * slide, y: 520, size: 580, brush: false, progress: 6 * seg(tt, au, la - 0.3), color: () => inkCss, alpha: () => s1 * (1 - seg(tt, B('b01') + 0.2, A('b02'))) });
+          const lao = win(tt, la - 0.2, sh + 0.3, 0.35);
+          if (lao > 0) E.text(ctx, '老', 960 - 330, 520, { font: 'ShuimoKai', size: 480, color: inkCss, alpha: lao });
         }} />
       </Cam>
+      <Caption text="2 500 soldats autour d'une butte" a={win(t, 0.4, ca + 0.4, 0.5)} y={880} size={52} />
       <Caption text="lǎoshī · le professeur" a={win(t, la + 0.2, sh + 0.2, 0.4)} y={880} size={58} />
-      <Caption text="shī · le maître" a={win(t, sh + 0.2, po, 0.4)} y={880} size={58} />
-      <Caption text="2 500 hommes" a={win(t, dm + 0.3, en + 1.0, 0.4)} y={880} size={58} />
+      <Caption text="shī · le maître" a={win(t, sh + 0.2, B('b01') + 0.4, 0.4)} y={880} size={58} />
     </AbsoluteFill>
   );
 };
 
-// ════════════════ 2. Rappel du 語 : deux bouches face à face → le maître → « né dans un camp militaire »
+// ════════════════ 2. Rappel du 語 (VOIX v4) : un assemblage de petits dessins → 語 → « pas né dans une salle de classe » →
+// « né dans un camp militaire »
 const Rappel: React.FC = () => {
   const t = useT();
-  const A2 = A('b02'), de = at('b02', 'dessins'), yu = at('b02', 'yu'), bo = at('b02', 'bouches'), ma = at('b02', 'maitre'), cl = at('b02', 'classe'), ca = at('b02', 'camp');
+  const A2 = A('b02'), de = at('b02', 'dessins'), yu = at('b02', 'yu'), cl = at('b02', 'classe'), ca = at('b02', 'camp');
   return (
     <AbsoluteFill>
       <Paper />
       <Landscape seed={14} from={ca - 0.6} to={A('b03') + 3} move="push" mood="aube" faint={0.55} />
-      <Cam keys={[[A2 - 0.3, 960, 540, 1.0], [yu - 0.3, 960, 520, 1.04, 1.0], [bo - 0.2, 900, 560, 1.1, 1.0], [ma - 0.3, 1100, 520, 1.04, 1.0], [ca - 0.2, 960, 540, 1.0, 1.0]]} punch={[de + 0.3, bo + 0.3, ma + 0.3]}>
+      <Cam keys={[[A2 - 0.3, 960, 540, 1.0], [yu - 0.3, 900, 540, 1.06, 1.0], [cl - 0.3, 1100, 520, 1.04, 1.0], [ca - 0.2, 960, 540, 1.0, 1.0]]} punch={[de + 0.3, yu + 0.4, cl + 0.3]}>
         <Draw draw={(ctx, tt, E) => {
           // un caractère = un assemblage de petits dessins : les deux moitiés de 師 prennent leurs pigments
           const d0 = win(tt, A2 - 0.3, yu - 0.1, 0.4), dk = seg(tt, de + 0.3, de + 1.0);
           if (d0 > 0) E.drawStrokes(ctx, 'shi_kai', { x: 960, y: 500, size: 520, brush: false, color: pig(dk), alpha: () => d0 });
-          // 語 de bronze, ses pigments (la parole, les bouches, le cinq) ; les bouches s'allument
-          const ya = win(tt, yu - 0.2, ma + 0.6, 0.4), sl = ease(seg(tt, ma - 0.3, ma + 0.6));
-          if (ya > 0) E.drawRealGlyph(ctx, 'yu_jinwen', { x: 960 - 380 * sl, y: 520, size: 560, opacity: ya * (1 - 0.6 * sl), color: pig(1), glow: 22 * win(tt, bo, ma, 0.3), glowColor: rgb(AZ, 0.6) });
+          // 語 de bronze, ses pigments ; les deux bouches s'allument
+          const ya = win(tt, yu - 0.2, cl + 0.6, 0.4), sl = ease(seg(tt, cl - 0.3, cl + 0.6));
+          if (ya > 0) E.drawRealGlyph(ctx, 'yu_jinwen', { x: 960 - 380 * sl, y: 520, size: 560, opacity: ya * (1 - 0.6 * sl), color: pig(1), glow: 22 * win(tt, yu + 0.3, cl, 0.3), glowColor: rgb(AZ, 0.6) });
           // le maître : 師 (bronze) à droite ; sur « camp militaire », il se rétracte en point d'encre
-          const ra = seg(tt, ma - 0.1, ma + 0.5), sh = 1 - ease(seg(tt, ca + 0.2, ca + 1.4));
-          if (ra > 0 && sh > 0.02) E.drawRealGlyph(ctx, 'shi_jinwen', { x: 960 + 340 * sl * sh, y: 520, size: 560 * sh, opacity: ra, color: pig(seg(tt, cl, cl + 0.6)) });
+          const ra = seg(tt, cl - 0.1, cl + 0.5), sh = 1 - ease(seg(tt, ca + 0.2, ca + 1.2));
+          if (ra > 0 && sh > 0.02) E.drawRealGlyph(ctx, 'shi_jinwen', { x: 960 + 340 * sl * sh, y: 520, size: 560 * sh, opacity: ra, color: pig(1) });
         }} />
       </Cam>
-      <Label x={960} y={150} zh="語" text="deux bouches face à face" color={AZ} a={win(t, bo - 0.1, ma, 0.4)} align="center" />
+      <Label x={960} y={150} zh="語" text="l'épisode précédent" color={AZ} a={win(t, yu - 0.1, cl, 0.4)} align="center" />
     </AbsoluteFill>
   );
 };
@@ -310,13 +322,6 @@ const fresques = () => {
   CARTONS ??= { eg: carton('Fresque A — l’Égypte de Ramsès II', '#d8bd88', '#5a4026'), sh: carton('Fresque B — Anyang, dynastie Shang', '#ebe6dc', '#2f2a26') };
   return { eg: IMG.egypte ?? CARTONS.eg, sh: IMG.shang ?? CARTONS.sh, vraies: !!(IMG.egypte && IMG.shang) };
 };
-// le camp en 3D (mètres) : la butte au fond, trois carrés (à droite, au centre, à gauche), trois chars devant le carré du centre
-const MOUND3: V2 = [0, 16];
-const SQ3: V2[] = [[34, 6], [0, -14], [-34, 6]];
-const N3 = 720, PER3 = N3 / 3;
-const camp3 = () => garde3('camp3', () => carres3(N3, SQ3, 16, 1.35));
-const CHARS3: V2[] = [[-9, -31], [0, -33], [9, -31]];
-const coins = (c: V2, w: number, d: number): V2[] => [[c[0] - w, c[1] - d], [c[0] + w, c[1] - d], [c[0] + w, c[1] + d], [c[0] - w, c[1] + d]];
 const Shang: React.FC = () => {
   const t = useT();
   const A3 = A('b03'), ra = at('b03', 'ramses'), ch = at('b03', 'chine'), fo = at('b03', 'forme'), bs = at('b03', 'bosses'), bu = at('b03', 'butte'), cp = at('b03', 'camp');
@@ -403,7 +408,7 @@ const camp = (ctx: CanvasRenderingContext2D, q: number[], a: number) => {
 };
 const Zhou: React.FC = () => {
   const t = useT();
-  const A4 = A('b04'), zh = at('b04', 'zhou'), si = at('b04', 'six'), hu = at('b04', 'huit'), lu = at('b04', 'luoyi'), cap = at('b04', 'capitale'), br = at('b04', 'bronzes'), se = at('b04', 'second');
+  const zh = at('b04', 'zhou'), si = at('b04', 'six'), hu = at('b04', 'huit'), cap = at('b04', 'capitale'), br = at('b04', 'officiers'), no = at('b04', 'noms'), ho = at('b04', 'homme'), bz = at('b04', 'bronzes'), se = at('b04', 'second');
   const T0 = R1 + TR1.duration!;
   return (
     <AbsoluteFill>
@@ -436,6 +441,10 @@ const Zhou: React.FC = () => {
         }} />
       </Cam>
       <Label x={960} y={150} zh="京師" text="la grande ville où campe l'armée" color={VER} a={win(t, cap - 0.1, br - 0.2, 0.4)} align="center" />
+      <Label x={1580} y={430} zh="師虎" text="" color={OCRE} a={win(t, no - 0.1, bz, 0.4)} align="center" />
+      <Label x={1580} y={600} zh="師酉" text="" color={OCRE} a={win(t, no + 0.3, bz, 0.4)} align="center" />
+      <Caption text="des officiers nommés sur les bronzes (師虎簋, 師酉簋)" a={win(t, no - 0.1, ho - 0.1, 0.4)} y={880} size={46} />
+      <Caption text="le titre 師 : l'homme qui commande la troupe" a={win(t, ho - 0.1, bz + 0.2, 0.4)} y={880} size={46} />
       <Caption text="six armées à l'ouest, huit à l'est (inscriptions de bronze)" a={win(t, hu + 0.6, cap - 0.1, 0.4)} y={880} size={46} />
       <EraTag {...cartouche('zhou', 'Zhou de l’Ouest · XIe–VIIIe s. av. J.-C.')} a={tagIn(TR1, t) * (1 - seg(t, B('b04') + 0.2, B('b04') + 0.8))} />
     </AbsoluteFill>
@@ -446,7 +455,7 @@ const Zhou: React.FC = () => {
 const Za: React.FC = () => {
   const t = useT();
   const A5 = A('b05'), pi = at('b05', 'pied'), li = at('b05', 'ligne'), pa = at('b05', 'partir'), rt = at('b05', 'retourne'), te = at('b05', 'tete'), rv = at('b05', 'revient'), to = at('b05', 'tour');
-  const nu = at('b05', 'nuit'), bu = at('b05', 'butte'), vo = at('b05', 'voila'), ex = at('b05', 'existe'), za = at('b05', 'za');
+  const nu = at('b05', 'nuit'), bu = at('b05', 'butte'), vo = at('b05', 'voila'), ex = at('b05', 'existe'), za = at('b05', 'za'), lo = at('b05', 'loin');
   const clipA = win(t, nu - 0.2, bu + 0.1, 0.6);
   return (
     <AbsoluteFill>
@@ -473,9 +482,9 @@ const Za: React.FC = () => {
           }
           // signature 2 : la ronde, de nuit, en perspective (la caméra tourne autour du camp) : la butte, les troupes au
           // repos, une file de sentinelles aux torches qui fait le tour ; leurs pas tracent l'anneau en malachite
-          const rn = win(tt, bu - 0.6, ex + 0.2, 0.6);
+          const rn = Math.max(win(tt, bu - 0.6, ex + 0.2, 0.6), win(tt, lo - 0.4, B('b05') + 1.0, 0.6));
           if (rn > 0) {
-            const b = camBasis(camAt([[bu - 0.6, { tx: 0, tz: 4, dist: 128, pitch: 52, yaw: -24, fov: 40 }], [vo, { tx: 0, tz: 4, dist: 112, pitch: 46, yaw: 14, fov: 40 }], [ex, { tx: 0, tz: 6, dist: 125, pitch: 62, yaw: 2, fov: 40 }]], tt));
+            const b = camBasis(camAt([[bu - 0.6, { tx: 0, tz: 4, dist: 128, pitch: 52, yaw: -24, fov: 40 }], [vo, { tx: 0, tz: 4, dist: 112, pitch: 46, yaw: 14, fov: 40 }], [ex, { tx: 0, tz: 6, dist: 125, pitch: 62, yaw: 2, fov: 40 }], [lo - 0.4, { tx: 0, tz: 6, dist: 140, pitch: 58, yaw: -10, fov: 40 }], [B('b05') + 1.0, { tx: 0, tz: 30, dist: 70, pitch: 16, yaw: 0, fov: 40 }]], tt));
             ctx.save(); ctx.globalAlpha = rn;
             ctx.fillStyle = 'rgba(22,26,40,0.22)'; ctx.fillRect(-100, -100, 2120, 1280);
             butte3D(ctx, b, MOUND3, 9, 1, OCRE);
@@ -490,7 +499,7 @@ const Za: React.FC = () => {
             if (vz > 0) E.drawRealGlyph(ctx, 'shi_jinwen', { x: 960, y: 520, size: 520, opacity: vz, color: pig(1), glow: 26, glowColor: 'rgba(246,241,231,0.95)' });
           }
           // 匝 : le même pied, toujours vivant, « un tour »
-          const zz = seg(tt, ex - 0.2, ex + 0.4) * (1 - seg(tt, B('b05') + 0.3, B('b05') + 0.9));
+          const zz = seg(tt, ex - 0.2, ex + 0.4) * (1 - seg(tt, lo - 0.6, lo));
           if (zz > 0) E.drawStrokes(ctx, 'shi_za2_kai', { x: 960, y: 480, size: 520, brush: false, progress: 5 * seg(tt, ex, za - 0.1), color: pig(seg(tt, za, za + 0.5)), alpha: () => zz });
         }} />
       </Cam>
@@ -498,7 +507,7 @@ const Za: React.FC = () => {
       <Label x={960} y={160} zh="之" text="partir" color={MAL} a={win(t, pa - 0.1, rt, 0.3)} align="center" />
       <Label x={960} y={160} zh="帀" text="faire le tour" color={MAL} a={win(t, te, nu - 0.3, 0.3)} align="center" />
       <Caption text="lecture traditionnelle (Xu Shen) : 帀, c'est 之 renversé" a={win(t, te + 0.4, nu - 0.3, 0.4)} y={880} size={44} />
-      <Label x={960} y={880} zh="匝" text="zā · un tour" color={MAL} a={win(t, za, B('b05') + 0.6, 0.4)} align="center" />
+      <Label x={960} y={880} zh="匝" text="zā · un tour" color={MAL} a={win(t, za, lo - 0.1, 0.4)} align="center" />
     </AbsoluteFill>
   );
 };
