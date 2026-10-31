@@ -35,4 +35,9 @@ b07 : en attendant la nouvelle version, `voix/b07.mp3` est encore la prise v01 (
 ## Prises v05 (b07 version B) — `apercus/comparaison_prises_v05.mp3` (prise 1, 2 s de silence, prise 2)
 | Bloc | Nœud | Prise 1 | Prise 2 | Retenue |
 |---|---|---|---|---|
-| b07 | `ngoeoR1hFZuSZsZZxV25` | `Sf1pam4oi1U5sPG3JJ7v` | `zGpRaHdoB20rHqFZtV2q` | ? |
+| b07 | `ngoeoR1hFZuSZsZZxV25` | `Sf1pam4oi1U5sPG3JJ7v` | `zGpRaHdoB20rHqFZtV2q` | non (晋, 师旷 mal prononcés) |
+
+## Prises v06 (b07, tournure v01 pour 晋 / 师旷) — `apercus/comparaison_prises_v06.mp3`
+| Bloc | Nœud | Prise 1 | Prise 2 | Retenue |
+|---|---|---|---|---|
+| b07 | `AnyUt3L1smCaXa9ncug2` | `YkaNku83dtBbO2cc35mQ` | `7vcjdsPUMTdYC1DDJBnf` | ? |
