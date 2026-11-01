@@ -1,5 +1,6 @@
 // Démo du fond shuimo : quatre plans de 8,4 s (graine, mouvement et ambiance différents), enchaînés par une
-// voile de papier (ou une brume qui passe, option mist), avec un caractère posé au centre pour juger de la lisibilité.
+// voile de papier (ou une brume qui passe, option mist), avec un caractère posé au centre pour juger de la lisibilité ;
+// oiseaux dessinés, grues, vent et un poème différent dans le fond de chaque plan.
 import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Img, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ShuimoBackground } from './ShuimoBackground';
@@ -61,15 +62,15 @@ const MistVeil: React.FC<{ mist: boolean }> = ({ mist }) => {
   );
 };
 
-export type ShuimoDemoProps = { clouds: boolean; mist: boolean; strokes: boolean };
-export const ShuimoDemo: React.FC<ShuimoDemoProps> = ({ clouds, mist, strokes }) => {
+export type ShuimoDemoProps = { clouds: boolean; mist: boolean; strokes: boolean; oiseaux?: 'image' | 'vol'; vent?: boolean; grues?: number; poeme?: boolean };
+export const ShuimoDemo: React.FC<ShuimoDemoProps> = ({ clouds, mist, strokes, oiseaux, vent, grues, poeme }) => {
   useFonts();
   const { fps } = useVideoConfig();
   return (
     <AbsoluteFill style={{ background: '#f8f5ee' }}>
       {SHOTS.map((s, i) => {
         const from = Math.round(i * (D - T) * fps);
-        const shot = compose(s.seed, { move: s.move, mood: s.mood, duration: D, clouds, mist, strokes });
+        const shot = compose(s.seed, { move: s.move, mood: s.mood, duration: D, clouds, mist, strokes, oiseaux, vent, grues, poeme });
         return (
           <Sequence key={i} from={from} durationInFrames={Math.round(D * fps)}>
             <FadeIn skip={i === 0}>
@@ -93,4 +94,13 @@ const FadeIn: React.FC<{ skip: boolean; children: React.ReactNode }> = ({ skip, 
   const { fps } = useVideoConfig();
   const o = skip ? interpolate(frame / fps, [0, T], [0, 1], { extrapolateRight: 'clamp' }) : 1;
   return <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill>;
+};
+
+// extrait pour juger les oiseaux, les grues, le vent et le poème : un seul plan sans caractère (graine 540 : un
+// nuage, une volée, deux grues, une rafale entre 4 et 7,5 s), avec le poème de Li Bai qui va avec la scène (les
+// oiseaux s'en vont haut, un nuage s'éloigne seul : entrée 0 de poemes.ts)
+export const SHUIMO_OISEAUX_SECONDS = 12;
+export const ShuimoOiseaux: React.FC<{ oiseaux: 'image' | 'vol'; seed: number; poeme: boolean; grues: number }> = ({ oiseaux, seed, poeme, grues }) => {
+  const shot = compose(seed, { move: 'still', mood: 'aube', duration: SHUIMO_OISEAUX_SECONDS, oiseaux, grues, vent: true, poeme: poeme ? 0 : false });
+  return <ShuimoBackground shot={shot} duration={SHUIMO_OISEAUX_SECONDS} />;
 };

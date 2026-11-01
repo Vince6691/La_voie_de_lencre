@@ -21,7 +21,7 @@ import { AGES_SECONDS, EssaiCarteAges } from './cartes/CarteAges';
 import { VIDEO_ENCRE_DEMO_SECONDS, VideoEncreDemo } from './video_encre/VideoEncreDemo';
 import { Xue, XueProps } from './Xue';
 import timeline from './data/timeline.json';
-import { SHUIMO_DEMO_SECONDS, ShuimoDemo, ShuimoDemoProps } from './shuimo/ShuimoDemo';
+import { SHUIMO_DEMO_SECONDS, SHUIMO_OISEAUX_SECONDS, ShuimoDemo, ShuimoDemoProps, ShuimoOiseaux } from './shuimo/ShuimoDemo';
 import { MorphEncre, MorphProps } from './morph/MorphEncre';
 import { SHUIMO_XUE_SECONDS, ShuimoXue } from './shuimo_xue/ShuimoXue';
 import { ROULEAU_DEMO_SECONDS, RouleauDemo } from './rouleau/RouleauDemo';
@@ -44,7 +44,9 @@ export const RemotionRoot: React.FC = () => (
   />
   {/* fond shuimo (banque d'éléments assets/shuimo) : démo de 30 s, quatre plans ; nuages du ciel ; brouillard et coups de pinceau en option */}
   <Composition id="ShuimoDemo" component={ShuimoDemo} durationInFrames={Math.round(SHUIMO_DEMO_SECONDS * FPS)} fps={FPS} width={1920} height={1080}
-    defaultProps={{ clouds: true, mist: false, strokes: false } satisfies ShuimoDemoProps} />
+    defaultProps={{ clouds: true, mist: false, strokes: false, oiseaux: 'vol', vent: true, grues: 1, poeme: true } satisfies ShuimoDemoProps} />
+  <Composition id="ShuimoOiseaux" component={ShuimoOiseaux} durationInFrames={SHUIMO_OISEAUX_SECONDS * FPS} fps={FPS} width={1920} height={1080}
+    defaultProps={{ oiseaux: 'vol' as const, seed: 540, poeme: true, grues: 2 }} />
   {/* fondus encre ↔ 3D (assets/morph, tools/build_morph.py) : essais en 720p, 8 s */}
   <Composition id="MorphPaysage" component={MorphEncre} durationInFrames={8 * FPS} fps={FPS} width={1280} height={720}
     defaultProps={{ name: 'paysage', dir: 'to3d', focus: [0.64, 0.36], end: 0.62 } satisfies MorphProps} />

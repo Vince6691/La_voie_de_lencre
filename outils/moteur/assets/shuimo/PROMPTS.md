@@ -70,3 +70,21 @@ Variantes à demander (une par planche) : « the upper massif is a long ridge ri
 the lower one a cluster of three tall peaks with a waterfall thread » ; « the upper massif has a flat-topped table
 mountain with cliffs, the lower one is a jagged sawtooth ridge » ; « both massifs lower and wider, gentle rounded
 hills seen through haze ».
+
+## 09_grue — grue en vol, en pièces détachées (marionnette articulée)
+
+Deuxième type d'oiseau, en plus des petites volées dessinées au pinceau (`Oiseaux.tsx`) : une grue du Japon
+(丹顶鹤) qui traverse lentement le ciel. Elle est animée comme une marionnette : corps fixe, chaque aile en deux
+pièces (bras et main) qui tournent à l'épaule et au coude. Il faut donc les pièces **séparées**, plus une grue
+entière en vol plané qui sert de modèle d'assemblage. Le corps est blanc : **fond vert uni** (et non blanc) pour
+pouvoir le détourer à la couleur. Haute définition (2K ou 4K).
+
+```
+Contemporary Chinese ink-wash art, modern minimalist shuimo, painted with a soft brush: clean graded ink from deep black to pale pearl grey, a few warm white feathers left unpainted with a thin soft ink contour, one single vermilion accent. Not an antique painting: no aged paper, no calligraphy, no seals, no signature, no frame.
+Flat uniform chroma green background (#00B140), perfectly even, no gradient, no texture, no shadow, no vignette. Nothing touches, nothing is cropped by the image edges. Landscape 16:9, 4K.
+Sheet of four separate pieces of the same red-crowned crane (Grus japonensis), all seen exactly from the side, flying to the right, at the same scale, with wide green gaps between them:
+1. top left: the whole crane gliding, wings fully spread and slightly raised, long neck stretched straight forward, legs trailing straight behind, as a reference for assembly;
+2. top right: the crane's body only, without any wing (smooth shoulder where the wings attach): white body, black neck and head, small vermilion crown patch, long pale beak, black tail-feather tuft, thin grey legs trailing straight back;
+3. bottom left: the inner half of one wing alone (from shoulder to wrist), spread flat and seen from above: white coverts, a row of long black secondary feathers along the trailing edge, cut cleanly at both ends;
+4. bottom right: the outer half of the same wing alone (from wrist to tip), spread flat and seen from above: long black primary feathers spread like fingers, cut cleanly at the wrist end.
+```

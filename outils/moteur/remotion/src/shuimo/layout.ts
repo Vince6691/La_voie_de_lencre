@@ -12,7 +12,13 @@ export type { InkEvent } from './common';
 import type { InkEvent } from './common';
 export type Move = 'pan' | 'push' | 'rise' | 'focus' | 'still';
 export type Mood = 'jour' | 'aube' | 'nuit' | 'brume';
-export type Shot = { pieces: Piece[]; ink: InkEvent[]; move: Move; mood: Mood; dir: 1 | -1 };
+import type { Volee } from './Oiseaux';
+import type { Grue } from './Grue';
+import { POEMES } from './poemes';
+// poème posé dans le fond du plan (Poeme.tsx) : x centre de la 1re colonne, profondeur entre lointain et massifs
+export type PoemeFond = { vers: string[]; source: string; x: number; top: number; taille: number; force: number; debut: number; duree: number; depth: number };
+// seed : graine du plan (elle donne aussi son vent, voir vent() dans common.ts) ; volees : oiseaux dessinés
+export type Shot = { pieces: Piece[]; ink: InkEvent[]; move: Move; mood: Mood; dir: 1 | -1; seed?: number; volees?: Volee[]; grues?: Grue[]; poeme?: PoemeFond; vent?: boolean };
 
 const EL = index as El[];
 // rôle des éléments dont la planche mélange plusieurs sortes d'objets
@@ -29,8 +35,12 @@ import { rng, W, H } from './common';
 import { edgeStrokes } from './InkEvents';
 
 // options : clouds (bandes de nuages du ciel et soleil voilé, activés par défaut), mist (nappes de brouillard entre
-// les plans et au premier plan, désactivées par défaut), strokes (coups de pinceau du skill coup-de-pinceau, désactivés)
-export type ComposeOptions = { move: Move; mood: Mood; duration: number; dir?: 1 | -1; clouds?: boolean; mist?: boolean; strokes?: boolean; front?: boolean /* premiers plans en coin, activés par défaut */ };
+// les plans et au premier plan, désactivées par défaut), strokes (coups de pinceau du skill coup-de-pinceau, désactivés),
+// vent : rend le vent visible (nuages qui passent, feuilles emportées, Vent.tsx)
+// poeme : un distique de la banque poemes.ts dans le fond du plan (true : tiré par la graine ; un nombre : cette entrée)
+// grues : nombre de petites grues du Japon qui traversent le ciel (marionnettes peintes, Grue.tsx ; 0 par défaut)
+// oiseaux : 'image' (volée détourée qui glisse, par défaut) ou 'vol' (oiseaux dessinés qui battent des ailes, Oiseaux.tsx)
+export type ComposeOptions = { move: Move; mood: Mood; duration: number; dir?: 1 | -1; clouds?: boolean; mist?: boolean; strokes?: boolean; oiseaux?: 'image' | 'vol'; grues?: number; poeme?: boolean | number; vent?: boolean; front?: boolean /* premiers plans en coin, activés par défaut */ };
 export function compose(seed: number, o: ComposeOptions): Shot {
   const R = rng(seed);
   const r = (a: number, b: number) => a + (b - a) * R();
@@ -40,6 +50,7 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   const pickNew = (a: El[]) => { const free = a.filter((e) => !used.has(e.file)); const e = pick(free.length ? free : a); used.add(e.file); return e; };
   const of = (k: string) => EL.filter((e) => role(e) === k);
   const pieces: Piece[] = [];
+  const volees: Volee[] = [];
   const add = (el: El, p: Omit<Piece, 'el' | 'flip'> & { flip?: boolean }) => pieces.push({ el, flip: p.flip ?? R() < 0.5, ...p });
   const dir = o.dir ?? (R() < 0.5 ? 1 : -1);
   const side = () => (R() < 0.5 ? r(220, 560) : r(1360, 1700)); // hors de la zone centrale du contenu
@@ -52,6 +63,16 @@ export function compose(seed: number, o: ComposeOptions): Shot {
     add(pick(of(k)), { x: side(), y: r(170, 300), h: k === 'sunmist' ? r(150, 210) : r(140, 210), depth: 0.03, opacity: k === 'moon' ? 0.8 : 0.92, flip: false });
   }
   if ((o.clouds ?? true) && R() < 0.5) add(pick(of('cloud')), { x: r(300, 1600), y: r(150, 260), h: r(60, 100), depth: 0.08, opacity: 0.55, drift: r(-8, 8), breathe: true });
+  // nuages qui passent, portés par le vent (option vent) : 3 bandes à des hauteurs et vitesses différentes, dont
+  // certaines entrent par le bord d'où vient le vent ; tirées à part pour ne rien changer au reste du plan
+  if (o.vent) {
+    const C = rng(seed * 131 + 7), c = (a: number, b: number) => a + (b - a) * C();
+    for (let k = 0; k < 3; k++) {
+      const el = of('cloud')[Math.floor(C() * of('cloud').length)];
+      const x = k === 0 ? c(300, W - 300) : dir > 0 ? c(-500, 400) : c(W - 400, W + 500);
+      add(el, { x, y: c(110, 330), h: c(75, 145), depth: c(0.05, 0.1), opacity: c(0.4, 0.62), drift: dir * c(10, 24), breathe: true, flip: C() < 0.5 });
+    }
+  }
   // montagnes lointaines : une chaîne continue de bandes qui se chevauchent
   const baseFar = r(470, 540);
   for (let x = r(-350, -100); x < W + 300;) {
@@ -102,7 +123,32 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   if (o.mist) add(el2, { x: r(500, 1400), y: r(800, 880), h: (w2 * el2.h) / el2.w, depth: 0.55, opacity: r(0.35, 0.55), drift: r(-18, 18), breathe: true });
   if (R() < 0.35) add(pick(of('boat')), { x: r(500, 1400), y: r(830, 870), h: r(55, 85), depth: 0.5, opacity: 0.9, drift: dir * r(10, 18) });
   // oiseaux qui traversent
-  if (o.mood !== 'nuit' && R() < 0.55) add(pick(of('birds')), { x: dir > 0 ? r(150, 500) : r(1400, 1750), y: r(200, 340), h: r(100, 150), depth: 0.3, opacity: 0.85, drift: dir * r(28, 45), flip: dir < 0 });
+  // (les tirages restent dans le même ordre dans les deux modes : le reste du plan ne change pas)
+  if (o.mood !== 'nuit' && R() < 0.55) {
+    const el = pick(of('birds'));
+    const x = dir > 0 ? r(150, 500) : r(1400, 1750), y = r(200, 340), h = r(100, 150), drift = dir * r(28, 45);
+    // la volée peut aussi voler contre le vent : départ du côté opposé (tirage à part)
+    const vd: 1 | -1 = rng(seed * 53 + 1)() < 0.5 ? dir : (-dir as 1 | -1), vx = vd === dir ? x : W - x;
+    if (o.oiseaux === 'vol') volees.push({ seed: seed * 7919 + 13, x: vx, y, dir: vd, speed: Math.abs(drift) * 1.6, n: 3 + Math.floor((h - 100) / 10), size: h / 4.5, depth: 0.3, opacity: 0.85 });
+    else add(el, { x, y, h, depth: 0.3, opacity: 0.85, drift, flip: dir < 0 });
+  }
+  // petites grues (tirées à part pour ne rien changer au reste du plan) : elles traversent lentement le ciel, l'une
+  // déjà dans le cadre, les autres entrant par le bord d'où elles viennent ; plus bas que la bande des petites volées
+  const grues: Grue[] = [];
+  if (o.grues) {
+    const C = rng(seed * 977 + 3), c = (a: number, b: number) => a + (b - a) * C();
+    for (let k = 0; k < o.grues; k++) {
+      // chaque grue a son sens ; une sur deux environ monte doucement, les autres volent à l'horizontale
+      const gd: 1 | -1 = C() < 0.5 ? 1 : -1;
+      let x = k === 0 ? (gd > 0 ? c(250, 700) : c(W - 700, W - 250)) : gd > 0 ? c(-400, -120) : c(W + 120, W + 400);
+      // une grue qui vole dans le sens d'une volée part loin devant elle (ou derrière, si devant sort du cadre) : elles
+      // ne traversent pas le ciel ensemble
+      const fl = volees.find((v) => v.dir === gd && Math.abs(v.x - x) < 650);
+      if (fl) { const ecart = c(700, 950), devant = fl.x + gd * ecart; x = devant > 150 && devant < W - 150 ? devant : fl.x - gd * ecart; }
+      const rise = C() < 0.5 ? 0 : c(4, 10);
+      grues.push({ seed: seed * 31 + k, x, y: c(340, 440), dir: gd, speed: c(32, 48), rise, size: c(80, 120), depth: 0.32, opacity: 0.95 });
+    }
+  }
   // premiers plans dans un ou deux coins
   const sides: ('l' | 'r')[] = R() < 0.4 ? ['l', 'r'] : [R() < 0.5 ? 'l' : 'r'];
   sides.forEach((s) => {
@@ -120,6 +166,22 @@ export function compose(seed: number, o: ComposeOptions): Shot {
   // coups de pinceau : 2 ou 3, répartis dans le plan, le long des bords (InkEvents.tsx)
   const n = 2 + (R() < 0.5 ? 1 : 0);
   const ink: InkEvent[] = !o.strokes ? [] : edgeStrokes(Math.floor(R() * 1e6), Array.from({ length: n }, (_, i) => 1 + ((o.duration - 3.5) * (i + r(0.1, 0.8))) / n));
+  // poème dans le fond (tirage à part) : côté opposé au soleil ou à la lune, haut du ciel, derrière les massifs ;
+  // il apparaît peu après le début du plan et s'est effacé avant la fin
+  let poeme: PoemeFond | undefined;
+  if (o.poeme !== undefined && o.poeme !== false) {
+    const P = rng(seed * 613 + 9), p = (a: number, b: number) => a + (b - a) * P();
+    const banque = POEMES.filter((q) => !!q.nuit === (o.mood === 'nuit'));
+    const q = typeof o.poeme === 'number' ? POEMES[o.poeme % POEMES.length] : banque[Math.floor(P() * banque.length)];
+    const astre = pieces.find((pc) => pc.depth === 0.03);
+    const droite = astre ? astre.x < W / 2 : P() < 0.5;
+    const long = Math.max(...q.vers.map((v) => [...v].length)) > 5;
+    const taille = long ? p(36, 42) : p(42, 52), debut = p(0.6, 1.8);
+    poeme = {
+      vers: q.vers, source: q.source, taille, debut, duree: Math.max(2, o.duration - debut - 2.6 - p(0.3, 1)),
+      x: droite ? p(1480, 1750) : p(330, 560), top: p(70, 180), force: p(0.2, 0.28), depth: 0.2,
+    };
+  }
   pieces.sort((a, b) => a.depth - b.depth);
-  return { pieces, ink, move: o.move, mood: o.mood, dir };
+  return { pieces, ink, move: o.move, mood: o.mood, dir, seed, volees, grues, poeme, vent: o.vent };
 }
