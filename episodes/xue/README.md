@@ -17,3 +17,7 @@ Même organisation que les autres épisodes (`outils/video_shuimo`) :
   utilisée par `outils/moteur/tools/*.py` et copiée par `outils/moteur/remotion/sync.mjs`)
 
 Détails techniques de la version fond noir : `outils/moteur/README.md`.
+
+## Langues
+- 🇫🇷 **Français** (version originale) : `VOIX.md`, `episode.json`, `voix/`, `rendu/xue_1440p.mp4`, `rendu/xue_fr.srt`.
+- 🇬🇧 **Anglais** (adaptation, voix Oliver) : `VOIX_EN.md`, `TEXTES_ECRAN_EN.md`, puis `episode_en.json`, `voix_en/`, `rendu/xue_en_1440p.mp4`, `rendu/xue_en.srt`.
