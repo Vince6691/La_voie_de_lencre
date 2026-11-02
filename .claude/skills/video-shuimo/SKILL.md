@@ -178,6 +178,9 @@ C'est elle qui fait retenir le caractère : ne jamais la supprimer ni la réduir
 - Envoyer une **planche d'images fixes** légendées (minutage + correction) pendant les longs rendus ; les légendes de la
   planche sans caractères chinois (Cormorant n'en a pas).
 
+## Version anglaise
+Une fois la version française publiée : skill `version-anglaise` (voix Bradford v4, textes à l'écran `T(fr, en)`, rendu `--langue en`, sous-titres et description anglais). Rien du français n'est modifié.
+
 ## Pièges techniques rencontrés
 - **Canvas en pleine définition** : le canvas de dessin (`Draw`) est dimensionné à `1920 × 1080 × DRAW_K` (DRAW_K = devicePixelRatio × 1,15, plafonné à 2 ; 1,53 en 1440p) avec `setTransform(DRAW_K…)`, et les flous d'ombre (`shadowBlur`, `shadowOffset`) multipliés d'autant (ils ne suivent pas la transformation). En 1920×1080 fixe, le caractère était agrandi ×1,33 à ×1,5 en 1440p : bords mous. Modèle : `Draw` dans `XueV2.tsx`, à reprendre dans chaque épisode.
 - **Grain : jamais animé.** Le grain de papier (`GrainVignette`, `src/commun/Effets.tsx`) est **fixe et fin** : une seule image de bruit en pleine définition (1920×1080), opacité 0,1, mode overlay. Refusé (validé sur le 學, 10/2026) : un bruit qui change à chaque image, ou de basse définition agrandi — il scintille comme de la « neige » sur les lavis gris, les cartes, les clips et surtout les aplats sombres (estampages), invisible dans le Studio (image réduite) mais flagrant dans le rendu 1440p, et il mange le débit (−25 % de poids sans lui). Diagnostic : la neige était déjà dans les PNG sans perte, l'encodage n'y était pour rien (49,5 dB) ; mesure = écart moyen entre images voisines (`tblend=all_mode=difference,signalstats`) sur un aplat immobile.
