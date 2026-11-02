@@ -1,6 +1,6 @@
 # 🇬🇧 ENGLISH — voix off anglaise du 學 (adaptation de `VOIX.md`, qui reste la version 🇫🇷 française)
 
-Voix ElevenLabs : **Oliver** (clear, British, steady), modèle multilingue (multilingual v2 : il lit les noms chinois en
+Voix ElevenLabs retenue : **Bradford - Expressive and Articulate** (`NNl6r8mD7vthiJatiJt1`), modèle **eleven_v4**, réglages par défaut, sans balise d'émotion (validé le 2 novembre 2026 après essais d'Oliver en multilingual v2, v3 et v4). Le v4 lit les noms chinois en
 caractères ; sinon les écrire en pinyin). Nombres en lettres. Un clip par bloc → `voix_en/b01..b09.mp3` (dossier anglais,
 à côté de `voix/` qui reste le français). Adaptation selon la skill `voiceover-en-translator` (phrases courtes, fragments,
 pas de jargon) ; chaque bloc garde les mêmes moments que le français pour que le montage se recale sur les repères.
