@@ -1,0 +1,364 @@
+{
+ "b01": {
+  "duration": 10.66,
+  "cues": {
+   "mains": 6.08,
+   "ou": 9.92
+  }
+ },
+ "b02": {
+  "duration": 17.07,
+  "cues": {
+   "huit": 1.77,
+   "seize": 3.13,
+   "retrouver": 13.69
+  }
+ },
+ "b03": {
+  "duration": 34.99,
+  "cues": {
+   "devins": 5.49,
+   "signe": 16.61,
+   "yao": 19.01,
+   "toit": 22.61,
+   "mains": 24.29,
+   "manque": 31.89
+  }
+ },
+ "b04": {
+  "duration": 28.23,
+  "cues": {
+   "bronze": 2.91,
+   "enfant": 10.83,
+   "dit": 15.63,
+   "vase": 22.75
+  }
+ },
+ "b05": {
+  "duration": 23.65,
+  "cues": {
+   "royaumes": 5.96,
+   "ministre": 10.52,
+   "symetrie": 15.96,
+   "mains": 21.08
+  }
+ },
+ "b06": {
+  "duration": 25.5,
+  "cues": {
+   "lettre": 9.24,
+   "livre": 11.24,
+   "definition": 17.0,
+   "toit": 22.12
+  }
+ },
+ "b07": {
+  "duration": 36.28,
+  "cues": {
+   "aplatit": 6.36,
+   "figent": 9.72,
+   "reguliere": 15.8,
+   "copies": 23.32,
+   "reponse": 29.4,
+   "decret": 30.96,
+   "autres": 33.2,
+   "presses": 35.0
+  }
+ },
+ "b08": {
+  "duration": 36.29,
+  "cues": {
+   "huit": 5.84,
+   "pinceau": 7.6,
+   "baguettes": 9.84,
+   "toit": 10.88,
+   "mains": 12.64,
+   "enfant": 14.08,
+   "nait": 16.24,
+   "ecole": 20.16,
+   "mots": 24.08,
+   "universite": 28.64,
+   "reconnaitre": 30.32
+  }
+ },
+ "b09": {
+  "duration": 17.82,
+  "cues": {
+   "geste": 2.68,
+   "depuis": 4.28,
+   "autre": 10.44,
+   "baton": 14.84
+  }
+ },
+ "_ligne": {
+  "clips": {
+   "b01": {
+    "debut": 0.6,
+    "duree": 10.66
+   },
+   "b02": {
+    "debut": 12.16,
+    "duree": 17.07
+   },
+   "b03": {
+    "debut": 30.23,
+    "duree": 34.99
+   },
+   "b04": {
+    "debut": 71.22,
+    "duree": 28.23
+   },
+   "b05": {
+    "debut": 104.05,
+    "duree": 23.65
+   },
+   "b06": {
+    "debut": 128.7,
+    "duree": 25.5
+   },
+   "b07": {
+    "debut": 155.2,
+    "duree": 36.28,
+    "pause": {
+     "coupe": 29.28,
+     "duree": 1.7
+    }
+   },
+   "b08": {
+    "debut": 199.68,
+    "duree": 36.29
+   },
+   "b09": {
+    "debut": 236.97,
+    "duree": 17.82
+   }
+  },
+  "rouleaux": [
+   {
+    "debut": 65.92,
+    "duree": 5
+   },
+   {
+    "debut": 100.25,
+    "duree": 3.5
+   },
+   {
+    "debut": 193.98,
+    "duree": 5.3,
+    "modele": "3d-complet"
+   }
+  ],
+  "pauses": [
+   [
+    184.48,
+    1.7
+   ]
+  ],
+  "plages": {},
+  "fin": 255.29,
+  "total": 265.29,
+  "bruitages": [
+   [
+    "pinceau",
+    0.4,
+    0.45
+   ],
+   [
+    "pinceau",
+    26.25,
+    0.3
+   ],
+   [
+    "gravure",
+    36.02,
+    0.35
+   ],
+   [
+    "gravure",
+    45.54,
+    0.35
+   ],
+   [
+    "sceau",
+    46.84,
+    0.5
+   ],
+   [
+    "tambour",
+    62.12,
+    0.3
+   ],
+   [
+    "sceau",
+    69.92,
+    0.6
+   ],
+   [
+    "sceau",
+    82.05,
+    0.5
+   ],
+   [
+    "sceau",
+    103.05,
+    0.6
+   ],
+   [
+    "pinceau",
+    114.57,
+    0.45
+   ],
+   [
+    "pinceau",
+    137.34,
+    0.4
+   ],
+   [
+    "pinceau",
+    161.56,
+    0.45
+   ],
+   [
+    "sceau",
+    164.92,
+    0.4
+   ],
+   [
+    "tambour",
+    165.02,
+    0.3
+   ],
+   [
+    "pinceau",
+    171.0,
+    0.4
+   ],
+   [
+    "gong",
+    185.0,
+    0.45
+   ],
+   [
+    "pinceau",
+    207.28,
+    0.4
+   ],
+   [
+    "sceau",
+    213.76,
+    0.35
+   ],
+   [
+    "gong",
+    215.92,
+    0.4
+   ],
+   [
+    "sceau",
+    251.81,
+    0.5
+   ],
+   [
+    "gong",
+    252.71,
+    0.4
+   ],
+   [
+    "pinceau",
+    14.13,
+    0.35
+   ],
+   [
+    "pinceau",
+    15.39,
+    0.3
+   ],
+   [
+    "tambour",
+    38.72,
+    0.22
+   ],
+   [
+    "gravure",
+    41.22,
+    0.3
+   ],
+   [
+    "pinceau",
+    111.61,
+    0.25
+   ],
+   [
+    "pinceau",
+    129.0,
+    0.35
+   ],
+   [
+    "sceau",
+    145.7,
+    0.35
+   ],
+   [
+    "pinceau",
+    155.6,
+    0.35
+   ],
+   [
+    "pinceau",
+    157.8,
+    0.3
+   ],
+   [
+    "pinceau",
+    220.04,
+    0.35
+   ],
+   [
+    "pinceau",
+    223.96,
+    0.35
+   ],
+   [
+    "pinceau",
+    225.16,
+    0.3
+   ],
+   [
+    "pinceau",
+    247.71,
+    0.4
+   ],
+   [
+    "flashback",
+    25.95,
+    0.5
+   ],
+   [
+    "ecole",
+    221.14,
+    0.35
+   ],
+   [
+    "universite",
+    228.12,
+    0.35
+   ],
+   [
+    "pinceau",
+    190.1,
+    0.5
+   ]
+  ],
+  "musique_fin": {
+   "fichier": "bamboo_grove_434735.mp3",
+   "debut": 252.79,
+   "fin_voix": 254.79,
+   "fin": 265.29,
+   "volume_voix": 0.12,
+   "volume": 0.3,
+   "montee": 1.5,
+   "fondu": 2.5,
+   "depart": 0
+  }
+ }
+}
