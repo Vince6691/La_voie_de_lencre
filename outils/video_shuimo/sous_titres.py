@@ -1,7 +1,8 @@
 """Sous-titres français (.srt) d'un épisode pour YouTube, d'après le minutage mot à mot ElevenLabs Scribe
 (voix/mots/bNN.json) recalé sur la ligne de temps du montage (voix/reperes.json, _ligne) : même calcul que reperes.py
 (silence de tête rogné, tempo, pause insérée dans un clip). Une réplique ≤ 2 lignes de 42 caractères, ≤ 6 s, coupée
-de préférence sur la ponctuation. Écrit episodes/<p>/rendu/<p>_fr.srt.
+de préférence sur la ponctuation. Écrit episodes/<p>/rendu/<p>_fr.srt (episode.json) ou <p>_en.srt (episode_en.json).
+Les balises d'émotion de la voix ([warmly]…) ne sont pas des mots : elles sont ignorées.
 Usage : python sous_titres.py episode.json"""
 import json, os, re, unicodedata, subprocess, sys
 import imageio_ffmpeg
@@ -24,7 +25,7 @@ mots = []  # (texte, début, fin) en temps absolu de la vidéo
 for clip, c in L['clips'].items():
     off, p = tete(f'{D}/{clip}.mp3'), c.get('pause')
     for w in json.load(open(f'{D}/mots/{clip}.json', encoding='utf-8'))['words']:
-        if w['type'] != 'word' or not w['text'].strip(): continue
+        if w['type'] != 'word' or not w['text'].strip() or re.fullmatch(r'\[[^\]]*\][.,…]?', w['text'].strip()): continue
         a, b = (w['start'] - off) / TEMPO, (w['end'] - off) / TEMPO
         dec = p['duree'] if p and a > p['coupe'] else 0
         mots.append((w['text'].strip(), c['debut'] + a + dec, c['debut'] + b + dec))
@@ -66,6 +67,7 @@ for k, r in enumerate(repliques):
     out.append(f'{k + 1}\n{hms(a)} --> {hms(b)}\n{lignes(nettoie(" ".join(x[0] for x in r)))}\n')
 p = os.path.join(os.path.dirname(os.path.abspath(sys.argv[1])), 'rendu')
 os.makedirs(p, exist_ok=True)
-f = os.path.join(p, f"{os.path.basename(os.path.dirname(os.path.abspath(sys.argv[1])))}_fr.srt")
+lg = re.match(r'episode_(\w+)\.json$', os.path.basename(sys.argv[1]))
+f = os.path.join(p, f"{os.path.basename(os.path.dirname(os.path.abspath(sys.argv[1])))}_{lg.group(1) if lg else 'fr'}.srt")
 open(f, 'w', encoding='utf-8').write('\n'.join(out))
 print(f'{len(out)} répliques → {f}')

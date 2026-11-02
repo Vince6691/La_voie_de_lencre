@@ -21,11 +21,13 @@ const ICI = path.dirname(fileURLToPath(import.meta.url));
 const RACINE = path.resolve(ICI, '../..');
 const REM = path.join(RACINE, 'outils/moteur/remotion');
 const [C, P, ...opts] = process.argv.slice(2);
-if (!C || !P) { console.error('usage : node rendu_final.mjs <Composition> <pinyin> [--hauteur 1440] [--crf 16] [--plan] [--essai] [--assembler]'); process.exit(1); }
+if (!C || !P) { console.error('usage : node rendu_final.mjs <Composition> <pinyin> [--hauteur 1440] [--crf 16] [--plan] [--essai] [--assembler] [--langue en]'); process.exit(1); }
 const opt = (n, d) => { const i = opts.indexOf(`--${n}`); return i < 0 ? d : opts[i + 1]; };
 const has = (n) => opts.includes(`--${n}`);
 const H = Number(opt('hauteur', 1440)), CRF = Number(opt('crf', 16)), GL = opt('gl', 'angle'), FPS = 30;
-const OUT = path.join(RACINE, `outils/moteur/out/final_${P}`), MORC = path.join(OUT, 'morceaux'), BUNDLE = path.join(OUT, 'bundle');
+// --langue en : version anglaise de l'épisode (episode_en.json, voix_en/, <p>_en_<h>p.mp4) ; sans option, la version française
+const LG = opt('langue', ''), SUF = LG ? `_${LG}` : '', EPJ = LG ? `episode_${LG}.json` : 'episode.json';
+const OUT = path.join(RACINE, `outils/moteur/out/final_${P}${SUF}`), MORC = path.join(OUT, 'morceaux'), BUNDLE = path.join(OUT, 'bundle');
 const EP = path.join(RACINE, 'episodes', P);
 fs.mkdirSync(MORC, { recursive: true });
 const journal = (m) => { const l = `[${new Date().toLocaleTimeString('fr-FR')}] ${m}`; console.log(l); fs.appendFileSync(path.join(OUT, 'journal.txt'), l + '\n'); };
@@ -47,7 +49,7 @@ if (!has('assembler')) {
   const b = spawnSync(npx, ['remotion', 'bundle', 'src/index.ts', `--out-dir=${BUNDLE}`], { cwd: REM, encoding: 'utf8', shell: true });
   if (b.status !== 0) { console.error(b.stdout, b.stderr); process.exit(1); }
 }
-const rep = JSON.parse(fs.readFileSync(path.join(EP, 'voix/reperes.json'), 'utf8'))._ligne;
+const rep = JSON.parse(fs.readFileSync(path.join(EP, JSON.parse(fs.readFileSync(path.join(EP, EPJ), 'utf8')).reperes), 'utf8'))._ligne;
 const compos = spawnSync(npx, ['remotion', 'compositions', BUNDLE], { cwd: REM, encoding: 'utf8', shell: true }).stdout ?? '';
 const ligne = compos.split('\n').find((l) => new RegExp(`^\\s*${C}\\s`).test(l.replace(/\x1b\[[0-9;]*m/g, '')));
 const N = ligne ? Number(ligne.replace(/\x1b\[[0-9;]*m/g, '').trim().split(/\s+/)[3]) : Math.round((Math.ceil(rep.total * 10) / 10) * FPS);
@@ -103,7 +105,7 @@ if (manquants.length) { journal(`ÉCHEC : morceaux incomplets ${manquants.map((m
 
 // ── 4. son : voix + bruitages + musique (bande_son.py), ramené à −14 LUFS, pic ≤ −1 dBTP
 const son = path.join(OUT, 'son.wav'), sonYT = path.join(OUT, 'son_yt.wav');
-spawnSync(PY, [path.join(ICI, 'bande_son.py'), path.join(EP, 'episode.json'), son], { stdio: 'inherit' });
+spawnSync(PY, [path.join(ICI, 'bande_son.py'), path.join(EP, EPJ), son], { stdio: 'inherit' });
 const I = Number((ff(['-i', son, '-af', 'ebur128', '-f', 'null', '-']).stderr.match(/I:\s+(-?[\d.]+) LUFS/g) ?? ['I: -14']).pop().match(/-?[\d.]+/)[0]);
 ff(['-y', '-loglevel', 'error', '-i', son, '-af', `volume=${(-14 - I).toFixed(2)}dB,alimiter=limit=0.89:level=false`, '-ar', '48000', '-ac', '2', '-c:a', 'pcm_s16le', sonYT]);
 journal(`son : ${I} LUFS → gain ${(-14 - I).toFixed(2)} dB`);
@@ -111,7 +113,7 @@ journal(`son : ${I} LUFS → gain ${(-14 - I).toFixed(2)} dB`);
 // ── 5. assemblage : les morceaux sont quasi sans perte (crf 10, veryfast) ; un seul encodage final (crf choisi, slow),
 //    qui convertit aussi en plage TV si les morceaux sont en pleine plage
 fs.mkdirSync(path.join(EP, 'rendu'), { recursive: true });
-const final = path.join(EP, 'rendu', `${P}_${H}p.mp4`), liste = path.join(OUT, 'liste.txt');
+const final = path.join(EP, 'rendu', `${P}${SUF}_${H}p.mp4`), liste = path.join(OUT, 'liste.txt');
 fs.writeFileSync(liste, morceaux.map((m) => `file '${nom(m).replace(/\\/g, '/')}'`).join('\n'));
 const pleine = /yuvj|\(pc/.test(fluxVideo(nom(morceaux[0])));
 const video = ['-c:v', 'libx264', '-preset', 'slow', '-crf', String(CRF), '-vf', pleine ? 'scale=in_range=full:out_range=tv,format=yuv420p' : 'format=yuv420p'];

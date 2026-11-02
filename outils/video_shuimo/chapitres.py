@@ -8,7 +8,8 @@ from episode import charger
 cfg = charger(sys.argv[1])
 L = json.load(open(cfg['reperes'], encoding='utf-8'))['_ligne']
 p = os.path.basename(os.path.dirname(os.path.abspath(sys.argv[1])))
-srt = os.path.join(os.path.dirname(os.path.abspath(sys.argv[1])), 'rendu', f'{p}_fr.srt')
+lg = re.match(r'episode_(\w+)\.json$', os.path.basename(sys.argv[1]))  # episode_en.json → <p>_en.srt
+srt = os.path.join(os.path.dirname(os.path.abspath(sys.argv[1])), 'rendu', f"{p}_{lg.group(1) if lg else 'fr'}.srt")
 rep = []  # (début en s, texte)
 if os.path.exists(srt):
     for bloc in open(srt, encoding='utf-8').read().strip().split('\n\n'):

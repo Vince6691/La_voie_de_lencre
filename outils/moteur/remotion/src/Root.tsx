@@ -1,7 +1,7 @@
 import React from 'react';
 import { Composition } from 'remotion';
 import { VIDEO_REVEAL_DEMO3_SECONDS, VideoRevealDemo3, VIDEO_REVEAL_DEMO2_SECONDS, VIDEO_REVEAL_DEMO_SECONDS, VideoRevealDemo, VideoRevealDemo2 } from './video_encre/VideoRevealDemo';
-import { XUE_V2_SECONDS, XueV2 } from './shuimo_v2/XueV2';
+import { XUE_V2_EN_SECONDS, XUE_V2_SECONDS, XueV2, XueV2EN } from './shuimo_v2/XueV2';
 import { JIAO_SECONDS, JiaoV1 } from './shuimo_jiao/JiaoV1';
 import { TIYING_SECONDS, TiyingReveal } from './shuimo_wen/TiyingReveal';
 import { WEN_SECONDS, WenV1 } from './shuimo_wen/WenV1';
@@ -61,7 +61,9 @@ export const RemotionRoot: React.FC = () => (
  <Composition id="JiaoV1" component={JiaoV1} durationInFrames={Math.round(JIAO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="MeiV1" component={MeiV1} durationInFrames={Math.round(MEI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuV1" component={YuV1} durationInFrames={Math.round(YU_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
-  <Composition id="ShiV1" component={ShiV1} durationInFrames={Math.round(SHI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
+  <Composition id="ShiV1" component={ShiV1} durationInFrames={Math.round(SHI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} defaultProps={{ peint: true }} />
+  {/* l'ancienne version des scènes 3D (sans le rendu peint), gardée pour comparaison */}
+  <Composition id="ShiV1Ancienne" component={ShiV1} durationInFrames={Math.round(SHI_SECONDS * FPS)} fps={FPS} width={1920} height={1080} defaultProps={{ peint: false }} />
   <Composition id="Bambou3D" component={Bambou3DDemo} durationInFrames={Math.round(BAMBOU3D_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="LattesBambou3D" component={LattesBambou3DDemo} durationInFrames={Math.round(LATTES_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="YuIntroEncre" component={YuIntroEncre} durationInFrames={Math.round(INTRO_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
@@ -77,6 +79,7 @@ export const RemotionRoot: React.FC = () => (
   <Composition id="WenV1" component={WenV1} durationInFrames={Math.round(WEN_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="WenTiying" component={TiyingReveal} durationInFrames={Math.round(TIYING_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="XueV2" component={XueV2} durationInFrames={Math.round(XUE_V2_SECONDS * FPS)} fps={30} width={1920} height={1080} />
+  <Composition id="XueV2EN" component={XueV2EN} durationInFrames={Math.round(XUE_V2_EN_SECONDS * FPS)} fps={FPS} width={1920} height={1080} />
   <Composition id="VideoRevealDemo" component={VideoRevealDemo} durationInFrames={VIDEO_REVEAL_DEMO_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   <Composition id="VideoRevealDemo2" component={VideoRevealDemo2} durationInFrames={VIDEO_REVEAL_DEMO2_SECONDS * FPS} fps={FPS} width={1920} height={1080} />
   <Composition id="VideoRevealDemo3" component={VideoRevealDemo3} durationInFrames={VIDEO_REVEAL_DEMO3_SECONDS * FPS} fps={FPS} width={1920} height={1080} />

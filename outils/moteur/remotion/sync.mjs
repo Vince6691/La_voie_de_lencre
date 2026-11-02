@@ -53,10 +53,12 @@ let extra = '';
 if (fs.existsSync(EP)) for (const p of fs.readdirSync(EP)) {
   const e = `${EP}/${p}`;
   if (!fs.existsSync(`${e}/episode.json`)) continue;
-  for (const [dir, ok] of [['voix', (f) => f.endsWith('.wav')], ['audio', (f) => f.endsWith('.wav')], ['clips', (f) => /\.(mp4|png|jpe?g)$/.test(f)], ['images', (f) => /\.(png|jpe?g|json)$/.test(f)]]) {
+  for (const [dir, ok] of [['voix', (f) => f.endsWith('.wav')], ['voix_en', (f) => f.endsWith('.wav')], ['audio', (f) => f.endsWith('.wav')], ['clips', (f) => /\.(mp4|png|jpe?g)$/.test(f)], ['images', (f) => /\.(png|jpe?g|json)$/.test(f)]]) {
     if (fs.existsSync(`${e}/${dir}`)) for (const f of fs.readdirSync(`${e}/${dir}`)) if (ok(f)) cp(`${e}/${dir}/${f}`, `${here}/public/episodes/${p}/${dir}/${f}`);
   }
   if (fs.existsSync(`${e}/voix/reperes.json`)) cp(`${e}/voix/reperes.json`, `${here}/src/data/episodes/${p}.json`);
+  // version anglaise (episode_en.json, voix_en/) : repères → src/data/episodes/<pinyin>_en.json
+  if (fs.existsSync(`${e}/voix_en/reperes.json`)) cp(`${e}/voix_en/reperes.json`, `${here}/src/data/episodes/${p}_en.json`);
   // glyphes/donnees.js (donnees_glyphes.py) et glyphes/portrait_*.js (portrait.py)
   if (fs.existsSync(`${e}/glyphes`)) for (const f of fs.readdirSync(`${e}/glyphes`).sort()) if (f.endsWith('.js')) extra += fs.readFileSync(`${e}/glyphes/${f}`, 'utf8');
 }

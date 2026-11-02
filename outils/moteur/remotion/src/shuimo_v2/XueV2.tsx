@@ -17,6 +17,7 @@ import { VideoReveal } from '../video_encre/VideoReveal';
 import { CloudReveal } from '../video_encre/CloudReveal';
 import { loadLegacy, W } from '../legacy';
 import rep from '../data/episodes/xue.json';
+import repEN from '../data/episodes/xue_en.json'; // version anglaise : episode_en.json, voix d'Oliver (voix_en/)
 
 type Clip = 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b06' | 'b07' | 'b08' | 'b09';
 type Rep = Record<Clip, { duration: number; cues: Record<string, number> }> & {
@@ -759,3 +760,4 @@ return { XueV2, XUE_V2_SECONDS };
 }
 
 export const { XueV2, XUE_V2_SECONDS } = creerXue(rep, 'fr', 'voix', 'musique.wav');
+export const { XueV2: XueV2EN, XUE_V2_SECONDS: XUE_V2_EN_SECONDS } = creerXue(repEN, 'en', 'voix_en', 'musique_en.wav');
