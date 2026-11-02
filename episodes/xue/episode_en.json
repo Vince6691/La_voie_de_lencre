@@ -402,5 +402,55 @@
   "fondu": 2.5,
   "depart": 0
  },
- "_langue": "🇬🇧 anglais : voix d'Oliver (eleven_v4), adaptation de VOIX_EN.md ; la version française est episode.json"
+ "_langue": "🇬🇧 anglais : voix d'Oliver (eleven_v4), adaptation de VOIX_EN.md ; la version française est episode.json",
+ "sous_titres_remplacements": [
+  [
+   "(?<!大)學(?![校生])",
+   "學 (xué)"
+  ],
+  [
+   "學校",
+   "xuéxiào 學校"
+  ],
+  [
+   "學生",
+   "xuésheng 學生"
+  ],
+  [
+   "大學",
+   "dàxué 大學"
+  ],
+  [
+   "安阳",
+   "Anyang 安阳"
+  ],
+  [
+   "商",
+   "Shang 商"
+  ],
+  [
+   "周",
+   "Zhou 周"
+  ],
+  [
+   "李斯",
+   "Li Si 李斯"
+  ],
+  [
+   "汉",
+   "Han 汉"
+  ],
+  [
+   "许慎",
+   "Xu Shen 许慎"
+  ],
+  [
+   "说文解字",
+   "Shuowen Jiezi 说文解字"
+  ],
+  [
+   "爻",
+   "yáo 爻"
+  ]
+ ]
 }
