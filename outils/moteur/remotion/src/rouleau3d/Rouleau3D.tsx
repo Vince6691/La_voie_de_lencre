@@ -19,9 +19,10 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 import { compose, Mood, Shot } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
 import { sonRouleau, travelM } from '../rouleau/TimeScroll';
-import { periode, periodesEntre } from '../periodes';
+import { Langue, nomPeriode, periode, periodesEntre } from '../periodes';
 
 export type Rouleau3DConfig = {
+  lang?: Langue; // langue du compteur (période, « AV. J.-C. » / « BC ») ; français par défaut
   at: number; duration?: number; // 5,8 s par défaut (le son est calé dessus)
   de: string; vers: string; // périodes de départ et d'arrivée (identifiants de src/periodes.ts : 'shang', 'zhou', 'royaumes', 'qin', 'han'…)
   annees?: [number, number]; // années du compteur (par défaut : début de chaque période)
@@ -512,7 +513,7 @@ export const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number
   if (a <= 0) return null;
   const [y0, y1] = yearsOf(cfg), k = clamp((year - y0) / (y1 - y0));
   // périodes traversées, avec les mêmes noms que les cartouches (src/periodes.ts)
-  const per = periodesEntre(y0, y1, cfg.de).map((p) => ({ from: p.debut, zh: p.zh, name: p.nom }));
+  const per = periodesEntre(y0, y1, cfg.de).map((p) => ({ from: p.debut, zh: p.zh, name: nomPeriode(p, cfg.lang) }));
   let pi = 0; per.forEach((p, i) => { if (year >= p.from) pi = i; });
   const P = per[pi], next = per[pi + 1];
   // fondu du nom de période autour de chaque changement (le premier est affiché d'emblée)
@@ -553,7 +554,7 @@ export const YearPlate: React.FC<{ cfg: Rouleau3DConfig; year: number; a: number
           </div>
           <Rule flip />
         </div>
-        <div style={{ fontFamily: 'ShuimoCaps', fontWeight: 500, fontSize: 22, letterSpacing: '0.42em', color: 'rgba(246,236,214,0.85)', marginTop: 8 }}>{year < 0 ? 'AV. J.-C.' : 'APR. J.-C.'}</div>
+        <div style={{ fontFamily: 'ShuimoCaps', fontWeight: 500, fontSize: 22, letterSpacing: '0.42em', color: 'rgba(246,236,214,0.85)', marginTop: 8 }}>{cfg.lang === 'en' ? (year < 0 ? 'BC' : 'AD') : year < 0 ? 'AV. J.-C.' : 'APR. J.-C.'}</div>
         {/* frise de progression : départ, périodes, arrivée */}
         <div style={{ position: 'relative', width: 560, height: 14, marginTop: 14 }}>
           <div style={{ position: 'absolute', left: 0, right: 0, top: 6, height: 1, background: 'rgba(232,200,130,0.45)' }} />

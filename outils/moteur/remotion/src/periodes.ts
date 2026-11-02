@@ -34,15 +34,28 @@ export const periode = (id: string): Periode => {
   return p;
 };
 const an = (y: number) => `${Math.abs(y)}`;
+// langue des textes à l'écran : français par défaut (tous les épisodes), anglais pour les versions anglaises
+export type Langue = 'fr' | 'en';
+const NOM_EN: Record<string, string> = {
+  shang: 'SHANG DYNASTY', zhou: 'ZHOU DYNASTY', lu: 'STATE OF LU', jin: 'STATE OF JIN', royaumes: 'WARRING STATES', qin: 'QIN DYNASTY',
+  han: 'HAN DYNASTY', tang: 'TANG DYNASTY', song: 'SONG DYNASTY', yuan: 'YUAN DYNASTY', ming: 'MING DYNASTY', qing: 'QING DYNASTY', aujourdhui: 'TODAY',
+};
+export const nomPeriode = (p: Periode, lang: Langue = 'fr') => (lang === 'en' ? NOM_EN[p.id] ?? p.nom : p.nom);
 // « 1046 – 256 av. J.-C. », « 206 av. J.-C. – 220 apr. J.-C. », « 618 – 907 », « depuis 1956 »
-export const datesTexte = (p: Periode) => {
+export const datesTexte = (p: Periode, lang: Langue = 'fr') => {
+  if (lang === 'en') { // « 1046 – 256 BC », « 206 BC – AD 220 », « since 1956 »
+    if (p.fin === null) return `since ${p.debut}`;
+    if (p.debut < 0 && p.fin <= 0) return `${an(p.debut)} – ${an(p.fin)} BC`;
+    if (p.debut < 0) return `${an(p.debut)} BC – AD ${p.fin}`;
+    return `${p.debut} – ${p.fin}`;
+  }
   if (p.fin === null) return `depuis ${p.debut}`;
   if (p.debut < 0 && p.fin <= 0) return `${an(p.debut)} – ${an(p.fin)} av. J.-C.`;
   if (p.debut < 0) return `${an(p.debut)} av. J.-C. – ${p.fin} apr. J.-C.`;
   return `${p.debut} – ${p.fin}`;
 };
 // cartouche d'époque : même sceau et même nom que le rouleau ; `precision` remplace la ligne des dates
-export const cartouche = (id: string, precision?: string) => { const p = periode(id); return { zh: p.sceau, name: p.nom, dates: precision ?? datesTexte(p) }; };
+export const cartouche = (id: string, precision?: string, lang: Langue = 'fr') => { const p = periode(id); return { zh: p.sceau, name: nomPeriode(p, lang), dates: precision ?? datesTexte(p, lang) }; };
 // périodes traversées entre deux années, dans l'ordre (compteur d'années du rouleau) : celle de départ `de`, puis
 // celles qui commencent avant l'arrivée
 export const periodesEntre = (y0: number, y1: number, de?: string) => {

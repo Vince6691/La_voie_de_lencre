@@ -17,7 +17,7 @@ import { AbsoluteFill, Audio, Img, Sequence, interpolate, staticFile, useCurrent
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose, Mood } from '../shuimo/layout';
 import { rng } from '../shuimo/common';
-import { periodesEntre } from '../periodes';
+import { Langue, nomPeriode, periodesEntre } from '../periodes';
 
 export type Era = { zh: string; date: string };
 // époques du 學 (dates de référence) ; remplacer par celles de la vidéo
@@ -26,6 +26,7 @@ export const ERAS_XUE: Era[] = [
   { zh: '唐', date: '618' }, { zh: '宋', date: '960' }, { zh: '今', date: '1956' },
 ];
 export type TimeScrollConfig = {
+  lang?: Langue; // langue du compteur (période, « av. J.-C. » / « BC ») ; français par défaut
   at: number; // début de la transition (s, temps de la composition)
   duration?: number; // 5 s par défaut (le son est calé dessus et suit si on change)
   eras?: Era[]; from: number; to: number; // indices des sceaux de départ et d'arrivée
@@ -324,7 +325,7 @@ const Wind: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
     </svg>
   );
 };
-const fmtYear = (y: number) => (y < 0 ? [`${-y}`, 'av. J.-C.'] : [`${y}`, '']);
+const fmtYear = (y: number, lang: Langue = 'fr') => (y < 0 ? [`${-y}`, lang === 'en' ? 'BC' : 'av. J.-C.'] : [`${y}`, '']);
 const GOLD_DARK = 'linear-gradient(180deg, #e0b457 0%, #b8862f 45%, #7d5619 100%)';
 const YearCounter: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const t = useT(), u = tsU(c, t);
@@ -336,12 +337,12 @@ const YearCounter: React.FC<{ c: TimeScrollConfig }> = ({ c }) => {
   const P = per[pi], next = per[pi + 1];
   const pa = P ? Math.min(pi === 0 ? 1 : clamp((year - P.debut) / 25), next ? clamp((next.debut - year) / 25) : 1) : 0;
   const blur = Math.min(4, (3.5 * speedAt(c, t)) / MAXSPEED);
-  const [, suffix] = fmtYear(year);
+  const [, suffix] = fmtYear(year, c.lang);
   return (
     <div style={{ position: 'absolute', width: '100%', top: 250, textAlign: 'center', opacity: a, filter: 'drop-shadow(0 2px 8px rgba(250,247,240,0.95))' }}>
       <div style={{ height: 56, display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 18, opacity: pa }}>
         {P && <span style={{ fontFamily: 'ShuimoKai', fontSize: 46, color: rgb(VERMILION) }}>{P.zh}</span>}
-        {P && <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 600, fontSize: 30, letterSpacing: '0.3em', color: '#4b4038' }}>{P.nom}</span>}
+        {P && <span style={{ fontFamily: 'ShuimoCaps, ShuimoLatin', fontWeight: 600, fontSize: 30, letterSpacing: '0.3em', color: '#4b4038' }}>{nomPeriode(P, c.lang)}</span>}
       </div>
       <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 18, filter: `blur(${blur.toFixed(2)}px)` }}>
         <span style={{ display: 'inline-flex' }}>{(() => {
