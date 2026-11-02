@@ -45,7 +45,7 @@ chinois ne changent pas. Conventions anglaises : « BC / AD » (pas BCE), dynast
 | Mots | l'élève · l'école · l'université | student · school · university |
 | Fiche | 8 traits · 學 avant : 16 traits · apprendre | 8 strokes · 學 before: 16 strokes · to learn |
 | Fiche | Les mains se sont effacées du signe. Pas du geste. | The hands have faded from the sign. Not from the gesture. |
-| Fin | LA VOIE DE L'ENCRE · Mò zhī dào | à confirmer : nom de la chaîne anglaise (Strokes and History ?) · Mò zhī dào |
+| Fin | LA VOIE DE L'ENCRE · Mò zhī dào | STROKES AND HISTORY · Mò zhī dào |
 | Fin | Prochain caractère · jiào · enseigner | Next character · jiào · to teach |
 
 ## Fichiers de la version anglaise (rien n'est renommé ni supprimé)

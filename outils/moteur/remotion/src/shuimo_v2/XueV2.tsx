@@ -698,7 +698,7 @@ const EndCard: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 26 }}>
           <div style={{ width: 100, height: 150, background: rgb(VERM, 0.95), borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'ShuimoKai', fontSize: 40, letterSpacing: 4, color: '#f6eee0', writingMode: 'vertical-rl', boxShadow: 'inset 0 0 12px rgba(80,10,5,0.35)' }}>墨之道</div>
           <div>
-            <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss, lineHeight: 1.15 }}>LA VOIE<br />DE L'ENCRE</div>
+            <div style={{ fontFamily: 'ShuimoLatin', fontWeight: 600, fontSize: 46, letterSpacing: 6, color: inkCss, lineHeight: 1.15 }}>{LANG === 'en' ? <>STROKES<br />AND HISTORY</> : <>LA VOIE<br />DE L'ENCRE</>}</div>
             <div style={{ marginTop: 8, fontFamily: 'ShuimoLatin', fontSize: 38, fontStyle: 'italic', color: '#5e5044' }}>Mò zhī dào</div>
           </div>
         </div>
