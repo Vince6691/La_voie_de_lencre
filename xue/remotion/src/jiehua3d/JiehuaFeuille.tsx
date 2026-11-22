@@ -230,7 +230,8 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
     const off = pathOff(pr.from, u, pr.slide);
     pr.meshes.forEach((me) => {
       me.mesh.visible = true; me.mesh.position.set(...off);
-      me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = 3;   // aplat entier, même loin de sa place me.mat.uniforms.uDeco.value = deco(me.paint);
+      me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = 3;   // aplat entier, même loin de sa place
+      me.mat.uniforms.uDeco.value = deco(me.paint);
     });
     for (const l of pr.lines) { const p = ptsOf(l, c.az); pushStroke(pl, p, WIDTHS[l.w] * px, len3(p), () => 0, off); }
     // filets d'or, tracés après les aplats

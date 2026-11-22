@@ -68,6 +68,9 @@ Images fixes de contrôle des plans clés avant d'animer.
 | **Objets 3D** (Three.js : plastron, ding) | support d'écriture au cœur du propos | décoration |
 | **Portrait peint trait à trait** (`tools/build_portrait.py`, ~3 s de tracé) | figure historique nommée ; préciser « portrait imaginé » | personnage anonyme |
 | **Métamorphoses par composante** (couleur constante par composante) | toujours utile pour suivre une composante à travers les âges | — |
+| **界畫 3D** (`jiehua-3d`) — bâtiment ou objet dessiné au crayon en perspective, assemblé, peint, caméra tournante | architecture, objet ou technique au cœur du caractère (宮 室 堂 鼎) ; moment signature | caractère sans objet construit |
+
+Autres idées à piocher (mémorisation, structure, culture) : `outils/idees_animations.md`.
 
 Règles : un plan d'analyse dense est suivi d'une respiration visuelle ; changer de registre visuel à chaque saut
 d'époque ; le caractère (ou sa composante en cours) reste lisible à l'écran presque tout le temps (téléphone).

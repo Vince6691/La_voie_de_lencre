@@ -27,7 +27,9 @@ déposés par l'utilisateur (clips, images) sont renommés et rangés dans ce sc
 pilote, est resté dans `xue/` ; ne pas le prendre comme modèle de rangement.)
 
 Skills appelées : `voix-off-modo` (mouture v2), `fond-shuimo`, `rouleau-du-temps`, `coup-de-pinceau`, `encre-3d`,
-`fiche-caractere`, `anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips.
+`fiche-caractere`, `jiehua-3d` (bâtiment ou objet en 3D qui se dessine puis se construit),
+`anthropic-skills:seedance-prompt-generator` / `nano-banana-prompt-generator` pour les clips. Banque d'idées
+d'animations pédagogiques (mémorisation, structure, culture) : `outils/idees_animations.md`.
 
 ## Principes
 - **Toujours dialoguer avec l'utilisateur en français.**

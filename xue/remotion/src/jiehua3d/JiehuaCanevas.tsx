@@ -19,9 +19,10 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { ShuimoBackground } from '../shuimo/ShuimoBackground';
 import { compose } from '../shuimo/layout';
 import { Cam, LineDef, Model, Paint, Solid, Style, V3, buildModel } from './model';
-import { PALETTE, clamp, ease, easeOut, lerp, mix, partial, ptsOf, roofGeo, solidGeo, timeLines } from './Jiehua3D';
+import { PALETTE, clamp, ease, easeOut, lerp, partial, ptsOf, roofGeo, solidGeo, timeLines } from './Jiehua3D';
 import { InkLines, pushPencil, pushStroke } from './inkline';
 import { buildParts, meshesOf, pathOff } from './JiehuaFeuille';
+import { applyCamPersp, camSpeed, kicks, orbit, timeWarp } from './camera';
 
 export const JIEHUA_CANEVAS_SECONDS = 10;
 const ANIM_SECONDS = 10;
@@ -49,19 +50,8 @@ const TITLE = '營造法式殿堂圖';
 const ORBIT_AZ0 = 0.8;
 const START: Cam = { az: ORBIT_AZ0, el: -0.08, zoom: 150, target: [8.3, 3.4, 5.6] };
 const END: Cam = { az: ORBIT_AZ0 + 2 * Math.PI, el: 0.6, zoom: 41, target: [0, 6.2, 0] };
-const CUTS: number[] = [];
-const io = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(u));
-const camAt = (t: number): Cam => {
-  const u = clamp(t / ANIM_SECONDS);
-  const turn = io(u) * 0.85 + u * 0.15;                    // le tour : jamais à l'arrêt, plus vif au milieu
-  const back = io(Math.min(1, u / 0.75));                  // le recul se fait sur les trois premiers quarts
-  const rise = io(u);                                      // de la contre-plongée à la plongée
-  return {
-    az: lerp(START.az, END.az, turn), el: lerp(START.el, END.el, rise),
-    zoom: Math.exp(lerp(Math.log(START.zoom), Math.log(END.zoom), back)),
-    target: [0, 1, 2].map((k) => lerp(START.target[k], END.target[k], back)) as V3,
-  };
-};
+const camAt = orbit(START, END, ANIM_SECONDS);
+const CUTS: number[] = [];                    // plan unique ; avec montage(SHOTS), CUTS = ses coupes
 // pièces : instant où elles touchent leur place (le trajet dépasse puis se recale, voir pathOff)
 const contactsOf = (m: Model) => {
   const tot = m.parts.reduce((a, p) => a + p.w, 0);
@@ -84,40 +74,21 @@ const hitsOf = (lands: { t: number; kind: string }[]) => {
   for (const L of lands) if (['column', 'beam', 'frame', 'wall', 'ridge'].includes(L.kind) && L.t - last > 0.22) { hits.push(L.t); last = L.t; }
   return hits;
 };
-const FX = new Map<Style, { hits: number[]; roof: number; real: Float64Array; anim: Float64Array }>();
+const FX = new Map<Style, { hits: number[]; roof: number; warp: ReturnType<typeof timeWarp> }>();
 const fxOf = (style: Style) => {
   if (!FX.has(style)) {
     const lands = contactsOf(buildModel(style)), roof = lands.find((l) => l.kind === 'roof')!.t;
-    // ralenti autour du toit : l'animation avance à 40 % de sa vitesse juste avant et pendant le contact
-    const dt = 0.001, real: number[] = [], anim: number[] = [];
-    let r = 0;
-    for (let a = 0; a <= ANIM_SECONDS + 1e-9; a += dt) { real.push(r); anim.push(a); r += dt; }   // pas de ralenti dans le plan tournant
-    FX.set(style, { hits: hitsOf(lands), roof, real: Float64Array.from(real), anim: Float64Array.from(anim) });
+    // pas de ralenti dans le plan tournant ; pour un ralenti au contact du toit : [{ at: roof - 0.1, depth: 0.6, width: 0.3 }]
+    FX.set(style, { hits: hitsOf(lands), roof, warp: timeWarp(ANIM_SECONDS, []) });
   }
   return FX.get(style)!;
 };
 // temps de l'animation à l'instant réel r (et l'inverse)
-const animOf = (style: Style, r: number) => {
-  const { real, anim } = fxOf(style);
-  let lo = 0, hi = real.length - 1;
-  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (real[mid] <= r) lo = mid; else hi = mid; }
-  return r >= real[real.length - 1] ? anim[anim.length - 1] + (r - real[real.length - 1]) : anim[lo] + ((r - real[lo]) / (real[hi] - real[lo] || 1)) * (anim[hi] - anim[lo]);
-};
-const realOf = (style: Style, a: number) => { const { real } = fxOf(style); return real[Math.min(real.length - 1, Math.max(0, Math.round(a / 0.001)))]; };
+const animOf = (style: Style, r: number) => fxOf(style).warp.animOf(r);
+const realOf = (style: Style, a: number) => fxOf(style).warp.realOf(a);
 // secousses : petite poussée de zoom sur chaque temps fort, choc et tremblement au contact du toit
-const camFx = (style: Style, t: number): Cam => {
-  const c = camAt(t), { hits, roof } = fxOf(style);
-  const kick = (h: number, tau: number) => (t >= h ? Math.min(1, (t - h) / 0.03) * Math.exp(-(t - h) / tau) : 0);
-  const z = hits.reduce((a, h) => a + 0.03 * kick(h, 0.12), 0) + 0.07 * kick(roof, 0.18);
-  const A = 0.16 * kick(roof, 0.25);
-  return { ...c, zoom: c.zoom * (1 + z), target: [c.target[0] + A * Math.sin(t * 53), c.target[1] + A * Math.sin(t * 41 + 1), c.target[2]] };
-};
-const applyCamP = (cam: THREE.PerspectiveCamera, c: Cam) => {
-  const D = H / (c.zoom * 2 * Math.tan(((FOV / 2) * Math.PI) / 180));
-  cam.fov = FOV; cam.aspect = W / H; cam.near = 1; cam.far = 600;
-  cam.position.set(c.target[0] + D * Math.sin(c.az) * Math.cos(c.el), c.target[1] + D * Math.sin(c.el), c.target[2] + D * Math.cos(c.az) * Math.cos(c.el));
-  cam.up.set(0, 1, 0); cam.lookAt(...c.target); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
-};
+const camFx = (style: Style, t: number): Cam => { const { hits, roof } = fxOf(style); return kicks(camAt(t), t, hits, roof); };
+const applyCamP = (cam: THREE.PerspectiveCamera, c: Cam) => applyCamPersp(cam, c, { fov: FOV, w: W, h: H });
 
 // ---- traits du canevas ----
 type Sk = { l: LineDef; t0: number; t1: number; high: boolean; base: boolean; seed: number };
@@ -214,7 +185,8 @@ const Scene: React.FC<{ t: number; style: Style }> = ({ t, style }) => {
     const off = pathOff(pr.from, u, pr.slide);
     pr.meshes.forEach((me) => {
       me.mesh.visible = true; me.mesh.position.set(...off);
-      me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = 3;   // aplat entier, même loin de sa place me.mat.uniforms.uDeco.value = deco(me.paint);
+      me.mat.uniforms.uFill.value = 1; me.mat.uniforms.uReveal.value = 3;   // aplat entier, même loin de sa place
+      me.mat.uniforms.uDeco.value = deco(me.paint);
     });
     for (const l of pr.lines) { const p = ptsOf(l, c.az); pushStroke(pl, p, INK[l.w] * px, len3(p), () => 0, off); }
     for (const g of pr.gold) {
@@ -271,9 +243,7 @@ export const canevasEvents = (style: Style): CanevasEvents => {
   // caméra : vitesse angulaire, de zoom et de visée (nulle sur une coupe)
   const cam = Array.from({ length: n }, (_, f) => {
     const ta = A(f), tb = A(f + 1);
-    if (CUTS.some((c) => ta < c && tb >= c)) return 0;
-    const a = camAt(ta), b = camAt(tb);
-    return (Math.abs(b.az - a.az) + Math.abs(b.el - a.el) + 0.5 * Math.abs(Math.log(b.zoom / a.zoom)) + Math.hypot(b.target[0] - a.target[0], b.target[1] - a.target[1], b.target[2] - a.target[2]) / 25) * fps;
+    return tb > ta ? camSpeed(camAt, ta, tb, CUTS) * (tb - ta) * fps : 0;
   });
   return {
     fps, total: JIEHUA_CANEVAS_SECONDS, pencil, cam, cuts: CUTS.map(R),
